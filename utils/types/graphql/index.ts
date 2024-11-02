@@ -63,6 +63,26 @@ type NewSaleListing = {
   transactionHash: string;
 };
 
+type Auction = {
+  assetContract: string;
+  auctionCreator: string;
+  auctionId: string;
+  bidBufferBps: number;
+  buyoutBidAmount: string;
+  currency: string;
+  endTimestamp: string;
+  id: string;
+  isAuctionExpired: boolean;
+  minimumBidAmount: string;
+  quantity: string;
+  startTimestamp: string;
+  status: number;
+  timeBufferInSeconds: number;
+  tokenId: string;
+  tokenType: number;
+  nft: NFT;
+  transactionHash?: string;
+};
 
 
 /* -------------------------------------------------------------------------------------------------
@@ -83,4 +103,16 @@ type NewListingsQueryResponse = {
 
 type NewSaleListingsQueryResponse = {
   newSaleListings: NewSaleListing[];
+};
+
+type AllAuctionsQueryResponse = {
+  allAuctions: Auction[];
+};
+
+type CompletedAuctionsQueryResponse = {
+  completedAuctions: Auction[];
+};
+
+type NewAuctionsQueryResponse = {
+  newAuctions: Auction[];
 };

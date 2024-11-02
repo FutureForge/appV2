@@ -1,10 +1,12 @@
 import {
+  useAllAuctionsQuery,
   useAllListingsQuery,
   useCompletedListingsQuery,
+  useNewAuctionsQuery,
 } from "@/modules/query";
 
 export default function Test() {
-  const { data, isLoading, isError } = useCompletedListingsQuery();
+  const { data, isLoading, isError } = useNewAuctionsQuery();
 
   console.log({ data });
 
