@@ -4,6 +4,7 @@ import {
   allListingsQuery,
   completedListingsQuery,
   newListingsQuery,
+  newSaleListingsQuery,
 } from "@/utils/graphql/queries/listing.queries";
 import { indexerEndpoint } from "@/utils/graphql";
 import { queryKeys } from "../query-keys";
@@ -22,19 +23,19 @@ export function useAllListingsQuery() {
   });
 }
 
-export function useCompletedListingsQuery() {
-  return useQuery({
-    queryKey: [queryKeys.listing.completed],
-    queryFn: async () => {
-      const response = await request<CompletedListingsQueryResponse>(
-        indexerEndpoint,
-        completedListingsQuery
-      );
-      return response.completedListings;
-    },
-    refetchInterval: 100000,
-  });
-}
+// export function useCompletedListingsQuery() {
+//   return useQuery({
+//     queryKey: [queryKeys.listing.completed],
+//     queryFn: async () => {
+//       const response = await request<CompletedListingsQueryResponse>(
+//         indexerEndpoint,
+//         completedListingsQuery
+//       );
+//       return response.completedListings;
+//     },
+//     refetchInterval: 100000,
+//   });
+// }
 
 export function useNewListingsQuery() {
   return useQuery({
@@ -45,6 +46,20 @@ export function useNewListingsQuery() {
         newListingsQuery
       );
       return response.newListings;
+    },
+    refetchInterval: 100000,
+  });
+}
+
+export function useNewSaleListingsQuery() {
+  return useQuery({
+    queryKey: [queryKeys.listing.newSale],
+    queryFn: async () => {
+      const response = await request<NewSaleListingsQueryResponse>(
+        indexerEndpoint,
+        newSaleListingsQuery
+      );
+      return response.newSaleListings;
     },
     refetchInterval: 100000,
   });

@@ -111,7 +111,7 @@ export const completedAuctionsQuery = gql`
 `;
 
 /* -------------------------------------------------------------------------------------------------
- * completedAuctionsQuery
+ * newAuctionsQuery
  * -----------------------------------------------------------------------------------------------*/
 
 export const newAuctionsQuery = gql`
@@ -161,6 +161,53 @@ export const newAuctionsQuery = gql`
         tokenURI
         type
       }
+    }
+  }
+`;
+
+/* -------------------------------------------------------------------------------------------------
+ * auctionClosedQuery
+ * -----------------------------------------------------------------------------------------------*/
+
+export const auctionClosedQuery = gql`
+  query AuctionClosed {
+    auctionCloseds {
+      assetContract
+      auctionCreator
+      auctionId
+      closer
+      id
+      tokenId
+      transactionHash
+      winningBidder
+      # nft {
+      #   assetContract
+      #   id
+      #   metadata {
+      #     animationUrl
+      #     attributes {
+      #       traitType
+      #       value
+      #     }
+      #     backgroundColor
+      #     customAnimationUrl
+      #     customImage
+      #     description
+      #     externalUrl
+      #     image
+      #     imageUrl
+      #     name
+      #     properties {
+      #       name
+      #       value
+      #     }
+      #     supply
+      #   }
+      #   owner
+      #   tokenId
+      #   tokenURI
+      #   type
+      # }
     }
   }
 `;

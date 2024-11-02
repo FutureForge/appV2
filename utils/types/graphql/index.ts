@@ -1,3 +1,4 @@
+
 type Attribute = {
   traitType: string;
   value: string;
@@ -84,6 +85,45 @@ type Auction = {
   transactionHash?: string;
 };
 
+type AuctionClosed = {
+  assetContract: string;
+  auctionCreator: string;
+  auctionId: string;
+  closer: string;
+  id: string;
+  tokenId: string;
+  transactionHash: string;
+  winningBidder: string;
+  //   nft: NFT;
+};
+
+type Offer = {
+  assetContract: string;
+  currency: string;
+  expirationTimestamp: string;
+  id: string;
+  offerId: string;
+  offeror: string;
+  quantity: string;
+  status: string;
+  tokenId: string;
+  tokenType: string;
+  totalPrice: string;
+  transactionHash?: string;
+  nft: NFT;
+};
+
+type AcceptedOffer = {
+  assetContract: string;
+  id: string;
+  offerId: string;
+  offeror: string;
+  quantityBought: string;
+  seller: string;
+  tokenId: string;
+  totalPricePaid: string;
+  nft: NFT;
+};
 
 /* -------------------------------------------------------------------------------------------------
  * QUERY RESPONSE TYPES
@@ -115,4 +155,24 @@ type CompletedAuctionsQueryResponse = {
 
 type NewAuctionsQueryResponse = {
   newAuctions: Auction[];
+};
+
+type AuctionClosedQueryResponse = {
+  auctionCloseds: AuctionClosed[];
+};
+
+type AllOffersQueryResponse = {
+  allOffers: Offer[];
+};
+
+type CompletedOffersQueryResponse = {
+  completedOffers: Offer[];
+};
+
+type AcceptedOffersQueryResponse = {
+  acceptedOffers: AcceptedOffer[];
+};
+
+type NewOffersQueryResponse = {
+  newOffers: Offer[];
 };

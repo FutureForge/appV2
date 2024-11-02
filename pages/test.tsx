@@ -1,14 +1,17 @@
 import {
   useAllAuctionsQuery,
   useAllListingsQuery,
-  useCompletedListingsQuery,
+  useAllOffersQuery,
+  useAuctionClosedQuery,
   useNewAuctionsQuery,
+  useNewOffersQuery,
+  useNewSaleListingsQuery,
 } from "@/modules/query";
 
 export default function Test() {
-  const { data, isLoading, isError } = useNewAuctionsQuery();
+  const { data, isLoading, isError, error } = useNewSaleListingsQuery();
 
-  console.log({ data });
+  console.log({ data, isLoading, isError, error });
 
   return <h1>HELLO WORLD</h1>;
 }
