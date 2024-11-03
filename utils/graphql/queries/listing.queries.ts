@@ -6,7 +6,65 @@ import { gql } from "graphql-request";
 
 export const allListingsQuery = gql`
   query AllListings {
-    allListings {
+    allListings(orderBy: listingId_DESC, limit: 50) {
+      assetContract
+      currency
+      endTimestamp
+      id
+      listingCreator
+      listingId
+      pricePerToken
+      quantity
+      reserved
+      startTimestamp
+      status
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const filteredAllListingsQuery = gql`
+  query FilteredAllListings(
+    $contractAddress: String!
+    $address: String!
+  ) {
+    allListings(
+      where: {
+        OR: {
+          assetContract_eq: $contractAddress
+          OR: { listingCreator_eq: $address }
+        }
+      }
+    ) {
       assetContract
       currency
       endTimestamp
@@ -58,7 +116,65 @@ export const allListingsQuery = gql`
 
 export const completedListingsQuery = gql`
   query CompletedListings {
-    completedListings {
+    completedListings(orderBy: listingId_DESC, limit: 50) {
+      assetContract
+      currency
+      endTimestamp
+      id
+      listingCreator
+      listingId
+      pricePerToken
+      quantity
+      reserved
+      startTimestamp
+      status
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const filteredCompletedListingsQuery = gql`
+  query FilteredCompletedListings(
+    $contractAddress: String!
+    $address: String!
+  ) {
+    completedListings(
+      where: {
+        OR: {
+          assetContract_eq: $contractAddress
+          OR: { listingCreator_eq: $address }
+        }
+      }
+    ) {
       assetContract
       currency
       endTimestamp
@@ -110,7 +226,66 @@ export const completedListingsQuery = gql`
 
 export const newListingsQuery = gql`
   query NewListings {
-    newListings {
+    newListings(orderBy: listingId_DESC, limit: 50) {
+      assetContract
+      currency
+      endTimestamp
+      id
+      listingCreator
+      listingId
+      pricePerToken
+      quantity
+      reserved
+      startTimestamp
+      tokenId
+      status
+      tokenType
+      transactionHash
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const filteredNewListingsQuery = gql`
+  query FilteredNewListings(
+    $contractAddress: String!
+    $address: String!
+  ) {
+    newListings(
+      where: {
+        OR: {
+          assetContract_eq: $contractAddress
+          OR: { listingCreator_eq: $address }
+        }
+      }
+    ) {
       assetContract
       currency
       endTimestamp
@@ -163,7 +338,61 @@ export const newListingsQuery = gql`
 
 export const newSaleListingsQuery = gql`
   query NewSaleListings {
-    newSaleListings {
+    newSaleListings(orderBy: listingId_DESC, limit: 50) {
+      assetContract
+      buyer
+      id
+      listingCreator
+      listingId
+      tokenId
+      quantityBought
+      totalPricePaid
+      transactionHash
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const filteredNewSaleListingsQuery = gql`
+  query FilteredNewSaleListings(
+    $contractAddress: String!
+    $address: String!
+  ) {
+    newSaleListings(
+      where: {
+        OR: {
+          assetContract_eq: $contractAddress
+          OR: { listingCreator_eq: $address }
+        }
+      }
+    ) {
       assetContract
       buyer
       id

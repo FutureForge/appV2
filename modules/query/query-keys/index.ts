@@ -17,4 +17,8 @@ export const queryKeys = {
     accepted: ["accepted"] as const,
     new: ["new"] as const,
   },
+  collection: {
+    all: ["collection", "all"] as const,
+    single: ["single"] as const,
+  },
 };
