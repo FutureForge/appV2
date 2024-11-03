@@ -1,9 +1,9 @@
-export * from "./listing";
-export * from "./auction";
-export * from "./offers";
-export * from "./collection";
-export * from "./nft";
-export * from "./user";
+export * from "./listing/listing.query";
+export * from "./auction/auction.query";
+export * from "./offers/offers.query";
+export * from "./collection/collection.query.";
+export * from "./nft/nft.query";
+export * from "./user/user.query";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 

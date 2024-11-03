@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import { useUserChainInfo } from "../user";
 import { CROSSFI_API_TESTNET, MARKETPLACE_ADDRESS } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
@@ -22,7 +21,6 @@ export function useSingleNFTQuery({
   contractAddress: string;
   tokenId: string;
 }) {
-  const { activeAccount } = useUserChainInfo();
 
   const { data: singleListing } = useSingleListingQuery({
     contractAddress,
