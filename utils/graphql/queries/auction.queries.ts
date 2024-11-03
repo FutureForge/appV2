@@ -5,8 +5,8 @@ import { gql } from "graphql-request";
  * -----------------------------------------------------------------------------------------------*/
 
 export const allAuctionsQuery = gql`
-  query AllAuctions {
-    allAuctions(orderBy: auctionId_DESC, limit: 50) {
+  query AllAuctions($limit: Int!) {
+    allAuctions(orderBy: auctionId_DESC, limit: $limit) {
       assetContract
       auctionCreator
       auctionId
@@ -312,8 +312,8 @@ export const filteredCompletedAuctionsQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const newAuctionsQuery = gql`
-  query NewAuctions {
-    newAuctions(orderBy: auctionId_DESC, limit: 50) {
+  query NewAuctions($limit: Int!) {
+    newAuctions(orderBy: auctionId_DESC, limit: $limit) {
       assetContract
       auctionCreator
       auctionId
@@ -425,8 +425,8 @@ export const filteredNewAuctionsQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const auctionClosedQuery = gql`
-  query AuctionClosed {
-    auctionCloseds(orderBy: auctionId_DESC, limit: 50) {
+  query AuctionClosed($limit: Int!) {
+    auctionCloseds(orderBy: auctionId_DESC, limit: $limit) {
       assetContract
       auctionCreator
       auctionId
@@ -517,9 +517,13 @@ export const filteredAuctionClosedQuery = gql`
   }
 `;
 
+/* -------------------------------------------------------------------------------------------------
+ * newBidsQuery
+ * -----------------------------------------------------------------------------------------------*/
+
 export const newBidsQuery = gql`
-  query NewBids {
-    newBids(orderBy: auctionId_DESC, limit: 50) {
+  query NewBids($limit: Int!) {
+    newBids(orderBy: auctionId_DESC, limit: $limit) {
       assetContract
       auctionCreator
       auctionId

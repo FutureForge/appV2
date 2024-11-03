@@ -5,8 +5,8 @@ import { gql } from "graphql-request";
  * -----------------------------------------------------------------------------------------------*/
 
 export const allOffersQuery = gql`
-  query AllOffers {
-    allOffers(orderBy: offerId_DESC, limit: 50) {
+  query AllOffers($limit: Int!) {
+    allOffers(orderBy: offerId_DESC, limit: $limit) {
       assetContract
       currency
       expirationTimestamp
@@ -153,8 +153,8 @@ export const singleOfferQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const acceptedOffersQuery = gql`
-  query AcceptedOffers {
-    acceptedOffers(orderBy: offerId_DESC, limit: 50) {
+  query AcceptedOffers($limit: Int!) {
+    acceptedOffers(orderBy: offerId_DESC, limit: $limit) {
       assetContract
       id
       offerId
@@ -247,8 +247,8 @@ export const filteredAcceptedOffersQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const completedOffersQuery = gql`
-  query CompletedOffers {
-    completedOffers(orderBy: offerId_DESC, limit: 50) {
+  query CompletedOffers($limit: Int!) {
+    completedOffers(orderBy: offerId_DESC, limit: $limit) {
       assetContract
       currency
       expirationTimestamp
@@ -347,8 +347,8 @@ export const filteredCompletedOffersQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const newOffersQuery = gql`
-  query NewOffers {
-    newOffers(orderBy: offerId_DESC, limit: 50) {
+  query NewOffers($limit: Int!) {
+    newOffers(orderBy: offerId_DESC, limit: $limit) {
       assetContract
       currency
       expirationTimestamp

@@ -21,16 +21,18 @@ import {
   SingleListingQueryResponse,
 } from "@/utils/types/graphql";
 
-export function useAllListingsQuery() {
+export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.listing.all],
     queryFn: async () => {
       const response = await request<AllListingsQueryResponse>(
         indexerEndpoint,
-        allListingsQuery
+        allListingsQuery,
+        { limit }
       );
       return response.allListings;
     },
+    enabled: !!limit || limit === 0 || limit === 50,
     refetchInterval: 100000,
   });
 }
@@ -121,16 +123,18 @@ export function useFilteredCompletedListingsQuery({
   });
 }
 
-export function useNewListingsQuery() {
+export function useNewListingsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.listing.new],
     queryFn: async () => {
       const response = await request<NewListingsQueryResponse>(
         indexerEndpoint,
-        newListingsQuery
+        newListingsQuery,
+        { limit }
       );
       return response.newListings;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }
@@ -160,16 +164,18 @@ export function useFilteredNewListingsQuery({
   });
 }
 
-export function useNewSaleListingsQuery() {
+export function useNewSaleListingsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.listing.newSale],
     queryFn: async () => {
       const response = await request<NewSaleListingsQueryResponse>(
         indexerEndpoint,
-        newSaleListingsQuery
+        newSaleListingsQuery,
+        { limit }
       );
       return response.newSaleListings;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }

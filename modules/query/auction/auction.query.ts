@@ -25,16 +25,18 @@ import {
   SingleAuctionQueryResponse,
 } from "@/utils/types/graphql";
 
-export function useAllAuctionsQuery() {
+export function useAllAuctionsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.auction.all],
     queryFn: async () => {
       const response = await request<AllAuctionsQueryResponse>(
         indexerEndpoint,
-        allAuctionsQuery
+        allAuctionsQuery,
+        { limit }
       );
       return response.allAuctions;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }
@@ -128,16 +130,18 @@ export function useFilteredCompletedAuctionsQuery({
   });
 }
 
-export function useNewAuctionsQuery() {
+export function useNewAuctionsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.auction.new],
     queryFn: async () => {
       const response = await request<NewAuctionsQueryResponse>(
         indexerEndpoint,
-        newAuctionsQuery
+        newAuctionsQuery,
+        { limit }
       );
       return response.newAuctions;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }
@@ -167,17 +171,19 @@ export function useFilteredNewAuctionsQuery({
   });
 }
 
-export function useAuctionClosedQuery() {
+export function useAuctionClosedQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.auction.closed],
     queryFn: async () => {
       const response = await request<AuctionClosedQueryResponse>(
         indexerEndpoint,
-        auctionClosedQuery
+        auctionClosedQuery,
+        { limit }
       );
 
       return response.auctionCloseds;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }
@@ -208,17 +214,19 @@ export function useFilteredAuctionClosedQuery({
   });
 }
 
-export function useNewBidsQuery() {
+export function useNewBidsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.auction.newBids],
     queryFn: async () => {
       const response = await request<NewBidsQueryResponse>(
         indexerEndpoint,
-        newBidsQuery
+        newBidsQuery,
+        { limit }
       );
 
       return response.newBids;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }

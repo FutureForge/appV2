@@ -194,7 +194,7 @@ export function useUserOffersReceivedQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: allOffers } = useAllOffersQuery();
+  const { data: allOffers } = useAllOffersQuery({});
 
   const userOffersReceived = allOffers?.filter((offer) => {
     const offerOwner = offer.nft.owner.toLowerCase();

@@ -5,8 +5,8 @@ import { gql } from "graphql-request";
  * -----------------------------------------------------------------------------------------------*/
 
 export const allListingsQuery = gql`
-  query AllListings {
-    allListings(orderBy: listingId_DESC, limit: 50) {
+  query AllListings($limit: Int!) {
+    allListings(orderBy: listingId_DESC, limit: $limit) {
       assetContract
       currency
       endTimestamp
@@ -272,8 +272,8 @@ export const filteredCompletedListingsQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const newListingsQuery = gql`
-  query NewListings {
-    newListings(orderBy: listingId_DESC, limit: 50) {
+  query NewListings($limit: Int!) {
+    newListings(orderBy: listingId_DESC, limit: $limit) {
       assetContract
       currency
       endTimestamp
@@ -381,8 +381,8 @@ export const filteredNewListingsQuery = gql`
  * -----------------------------------------------------------------------------------------------*/
 
 export const newSaleListingsQuery = gql`
-  query NewSaleListings {
-    newSaleListings(orderBy: listingId_DESC, limit: 50) {
+  query NewSaleListings($limit: Int!) {
+    newSaleListings(orderBy: listingId_DESC, limit: $limit) {
       assetContract
       buyer
       id

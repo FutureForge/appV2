@@ -21,16 +21,18 @@ import {
   SingleOfferQueryResponse,
 } from "@/utils/types/graphql";
 
-export function useAllOffersQuery() {
+export function useAllOffersQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.offers.all],
     queryFn: async () => {
       const response = await request<AllOffersQueryResponse>(
         indexerEndpoint,
-        allOffersQuery
+        allOffersQuery,
+        { limit }
       );
       return response.allOffers;
     },
+    enabled: !!limit,
     refetchInterval: 5000,
   });
 }
@@ -86,16 +88,18 @@ export function useSingleOfferQuery({
   });
 }
 
-export function useAcceptedOffersQuery() {
+export function useAcceptedOffersQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.offers.accepted],
     queryFn: async () => {
       const response = await request<AcceptedOffersQueryResponse>(
         indexerEndpoint,
-        acceptedOffersQuery
+        acceptedOffersQuery,
+        { limit }
       );
       return response.acceptedOffers;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }
@@ -164,16 +168,18 @@ export function useFilteredCompletedOffersQuery({
   });
 }
 
-export function useNewOffersQuery() {
+export function useNewOffersQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.offers.new],
     queryFn: async () => {
       const response = await request<NewOffersQueryResponse>(
         indexerEndpoint,
-        newOffersQuery
+        newOffersQuery,
+        { limit }
       );
       return response.newOffers;
     },
+    enabled: !!limit,
     refetchInterval: 100000,
   });
 }

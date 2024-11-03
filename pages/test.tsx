@@ -34,7 +34,7 @@ export default function Test() {
   //   tokenId: "9",
   // });
 
-  const { data, isLoading, isError, error } = useUserOffersReceivedQuery();
+  const { data, isLoading, isError, error } = useAllListingsQuery({});
 
   console.log({ data, isLoading, isError, error });
 
