@@ -51,6 +51,11 @@ export const allAuctionsQuery = gql`
         tokenURI
         type
       }
+      winningBid {
+        bidAmount
+        bidder
+        currency
+      }
     }
   }
 `;
@@ -109,6 +114,11 @@ export const filteredAllAuctionsQuery = gql`
         tokenURI
         type
       }
+      winningBid {
+        bidAmount
+        bidder
+        currency
+      }
     }
   }
 `;
@@ -161,6 +171,11 @@ export const singleAuctionQuery = gql`
         tokenId
         tokenURI
         type
+      }
+      winningBid {
+        bidAmount
+        bidder
+        currency
       }
     }
   }
@@ -216,6 +231,11 @@ export const completedAuctionsQuery = gql`
         tokenId
         tokenURI
         type
+      }
+      winningBid {
+        bidAmount
+        bidder
+        currency
       }
     }
   }
@@ -277,6 +297,11 @@ export const filteredCompletedAuctionsQuery = gql`
         tokenId
         tokenURI
         type
+      }
+      winningBid {
+        bidAmount
+        bidder
+        currency
       }
     }
   }
@@ -488,6 +513,110 @@ export const filteredAuctionClosedQuery = gql`
       #   tokenURI
       #   type
       # }
+    }
+  }
+`;
+
+export const newBidsQuery = gql`
+  query NewBids {
+    newBids(orderBy: auctionId_DESC, limit: 50) {
+      assetContract
+      auctionCreator
+      auctionId
+      bidAmount
+      bidBufferBps
+      bidder
+      buyoutBidAmount
+      currency
+      endTimestamp
+      id
+      minimumBidAmount
+      quantity
+      startTimestamp
+      status
+      timeBufferInSeconds
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const filteredUserNewBidsQuery = gql`
+  query FilteredUserNewBids($address: String!) {
+    newBids(where: { bidder_eq: $address }) {
+      assetContract
+      auctionCreator
+      auctionId
+      bidAmount
+      bidBufferBps
+      bidder
+      buyoutBidAmount
+      currency
+      endTimestamp
+      id
+      minimumBidAmount
+      quantity
+      startTimestamp
+      status
+      timeBufferInSeconds
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
     }
   }
 `;

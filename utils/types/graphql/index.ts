@@ -8,6 +8,12 @@ type Property = {
   value: string;
 };
 
+type WinningBid = {
+  bidAmount: string;
+  bidder: string;
+  currency: string;
+};
+
 export type NFTMetadata = {
   animationUrl: string;
   attributes: Attribute[];
@@ -82,6 +88,7 @@ export type Auction = {
   tokenType: number;
   nft: NFT;
   transactionHash?: string;
+  winningBid: WinningBid;
 };
 
 export type AuctionClosed = {
@@ -186,4 +193,12 @@ export type AcceptedOffersQueryResponse = {
 
 export type NewOffersQueryResponse = {
   newOffers: Offer[];
+};
+
+export type NewBidsQueryResponse = {
+  newBids: Auction[];
+};
+
+export type NewBidsUserQueryResponse = {
+  newBids: Auction[];
 };

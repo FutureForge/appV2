@@ -22,7 +22,6 @@ export function useSingleNFTQuery({
   contractAddress: string;
   tokenId: string;
 }) {
-
   const { data: singleListing } = useSingleListingQuery({
     contractAddress,
     tokenId,
@@ -89,9 +88,20 @@ export function useSingleNFTQuery({
           ? "listing"
           : singleAuction?.length! > 0
           ? "auction"
-          : singleOffer?.length! > 0
-          ? "offer"
           : "none";
+
+      let activeTypeData;
+
+      switch (activeType) {
+        case "listing":
+          activeTypeData = singleListing;
+          break;
+        case "auction":
+          activeTypeData = singleAuction;
+          break;
+        default:
+          activeTypeData = null;
+      }
 
       return {
         collectionFee,
@@ -100,6 +110,7 @@ export function useSingleNFTQuery({
         nft: updatedNFT,
         activeType,
         offers: singleOffer,
+        activeTypeData,
       };
     },
     refetchInterval: 5000,

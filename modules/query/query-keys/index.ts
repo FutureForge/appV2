@@ -12,6 +12,8 @@ export const queryKeys = {
     new: ["new-auction"] as const,
     closed: ["closed-auctions"] as const,
     single: ["single-auction"] as const,
+    newBids: ["new-bids"] as const,
+    newBidsUser: ["new-bids-user"] as const,
   },
   offers: {
     all: ["offers"] as const,
@@ -29,5 +31,9 @@ export const queryKeys = {
   },
   user: {
     nfts: ["user-nfts"] as const,
+    offers: ["user-offers"] as const,
+    auctions: ["user-auctions"] as const,
+    listings: ["user-listings"] as const,
+    offersReceived: ["user-offers-received"] as const,
   },
 };

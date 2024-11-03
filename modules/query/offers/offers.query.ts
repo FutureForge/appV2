@@ -13,7 +13,13 @@ import {
   newOffersQuery,
   singleOfferQuery,
 } from "@/utils/graphql/queries/offers.queries";
-import { AcceptedOffersQueryResponse, AllOffersQueryResponse, CompletedOffersQueryResponse, NewOffersQueryResponse, SingleOfferQueryResponse } from "@/utils/types/graphql";
+import {
+  AcceptedOffersQueryResponse,
+  AllOffersQueryResponse,
+  CompletedOffersQueryResponse,
+  NewOffersQueryResponse,
+  SingleOfferQueryResponse,
+} from "@/utils/types/graphql";
 
 export function useAllOffersQuery() {
   return useQuery({
@@ -25,7 +31,7 @@ export function useAllOffersQuery() {
       );
       return response.allOffers;
     },
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -49,6 +55,8 @@ export function useFilteredAllOffersQuery({
       );
       return response.allOffers;
     },
+    enabled: !!address || !!contractAddress,
+
     refetchInterval: 100000,
   });
 }
@@ -73,6 +81,7 @@ export function useSingleOfferQuery({
       );
       return response.allOffers;
     },
+    enabled: !!contractAddress || !!tokenId,
     refetchInterval: 100000,
   });
 }
@@ -111,6 +120,7 @@ export function useFilteredAcceptedOffersQuery({
       );
       return response.acceptedOffers;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -149,6 +159,7 @@ export function useFilteredCompletedOffersQuery({
       );
       return response.completedOffers;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -187,6 +198,7 @@ export function useFilteredNewOffersQuery({
       );
       return response.newOffers;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }

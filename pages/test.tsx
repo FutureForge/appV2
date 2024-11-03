@@ -12,6 +12,10 @@ import {
   useSingleCollectionQuery,
   useSingleNFTQuery,
   useUserNFTsQuery,
+  useUserOffersQuery,
+  useUserAuctionsQuery,
+  useUserListingsQuery,
+  useUserOffersReceivedQuery,
 } from "@/modules/query";
 
 export default function Test() {
@@ -30,7 +34,7 @@ export default function Test() {
   //   tokenId: "9",
   // });
 
-  const { data, isLoading, isError, error } = useUserNFTsQuery();
+  const { data, isLoading, isError, error } = useUserOffersReceivedQuery();
 
   console.log({ data, isLoading, isError, error });
 

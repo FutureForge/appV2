@@ -10,7 +10,9 @@ import {
   filteredAuctionClosedQuery,
   filteredCompletedAuctionsQuery,
   filteredNewAuctionsQuery,
+  filteredUserNewBidsQuery,
   newAuctionsQuery,
+  newBidsQuery,
   singleAuctionQuery,
 } from "@/utils/graphql/queries/auction.queries";
 import {
@@ -18,6 +20,8 @@ import {
   AuctionClosedQueryResponse,
   CompletedAuctionsQueryResponse,
   NewAuctionsQueryResponse,
+  NewBidsQueryResponse,
+  NewBidsUserQueryResponse,
   SingleAuctionQueryResponse,
 } from "@/utils/types/graphql";
 
@@ -43,7 +47,7 @@ export function useFilteredAllAuctionsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.all, contractAddress],
+    queryKey: [queryKeys.auction.all],
     queryFn: async () => {
       const response = await request<AllAuctionsQueryResponse>(
         indexerEndpoint,
@@ -55,6 +59,7 @@ export function useFilteredAllAuctionsQuery({
       );
       return response.allAuctions;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -79,6 +84,7 @@ export function useSingleAuctionQuery({
       );
       return response.allAuctions;
     },
+    enabled: !!contractAddress || !!tokenId,
     refetchInterval: 100000,
   });
 }
@@ -105,7 +111,7 @@ export function useFilteredCompletedAuctionsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.completed, contractAddress],
+    queryKey: [queryKeys.auction.completed],
     queryFn: async () => {
       const response = await request<CompletedAuctionsQueryResponse>(
         indexerEndpoint,
@@ -117,6 +123,7 @@ export function useFilteredCompletedAuctionsQuery({
       );
       return response.completedAuctions;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -143,7 +150,7 @@ export function useFilteredNewAuctionsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.new, contractAddress],
+    queryKey: [queryKeys.auction.new],
     queryFn: async () => {
       const response = await request<NewAuctionsQueryResponse>(
         indexerEndpoint,
@@ -155,6 +162,7 @@ export function useFilteredNewAuctionsQuery({
       );
       return response.newAuctions;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -182,7 +190,7 @@ export function useFilteredAuctionClosedQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.closed, contractAddress],
+    queryKey: [queryKeys.auction.closed],
     queryFn: async () => {
       const response = await request<AuctionClosedQueryResponse>(
         indexerEndpoint,
@@ -195,6 +203,45 @@ export function useFilteredAuctionClosedQuery({
 
       return response.auctionCloseds;
     },
+    enabled: !!address || !!contractAddress,
+    refetchInterval: 100000,
+  });
+}
+
+export function useNewBidsQuery() {
+  return useQuery({
+    queryKey: [queryKeys.auction.newBids],
+    queryFn: async () => {
+      const response = await request<NewBidsQueryResponse>(
+        indexerEndpoint,
+        newBidsQuery
+      );
+
+      return response.newBids;
+    },
+    refetchInterval: 100000,
+  });
+}
+
+export function useFilteredUserNewBidsQuery({
+  address = "",
+}: {
+  address?: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.auction.newBidsUser],
+    queryFn: async () => {
+      const response = await request<NewBidsUserQueryResponse>(
+        indexerEndpoint,
+        filteredUserNewBidsQuery,
+        {
+          address,
+        }
+      );
+
+      return response.newBids;
+    },
+    enabled: !!address,
     refetchInterval: 100000,
   });
 }

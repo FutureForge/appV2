@@ -55,6 +55,7 @@ export function useFilteredAllListingsQuery({
       );
       return response.allListings;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -76,6 +77,7 @@ export function useSingleListingQuery({
       );
       return response.allListings;
     },
+    enabled: !!contractAddress || !!tokenId,
     refetchInterval: 5000,
   });
 }
@@ -114,6 +116,7 @@ export function useFilteredCompletedListingsQuery({
       );
       return response.completedListings;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -152,6 +155,7 @@ export function useFilteredNewListingsQuery({
       );
       return response.newListings;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }
@@ -190,6 +194,7 @@ export function useFilteredNewSaleListingsQuery({
       );
       return response.newSaleListings;
     },
+    enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
   });
 }

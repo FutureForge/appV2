@@ -4,7 +4,13 @@ import { queryKeys } from "../query-keys";
 import axios from "axios";
 import { CROSSFI_API_TESTNET } from "@/utils/configs";
 import { UserNFTResponse } from "@/utils/types/global";
-import { useFilteredAllListingsQuery } from "..";
+import {
+  useAllOffersQuery,
+  useFilteredAllAuctionsQuery,
+  useFilteredAllListingsQuery,
+  useFilteredAllOffersQuery,
+  useFilteredUserNewBidsQuery,
+} from "..";
 import { getContractCustom } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { ensureSerializable, tryParseJSON } from "@/utils/functions";
@@ -97,5 +103,114 @@ export function useUserNFTsQuery() {
     },
     enabled: !!userAddress,
     refetchInterval: 1000000,
+  });
+}
+
+export function useUserOffersQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: userOffers } = useFilteredAllOffersQuery({
+    address: userAddress?.toLowerCase() || "",
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.offers],
+    queryFn: async () => {
+      return ensureSerializable({
+        userOffers,
+        offerLength: userOffers?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserAuctionsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: userAuctions } = useFilteredAllAuctionsQuery({
+    address: userAddress?.toLowerCase() || "",
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.auctions],
+    queryFn: async () => {
+      return ensureSerializable({
+        userAuctions,
+        auctionLength: userAuctions?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserListingsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: userListings } = useFilteredAllListingsQuery({
+    address: userAddress?.toLowerCase() || "",
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.listings],
+    queryFn: async () => {
+      return ensureSerializable({
+        userListings,
+        userListingsLength: userListings?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 1000000,
+  });
+}
+
+export function useUserBidsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: userBids } = useFilteredUserNewBidsQuery({
+    address: userAddress?.toLowerCase() || "",
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.listings],
+    queryFn: async () => {
+      return ensureSerializable({
+        userBids,
+        userBidsLength: userBids?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 1000000,
+  });
+}
+
+export function useUserOffersReceivedQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: allOffers } = useAllOffersQuery();
+
+  const userOffersReceived = allOffers?.filter((offer) => {
+    const offerOwner = offer.nft.owner.toLowerCase();
+
+    return offerOwner === userAddress?.toLowerCase();
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.offersReceived],
+    queryFn: async () => {
+      return ensureSerializable({
+        userOffersReceived,
+        userOffersReceivedLength: userOffersReceived?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
   });
 }
