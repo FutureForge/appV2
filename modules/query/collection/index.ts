@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import axios from "axios";
 import { backendURL, CROSSFI_API, MARKETPLACE_ADDRESS } from "@/utils/configs";
@@ -20,6 +20,7 @@ import {
 import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { ensureSerializable, to3DP } from "@/utils/functions";
 import { getNFT } from "thirdweb/extensions/erc721";
+import { useMemo } from "react";
 
 // syntax
 export function useAllCollectionsQuery() {
@@ -105,37 +106,60 @@ export function useSingleCollectionQuery({
 
   console.log({ newOffers, completedOffers, allOffers, acceptedOffers });
 
+  //   const testQueries = useQueries({
+  //     queries: [
+  //       { queryKey: [queryKeys.listing.all, contractAddress], queryFn: () => useFilteredAllListingsQuery({ contractAddress }) },
+  //       { queryKey: [queryKeys.listing.newSale, contractAddress], queryFn: () => useFilteredNewSaleListingsQuery({ contractAddress }) },
+  //       { queryKey: [queryKeys.listing.new, contractAddress], queryFn: () => useFilteredNewListingsQuery({ contractAddress }) },
+  //     ],
+  //   });
+
+  //   console.log({ testQueries });
+
+  const totalListingVolume = useMemo(() => {
+    return newSaleListings?.reduce((acc, listing) => {
+      const price = parseFloat(decimalOffChain(listing.totalPricePaid) || "0");
+      return acc + price;
+    }, 0);
+  }, [newSaleListings]);
+
+  const formattedTotalVolume = useMemo(
+    () => to3DP(totalListingVolume || 0),
+    [totalListingVolume]
+  );
+
+  const floorPrice = useMemo(() => {
+    let floor = Infinity;
+    for (const listing of allListings || []) {
+      const price = decimalOffChain(listing.pricePerToken) || "0";
+      const listingPrice = parseFloat(price);
+      floor = Math.min(floor, listingPrice);
+    }
+    return floor;
+  }, [allListings]);
+
   return useQuery({
     queryKey: [queryKeys.collection.single, contractAddress],
     queryFn: async () => {
-      const response = await axios.get<SingleCollectionQueryResponse>(
-        `${backendURL}/collection/${contractAddress}`
-      );
-
-      const collection = response.data;
-
-      let collectionFee = {};
-      let marketplaceFee = {};
-
-      try {
-        collectionFee = await getPlatformFeeInfoCustom({
-          contractAddress: contractAddress,
-        });
-      } catch (error) {
-        // console.log("error fetching collection fee", error);
-      }
-
-      try {
-        marketplaceFee = await getPlatformFeeInfoCustom({
+      const [
+        collectionResponse,
+        tokenTransfersResponse,
+        collectionFee,
+        marketplaceFee,
+      ] = await Promise.all([
+        axios.get<SingleCollectionQueryResponse>(
+          `${backendURL}/collection/${contractAddress}`
+        ),
+        axios.get<NFTActivityResponse>(
+          `${CROSSFI_API}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
+        ),
+        getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
+        getPlatformFeeInfoCustom({
           contractAddress: MARKETPLACE_ADDRESS,
-        });
-      } catch (error) {
-        // console.log("error fetching marketplace fee", error);
-      }
+        }).catch(() => ({})),
+      ]);
 
-      const tokenTransfersResponse = await axios.get<NFTActivityResponse>(
-        `${CROSSFI_API}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
-      );
+      const collection = collectionResponse.data;
       const tokenTransfers = tokenTransfersResponse.data.docs;
 
       const updatedTokenTransfers = tokenTransfers.map((transfer) => {
@@ -154,23 +178,6 @@ export function useSingleCollectionQuery({
           nft,
         };
       });
-
-      const totalListingVolume = newSaleListings?.reduce((acc, listing) => {
-        const price = parseFloat(
-          decimalOffChain(listing.totalPricePaid) || "0"
-        );
-        return acc + price;
-      }, 0);
-
-      const formattedTotalVolume = to3DP(totalListingVolume || 0);
-
-      let floorPrice = Infinity;
-      for (const listing of allListings || []) {
-        const price = decimalOffChain(listing.pricePerToken) || "0";
-        const listingPrice = parseFloat(price);
-
-        floorPrice = Math.min(floorPrice, listingPrice);
-      }
 
       return {
         collection,
@@ -197,6 +204,6 @@ export function useSingleCollectionQuery({
         },
       };
     },
-    refetchInterval: 5000,
+    refetchInterval: 50000000,
   });
 }
