@@ -11,7 +11,15 @@ import {
   filteredCompletedAuctionsQuery,
   filteredNewAuctionsQuery,
   newAuctionsQuery,
+  singleAuctionQuery,
 } from "@/utils/graphql/queries/auction.queries";
+import {
+  AllAuctionsQueryResponse,
+  AuctionClosedQueryResponse,
+  CompletedAuctionsQueryResponse,
+  NewAuctionsQueryResponse,
+  SingleAuctionQueryResponse,
+} from "@/utils/types/graphql";
 
 export function useAllAuctionsQuery() {
   return useQuery({
@@ -43,6 +51,30 @@ export function useFilteredAllAuctionsQuery({
         {
           contractAddress,
           address,
+        }
+      );
+      return response.allAuctions;
+    },
+    refetchInterval: 100000,
+  });
+}
+
+export function useSingleAuctionQuery({
+  contractAddress,
+  tokenId,
+}: {
+  contractAddress: string;
+  tokenId: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.auction.single],
+    queryFn: async () => {
+      const response = await request<SingleAuctionQueryResponse>(
+        indexerEndpoint,
+        singleAuctionQuery,
+        {
+          contractAddress,
+          tokenId,
         }
       );
       return response.allAuctions;

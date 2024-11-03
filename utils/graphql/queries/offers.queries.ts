@@ -100,6 +100,54 @@ export const filteredAllOffersQuery = gql`
   }
 `;
 
+export const singleOfferQuery = gql`
+  query SingleOffer($contractAddress: String!, $tokenId: BigInt!) {
+    allOffers(
+      where: { assetContract_eq: $contractAddress, tokenId_eq: $tokenId }
+    ) {
+      assetContract
+      currency
+      expirationTimestamp
+      id
+      offerId
+      offeror
+      quantity
+      status
+      tokenId
+      tokenType
+      totalPrice
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
 /* -------------------------------------------------------------------------------------------------
  * acceptedOffersQuery
  * -----------------------------------------------------------------------------------------------*/

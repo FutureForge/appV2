@@ -53,10 +53,7 @@ export const allListingsQuery = gql`
 `;
 
 export const filteredAllListingsQuery = gql`
-  query FilteredAllListings(
-    $contractAddress: String!
-    $address: String!
-  ) {
+  query FilteredAllListings($contractAddress: String!, $address: String!) {
     allListings(
       where: {
         OR: {
@@ -64,6 +61,56 @@ export const filteredAllListingsQuery = gql`
           OR: { listingCreator_eq: $address }
         }
       }
+    ) {
+      assetContract
+      currency
+      endTimestamp
+      id
+      listingCreator
+      listingId
+      pricePerToken
+      quantity
+      reserved
+      startTimestamp
+      status
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+export const singleListingQuery = gql`
+  query SingleListing($contractAddress: String!, $tokenId: BigInt!) {
+    allListings(
+      where: { assetContract_eq: $contractAddress, tokenId_eq: $tokenId }
     ) {
       assetContract
       currency
@@ -274,10 +321,7 @@ export const newListingsQuery = gql`
 `;
 
 export const filteredNewListingsQuery = gql`
-  query FilteredNewListings(
-    $contractAddress: String!
-    $address: String!
-  ) {
+  query FilteredNewListings($contractAddress: String!, $address: String!) {
     newListings(
       where: {
         OR: {
@@ -381,10 +425,7 @@ export const newSaleListingsQuery = gql`
 `;
 
 export const filteredNewSaleListingsQuery = gql`
-  query FilteredNewSaleListings(
-    $contractAddress: String!
-    $address: String!
-  ) {
+  query FilteredNewSaleListings($contractAddress: String!, $address: String!) {
     newSaleListings(
       where: {
         OR: {

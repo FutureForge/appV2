@@ -9,9 +9,17 @@ import {
   filteredNewSaleListingsQuery,
   newListingsQuery,
   newSaleListingsQuery,
+  singleListingQuery,
 } from "@/utils/graphql/queries/listing.queries";
 import { indexerEndpoint } from "@/utils/graphql";
 import { queryKeys } from "../query-keys";
+import {
+  AllListingsQueryResponse,
+  CompletedListingsQueryResponse,
+  NewListingsQueryResponse,
+  NewSaleListingsQueryResponse,
+  SingleListingQueryResponse,
+} from "@/utils/types/graphql";
 
 export function useAllListingsQuery() {
   return useQuery({
@@ -48,6 +56,27 @@ export function useFilteredAllListingsQuery({
       return response.allListings;
     },
     refetchInterval: 100000,
+  });
+}
+
+export function useSingleListingQuery({
+  contractAddress,
+  tokenId,
+}: {
+  contractAddress: string;
+  tokenId: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.listing.single],
+    queryFn: async () => {
+      const response = await request<SingleListingQueryResponse>(
+        indexerEndpoint,
+        singleListingQuery,
+        { contractAddress, tokenId }
+      );
+      return response.allListings;
+    },
+    refetchInterval: 5000,
   });
 }
 

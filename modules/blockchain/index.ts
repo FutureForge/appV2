@@ -21,16 +21,27 @@ export function getContractEthers({
 
 export function getContractCustom({
   contractAddress,
+  abi,
 }: {
   contractAddress: string;
+  abi?: any;
 }) {
-  const contract = getContractThirdweb({
-    client,
-    chain: chainInfo,
-    address: contractAddress!,
-  });
-
-  return contract;
+  if (!abi) {
+    const contract = getContractThirdweb({
+      client,
+      chain: chainInfo,
+      address: contractAddress!,
+    });
+    return contract;
+  } else {
+    const contract = getContractThirdweb({
+      client,
+      chain: chainInfo,
+      address: contractAddress!,
+      abi,
+    });
+    return contract;
+  }
 }
 
 export function decimalOffChain(number: bigint | string | number) {

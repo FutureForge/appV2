@@ -1,7 +1,7 @@
-import { useQuery, useQueries } from "@tanstack/react-query";
-import { queryKeys } from "../query-keys";
 import axios from "axios";
-import { backendURL, CROSSFI_API, MARKETPLACE_ADDRESS } from "@/utils/configs";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "../query-keys";
+import { backendURL, CROSSFI_API_TESTNET, MARKETPLACE_ADDRESS } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import {
   useFilteredAllListingsQuery,
@@ -123,7 +123,7 @@ export function useSingleCollectionQuery({
           `${backendURL}/collection/${contractAddress}`
         ),
         axios.get<NFTActivityResponse>(
-          `${CROSSFI_API}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
+          `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
         ),
         getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
         getPlatformFeeInfoCustom({

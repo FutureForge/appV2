@@ -113,6 +113,59 @@ export const filteredAllAuctionsQuery = gql`
   }
 `;
 
+export const singleAuctionQuery = gql`
+  query SingleAuction($contractAddress: String!, $tokenId: BigInt!) {
+    allAuctions(
+      where: { assetContract_eq: $contractAddress, tokenId_eq: $tokenId }
+    ) {
+      assetContract
+      auctionCreator
+      auctionId
+      bidBufferBps
+      buyoutBidAmount
+      currency
+      endTimestamp
+      id
+      isAuctionExpired
+      minimumBidAmount
+      quantity
+      startTimestamp
+      status
+      timeBufferInSeconds
+      tokenId
+      tokenType
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
 /* -------------------------------------------------------------------------------------------------
  * completedAuctionsQuery
  * -----------------------------------------------------------------------------------------------*/

@@ -1,4 +1,3 @@
-
 type Attribute = {
   traitType: string;
   value: string;
@@ -9,7 +8,7 @@ type Property = {
   value: string;
 };
 
-type NFTMetadata = {
+export type NFTMetadata = {
   animationUrl: string;
   attributes: Attribute[];
   backgroundColor: string;
@@ -24,7 +23,7 @@ type NFTMetadata = {
   supply: number;
 };
 
-type NFT = {
+export type NFT = {
   assetContract: string;
   id: string;
   metadata: NFTMetadata;
@@ -34,7 +33,7 @@ type NFT = {
   type: string;
 };
 
-type Listing = {
+export type Listing = {
   assetContract: string;
   currency: string;
   endTimestamp: string;
@@ -52,7 +51,7 @@ type Listing = {
   transactionHash?: string;
 };
 
-type NewSaleListing = {
+export type NewSaleListing = {
   assetContract: string;
   buyer: string;
   id: string;
@@ -64,7 +63,7 @@ type NewSaleListing = {
   transactionHash: string;
 };
 
-type Auction = {
+export type Auction = {
   assetContract: string;
   auctionCreator: string;
   auctionId: string;
@@ -85,7 +84,7 @@ type Auction = {
   transactionHash?: string;
 };
 
-type AuctionClosed = {
+export type AuctionClosed = {
   assetContract: string;
   auctionCreator: string;
   auctionId: string;
@@ -97,7 +96,7 @@ type AuctionClosed = {
   //   nft: NFT;
 };
 
-type Offer = {
+export type Offer = {
   assetContract: string;
   currency: string;
   expirationTimestamp: string;
@@ -113,7 +112,7 @@ type Offer = {
   nft: NFT;
 };
 
-type AcceptedOffer = {
+export type AcceptedOffer = {
   assetContract: string;
   id: string;
   offerId: string;
@@ -129,50 +128,62 @@ type AcceptedOffer = {
  * QUERY RESPONSE TYPES
  * -----------------------------------------------------------------------------------------------*/
 
-type AllListingsQueryResponse = {
+export type AllListingsQueryResponse = {
   allListings: Listing[];
 };
 
-type CompletedListingsQueryResponse = {
+export type SingleListingQueryResponse = {
+  allListings: Listing[];
+};
+
+export type CompletedListingsQueryResponse = {
   completedListings: Listing[];
 };
 
-type NewListingsQueryResponse = {
+export type NewListingsQueryResponse = {
   newListings: Listing[];
 };
 
-type NewSaleListingsQueryResponse = {
+export type NewSaleListingsQueryResponse = {
   newSaleListings: NewSaleListing[];
 };
 
-type AllAuctionsQueryResponse = {
+export type AllAuctionsQueryResponse = {
   allAuctions: Auction[];
 };
 
-type CompletedAuctionsQueryResponse = {
+export type SingleAuctionQueryResponse = {
+  allAuctions: Auction[];
+};
+
+export type CompletedAuctionsQueryResponse = {
   completedAuctions: Auction[];
 };
 
-type NewAuctionsQueryResponse = {
+export type NewAuctionsQueryResponse = {
   newAuctions: Auction[];
 };
 
-type AuctionClosedQueryResponse = {
+export type AuctionClosedQueryResponse = {
   auctionCloseds: AuctionClosed[];
 };
 
-type AllOffersQueryResponse = {
+export type AllOffersQueryResponse = {
   allOffers: Offer[];
 };
 
-type CompletedOffersQueryResponse = {
+export type SingleOfferQueryResponse = {
+  allOffers: Offer[];
+};
+
+export type CompletedOffersQueryResponse = {
   completedOffers: Offer[];
 };
 
-type AcceptedOffersQueryResponse = {
+export type AcceptedOffersQueryResponse = {
   acceptedOffers: AcceptedOffer[];
 };
 
-type NewOffersQueryResponse = {
+export type NewOffersQueryResponse = {
   newOffers: Offer[];
 };

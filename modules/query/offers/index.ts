@@ -11,7 +11,9 @@ import {
   filteredCompletedOffersQuery,
   filteredNewOffersQuery,
   newOffersQuery,
+  singleOfferQuery,
 } from "@/utils/graphql/queries/offers.queries";
+import { AcceptedOffersQueryResponse, AllOffersQueryResponse, CompletedOffersQueryResponse, NewOffersQueryResponse, SingleOfferQueryResponse } from "@/utils/types/graphql";
 
 export function useAllOffersQuery() {
   return useQuery({
@@ -43,6 +45,30 @@ export function useFilteredAllOffersQuery({
         {
           contractAddress,
           address,
+        }
+      );
+      return response.allOffers;
+    },
+    refetchInterval: 100000,
+  });
+}
+
+export function useSingleOfferQuery({
+  contractAddress,
+  tokenId,
+}: {
+  contractAddress: string;
+  tokenId: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.offers.single],
+    queryFn: async () => {
+      const response = await request<SingleOfferQueryResponse>(
+        indexerEndpoint,
+        singleOfferQuery,
+        {
+          contractAddress,
+          tokenId,
         }
       );
       return response.allOffers;

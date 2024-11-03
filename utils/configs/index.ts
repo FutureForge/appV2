@@ -17,5 +17,5 @@ export const MARKETPLACE_ADDRESS = "0x7Ed11a18630a9E569882Ca2F4D3488A88eF45d28";
 
 export const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
-export const CROSSFI_API = "https://test.xfiscan.com/api/1.0";
+export const CROSSFI_API_TESTNET = "https://test.xfiscan.com/api/1.0";
 
