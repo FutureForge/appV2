@@ -13,6 +13,7 @@ import {
   useSingleListingQuery,
   useSingleOfferQuery,
 } from "..";
+import { NFTActivityResponse } from "@/utils/types/global";
 
 export function useSingleNFTQuery({
   contractAddress,

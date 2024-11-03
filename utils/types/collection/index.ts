@@ -1,4 +1,6 @@
-type Collection = {
+import { NFTMetadata } from "../graphql";
+
+export type Collection = {
   collectionName: string;
   collectionDescription: string;
   collectionAddress: string;
@@ -7,7 +9,7 @@ type Collection = {
   collectionOwnerAddress: string;
 };
 
-type SingleCollection = {
+export type SingleCollection = {
   collection: Collection;
   nftLength: number;
   nfts: {
@@ -19,10 +21,10 @@ type SingleCollection = {
   }[];
 };
 
-type CollectionsQueryResponse = {
+export type CollectionsQueryResponse = {
   collections: Collection[];
 };
 
-type SingleCollectionQueryResponse = {
+export type SingleCollectionQueryResponse = {
   collection: SingleCollection;
 };

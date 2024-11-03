@@ -21,6 +21,8 @@ import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { ensureSerializable, to3DP } from "@/utils/functions";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { useMemo } from "react";
+import { CollectionsQueryResponse, SingleCollectionQueryResponse } from "@/utils/types/collection";
+import { NFTActivityResponse } from "@/utils/types/global";
 
 // syntax
 export function useAllCollectionsQuery() {
