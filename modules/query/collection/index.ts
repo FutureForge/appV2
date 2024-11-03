@@ -48,10 +48,6 @@ export function useSingleCollectionQuery({
     contractAddress,
   });
 
-  //   const { data: completedListings } = useFilteredCompletedListingsQuery({
-  //     contractAddress,
-  //   });
-
   const { data: allListings } = useFilteredAllListingsQuery({
     contractAddress,
   });
@@ -59,8 +55,6 @@ export function useSingleCollectionQuery({
   const { data: newListings } = useFilteredNewListingsQuery({
     contractAddress,
   });
-
-  console.log({ newSaleListings, allListings, newListings });
 
   /**
    * GETTING COLLECTION AUCTION DATA
@@ -78,21 +72,11 @@ export function useSingleCollectionQuery({
     contractAddress,
   });
 
-  //   const { data: completedAuctions } = useFilteredCompletedAuctionsQuery({
-  //     contractAddress,
-  //   });
-
-  console.log({ auctionClosed, newAuctions, allAuctions });
-
   /**
    * GETTING COLLECTION OFFERS DATA
    */
 
   const { data: newOffers } = useFilteredNewOffersQuery({
-    contractAddress,
-  });
-
-  const { data: completedOffers } = useFilteredCompletedOffersQuery({
     contractAddress,
   });
 
@@ -103,18 +87,6 @@ export function useSingleCollectionQuery({
   const { data: acceptedOffers } = useFilteredAcceptedOffersQuery({
     contractAddress,
   });
-
-  console.log({ newOffers, completedOffers, allOffers, acceptedOffers });
-
-  //   const testQueries = useQueries({
-  //     queries: [
-  //       { queryKey: [queryKeys.listing.all, contractAddress], queryFn: () => useFilteredAllListingsQuery({ contractAddress }) },
-  //       { queryKey: [queryKeys.listing.newSale, contractAddress], queryFn: () => useFilteredNewSaleListingsQuery({ contractAddress }) },
-  //       { queryKey: [queryKeys.listing.new, contractAddress], queryFn: () => useFilteredNewListingsQuery({ contractAddress }) },
-  //     ],
-  //   });
-
-  //   console.log({ testQueries });
 
   const totalListingVolume = useMemo(() => {
     return newSaleListings?.reduce((acc, listing) => {
@@ -188,19 +160,19 @@ export function useSingleCollectionQuery({
         marketplaceFee,
         collectionFee,
         collectionOffers: {
-          newOffers,
-          allOffers,
-          acceptedOffers,
+          newOffers: newOffers || [],
+          allOffers: allOffers || [],
+          acceptedOffers: acceptedOffers || [],
         },
         collectionAuctions: {
-          auctionClosed,
-          newAuctions,
-          allAuctions,
+          auctionClosed: auctionClosed || [],
+          newAuctions: newAuctions || [],
+          allAuctions: allAuctions || [],
         },
         collectionListings: {
-          allListings,
-          newListings,
-          newSaleListings,
+          allListings: allListings || [],
+          newListings: newListings || [],
+          newSaleListings: newSaleListings || [],
         },
       };
     },
