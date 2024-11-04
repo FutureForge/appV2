@@ -28,12 +28,14 @@ export function useAddCollectionMutation() {
       description,
       image,
       backgroundImage,
+      collectionSocials,
     }: {
       contractAddress: string;
       name: string;
       description: string;
       image: File;
       backgroundImage: File;
+      collectionSocials: { socialName: string; socialLink: string }[];
     }) => {
       if (!userAddress) {
         throw new Error("User not connected");
@@ -58,6 +60,7 @@ export function useAddCollectionMutation() {
       formData.append("collectionImage", image);
       formData.append("collectionBackgroundImage", backgroundImage);
       formData.append("collectionOwnerAddress", userAddress.toLowerCase());
+      formData.append("collectionSocials", JSON.stringify(collectionSocials));
 
       const response = await axios.post(
         `${backendURL}/collection/add-collection`,
@@ -105,6 +108,7 @@ export function useUpdateCollectionMutation() {
       description,
       image,
       backgroundImage,
+      collectionSocials,
     }: {
       collectionId: string;
       contractAddress: string;
@@ -112,6 +116,7 @@ export function useUpdateCollectionMutation() {
       description: string;
       image: File;
       backgroundImage: File;
+      collectionSocials: { socialName: string; socialLink: string }[];
     }) => {
       if (!userAddress) {
         throw new Error("User not connected");
@@ -135,6 +140,7 @@ export function useUpdateCollectionMutation() {
       formData.append("collectionImage", image);
       formData.append("collectionBackgroundImage", backgroundImage);
       formData.append("collectionOwnerAddress", userAddress.toLowerCase());
+      formData.append("collectionSocials", JSON.stringify(collectionSocials));
 
       const response = await axios.put(
         `${backendURL}/collection/update-collection/${collectionId}`,

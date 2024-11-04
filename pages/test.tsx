@@ -22,12 +22,13 @@ import {
 } from "@/modules/query";
 import { useAddCollectionMutation } from "@/modules/mutation";
 import { useState, ChangeEvent, FormEvent } from "react";
+import { Social } from "@/utils/types/global";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
 // 8
 
 export default function Test() {
-  const { data } = useUserExpiredAuctionsQuery();
+  const { data } = useAllCollectionsQuery();
   console.log({ data });
 
   // const { data: singleNFT } = useSingleNFTQuery({
@@ -41,6 +42,7 @@ export default function Test() {
     contractAddress: "",
     name: "",
     description: "",
+    collectionSocials: [{ socialName: "", socialLink: "" }],
   });
   const [image, setImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
@@ -54,6 +56,28 @@ export default function Test() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleSocialChange = (
+    index: number,
+    field: keyof Social,
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const newSocials = [...prev.collectionSocials];
+      newSocials[index] = { ...newSocials[index], [field]: value };
+      return { ...prev, collectionSocials: newSocials };
+    });
+  };
+
+  const addSocialField = () => {
+    setFormData((prev) => ({
+      ...prev,
+      collectionSocials: [
+        ...prev.collectionSocials,
+        { socialName: "", socialLink: "" },
+      ],
     }));
   };
 
@@ -88,6 +112,7 @@ export default function Test() {
               contractAddress: "",
               name: "",
               description: "",
+              collectionSocials: [{ socialName: "", socialLink: "" }],
             });
             setImage(null);
             setBackgroundImage(null);
@@ -112,6 +137,7 @@ export default function Test() {
           value={formData.contractAddress}
           onChange={handleInputChange}
           className="w-full p-2 border rounded text-black"
+          autoComplete="off"
           required
         />
       </div>
@@ -127,6 +153,7 @@ export default function Test() {
           value={formData.name}
           onChange={handleInputChange}
           className="w-full p-2 border rounded text-black"
+          autoComplete="off"
           required
         />
       </div>
@@ -141,6 +168,7 @@ export default function Test() {
           value={formData.description}
           onChange={handleInputChange}
           className="w-full p-2 border rounded text-black"
+          autoComplete="off"
           required
         />
       </div>
@@ -173,6 +201,55 @@ export default function Test() {
           className="w-full p-2 border rounded"
           required
         />
+      </div>
+
+      <div>
+        <label className="block mb-2">Collection Socials:</label>
+        {formData.collectionSocials.map((social, index) => (
+          <div key={index}>
+            <input
+              type="text"
+              placeholder="Social Name"
+              value={social.socialName}
+              onChange={(e) =>
+                handleSocialChange(index, "socialName", e.target.value)
+              }
+              className="w-1/2 p-2 border rounded text-black"
+            />
+            <input
+              type="text"
+              placeholder="Social Link"
+              value={social.socialLink}
+              onChange={(e) =>
+                handleSocialChange(index, "socialLink", e.target.value)
+              }
+              className="w-1/2 p-2 border rounded text-black"
+            />
+            {index > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    collectionSocials: prev.collectionSocials.filter(
+                      (_, i) => i !== index
+                    ),
+                  }));
+                }}
+                className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addSocialField}
+          className="w-full p-2 bg-gray-500 text-white rounded"
+        >
+          Add Social Link
+        </button>
       </div>
 
       <button

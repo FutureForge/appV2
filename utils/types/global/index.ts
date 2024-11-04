@@ -39,3 +39,8 @@ export interface UserNFTResponse {
   limit: number;
   page: number;
 }
+
+export interface Social {
+  socialName: string;
+  socialLink: string;
+}
