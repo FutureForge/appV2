@@ -1,5 +1,4 @@
 import { createThirdwebClient, defineChain } from "thirdweb";
-import { bscTestnet } from "thirdweb/chains";
 
 if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL is not set");
@@ -11,19 +10,20 @@ export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
 });
 
-export const MARKETPLACE_ADDRESS_TESTNET = "0x7Ed11a18630a9E569882Ca2F4D3488A88eF45d28";
+export const MARKETPLACE_ADDRESS_TESTNET =
+  "0x8cDecE143Bd214D0c4f645602c5fFCB5EFb042f9";
 
 export const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
-export const nativeCurrency = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+export const nativeCurrency = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 export const CROSSFI_API_TESTNET = "https://test.xfiscan.com/api/1.0";
 
-export const providerUrl = "https://rpc.xfi.ms/archive/4157";
+export const testnetProviderUrl = "https://rpc.xfi.ms/archive/4157";
 
-export const chainInfo = defineChain({
+export const crossFiTestnet = defineChain({
   id: 4157,
-  rpc: providerUrl,
+  rpc: testnetProviderUrl,
   nativeCurrency: {
     decimals: 18,
     name: "XFI",
@@ -34,3 +34,32 @@ export const chainInfo = defineChain({
     { name: "Testnet Explorer", url: "https://test.xfiscan.com/" },
   ],
 });
+
+export const mainnetProviderUrlMap = ["https://rpc.mainnet.ms/"];
+
+export const crossFiMainnet = defineChain({
+  id: 4158,
+  name: "CrossFi Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "XFI",
+    symbol: "XFI",
+  },
+  rpcUrls: {
+    default: {
+      // http: ['https://rpc.mainnet.ms/'],
+      http: mainnetProviderUrlMap,
+    },
+  },
+  blockExplorers: {
+    default: { name: "Explorer", url: "https://xfiscan.com/" },
+  },
+});
+
+export const chainInfo =
+  process.env.NODE_ENV === "development" ? crossFiTestnet : crossFiMainnet;
+
+export const providerUrl =
+  process.env.NODE_ENV === "development"
+    ? testnetProviderUrl
+    : mainnetProviderUrlMap;
