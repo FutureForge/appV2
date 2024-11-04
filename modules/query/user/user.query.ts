@@ -216,7 +216,7 @@ export function useUserOffersReceivedQuery() {
       });
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    refetchInterval: 5000000,
   });
 }
 
@@ -247,7 +247,7 @@ export function useUserExpiredListingsQuery() {
       });
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    refetchInterval: 5000000,
   });
 }
 
@@ -278,7 +278,7 @@ export function useUserExpiredAuctionsQuery() {
       });
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    refetchInterval: 5000000,
   });
 }
 
@@ -309,6 +309,6 @@ export function useUserExpiredOffersQuery() {
       });
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    refetchInterval: 5000000,
   });
 }

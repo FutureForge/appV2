@@ -7,7 +7,7 @@ import {
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
-import { getContractCustom } from "@/modules/blockchain";
+import { getContractCustom, getIsAuctionExpired } from "@/modules/blockchain";
 import ERC721ABI from "@/utils/abi/erc721.json";
 import { NFT } from "thirdweb";
 import { tryParseJSON } from "@/utils/functions";
@@ -57,15 +57,24 @@ export function useSingleNFTQuery({
   const expiredAuction = expiredAuctions?.expiredAuctions;
   const expiredOffer = expiredOffers?.expiredOffers;
 
-  const filteredExpiredListing: Listing | undefined = expiredListing?.filter(
-    (listing: Listing) => listing.tokenId === tokenId
-  )[0];
-  const filteredExpiredAuction: Auction | undefined = expiredAuction?.filter(
-    (auction: Auction) => auction.tokenId === tokenId
-  )[0];
-  const filteredExpiredOffer: Offer | undefined = expiredOffer?.filter(
-    (offer: Offer) => offer.tokenId === tokenId
-  )[0];
+  // const filteredExpiredListing: Listing | undefined = expiredListing?.filter(
+  //   (listing: Listing) => listing.tokenId === tokenId
+  // )[0];
+  // const filteredExpiredAuction: Auction | undefined = expiredAuction?.filter(
+  //   (auction: Auction) => auction.tokenId === tokenId
+  // )[0];
+  // const filteredExpiredOffer: Offer | undefined = expiredOffer?.filter(
+  //   (offer: Offer) => offer.tokenId === tokenId
+  // )[0];
+
+  const hasExpiredListing: boolean =
+    expiredListing?.some((listing: Listing) => listing.tokenId === tokenId) ??
+    false;
+  const hasExpiredAuction: boolean =
+    expiredAuction?.some((auction: Auction) => auction.tokenId === tokenId) ??
+    false;
+  const hasExpiredOffer: boolean =
+    expiredOffer?.some((offer: Offer) => offer.tokenId === tokenId) ?? false;
 
   return useQuery({
     queryKey: [queryKeys.nft.single, contractAddress, tokenId],
@@ -111,6 +120,19 @@ export function useSingleNFTQuery({
         updatedNFT = nft;
       }
 
+      const updatedSingleAuction = await Promise.all(
+        (singleAuction ?? []).map(async (auction) => {
+          const isExpired = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          // Inverting the result to correct the naming mismatch
+          const isAuctionExpired = !isExpired;
+
+          return { ...auction, isAuctionExpired };
+        })
+      );
+
       const activeType =
         singleListing?.length! > 0
           ? "listing"
@@ -119,20 +141,20 @@ export function useSingleNFTQuery({
           : "none";
 
       let activeTypeData;
-      let expiredData;
+      let isExpiredActiveType;
 
       switch (activeType) {
         case "listing":
           activeTypeData = singleListing;
-          expiredData = filteredExpiredListing;
+          isExpiredActiveType = hasExpiredListing;
           break;
         case "auction":
-          activeTypeData = singleAuction;
-          expiredData = filteredExpiredAuction;
+          activeTypeData = updatedSingleAuction;
+          isExpiredActiveType = hasExpiredListing;
           break;
         default:
           activeTypeData = null;
-          expiredData = filteredExpiredOffer;
+          isExpiredActiveType = hasExpiredOffer;
       }
 
       return {
@@ -143,7 +165,7 @@ export function useSingleNFTQuery({
         activeType,
         offers: singleOffer,
         activeTypeData,
-        expiredData,
+        isExpiredActiveType,
       };
     },
     enabled:
@@ -154,6 +176,6 @@ export function useSingleNFTQuery({
       !isLoadingExpiredListings &&
       !isLoadingExpiredAuctions &&
       !isLoadingExpiredOffers,
-    refetchInterval: 5000,
+    refetchInterval: 50000000,
   });
 }

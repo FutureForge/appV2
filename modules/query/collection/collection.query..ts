@@ -21,7 +21,11 @@ import {
   useFilteredCompletedOffersQuery,
   useFilteredAcceptedOffersQuery,
 } from "..";
-import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
+import {
+  decimalOffChain,
+  getContractCustom,
+  getIsAuctionExpired,
+} from "@/modules/blockchain";
 import { ensureSerializable, to3DP } from "@/utils/functions";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { useMemo } from "react";
@@ -169,6 +173,45 @@ export function useSingleCollectionQuery({
         };
       });
 
+      const updatedAllAuctions = await Promise.all(
+        (allAuctions ?? []).map(async (auction) => {
+          const isExpired = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          // Inverting the result to correct the naming mismatch
+          const isAuctionExpired = !isExpired;
+
+          return { ...auction, isAuctionExpired };
+        })
+      );
+
+      const updatedNewAuctions = await Promise.all(
+        (newAuctions ?? []).map(async (auction) => {
+          const isExpired = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          // Inverting the result to correct the naming mismatch
+          const isAuctionExpired = !isExpired;
+
+          return { ...auction, isAuctionExpired };
+        })
+      );
+
+      const updatedAuctionClosed = await Promise.all(
+        (auctionClosed ?? []).map(async (auction) => {
+          const isExpired = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          // Inverting the result to correct the naming mismatch
+          const isAuctionExpired = !isExpired;
+
+          return { ...auction, isAuctionExpired };
+        })
+      );
+
       return {
         collection,
         newSaleListings,
@@ -183,9 +226,9 @@ export function useSingleCollectionQuery({
           acceptedOffers: acceptedOffers || [],
         },
         collectionAuctions: {
-          auctionClosed: auctionClosed || [],
-          newAuctions: newAuctions || [],
-          allAuctions: allAuctions || [],
+          auctionClosed: updatedAuctionClosed || [],
+          newAuctions: updatedNewAuctions || [],
+          allAuctions: updatedAllAuctions || [],
         },
         collectionListings: {
           allListings: allListings || [],
