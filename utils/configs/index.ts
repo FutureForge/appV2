@@ -4,6 +4,10 @@ if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL is not set");
 }
 
+if (!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID) {
+  throw new Error("NEXT_PUBLIC_THIRDWEB_CLIENT_ID is not set");
+}
+
 export const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const client = createThirdwebClient({
