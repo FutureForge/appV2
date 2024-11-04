@@ -16,13 +16,26 @@ import {
   useUserAuctionsQuery,
   useUserListingsQuery,
   useUserOffersReceivedQuery,
+  useUserExpiredListingsQuery,
+  useUserExpiredAuctionsQuery,
+  useUserExpiredOffersQuery,
 } from "@/modules/query";
 import { useAddCollectionMutation } from "@/modules/mutation";
 import { useState, ChangeEvent, FormEvent } from "react";
 
+// "0x1a35a38630b6f56637268f437493601dbf72e61a"
+// 8
+
 export default function Test() {
-  const { data } = useAllCollectionsQuery();
+  const { data } = useUserExpiredAuctionsQuery();
   console.log({ data });
+
+  // const { data: singleNFT } = useSingleNFTQuery({
+  //   contractAddress: "0x1a35a38630b6f56637268f437493601dbf72e61a",
+  //   tokenId: "8",
+  // });
+
+  // console.log({ singleNFT });
 
   const [formData, setFormData] = useState({
     contractAddress: "",

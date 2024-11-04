@@ -1,6 +1,6 @@
 import { prepareContractCall, readContract } from "thirdweb";
 import { getContractCustom } from "..";
-import { MARKETPLACE_ADDRESS } from "@/utils/configs";
+import { MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
 
 export async function getCheckApprovedForAll({
   walletAddress,
@@ -17,7 +17,7 @@ export async function getCheckApprovedForAll({
     contract,
     method:
       "function isApprovedForAll(address owner, address operator) view returns (bool)",
-    params: [walletAddress, MARKETPLACE_ADDRESS],
+    params: [walletAddress, MARKETPLACE_ADDRESS_TESTNET],
   });
 
   return approved;
@@ -37,7 +37,7 @@ export async function getSetApprovalForAll({
   const transaction = await prepareContractCall({
     contract,
     method: "function setApprovalForAll(address operator, bool approved)",
-    params: [MARKETPLACE_ADDRESS, approved],
+    params: [MARKETPLACE_ADDRESS_TESTNET, approved],
   });
 
   return transaction;

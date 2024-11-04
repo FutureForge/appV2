@@ -13,7 +13,12 @@ import {
 } from "..";
 import { getContractCustom } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
-import { ensureSerializable, tryParseJSON } from "@/utils/functions";
+import {
+  ensureSerializable,
+  formatBlockchainTimestamp,
+  tryParseJSON,
+} from "@/utils/functions";
+import { Auction, Listing, Offer } from "@/utils/types/graphql";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -208,6 +213,99 @@ export function useUserOffersReceivedQuery() {
       return ensureSerializable({
         userOffersReceived,
         userOffersReceivedLength: userOffersReceived?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserExpiredListingsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: filteredListings } = useFilteredAllListingsQuery({
+    address: userAddress?.toLowerCase(),
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.expiredListings],
+    queryFn: async () => {
+      const expiredListings: Listing[] | undefined = filteredListings?.filter(
+        (listing) => {
+          const endTime = formatBlockchainTimestamp(listing.endTimestamp);
+          const endTimeFormatted = new Date(endTime).getTime();
+          const currentTime = new Date().getTime();
+
+          return endTimeFormatted < currentTime;
+        }
+      );
+
+      return ensureSerializable({
+        expiredListings,
+        expiredListingsLength: expiredListings?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserExpiredAuctionsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: filteredAuctions } = useFilteredAllAuctionsQuery({
+    address: userAddress?.toLowerCase(),
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.expiredAuctions],
+    queryFn: async () => {
+      const expiredAuctions: Auction[] | undefined = filteredAuctions?.filter(
+        (auction) => {
+          const endTime = formatBlockchainTimestamp(auction.endTimestamp);
+          const endTimeFormatted = new Date(endTime).getTime();
+          const currentTime = new Date().getTime();
+
+          return endTimeFormatted < currentTime;
+        }
+      );
+
+      return ensureSerializable({
+        expiredAuctions,
+        expiredAuctionsLength: expiredAuctions?.length,
+      });
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserExpiredOffersQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: filteredOffers } = useFilteredAllOffersQuery({
+    address: userAddress?.toLowerCase(),
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.expiredAuctions],
+    queryFn: async () => {
+      const expiredOffers: Offer[] | undefined = filteredOffers?.filter(
+        (offer) => {
+          const endTime = formatBlockchainTimestamp(offer.expirationTimestamp);
+          const endTimeFormatted = new Date(endTime).getTime();
+          const currentTime = new Date().getTime();
+
+          return endTimeFormatted < currentTime;
+        }
+      );
+
+      return ensureSerializable({
+        expiredOffers,
+        expiredOffersLength: expiredOffers?.length,
       });
     },
     enabled: !!userAddress,

@@ -75,7 +75,7 @@ export function useAddCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.collection.single, queryKeys.collection.all],
+        queryKey: [queryKeys.collection.all],
       });
     },
     onError: () => {},
@@ -150,7 +150,7 @@ export function useUpdateCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.collection.single, queryKeys.collection.all],
+        queryKey: [queryKeys.collection.single],
       });
     },
     onError: () => {},

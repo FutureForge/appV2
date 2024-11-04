@@ -1,7 +1,11 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import { backendURL, CROSSFI_API_TESTNET, MARKETPLACE_ADDRESS } from "@/utils/configs";
+import {
+  backendURL,
+  CROSSFI_API_TESTNET,
+  MARKETPLACE_ADDRESS_TESTNET,
+} from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import {
   useFilteredAllListingsQuery,
@@ -21,7 +25,10 @@ import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { ensureSerializable, to3DP } from "@/utils/functions";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { useMemo } from "react";
-import { CollectionsQueryResponse, SingleCollectionQueryResponse } from "@/utils/types/collection";
+import {
+  CollectionsQueryResponse,
+  SingleCollectionQueryResponse,
+} from "@/utils/types/collection";
 import { NFTActivityResponse } from "@/utils/types/global";
 
 // syntax
@@ -46,49 +53,58 @@ export function useSingleCollectionQuery({
   /**
    * GETTING COLLECTION LISTING DATA
    */
-  const { data: newSaleListings } = useFilteredNewSaleListingsQuery({
-    contractAddress,
-  });
+  const { data: newSaleListings, isLoading: isLoadingNewSaleListings } =
+    useFilteredNewSaleListingsQuery({
+      contractAddress,
+    });
 
-  const { data: allListings } = useFilteredAllListingsQuery({
-    contractAddress,
-  });
+  const { data: allListings, isLoading: isLoadingAllListings } =
+    useFilteredAllListingsQuery({
+      contractAddress,
+    });
 
-  const { data: newListings } = useFilteredNewListingsQuery({
-    contractAddress,
-  });
+  const { data: newListings, isLoading: isLoadingNewListings } =
+    useFilteredNewListingsQuery({
+      contractAddress,
+    });
 
   /**
    * GETTING COLLECTION AUCTION DATA
    */
 
-  const { data: auctionClosed } = useFilteredAuctionClosedQuery({
-    contractAddress,
-  });
+  const { data: auctionClosed, isLoading: isLoadingAuctionClosed } =
+    useFilteredAuctionClosedQuery({
+      contractAddress,
+    });
 
-  const { data: newAuctions } = useFilteredNewAuctionsQuery({
-    contractAddress,
-  });
+  const { data: newAuctions, isLoading: isLoadingNewAuctions } =
+    useFilteredNewAuctionsQuery({
+      contractAddress,
+    });
 
-  const { data: allAuctions } = useFilteredAllAuctionsQuery({
-    contractAddress,
-  });
+  const { data: allAuctions, isLoading: isLoadingAllAuctions } =
+    useFilteredAllAuctionsQuery({
+      contractAddress,
+    });
 
   /**
    * GETTING COLLECTION OFFERS DATA
    */
 
-  const { data: newOffers } = useFilteredNewOffersQuery({
-    contractAddress,
-  });
+  const { data: newOffers, isLoading: isLoadingNewOffers } =
+    useFilteredNewOffersQuery({
+      contractAddress,
+    });
 
-  const { data: allOffers } = useFilteredAllOffersQuery({
-    contractAddress,
-  });
+  const { data: allOffers, isLoading: isLoadingAllOffers } =
+    useFilteredAllOffersQuery({
+      contractAddress,
+    });
 
-  const { data: acceptedOffers } = useFilteredAcceptedOffersQuery({
-    contractAddress,
-  });
+  const { data: acceptedOffers, isLoading: isLoadingAcceptedOffers } =
+    useFilteredAcceptedOffersQuery({
+      contractAddress,
+    });
 
   const totalListingVolume = useMemo(() => {
     return newSaleListings?.reduce((acc, listing) => {
@@ -129,7 +145,7 @@ export function useSingleCollectionQuery({
         ),
         getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
         getPlatformFeeInfoCustom({
-          contractAddress: MARKETPLACE_ADDRESS,
+          contractAddress: MARKETPLACE_ADDRESS_TESTNET,
         }).catch(() => ({})),
       ]);
 
@@ -178,6 +194,28 @@ export function useSingleCollectionQuery({
         },
       };
     },
+    enabled:
+      !!contractAddress &&
+      !isLoadingNewSaleListings &&
+      !isLoadingAllListings &&
+      !isLoadingNewListings &&
+      !isLoadingAuctionClosed &&
+      !isLoadingNewAuctions &&
+      !isLoadingAllAuctions &&
+      !isLoadingNewOffers &&
+      !isLoadingAllOffers &&
+      !isLoadingAcceptedOffers,
+    // enabled:
+    //   !!contractAddress &&
+    //   (!!isLoadingNewSaleListings ||
+    //     !!isLoadingAllListings ||
+    //     !!isLoadingNewListings ||
+    //     !!isLoadingAuctionClosed ||
+    //     !!isLoadingNewAuctions ||
+    //     !!isLoadingAllAuctions ||
+    //     !!isLoadingNewOffers ||
+    //     !!isLoadingAllOffers ||
+    //     !!isLoadingAcceptedOffers),
     refetchInterval: 50000000,
   });
 }

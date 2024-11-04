@@ -35,5 +35,8 @@ export const queryKeys = {
     auctions: ["user-auctions"] as const,
     listings: ["user-listings"] as const,
     offersReceived: ["user-offers-received"] as const,
+    expiredListings: ["user-expired-listings"] as const,
+    expiredAuctions: ["user-expired-auctions"] as const,
+    expiredOffers: ["user-expired-offers"] as const,
   },
 };
