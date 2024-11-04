@@ -54,7 +54,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
 
             toast.error(
               errorMessage
-                ? `${errorMessage.description} ${error.message}`
+                ? `${errorMessage.description} - ${error.message}`
                 : error.message,
               {
                 id: mutation?.mutationId,

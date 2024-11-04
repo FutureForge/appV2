@@ -74,3 +74,75 @@ export async function getIsAuctionExpired({
 
   return transaction;
 }
+
+export async function getCollectAuctionPayout({
+  auctionId,
+}: {
+  auctionId: string;
+}) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const transaction = await prepareContractCall({
+    contract,
+    method: "function collectAuctionPayout(uint256 _auctionId)",
+    params: [BigInt(auctionId)],
+  });
+
+  return transaction;
+}
+
+export async function getCollectAuctionTokens({
+  auctionId,
+}: {
+  auctionId: string;
+}) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const transaction = await prepareContractCall({
+    contract,
+    method: "function collectAuctionTokens(uint256 _auctionId)",
+    params: [BigInt(auctionId)],
+  });
+
+  return transaction;
+}
+
+export async function getCancelAuction({ auctionId }: { auctionId: string }) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const transaction = await prepareContractCall({
+    contract,
+    method: "function cancelAuction(uint256 _auctionId)",
+    params: [BigInt(auctionId)],
+  });
+
+  return transaction;
+}
+
+export async function getBidInAuction({
+  auctionId,
+  bidAmount,
+}: {
+  auctionId: string;
+  bidAmount: string;
+}) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const transaction = await prepareContractCall({
+    contract,
+    method:
+      "function bidInAuction(uint256 _auctionId, uint256 _bidAmount) payable",
+    params: [BigInt(auctionId), toWei(bidAmount)],
+    value: toWei(bidAmount),
+  });
+
+  return transaction;
+}
