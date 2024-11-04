@@ -7,4 +7,10 @@ export enum MessagesEnum {
   AUCTION_CREATED_ERROR = "Error Creating Auction",
   AUCTION_CANCELLED_SUCCESS = "Auction Cancelled Successfully",
   AUCTION_CANCELLED_ERROR = "Error Cancelling Auction",
+  APPROVAL_SUCCESS = "Approval Successfully",
+  APPROVAL_ERROR = "Error Making Approval",
+  LISTING_CREATED_SUCCESS = "Listing Created Successfully",
+  LISTING_CREATED_ERROR = "Error Creating Listing",
+  LISTING_UPDATED_SUCCESS = "Listing Updated Successfully",
+  LISTING_UPDATED_ERROR = "Error Updating Listing",
 }

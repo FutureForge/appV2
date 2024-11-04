@@ -4,8 +4,8 @@ import {
   getEndBlockchainTimestamp,
 } from "@/utils/functions";
 import { getContractCustom } from "..";
-import { CreateAuctionType } from "@/utils/types/blockchain";
 import { prepareContractCall, readContract, toWei } from "thirdweb";
+import { CreateAuctionType } from "@/utils/types/blockchain/blockchain.type";
 
 export async function getCreateAuction({
   params: _params,

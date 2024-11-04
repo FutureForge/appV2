@@ -5,6 +5,8 @@ export const queryKeys = {
     new: ["new-listing"] as const,
     newSale: ["newSale-listings"] as const,
     single: ["single-listing"] as const,
+    newFiltered: ["new-listing-filtered"] as const,
+    newSaleFiltered: ["newSale-listing-filtered"] as const,
   },
   auction: {
     all: ["auction"] as const,

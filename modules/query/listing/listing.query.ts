@@ -147,7 +147,7 @@ export function useFilteredNewListingsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.listing.new],
+    queryKey: [queryKeys.listing.newFiltered],
     queryFn: async () => {
       const response = await request<NewListingsQueryResponse>(
         indexerEndpoint,
@@ -188,7 +188,7 @@ export function useFilteredNewSaleListingsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.listing.newSale],
+    queryKey: [queryKeys.listing.newSaleFiltered],
     queryFn: async () => {
       const response = await request<NewSaleListingsQueryResponse>(
         indexerEndpoint,

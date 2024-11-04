@@ -32,7 +32,7 @@ import { useMemo } from "react";
 import {
   CollectionsQueryResponse,
   SingleCollectionQueryResponse,
-} from "@/utils/types/collection";
+} from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
 
 // syntax

@@ -2,7 +2,7 @@ import { getCancelAuction, getCreateAuction } from "@/modules/blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { queryKeys } from "@/modules/query/query-keys";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
-import { CreateAuctionType } from "@/utils/types/blockchain";
+import { CreateAuctionType } from "@/utils/types/blockchain/blockchain.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendAndConfirmTransaction } from "thirdweb";
 
