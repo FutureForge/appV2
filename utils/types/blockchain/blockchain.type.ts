@@ -32,3 +32,12 @@ export type BuyFromDirectListingType = {
   totalPrice: string;
   nativeTokenValue: string;
 };
+
+export type MakeOfferListingType = {
+  assetContract: string;
+  tokenId: string;
+  quantity: string;
+  currency: string;
+  totalPrice: string;
+  expirationTimestamp?: Date;
+};

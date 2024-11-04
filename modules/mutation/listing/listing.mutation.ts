@@ -159,16 +159,16 @@ export function useCancelDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["userListing"],
+        queryKey: [queryKeys.nft.single],
       });
     },
     onError: () => {},
     meta: {
       successMessage: {
-        description: "Listing cancelled",
+        description: MessagesEnum.CANCEL_LISTING_SUCCESS,
       },
       errorMessage: {
-        description: "Failed to cancel listing",
+        description: MessagesEnum.CANCEL_LISTING_ERROR,
       },
     },
   });
@@ -212,16 +212,16 @@ export function useBuyFromDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["userListing"],
+        queryKey: [queryKeys.listing.completed, queryKeys.nft.single],
       });
     },
     onError: () => {},
     meta: {
       successMessage: {
-        description: "Listing bought",
+        description: MessagesEnum.BUY_LISTING_SUCCESS,
       },
       errorMessage: {
-        description: "Failed to buy listing",
+        description: MessagesEnum.BUY_LISTING_ERROR,
       },
     },
   });
