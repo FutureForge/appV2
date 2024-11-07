@@ -97,7 +97,7 @@ export function useUserNFTsQuery() {
         const nftTokenId = nft.tokenId;
 
         return !userListedNFTs?.some(
-          (listing) =>
+          (listing: Listing) =>
             listing.assetContract.toLowerCase() ===
               nft.contractAddress.toLowerCase() &&
             listing.tokenId.toString() === nftTokenId
@@ -232,19 +232,20 @@ export function useUserExpiredListingsQuery() {
     queryKey: [queryKeys.user.expiredListings],
     queryFn: async () => {
       const expiredListings: Listing[] | undefined = filteredListings?.filter(
-        (listing) => {
+        (listing: Listing) => {
           const endTime = formatBlockchainTimestamp(listing.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
+          // looking for expired listings
           return endTimeFormatted < currentTime;
         }
       );
 
-      return ensureSerializable({
+      return {
         expiredListings,
         expiredListingsLength: expiredListings?.length,
-      });
+      };
     },
     enabled: !!userAddress,
     refetchInterval: 5000000,
