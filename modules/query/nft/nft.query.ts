@@ -41,6 +41,8 @@ export function useSingleNFTQuery({
       tokenId,
     });
 
+  // include query for single auction-closed
+
   const { data: singleOffer, isLoading: isLoadingOffer } = useSingleOfferQuery({
     contractAddress,
     tokenId,

@@ -1,5 +1,7 @@
-import { QueryProvider } from "@/modules/provider";
+import "../utils/suppressConsoleErrors";
 import "@/styles/globals.css";
+
+import { QueryProvider } from "@/modules/provider";
 import type { AppProps } from "next/app";
 import { ThirdwebProvider } from "thirdweb/react";
 import { Inter } from "next/font/google";

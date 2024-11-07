@@ -7,6 +7,8 @@ export type Collection = {
   collectionImage: string;
   collectionBackgroundImage: string;
   collectionOwnerAddress: string;
+  floorPrice?: number;
+  totalVolume?: number;
 };
 
 export type SingleCollection = {

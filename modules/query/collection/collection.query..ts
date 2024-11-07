@@ -34,6 +34,16 @@ import {
   SingleCollectionQueryResponse,
 } from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
+import {
+  AllListingsQueryResponse,
+  NewSaleListingsQueryResponse,
+} from "@/utils/types/graphql";
+import request from "graphql-request";
+import { indexerEndpoint } from "@/utils/graphql";
+import {
+  filteredAllListingsQuery,
+  filteredNewSaleListingsQuery,
+} from "@/utils/graphql/queries/listing.queries";
 
 // syntax
 export function useAllCollectionsQuery() {
@@ -43,9 +53,60 @@ export function useAllCollectionsQuery() {
       const response = await axios.get<CollectionsQueryResponse>(
         `${backendURL}/collection`
       );
+
+      for (const collection of response.data.collections) {
+        console.log({ collection });
+        try {
+          const [newListingResponse, allListingsResponse] = await Promise.all([
+            request<NewSaleListingsQueryResponse>(
+              indexerEndpoint,
+              filteredNewSaleListingsQuery,
+              {
+                contractAddress: collection.collectionAddress.toLowerCase(),
+                address: "",
+              }
+            ),
+            request<AllListingsQueryResponse>(
+              indexerEndpoint,
+              filteredAllListingsQuery,
+              {
+                contractAddress: collection.collectionAddress.toLowerCase(),
+                address: "",
+              }
+            ),
+          ]);
+
+          const newSaleListings = newListingResponse.newSaleListings;
+          const allListings = allListingsResponse.allListings;
+
+          const totalListingVolume =
+            newSaleListings?.reduce((acc, listing) => {
+              const price = parseFloat(
+                decimalOffChain(listing.totalPricePaid) || "0"
+              );
+              return acc + price;
+            }, 0) ?? 0;
+
+          const formattedTotalVolume = to3DP(totalListingVolume || 0);
+
+          const floorPrice = (() => {
+            let floor = 0;
+            for (const listing of allListings || []) {
+              const price = decimalOffChain(listing.pricePerToken) || "0";
+              const listingPrice = parseFloat(price);
+              floor = Math.min(floor, listingPrice);
+            }
+            return floor;
+          })();
+
+          collection.floorPrice = floorPrice;
+          collection.totalVolume = Number(formattedTotalVolume);
+        } catch (error) {}
+      }
+
       return response.data.collections;
     },
-    refetchInterval: 10000,
+    refetchInterval: 5000,
   });
 }
 
@@ -69,6 +130,11 @@ export function useSingleCollectionQuery({
 
   const { data: newListings, isLoading: isLoadingNewListings } =
     useFilteredNewListingsQuery({
+      contractAddress,
+    });
+
+  const { data: completedListings, isLoading: isLoadingCompletedListings } =
+    useFilteredCompletedListingsQuery({
       contractAddress,
     });
 
@@ -214,7 +280,6 @@ export function useSingleCollectionQuery({
 
       return {
         collection,
-        newSaleListings,
         tokenTransfers: updatedTokenTransfers,
         totalVolume: formattedTotalVolume,
         floorPrice,
@@ -233,7 +298,8 @@ export function useSingleCollectionQuery({
         collectionListings: {
           allListings: allListings || [],
           newListings: newListings || [],
-          newSaleListings: newSaleListings || [],
+          newSaleListings: newSaleListings?.slice(0, 20) || [],
+          completedListings: completedListings || [],
         },
       };
     },
