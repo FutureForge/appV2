@@ -435,34 +435,34 @@ export const auctionClosedQuery = gql`
       tokenId
       transactionHash
       winningBidder
-      # nft {
-      #   assetContract
-      #   id
-      #   metadata {
-      #     animationUrl
-      #     attributes {
-      #       traitType
-      #       value
-      #     }
-      #     backgroundColor
-      #     customAnimationUrl
-      #     customImage
-      #     description
-      #     externalUrl
-      #     image
-      #     imageUrl
-      #     name
-      #     properties {
-      #       name
-      #       value
-      #     }
-      #     supply
-      #   }
-      #   owner
-      #   tokenId
-      #   tokenURI
-      #   type
-      # }
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
     }
   }
 `;
@@ -485,34 +485,34 @@ export const filteredAuctionClosedQuery = gql`
       tokenId
       transactionHash
       winningBidder
-      # nft {
-      #   assetContract
-      #   id
-      #   metadata {
-      #     animationUrl
-      #     attributes {
-      #       traitType
-      #       value
-      #     }
-      #     backgroundColor
-      #     customAnimationUrl
-      #     customImage
-      #     description
-      #     externalUrl
-      #     image
-      #     imageUrl
-      #     name
-      #     properties {
-      #       name
-      #       value
-      #     }
-      #     supply
-      #   }
-      #   owner
-      #   tokenId
-      #   tokenURI
-      #   type
-      # }
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
     }
   }
 `;

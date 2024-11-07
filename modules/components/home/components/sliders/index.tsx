@@ -1,5 +1,9 @@
 import { CustomSlider, NFTCard } from "@/modules/app";
-import { useAllCollectionsQuery, useNewListingsQuery, useNewSaleListingsQuery } from "@/modules/query";
+import {
+  useAllCollectionsQuery,
+  useNewListingsQuery,
+  useNewSaleListingsQuery,
+} from "@/modules/query";
 import React from "react";
 import {
   CollectionNFTCardProps,
@@ -16,11 +20,13 @@ export function Sliders() {
     isLoading,
     isError,
   } = useAllCollectionsQuery();
-  const { data: NewListings } = useNewListingsQuery({});
-  const { data: NewSales } = useNewSaleListingsQuery({});
-  console.log('====================================');
-  console.log(NewSales, 'Hello');
-  console.log('====================================');
+  const { data: NewListings, isLoading: isNewListingsLoading } =
+    useNewListingsQuery({});
+  const { data: NewSalesListing, isLoading: isNewSalesLoading } =
+    useNewSaleListingsQuery({});
+  console.log("====================================");
+  console.log(NewSalesListing, "Hello");
+  console.log("====================================");
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col">
@@ -50,31 +56,30 @@ export function Sliders() {
 
       {/* Recently Listed */}
       <DataSlider
-        isLoading={isLoading}
+        isLoading={isNewListingsLoading}
         title="Recently Listed"
         cta="View More"
         href="/collections"
         data={NewListings || []}
         renderItem={(listing: Listing) => {
-          return <NFTCard key={listing.id} {...listing} />;
+          return <NFTCard key={listing.id} data={listing} type="new-listing" />;
         }}
       />
+
       {/* Recently Sold */}
       <DataSlider
-        isLoading={isLoading}
-        title="Recently Listed"
+        isLoading={isNewSalesLoading}
+        title="Recently Sold Listing"
         cta="View More"
         href="/collections"
-        data={NewSales || []}
+        data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} {...sale} />;
+          return <NFTCard key={sale.id} data={sale} type="new-sale-listing" />;
         }}
       />
     </div>
   );
 }
-
-
 
 interface DataSliderProps {
   title: string;

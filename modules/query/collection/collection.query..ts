@@ -55,7 +55,6 @@ export function useAllCollectionsQuery() {
       );
 
       for (const collection of response.data.collections) {
-        console.log({ collection });
         try {
           const [newListingResponse, allListingsResponse] = await Promise.all([
             request<NewSaleListingsQueryResponse>(
