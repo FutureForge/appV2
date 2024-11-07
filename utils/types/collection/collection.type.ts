@@ -1,14 +1,15 @@
 import { NFTMetadata } from "../graphql";
 
 export type Collection = {
+  _id: number;
   collectionName: string;
   collectionDescription: string;
   collectionAddress: string;
   collectionImage: string;
   collectionBackgroundImage: string;
   collectionOwnerAddress: string;
-  floorPrice?: number;
-  totalVolume?: number;
+  floorPrice: number;
+  totalVolume: number;
 };
 
 export type SingleCollection = {
@@ -19,7 +20,7 @@ export type SingleCollection = {
     owner: string;
     type: string;
     tokenURI: string;
-    metadata: NFTMetadata
+    metadata: NFTMetadata;
   }[];
 };
 

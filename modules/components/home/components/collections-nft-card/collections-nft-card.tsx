@@ -8,7 +8,10 @@ import { Collection } from "@/utils/types/collection/collection.type";
 
 export type CollectionWithoutOwnerBackground = Omit<
   Collection,
-  "collectionBackgroundImage" | "collectionOwnerAddress" | "collectionDescription"
+  | "collectionBackgroundImage"
+  | "collectionOwnerAddress"
+  | "collectionDescription"
+  | "_id"
 >;
 export type CollectionNFTCardProps = CollectionWithoutOwnerBackground & {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -16,7 +19,14 @@ export type CollectionNFTCardProps = CollectionWithoutOwnerBackground & {
 };
 export function CollectionsNFTCard(props: CollectionNFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { collectionImage, collectionName, onClick, cta } = props;
+  const {
+    collectionImage,
+    collectionName,
+    onClick,
+    cta,
+    floorPrice,
+    totalVolume,
+  } = props;
 
   return (
     <div
