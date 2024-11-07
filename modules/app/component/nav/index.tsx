@@ -13,7 +13,8 @@ import { usePathname } from "next/navigation";
 import Logo from "@/public/logo.svg";
 import { TextField } from "../inputs/inputs";
 import { TransitionLinks } from "./transition-links";
-
+import { useUserChainInfo } from "@/modules/query";
+import { getFormatAddress } from "@/utils/functions";
 
 const Nav_Links = [
   {
@@ -31,9 +32,13 @@ const Nav_Links = [
 ];
 
 export function Nav() {
+  const { activeAccount, activeWallet } = useUserChainInfo();
+  const walletAddress = activeAccount?.address;
+
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const [showSignOut, setShowSignOut] = useState(false);
 
   useDisableScroll(isMobileNavOpen);
 
@@ -48,6 +53,11 @@ export function Nav() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const handleSignOut = async () => {
+    console.log("Signing out...");
+    await activeWallet?.disconnect();
+  };
 
   return (
     <nav
@@ -98,16 +108,37 @@ export function Nav() {
           <TransitionLinks href="/profile" className={cn("font-medium")}>
             Profile
           </TransitionLinks>
-          <ConnectButton
-            client={client}
-            chain={chainInfo}
-            wallets={[createWallet("io.metamask")]}
-            connectButton={{
-              label: "Connect Wallet",
-              className:
-                "!font-space !rounded-lg !p-2 max-sm:!w-full !w-fit !text-sm !min-w-0 !flex !items-center !max-w-[28] !justify-center hover:!bg-primary/85 !duration-300 !ease-in-out !transition !bg-primary !text-white !h-[34px]",
-            }}
-          />
+          {!walletAddress ? (
+            <ConnectButton
+              client={client}
+              chain={chainInfo}
+              wallets={[createWallet("io.metamask")]}
+              connectButton={{
+                label: "Connect Wallet",
+                className:
+                  "!font-space !rounded-lg !p-2 max-sm:!w-full !w-fit !text-sm !min-w-0 !flex !items-center !max-w-[28] !justify-center hover:!bg-primary/85 !duration-300 !ease-in-out !transition !bg-primary !text-white !h-[34px]",
+              }}
+            />
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setShowSignOut(!showSignOut)}
+                className="text-white font-medium"
+              >
+                {getFormatAddress(walletAddress)}
+              </button>
+              {showSignOut && (
+                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md">
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-200"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {/* <div className="min-[1170px]:hidden flex items-center gap-8">
