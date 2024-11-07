@@ -20,9 +20,11 @@ body {
   background: #000000;
   color: white;
 }
+
 * {
   /* outline: 1px solid red; */
 }
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -37,7 +39,8 @@ body {
 }
 
 .hide-arrows {
-  -moz-appearance: textfield; /* For Firefox */
+  -moz-appearance: textfield;
+  /* For Firefox */
 }
 
 .loader-container {
@@ -53,10 +56,12 @@ body {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
@@ -80,18 +85,60 @@ body {
   border-spacing: 0 15px;
 }
 
-.gfg tbody > tr > td:nth-child(1) {
+.gfg tbody>tr>td:nth-child(1) {
   border-top-left-radius: 12px !important;
   border-bottom-left-radius: 12px !important;
 }
 
-.gfg tbody > tr > td:last-child {
+.gfg tbody>tr>td:last-child {
   border-top-right-radius: 12px !important;
   border-bottom-right-radius: 12px !important;
 }
-.gfg tbody > tr {
+
+.gfg tbody>tr {
   transition: background-color 0.3s ease;
 }
-.gfg tbody > tr:hover {
+
+.gfg tbody>tr:hover {
   background-color: #3c3c434a !important;
 }
+
+.skeleton-el {
+  @apply bg-muted/50 w-32;
+  @apply bg-gradient-to-r from-transparent via-muted/75 to-transparent;
+  border-radius: 6px;
+  min-height: 20px;
+  padding: 0.375rem;
+  font-size: 0.875rem;
+  /* background-size: 80px 80px; */
+  background-size: 80px 100%;
+  background-repeat: no-repeat;
+  background-position: -200px 0;
+  animation: shine 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) infinite;
+}
+
+@keyframes shine {
+  100% {
+    background-position: calc(100% + 100px) 0;
+  }
+}
+
+
+/* .slick-dots li {
+  margin: 0px !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+} */
+
+/* .slick-dots {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+  align-items: center;
+  margin-top: 1rem !important;
+} */
+
+/* .slick-dots li:last-child {
+  width: fit-content !important;
+} */
