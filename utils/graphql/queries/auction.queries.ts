@@ -426,11 +426,18 @@ export const filteredNewAuctionsQuery = gql`
 
 export const auctionClosedQuery = gql`
   query AuctionClosed($limit: Int!) {
-    auctionCloseds(orderBy: auctionId_DESC, limit: $limit) {
+    auctionCloseds(
+      orderBy: auctionId_DESC
+      limit: $limit
+      where: { auctionStatus_containsInsensitive: "claimed" }
+    ) {
       assetContract
       auctionCreator
       auctionId
+      auctionStatus
+      bidAmount
       closer
+      currency
       id
       tokenId
       transactionHash
@@ -474,13 +481,17 @@ export const filteredAuctionClosedQuery = gql`
         OR: {
           assetContract_eq: $contractAddress
           OR: { auctionCreator_eq: $address }
+          AND: { auctionStatus_contains: "payout-claimed" }
         }
       }
     ) {
       assetContract
       auctionCreator
       auctionId
+      auctionStatus
+      bidAmount
       closer
+      currency
       id
       tokenId
       transactionHash
