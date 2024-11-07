@@ -38,7 +38,6 @@ export function Nav() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const [showSignOut, setShowSignOut] = useState(false);
 
   useDisableScroll(isMobileNavOpen);
 
@@ -120,23 +119,18 @@ export function Nav() {
               }}
             />
           ) : (
-            <div className="relative">
-              <button
-                onClick={() => setShowSignOut(!showSignOut)}
-                className="text-white font-medium"
-              >
+            <div className="relative group">
+              <div className="text-white font-medium cursor-pointer">
                 {getFormatAddress(walletAddress)}
-              </button>
-              {showSignOut && (
-                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md">
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-200"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
+              </div>
+              <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-200"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           )}
         </div>
