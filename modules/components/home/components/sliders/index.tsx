@@ -1,5 +1,9 @@
 import { CustomSlider, NFTCard } from "@/modules/app";
-import { useAllCollectionsQuery, useNewListingsQuery, useNewSaleListingsQuery } from "@/modules/query";
+import {
+  useAllCollectionsQuery,
+  useNewListingsQuery,
+  useNewSaleListingsQuery,
+} from "@/modules/query";
 import React from "react";
 import {
   CollectionNFTCardProps,
@@ -8,25 +12,32 @@ import {
 import { useRouter } from "next/navigation";
 import { Listing } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
+import { Collection } from "@/utils/types/collection/collection.type";
 
 export function Sliders() {
   const router = useRouter();
   const {
     data: CollectionQuery,
-    isLoading,
+    isLoading: isCollectionLoading,
     isError,
   } = useAllCollectionsQuery();
-  const { data: NewListings } = useNewListingsQuery({});
-  const { data: NewSales } = useNewSaleListingsQuery({});
-  console.log('====================================');
-  console.log(NewSales, 'Hello');
-  console.log('====================================');
+
+  console.log({ CollectionQuery });
+
+  const { data: NewListings, isLoading: isNewListingsLoading } =
+    useNewListingsQuery({});
+  const { data: NewSalesListing, isLoading: isNewSalesLoading } =
+    useNewSaleListingsQuery({});
+
+  console.log("====================================");
+  console.log(NewSalesListing, "Hello");
+  console.log("====================================");
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col">
       {/* collection List */}
       <DataSlider
-        isLoading={isLoading}
+        isLoading={isCollectionLoading}
         title="Collection List"
         cta="View More"
         href="/collections"
@@ -41,6 +52,8 @@ export function Sliders() {
               collectionAddress={collection.collectionAddress}
               collectionImage={collection.collectionImage}
               collectionName={collection.collectionName}
+              floorPrice={collection.floorPrice}
+              totalVolume={collection.totalVolume}
               onClick={handleClick}
               cta="Shop Collections"
             />
@@ -50,31 +63,30 @@ export function Sliders() {
 
       {/* Recently Listed */}
       <DataSlider
-        isLoading={isLoading}
+        isLoading={isNewListingsLoading}
         title="Recently Listed"
         cta="View More"
         href="/collections"
         data={NewListings || []}
         renderItem={(listing: Listing) => {
-          return <NFTCard key={listing.id} {...listing} />;
+          return <NFTCard key={listing.id} data={listing} type="new-listing" />;
         }}
       />
+
       {/* Recently Sold */}
       <DataSlider
-        isLoading={isLoading}
-        title="Recently Listed"
+        isLoading={isNewSalesLoading}
+        title="Recently Sold Listing"
         cta="View More"
         href="/collections"
-        data={NewSales || []}
+        data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} {...sale} />;
+          return <NFTCard key={sale.id} data={sale} type="new-sale-listing" />;
         }}
       />
     </div>
   );
 }
-
-
 
 interface DataSliderProps {
   title: string;
@@ -93,6 +105,19 @@ export const DataSlider: React.FC<DataSliderProps> = ({
   data,
   renderItem,
 }) => {
+  if (data.length === 0) {
+    return (
+      <div className="flex gap-8 flex-col mt-12">
+        <div className="flex items-center w-full justify-between">
+          <h3 className="font-medium text-2xl text-white">{title}</h3>
+        </div>
+        <div className="flex justify-center items-center min-h-[200px]">
+          <span className="text-white/50 text-2xl">No {title} found</span>
+        </div>
+      </div>
+    );
+  }
+
   if (data.length <= 3) {
     return (
       <div className="flex gap-8 flex-col mt-12">

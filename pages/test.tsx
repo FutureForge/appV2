@@ -20,9 +20,11 @@ import {
   useUserExpiredAuctionsQuery,
   useUserExpiredOffersQuery,
   useUserChainInfo,
+  useCheckApprovedForAllQuery,
 } from "@/modules/query";
 import {
   useAddCollectionMutation,
+  useApprovedForAllMutation,
   useBidInAuctionMutation,
   useBuyFromDirectListingMutation,
   useCollectAuctionPayoutMutation,
@@ -39,6 +41,9 @@ import DatePicker from "react-datepicker";
 export default function Test() {
   const { data } = useAllCollectionsQuery();
   console.log({ data });
+
+  // const { data: userNFTs } = useUserNFTsQuery();
+  // console.log({ userNFTs });
 
   // const { data: singleNFT } = useSingleNFTQuery({
   //   contractAddress: "0x1a35a38630b6f56637268f437493601dbf72e61a",
@@ -143,6 +148,12 @@ export default function Test() {
     setSelectedDate(newDate);
   };
 
+  // const { data: isApproved } = useCheckApprovedForAllQuery({
+  //   collectionContractAddress: userNFTs?.[8]?.contractAddress!,
+  // });
+
+  // console.log({ isApproved });
+
   // const createListingMutation = useCreateListingMutation();
   // console.log({ createListingMutation });
 
@@ -155,48 +166,58 @@ export default function Test() {
   // const buyListingMutation = useBuyFromDirectListingMutation();
   // console.log({ buyListingMutation });
 
-  const collectAuctionPayoutMutation = useCollectAuctionPayoutMutation();
-  console.log({ collectAuctionPayoutMutation });
+  // const collectAuctionPayoutMutation = useCollectAuctionPayoutMutation();
+  // console.log({ collectAuctionPayoutMutation });
 
-  const handleClick = () => {
+  // const approveMutation = useApprovedForAllMutation();
+  // console.log({ approveMutation });
+
+  const handleClick = async () => {
+    // if (!isApproved) {
+    //   await approveMutation.mutateAsync({
+    //     collectionContractAddress: userNFTs?.[8]?.contractAddress!,
+    //   });
+    // }
+
     // createListingMutation.mutateAsync({
     //   directListing: {
-    //     assetContract: "0x55babee194af5c59a5f17f9dea47be4a37dfb36d",
-    //     tokenId: "1",
+    //     assetContract: userNFTs?.[0]?.contractAddress!,
+    //     tokenId: userNFTs?.[0]?.tokenId!,
     //     quantity: "1",
-    //     pricePerToken: "21",
+    //     pricePerToken: "11",
     //     endTimestamp: selectedDate,
     //   },
     // });
 
+
     // createAuctionMutation.mutateAsync({
     //   auctionDetails: {
-    //     assetContract: "0x55babee194af5c59a5f17f9dea47be4a37dfb36d",
-    //     tokenId: "5",
+    //     assetContract: userNFTs?.[8]?.contractAddress!,
+    //     tokenId: userNFTs?.[8]?.tokenId!,
     //     quantity: "1",
-    //     minimumBidAmount: "3",
-    //     buyoutBidAmount: "15",
+    //     minimumBidAmount: "1",
+    //     buyoutBidAmount: "5",
     //     endTimestamp: selectedDate,
     //   },
     // });
 
     // bidInAuctionMutation.mutateAsync({
-    //   auctionId: "3",
-    //   bidAmount: "15",
+    //   auctionId: "6",
+    //   bidAmount: "5",
     // });
 
     // buyListingMutation.mutateAsync({
     //   buyFromListing: {
-    //     listingId: "0",
+    //     listingId: "4",
     //     buyFor: activeAccount?.address!,
     //     quantity: "1",
-    //     totalPrice: "100",
-    //     nativeTokenValue: "100",
+    //     totalPrice: "11",
+    //     nativeTokenValue: "11",
     //   },
     // });
 
     // collectAuctionPayoutMutation.mutateAsync({
-    //   auctionId: "3",
+    //   auctionId: "6",
     // });
   };
 
@@ -209,14 +230,14 @@ export default function Test() {
         className="bg-background border border-dialog-border rounded-xl w-1/2 py-[.625rem] px-2.5 text-sm"
         minDate={new Date()}
       />
-      <div className="bg-background border border-dialog-border rounded-xl flex justify-between w-[65%] py-[.625rem] px-2.5">
+      {/* <div className="bg-background border border-dialog-border rounded-xl flex justify-between w-[65%] py-[.625rem] px-2.5">
         <p className="font-medium text-sm">
           {selectedDate ? selectedDate.toDateString() : "Select Date"}
         </p>
         <p className="font-medium text-sm">
           {selectedDate ? selectedDate.toLocaleTimeString() : "Time"}
         </p>
-      </div>
+      </div> */}
       <button onClick={handleClick}>Click</button>
     </div>
     // <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto p-4">

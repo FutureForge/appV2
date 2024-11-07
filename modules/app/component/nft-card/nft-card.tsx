@@ -1,39 +1,85 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { Auction, Listing } from "@/utils/types/graphql";
+import { Auction, Listing, NewSaleListing, NFT } from "@/utils/types/graphql";
 
 // icons
 import XFI from "@/assets/xfi.svg";
+import { getFormatAddress } from "@/utils/functions";
+import { decimalOffChain } from "@/modules/blockchain";
 
+export type NFTCardInfo =
+  | "listing"
+  | "auction"
+  | "new-listing"
+  | "new-sale-listing"
+  | "new-auction";
 
-type NFTType = Listing | Auction
-export type NFTCardProps = NFTType & {
+type NFTType = Listing | Auction | NewSaleListing;
+
+export type NFTCardProps = {
+  data: NFTType;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   cta?: string;
+  type: NFTCardInfo;
 };
 
-function isListing(data: NFTType): data is Listing {
-  return "pricePerToken" in data;
-}
+// function isListing(data: NFTType): data is Listing {
+//   return "pricePerToken" in data;
+// }
 
-function isAuction(data: NFTType): data is Auction {
-  return "minimumBidAmount" in data;
-}
+// function isAuction(data: NFTType): data is Auction {
+//   return "minimumBidAmount" in data;
+// }
 
 // function isOffer(data: NFTType): data is Offer {
 //   return "totalPrice" in data;
 // }
+
+const getNFTCardInfo = ({
+  type,
+  data,
+}: {
+  type: NFTCardInfo;
+  data: NFTType;
+}) => {
+  switch (type) {
+    case "new-sale-listing":
+      const listingCreator =
+        "listingCreator" in data ? data.listingCreator : "";
+      const totalPricePaid =
+        "totalPricePaid" in data ? data.totalPricePaid : "";
+
+      return {
+        title1: "Listing Price",
+        title2: "Listed By",
+        info1: `${decimalOffChain(totalPricePaid)} XFI`,
+        info2: getFormatAddress(listingCreator),
+      };
+
+    default:
+      return {
+        title1: "Floor Price",
+        title2: "Volume",
+      };
+  }
+};
+
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { onClick, cta, nft } = props;
-   const { metadata } = nft || {}; 
-   const image = metadata?.image || "";
-   const name = metadata?.name || "";
+  const { onClick, cta, data } = props;
+  const { metadata } = data.nft || {};
+  const image = metadata?.image || "";
+  const name = metadata?.name || "";
 
-    const isListingType = isListing(props);
-    const isAuctionType = isAuction(props);
-    // const isOfferType = isOffer(props);
+  // const isListingType = isListing(props);
+  // const isAuctionType = isAuction(props);
+  // // const isOfferType = isOffer(props);
+
+  const { title1, title2, info1, info2 } = getNFTCardInfo({
+    type: props.type,
+    data,
+  });
 
   return (
     <div
@@ -63,13 +109,13 @@ export function NFTCard(props: NFTCardProps) {
         <div>
           <div className="flex items-center gap-1">
             <XFI />
-            <p className="text-lg font-medium text-white">18.71 XFI</p>
+            <p className="text-lg font-medium text-white">{info1}</p>
           </div>
-          <p className="text-sm text-muted-foreground">Floor Price</p>
+          <p className="text-sm text-muted-foreground">{title1}</p>
         </div>
         <div>
-          <p className="text-lg font-medium text-white">19 XFI</p>
-          <p className="text-sm text-muted-foreground">Volume</p>
+          <p className="text-lg font-medium text-white">{info2}</p>
+          <p className="text-sm text-muted-foreground">{title2}</p>
         </div>
       </div>
       {cta && (

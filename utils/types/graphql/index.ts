@@ -67,6 +67,7 @@ export type NewSaleListing = {
   quantityBought: string;
   totalPricePaid: string;
   transactionHash: string;
+  nft: NFT;
 };
 
 export type Auction = {
@@ -100,7 +101,7 @@ export type AuctionClosed = {
   tokenId: string;
   transactionHash: string;
   winningBidder: string;
-  //   nft: NFT;
+  nft: NFT;
 };
 
 export type Offer = {
