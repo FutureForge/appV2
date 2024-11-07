@@ -2,13 +2,13 @@ export type AuctionBaseType = {
   assetContract: string;
   tokenId: string;
   quantity: string;
-  currency: string;
+  currency?: string;
   minimumBidAmount: string;
   buyoutBidAmount: string;
-  timeBufferInSeconds: string;
-  bidBufferBps: string;
+  timeBufferInSeconds?: string;
+  bidBufferBps?: string;
   startTimestamp?: string;
-  endTimestamp?: Date;
+  endTimestamp: Date;
 };
 
 export type CreateAuctionType = AuctionBaseType;
@@ -28,7 +28,7 @@ export type BuyFromDirectListingType = {
   listingId: string;
   buyFor: string;
   quantity: string;
-  currency: string;
+  currency?: string;
   totalPrice: string;
   nativeTokenValue: string;
 };

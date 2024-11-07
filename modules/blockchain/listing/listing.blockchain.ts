@@ -24,6 +24,9 @@ export async function getCreateDirectListing({
     contractAddress: MARKETPLACE_ADDRESS_TESTNET,
   });
 
+  console.log({ _params });
+  console.log({ contract });
+
   if (
     !_params.assetContract ||
     !_params.tokenId ||
@@ -39,7 +42,11 @@ export async function getCreateDirectListing({
     tokenId: BigInt(_params.tokenId),
     pricePerToken: _params.pricePerToken,
     endTimestamp: _params.endTimestamp,
+    currencyContractAddress: _params.currency || nativeCurrency,
+    isReservedListing: false,
   });
+
+  console.log("transaction, blockchain", { transaction });
 
   return transaction;
 }

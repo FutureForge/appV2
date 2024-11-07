@@ -14,7 +14,7 @@ export function useCreateAuctionMutation() {
     mutationFn: async ({
       auctionDetails,
     }: {
-      auctionDetails: Partial<CreateAuctionType>;
+      auctionDetails: CreateAuctionType;
     }) => {
       if (!activeAccount) {
         throw new Error("Please connect your wallet");

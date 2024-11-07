@@ -19,7 +19,7 @@ export function useApprovedForAllMutation() {
       }
 
       const transaction = await getSetApprovalForAll({
-        collectionContractAddress,
+        contractAddress: collectionContractAddress,
       });
 
       const transactionReceipt = await sendAndConfirmTransaction({

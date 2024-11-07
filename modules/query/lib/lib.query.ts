@@ -15,7 +15,7 @@ export function useCheckApprovedForAllQuery({
       if (!activeAccount?.address) return false;
 
       const isApproved = await getCheckApprovedForAll({
-        collectionContractAddress,
+        contractAddress: collectionContractAddress,
         walletAddress: activeAccount?.address,
       });
 

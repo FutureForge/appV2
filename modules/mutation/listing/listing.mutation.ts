@@ -36,6 +36,8 @@ export function useCreateListingMutation() {
         throw new Error("Please connect your wallet");
       }
 
+      console.log({ directListing });
+
       const transaction = await getCreateDirectListing({
         params: {
           assetContract: directListing.assetContract,
@@ -44,6 +46,8 @@ export function useCreateListingMutation() {
           endTimestamp: directListing.endTimestamp,
         },
       });
+
+      console.log({ transaction });
 
       if (!transaction) throw new Error("Failed to create listing");
 
@@ -182,7 +186,7 @@ export function useBuyFromDirectListingMutation() {
     mutationFn: async ({
       buyFromListing,
     }: {
-      buyFromListing: Partial<BuyFromDirectListingType>;
+      buyFromListing: BuyFromDirectListingType;
     }) => {
       if (!activeAccount) {
         throw new Error("Please connect your wallet");
