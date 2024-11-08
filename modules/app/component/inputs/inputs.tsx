@@ -9,8 +9,8 @@ import { MdOutlineDelete } from "react-icons/md";
 /* -------------------------------------------------------------------------------------------------
  * Text Field
  * -----------------------------------------------------------------------------------------------*/
-export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> &{
-  containerClass?:string
+export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> & {
+  containerClass?: string;
 };
 
 const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
@@ -24,7 +24,12 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
   };
 
   return (
-    <div className={cn("flex gap-1 items-center h-[42px] w-full bg-[#1C1C2A] rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4", containerClass)}>
+    <div
+      className={cn(
+        "flex gap-1 items-center h-[42px] w-full bg-[#1C1C2A] rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4",
+        containerClass
+      )}
+    >
       {type === "search" && <SearchIcon className="size-4 text-[#5A5A86]" />}
       <input
         autoComplete="off"
@@ -254,9 +259,10 @@ const FileInput = forwardRef<
         {filePreview && (
           <button
             onClick={handleDelete}
+            aria-label="Delete file"
             className="mt-4 p-2 border border-border backdrop-blur-2xl hover:scale-105 transition-all duration-300 ease-in-out text-white rounded-md absolute top-4 right-4"
           >
-            <MdOutlineDelete size={24} className="text-error"/>
+            <MdOutlineDelete size={24} className="text-error" />
           </button>
         )}
       </div>

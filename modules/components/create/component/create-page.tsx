@@ -6,6 +6,8 @@ import {
   TextArea,
   TextField,
 } from "@/modules/app";
+import { useToast } from "@/modules/app/hooks/useToast";
+import { useCreateNFTMutation } from "@/modules/mutation";
 import React, { useState } from "react";
 
 type Trait = {
@@ -14,12 +16,17 @@ type Trait = {
 };
 
 export function CreatePage() {
+  const toast = useToast();
+  const createNFTMutation = useCreateNFTMutation();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [traits, setTraits] = useState<Trait[]>([]);
   const [showTraitInputs, setShowTraitInputs] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(() => Date.now().toString());
 
-  const isDisabled = !name || !description
+  console.log({ file });
 
   const handleAddTrait = () => {
     setShowTraitInputs(true);
@@ -44,12 +51,53 @@ export function CreatePage() {
     }
   };
 
+  const resetForm = () => {
+    setName("");
+    setDescription("");
+    setFile(null);
+    setTraits([]);
+    setFileInputKey(Date.now().toString());
+  };
+
+  const handleCreateNFT = async () => {
+    if (!name || !description || !file)
+      return toast.error("Please fill out all fields");
+
+    createNFTMutation.mutate(
+      {
+        name,
+        description,
+        file,
+        attributes: traits,
+      },
+      {
+        onSuccess: () => {
+          resetForm();
+        },
+        onError: () => {
+          resetForm();
+        },
+      }
+    );
+  };
+
+  const isDisabled =
+    !name || !description || !file || createNFTMutation.isPending;
+
   return (
     <div className="flex items-center justify-center gap-7">
       {/* Choose File */}
       <div className="border-dashed border relative border-primary p-4 h-[556px] flex items-center justify-center w-[504px] rounded-3xl">
-        <FileInput />
-        <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40"/>
+        <FileInput
+          key={fileInputKey}
+          onChange={(e) => {
+            const selectedFile = e.target.files?.[0];
+            if (selectedFile) {
+              setFile(selectedFile);
+            }
+          }}
+        />
+        <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
       </div>
 
       {/* Form */}
@@ -73,7 +121,7 @@ export function CreatePage() {
               <div className="flex flex-col gap-4">
                 <Label htmlFor="description">Description</Label>
                 <TextArea
-                placeholder="Description"
+                  placeholder="Description"
                   value={description}
                   onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setDescription(event.target.value)
@@ -148,7 +196,12 @@ export function CreatePage() {
           </div>
         </ScrollArea>
         <div className="mt-4 flex items-center justify-end gap-3">
-          <Button disabled={isDisabled} shape="square" className="w-full">
+          <Button
+            onClick={handleCreateNFT}
+            disabled={isDisabled}
+            shape="square"
+            className="w-full"
+          >
             Create NFT
           </Button>
         </div>

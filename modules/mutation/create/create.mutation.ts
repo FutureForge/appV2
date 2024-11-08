@@ -29,18 +29,25 @@ export function useCreateNFTMutation() {
 
   return useMutation({
     mutationFn: async (createNFTData: CreateNFTMetadata) => {
-      if (!activeAccount) return toast.error("Please connect your wallet");
+      //   if (!activeAccount) return toast.error("Please connect your wallet");
 
-      const minterContract = await getContractEthers({
-        contractAddress: MARKETPLACE_ADDRESS_TESTNET,
-        abi: MinterABI,
-      });
+      //   const minterContract = await getContractEthers({
+      //     contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+      //     abi: MinterABI,
+      //   });
 
       const uri = await upload({
         client,
         files: [createNFTData.file!],
         uploadWithoutDirectory: true,
+        metadata: {
+          name: createNFTData.name,
+          description: createNFTData.description,
+        },
       });
+
+      console.log({ uri });
+      console.log({ createNFTData });
 
       if (uri) {
         const tokenURI = JSON.stringify({
@@ -50,27 +57,28 @@ export function useCreateNFTMutation() {
           attributes: createNFTData.attributes,
         });
 
-        const transaction = await minterContract.populateTransaction.mint(
-          tokenURI,
-          {
-            value: ethers.utils.parseEther("1"), // update this to the mint price directly from the contract
-          }
-        );
+        // const transaction = await minterContract.populateTransaction.mint(
+        //   tokenURI,
+        //   {
+        //     value: ethers.utils.parseEther("1"), // update this to the mint price directly from the contract
+        //   }
+        // );
 
-        // @ts-ignore
-        const tx = await activeAccount.sendTransaction(transaction);
-        const receipt = await waitForTransaction(tx.transactionHash);
+        // // @ts-ignore
+        // const tx = await activeAccount.sendTransaction(transaction);
+        // const receipt = await waitForTransaction(tx.transactionHash);
 
-        if (receipt.status === "reverted") {
-          throw new Error("Transaction failed");
-        }
+        // if (receipt.status === "reverted") {
+        //   throw new Error("Transaction failed");
+        // }
 
         // const totalSupply = await minterContract.totalSupply();
         // const tokenId = totalSupply.toString() - 1;
 
         // await router.push(`/nft/${CROSSFI_MINTER_ADDRESS}/CFC-721/${tokenId}`);
 
-        return receipt;
+        // return receipt;
+        return uri;
       } else {
         throw new Error("No URI");
       }
