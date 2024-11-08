@@ -20,6 +20,7 @@ import {
   NewOffersQueryResponse,
   SingleOfferQueryResponse,
 } from "@/utils/types/graphql";
+import { formatBlockchainTimestamp } from "@/utils/functions";
 
 export function useAllOffersQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
@@ -30,7 +31,17 @@ export function useAllOffersQuery({ limit = 50 }: { limit?: number }) {
         allOffersQuery,
         { limit }
       );
-      return response.allOffers;
+
+      const updatedOffers = response.allOffers.filter((offer) => {
+        const { expirationTimestamp } = offer;
+        const endTime = formatBlockchainTimestamp(expirationTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedOffers;
     },
     enabled: !!limit,
     refetchInterval: 5000,
@@ -55,7 +66,17 @@ export function useFilteredAllOffersQuery({
           address,
         }
       );
-      return response.allOffers;
+
+      const updatedOffers = response.allOffers.filter((offer) => {
+        const { expirationTimestamp } = offer;
+        const endTime = formatBlockchainTimestamp(expirationTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedOffers;
     },
     enabled: !!address || !!contractAddress,
 
@@ -81,7 +102,17 @@ export function useSingleOfferQuery({
           tokenId,
         }
       );
-      return response.allOffers;
+      const updatedOffers = response.allOffers.filter((offer) => {
+        const { expirationTimestamp } = offer;
+        const endTime = formatBlockchainTimestamp(expirationTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return { ...offer, expired: endTimeFormatted < currentTime };
+      });
+
+      return updatedOffers;
     },
     enabled: !!contractAddress || !!tokenId,
     refetchInterval: 100000,
@@ -177,7 +208,16 @@ export function useNewOffersQuery({ limit = 50 }: { limit?: number }) {
         newOffersQuery,
         { limit }
       );
-      return response.newOffers;
+
+      const updatedOffers = response.newOffers.filter((offer) => {
+        const { expirationTimestamp } = offer;
+        const endTime = formatBlockchainTimestamp(expirationTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedOffers;
     },
     enabled: !!limit,
     refetchInterval: 100000,
@@ -202,7 +242,17 @@ export function useFilteredNewOffersQuery({
           address,
         }
       );
-      return response.newOffers;
+
+      const updatedOffers = response.newOffers.filter((offer) => {
+        const { expirationTimestamp } = offer;
+        const endTime = formatBlockchainTimestamp(expirationTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedOffers;
     },
     enabled: !!address || !!contractAddress,
     refetchInterval: 100000,

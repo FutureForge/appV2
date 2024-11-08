@@ -20,6 +20,7 @@ import {
   NewSaleListingsQueryResponse,
   SingleListingQueryResponse,
 } from "@/utils/types/graphql";
+import { formatBlockchainTimestamp } from "@/utils/functions";
 
 export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
@@ -30,7 +31,20 @@ export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
         allListingsQuery,
         { limit }
       );
-      return response.allListings;
+
+      const updatedListings = response.allListings.filter((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedListings;
+
+      // return response.allListings;
     },
     enabled: !!limit || limit === 0 || limit === 50,
     refetchInterval: 100000,
@@ -55,7 +69,18 @@ export function useFilteredAllListingsQuery({
           address,
         }
       );
-      return response.allListings;
+
+      const updatedListings = response.allListings.filter((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedListings;
     },
     enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
@@ -77,7 +102,18 @@ export function useSingleListingQuery({
         singleListingQuery,
         { contractAddress, tokenId }
       );
-      return response.allListings;
+
+      const updatedListings = response.allListings.map((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return { ...listing, expired: endTimeFormatted < currentTime };
+      });
+
+      return updatedListings;
     },
     enabled: !!contractAddress || !!tokenId,
     refetchInterval: 5000,
@@ -132,7 +168,18 @@ export function useNewListingsQuery({ limit = 50 }: { limit?: number }) {
         newListingsQuery,
         { limit }
       );
-      return response.newListings;
+
+      const updatedNewListings = response.newListings.map((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return { ...listing, expired: endTimeFormatted < currentTime };
+      });
+
+      return updatedNewListings;
     },
     enabled: !!limit,
     refetchInterval: 100000,
@@ -157,7 +204,18 @@ export function useFilteredNewListingsQuery({
           address,
         }
       );
-      return response.newListings;
+
+      const updatedNewListings = response.newListings.map((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return { ...listing, expired: endTimeFormatted < currentTime };
+      });
+
+      return updatedNewListings;
     },
     enabled: !!address || !!contractAddress,
     refetchInterval: 100000,

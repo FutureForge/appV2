@@ -24,10 +24,18 @@ export type SingleCollection = {
   }[];
 };
 
+export type TokenDetails = {
+  contractAddress: string;
+  blockNumberCreate: string;
+  creatorAddress: string;
+  timestamp: string;
+  tokenType: string;
+  txHashCreate: string;
+  holderCount: number;
+  transferCount: number;
+};
+
 export type CollectionsQueryResponse = {
   collections: Collection[];
 };
 
-export type SingleCollectionQueryResponse = {
-  collection: SingleCollection;
-};

@@ -32,6 +32,7 @@ export const queryKeys = {
     single: ["single-nft"] as const,
   },
   user: {
+    all: ["user"] as const,
     nfts: ["user-nfts"] as const,
     offers: ["user-offers"] as const,
     auctions: ["user-auctions"] as const,

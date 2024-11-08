@@ -24,6 +24,7 @@ import {
   NewBidsUserQueryResponse,
   SingleAuctionQueryResponse,
 } from "@/utils/types/graphql";
+import { formatBlockchainTimestamp } from "@/utils/functions";
 
 export function useAllAuctionsQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
@@ -34,7 +35,17 @@ export function useAllAuctionsQuery({ limit = 50 }: { limit?: number }) {
         allAuctionsQuery,
         { limit }
       );
-      return response.allAuctions;
+
+      const updatedAuctions = response.allAuctions.filter((auction) => {
+        const { endTimestamp } = auction;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedAuctions;
     },
     enabled: !!limit,
     refetchInterval: 100000,
@@ -59,7 +70,17 @@ export function useFilteredAllAuctionsQuery({
           address,
         }
       );
-      return response.allAuctions;
+
+      const updatedAuctions = response.allAuctions.filter((auction) => {
+        const { endTimestamp } = auction;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted > currentTime;
+      });
+
+      return updatedAuctions;
     },
     enabled: !!address || !!contractAddress,
     refetchInterval: 100000,
@@ -84,7 +105,18 @@ export function useSingleAuctionQuery({
           tokenId,
         }
       );
-      return response.allAuctions;
+
+      const updatedAuction = response.allAuctions.filter((auction) => {
+        const { endTimestamp } = auction;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        // looking for active listings
+        return { ...auction, expired: endTimeFormatted < currentTime };
+      });
+
+      return updatedAuction;
     },
     enabled: !!contractAddress || !!tokenId,
     refetchInterval: 100000,
