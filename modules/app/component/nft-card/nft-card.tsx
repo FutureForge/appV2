@@ -24,18 +24,6 @@ export type NFTCardProps = {
   type: NFTCardInfo;
 };
 
-// function isListing(data: NFTType): data is Listing {
-//   return "pricePerToken" in data;
-// }
-
-// function isAuction(data: NFTType): data is Auction {
-//   return "minimumBidAmount" in data;
-// }
-
-// function isOffer(data: NFTType): data is Offer {
-//   return "totalPrice" in data;
-// }
-
 const getNFTCardInfo = ({
   type,
   data,
@@ -56,7 +44,17 @@ const getNFTCardInfo = ({
         info1: `${decimalOffChain(totalPricePaid)} XFI`,
         info2: getFormatAddress(listingCreator),
       };
+    case "new-auction":
+      const auctionCreator =
+        "auctionCreator" in data ? data.auctionCreator : "";
+      const buyoutBidAmount = "buyoutBidAmount" in data ? data.buyoutBidAmount : "";
 
+      return{
+        title1: "Bid Price",
+        title2: "Creator",
+        info1: `${decimalOffChain(buyoutBidAmount)}XFI`,
+        info2: getFormatAddress(auctionCreator),
+      }
     default:
       return {
         title1: "Floor Price",
@@ -67,14 +65,13 @@ const getNFTCardInfo = ({
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { onClick, cta, data } = props;
+  const { onClick, cta, data, type } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";
-
-  // const isListingType = isListing(props);
-  // const isAuctionType = isAuction(props);
-  // // const isOfferType = isOffer(props);
+  console.log("====================================");
+  console.log(data, type, "hello");
+  console.log("====================================");
 
   const { title1, title2, info1, info2 } = getNFTCardInfo({
     type: props.type,
