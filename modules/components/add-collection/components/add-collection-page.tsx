@@ -190,131 +190,133 @@ export function AddCollectionsPage() {
           Make sure you’re the owner of the collection
         </p>
       </div>
-      <div className="flex items-center justify-center gap-7">
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-4">
-            <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
-              <FileInput
-                id="image"
-                name="image"
-                onChange={handleFileChange}
-                subTitle="Upload Image"
-                icon={<DownloadIcon className="size-10" />}
-              />
-              <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
-            </div>
-            <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
-              <FileInput
-                id="backgroundImage"
-                name="backgroundImage"
-                onChange={handleFileChange}
-                subTitle="Upload Background"
-                icon={<DownloadIcon className="size-10" />}
-              />
-              <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
-            </div>
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center justify-center gap-7"
+      >
+        <div className="flex flex-col gap-4">
+          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
+            <FileInput
+              id="image"
+              name="image"
+              onChange={handleFileChange}
+              subTitle="Upload Image"
+              icon={<DownloadIcon className="size-10" />}
+            />
+            <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
-          <div className="w-[504px] max-[1450px]:h-[482px] bg-tertiary p-6 flex flex-col rounded-3xl">
-            <ScrollArea>
-              <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
-                <div className="w-full flex flex-col gap-5">
-                  <div className="flex flex-col gap-4">
-                    <Label htmlFor="name">Display Name</Label>
+          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
+            <FileInput
+              id="backgroundImage"
+              name="backgroundImage"
+              onChange={handleFileChange}
+              subTitle="Upload Background"
+              icon={<DownloadIcon className="size-10" />}
+            />
+            <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
+          </div>
+        </div>
+        <div className="w-[504px] max-[1450px]:h-[482px] bg-tertiary p-6 flex flex-col rounded-3xl">
+          <ScrollArea>
+            <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
+              <div className="w-full flex flex-col gap-5">
+                <div className="flex flex-col gap-4">
+                  <Label htmlFor="name">Display Name</Label>
+                  <TextField
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Collection Name"
+                    containerClass="bg-border border-0"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <Label htmlFor="description">Description</Label>
+                  <TextArea
+                    placeholder="Collection Description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    id="description"
+                    name="description"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="traits">Contract Address</Label>
                     <TextField
-                      value={formData.name}
+                      value={formData.contractAddress}
                       onChange={handleInputChange}
                       type="text"
-                      id="name"
-                      name="name"
-                      placeholder="Collection Name"
+                      id="contractAddress"
+                      name="contractAddress"
+                      placeholder="Collection Contract Address"
                       containerClass="bg-border border-0"
                       required
                     />
+                    {formData.contractAddress && !NFTContract && (
+                      <p className="text-error text-sm font-medium">
+                        Not a Valid CFC-721 token
+                      </p>
+                    )}
+                    {formData.contractAddress && collectionExist && (
+                      <p className="text-error text-sm font-medium">
+                        Collection already in Marketplace
+                      </p>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-4">
-                    <Label htmlFor="description">Description</Label>
-                    <TextArea
-                      placeholder="Collection Description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      id="description"
-                      name="description"
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="traits">Contract Address</Label>
-                      <TextField
-                        value={formData.contractAddress}
-                        onChange={handleInputChange}
-                        type="text"
-                        id="contractAddress"
-                        name="contractAddress"
-                        placeholder="Collection Contract Address"
-                        containerClass="bg-border border-0"
-                        required
-                      />
-                      {formData.contractAddress && !NFTContract && (
-                        <p style={{ color: "red" }}>
-                          Not a Valid CFC-721 token
-                        </p>
-                      )}
-                      {formData.contractAddress && collectionExist && (
-                        <p style={{ color: "red" }}>
-                          Collection already in Marketplace
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {formData.collectionSocials.map((social, index) => (
-                        <div key={index} className="flex flex-col gap-1">
-                          <TextField
-                            value={social.socialLink}
-                            icon={
-                              <span className="bg-tertiary size-7 rounded-lg min-w-7 flex items-center justify-center">
-                                {social.socialName === "twitter" ? (
-                                  <X />
-                                ) : social.socialName === "discord" ? (
-                                  <Discord />
-                                ) : (
-                                  <Telegram />
-                                )}
-                              </span>
-                            }
-                            onChange={(e) =>
-                              handleSocialChange(
-                                index,
-                                "socialLink",
-                                e.target.value
-                              )
-                            }
-                          />
-                          {socialErrors[index] && (
-                            <span className="text-red-500 text-sm">
-                              {socialErrors[index]}
+                  <div className="flex items-center gap-4 pb-1">
+                    {formData.collectionSocials.map((social, index) => (
+                      <div key={index} className="flex flex-col gap-1">
+                        <TextField
+                          value={social.socialLink}
+                          icon={
+                            <span className="bg-tertiary size-7 rounded-lg min-w-7 flex items-center justify-center">
+                              {social.socialName === "twitter" ? (
+                                <X />
+                              ) : social.socialName === "discord" ? (
+                                <Discord />
+                              ) : (
+                                <Telegram />
+                              )}
                             </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                          }
+                          onChange={(e) =>
+                            handleSocialChange(
+                              index,
+                              "socialLink",
+                              e.target.value
+                            )
+                          }
+                          containerClass="bg-border px-2 border-0"
+                        />
+                        {socialErrors[index] && (
+                          <span className="text-error text-sm">
+                            {socialErrors[index]}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            </ScrollArea>
-            <div className="mt-4 flex items-center justify-end gap-3">
-              <Button
-                type="submit"
-                disabled={isDisabled}
-                shape="square"
-                className="w-full"
-              >
-                Add Collection
-              </Button>
             </div>
+          </ScrollArea>
+          <div className="mt-4 flex items-center justify-end gap-3">
+            <Button
+              type="submit"
+              disabled={isDisabled}
+              shape="square"
+              className="w-full"
+            >
+              Add Collection
+            </Button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }
