@@ -1,34 +1,36 @@
-import React, { forwardRef, useState, useRef } from 'react'
-import { cn } from '../../utils'
-import Image from 'next/image'
+import React, { forwardRef, useState, useRef } from "react";
+import { cn } from "../../utils";
+import Image from "next/image";
 // icons
-import SearchIcon from '@/assets/search-lg.svg'
-// import { Icon } from '../icon-selector/icon-selector'
+import SearchIcon from "@/assets/search-lg.svg";
+import DownloadIcon from "@/assets/download.svg";
+import { MdOutlineDelete } from "react-icons/md";
 
 /* -------------------------------------------------------------------------------------------------
  * Text Field
  * -----------------------------------------------------------------------------------------------*/
-export type TextFieldProps = React.ComponentPropsWithoutRef<'input'>
+export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> &{
+  containerClass?:string
+};
 
 const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
-  const { type, className, ...inputProps } = props
+  const { type, className, containerClass, ...inputProps } = props;
 
   // Function to prevent negative input
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (type === 'number' && (e.key === '-' || e.key === 'e')) {
-      e.preventDefault()
+    if (type === "number" && (e.key === "-" || e.key === "e")) {
+      e.preventDefault();
     }
-  }
-
+  };
 
   return (
-    <div className="flex gap-1 items-center h-[42px] w-full bg-[#1C1C2A] rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4">
+    <div className={cn("flex gap-1 items-center h-[42px] w-full bg-[#1C1C2A] rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4", containerClass)}>
       {type === "search" && <SearchIcon className="size-4 text-[#5A5A86]" />}
       <input
         autoComplete="off"
         type={type}
         className={cn(
-          " bg-transparent outline-none placeholder:text-sm text-sm w-full",
+          " bg-transparent outline-none placeholder:text-sm text-sm w-full placeholder:text-muted-foreground",
           className,
           type === "number" && "hide-arrows"
         )}
@@ -38,148 +40,168 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
       />
     </div>
   );
-})
-TextField.displayName = 'TextField'
+});
+TextField.displayName = "TextField";
 
 /* -------------------------------------------------------------------------------------------------
  * Text Area
  * -----------------------------------------------------------------------------------------------*/
 
-export type TextAreaProps = React.ComponentPropsWithoutRef<'textarea'>
-const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>((props, ref) => {
-  const { className, ...textareaProps } = props
+export type TextAreaProps = React.ComponentPropsWithoutRef<"textarea">;
+const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  (props, ref) => {
+    const { className, ...textareaProps } = props;
 
-  return (
-    <textarea
-      autoComplete="off"
-      className={cn('bg-sec-bg rounded-xl resize-none h-[138px] p-4', className)}
-      ref={ref}
-      {...textareaProps}
-    />
-  )
-})
-TextArea.displayName = 'TextArea'
+    return (
+      <textarea
+        autoComplete="off"
+        className={cn(
+          "bg-border focus:border-primary outline-none placeholder:text-muted-foreground caret-primary border border-transparent rounded-xl resize-none h-[138px] p-4",
+          className
+        )}
+        ref={ref}
+        {...textareaProps}
+      />
+    );
+  }
+);
+TextArea.displayName = "TextArea";
 
 /* -------------------------------------------------------------------------------------------------
  * FormFieldLabel
  * -----------------------------------------------------------------------------------------------*/
 
-const LABEL_NAME = 'FormLabel'
+const LABEL_NAME = "FormLabel";
 
-type FormLabelElement = React.ElementRef<'label'>
-export interface FormLabelProps extends React.ComponentPropsWithoutRef<'label'> {
-  trailing?: React.ReactNode
+type FormLabelElement = React.ElementRef<"label">;
+export interface FormLabelProps
+  extends React.ComponentPropsWithoutRef<"label"> {
+  trailing?: React.ReactNode;
 }
 
-const Label = React.forwardRef<FormLabelElement, FormLabelProps>((props, ref) => {
-  const { className, trailing, children, htmlFor, ...labelProps } = props
+const Label = React.forwardRef<FormLabelElement, FormLabelProps>(
+  (props, ref) => {
+    const { className, trailing, children, htmlFor, ...labelProps } = props;
 
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <label
-          htmlFor={htmlFor}
-          {...labelProps}
-          ref={ref}
-          className={cn('text-white font-medium text-sm', className)}
-        >
-          {children}
-        </label>
+    return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor={htmlFor}
+            {...labelProps}
+            ref={ref}
+            className={cn("text-white font-medium text-base", className)}
+          >
+            {children}
+          </label>
+        </div>
+        {trailing}
       </div>
-      {trailing}
-    </div>
-  )
-})
+    );
+  }
+);
 
-Label.displayName = LABEL_NAME
+Label.displayName = LABEL_NAME;
 
 /* -------------------------------------------------------------------------------------------------
  * File Input
  * -----------------------------------------------------------------------------------------------*/
 
-const FileInput = forwardRef<HTMLInputElement, FileInputProps & { key?: string }>((props, ref) => {
-  const { onChange, ...otherProps } = props
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [filePreview, setFilePreview] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+const FileInput = forwardRef<
+  HTMLInputElement,
+  FileInputProps & { key?: string }
+>((props, ref) => {
+  const { onChange, ...otherProps } = props;
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const MAX_FILE_SIZE_MB = 50
-  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+  const MAX_FILE_SIZE_MB = 50;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
       if (validateFileType(file) && validateFileSize(file)) {
-        setFileName(file.name)
-        setFilePreview(URL.createObjectURL(file))
-        setError(null)
+        setFileName(file.name);
+        setFilePreview(URL.createObjectURL(file));
+        setError(null);
         // Call the onChange prop with the selected file
         if (onChange) {
-          onChange(event)
+          onChange(event);
         }
       }
     }
-  }
+  };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-  }
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
+    event.preventDefault();
+    event.stopPropagation();
 
-    const file = event.dataTransfer.files?.[0]
+    const file = event.dataTransfer.files?.[0];
     if (file) {
       if (validateFileType(file) && validateFileSize(file)) {
-        setFileName(file.name)
-        setFilePreview(URL.createObjectURL(file))
-        setError(null)
+        setFileName(file.name);
+        setFilePreview(URL.createObjectURL(file));
+        setError(null);
         // Create a new change event and call onChange
         if (onChange && fileInputRef.current) {
-          const dataTransfer = new DataTransfer()
-          dataTransfer.items.add(file)
-          fileInputRef.current.files = dataTransfer.files
-          const newEvent = new Event('change', { bubbles: true })
-          onChange(newEvent as unknown as React.ChangeEvent<HTMLInputElement>)
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInputRef.current.files = dataTransfer.files;
+          const newEvent = new Event("change", { bubbles: true });
+          onChange(newEvent as unknown as React.ChangeEvent<HTMLInputElement>);
         }
       }
     }
-  }
+  };
 
   const validateFileType = (file: File) => {
     const validTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'image/avif',
-      'image/svg+xml',
-      'video/mp4',
-    ]
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/avif",
+      "image/svg+xml",
+      "video/mp4",
+    ];
     if (!validTypes.includes(file.type)) {
-      setError('Invalid file type. Please upload a JPG, PNG, GIF, SVG, or MP4 file.')
-      return false
+      setError(
+        "Invalid file type. Please upload a JPG, PNG, GIF, SVG, or MP4 file."
+      );
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const validateFileSize = (file: File) => {
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`)
-      return false
+      setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const handleClick = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click()
+      fileInputRef.current.click();
     }
-  }
+  };
+
+  const handleDelete = () => {
+    setFileName(null);
+    setFilePreview(null);
+    setError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   return (
     <>
@@ -187,48 +209,64 @@ const FileInput = forwardRef<HTMLInputElement, FileInputProps & { key?: string }
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className="flex w-full h-full items-center relative text-center bg-sec-bg justify-center cursor-pointer rounded-2xl"
+        className="flex w-full h-full items-center relative text-center bg-gradient-to-t from-transparent to-[#292A3E] justify-center cursor-pointer rounded-2xl"
       >
         <input
           ref={fileInputRef}
           type="file"
           onChange={handleFileChange}
           accept=".jpeg,.jpg,.png,.gif,.svg,.mp4,.webp,.avif"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           {...otherProps}
         />
         {filePreview ? (
-          filePreview.endsWith('.mp4') ? (
-            <video src={filePreview} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
+          filePreview.endsWith(".mp4") ? (
+            <video
+              src={filePreview}
+              controls
+              style={{ maxWidth: "100%", maxHeight: "100%" }}
+            />
           ) : (
             <Image
               src={filePreview}
-              alt={fileName || 'Uploaded file'}
+              alt={fileName || "Uploaded file"}
               layout="fill"
               className="absolute inset-0 rounded-xl border border-sec-bg"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
+              style={{ maxWidth: "100%", maxHeight: "100%" }}
             />
           )
         ) : (
-          <div className="flex flex-col items-center justify-center gap-6 py-8">
-            {/* <Icon iconType={'download'} className="w-20 max-md:w-10" /> */}
-            <div className="flex flex-col gap-4">
-              <p className="font-medium text-muted-foreground">Drag and drop media</p>
-              <p>Browse Files</p>
+          <div className="flex flex-col items-center  justify-center gap-6 py-8">
+            <h3 className="font-medium text-[28px]">Create an NFT</h3>
+
+            <div className="flex flex-col items-center gap-4">
+              <DownloadIcon />
+              <p className="font-medium text-foreground">Drag and drop media</p>
               <span>
                 <p className="text-sm text-muted-foreground">Max size: 50MB</p>
-                <p className="text-sm text-muted-foreground">JPG, PNG, GIF, SVG, MP4</p>
+                <p className="text-sm text-muted-foreground">
+                  JPG, PNG, GIF, SVG, MP4
+                </p>
               </span>
             </div>
           </div>
         )}
+        {filePreview && (
+          <button
+            onClick={handleDelete}
+            className="mt-4 p-2 border border-border backdrop-blur-2xl hover:scale-105 transition-all duration-300 ease-in-out text-white rounded-md absolute top-4 right-4"
+          >
+            <MdOutlineDelete size={24} className="text-error"/>
+          </button>
+        )}
       </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </>
-  )
-})
-FileInput.displayName = 'FileInput'
+  );
+});
+FileInput.displayName = "FileInput";
 
-export { TextField, TextArea, Label, FileInput }
+export { TextField, TextArea, Label, FileInput };
 
-export type FileInputProps = React.ComponentPropsWithoutRef<'input'>
+export type FileInputProps = React.ComponentPropsWithoutRef<"input">;

@@ -1,0 +1,1 @@
+export {CreatePage} from './component/create-page'
