@@ -1,67 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { Auction, Listing, NewSaleListing, NFT } from "@/utils/types/graphql";
+import { getNFTCardInfo, NFTCardProps } from "./utils/nft-card.utils";
 
 // icons
 import XFI from "@/assets/xfi.svg";
-import { getFormatAddress } from "@/utils/functions";
-import { decimalOffChain } from "@/modules/blockchain";
-
-export type NFTCardInfo =
-  | "listing"
-  | "auction"
-  | "new-listing"
-  | "new-sale-listing"
-  | "new-auction";
-
-type NFTType = Listing | Auction | NewSaleListing;
-
-export type NFTCardProps = {
-  data: NFTType;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  cta?: string;
-  type: NFTCardInfo;
-};
-
-const getNFTCardInfo = ({
-  type,
-  data,
-}: {
-  type: NFTCardInfo;
-  data: NFTType;
-}) => {
-  switch (type) {
-    case "new-sale-listing":
-      const listingCreator =
-        "listingCreator" in data ? data.listingCreator : "";
-      const totalPricePaid =
-        "totalPricePaid" in data ? data.totalPricePaid : "";
-
-      return {
-        title1: "Listing Price",
-        title2: "Listed By",
-        info1: `${decimalOffChain(totalPricePaid)} XFI`,
-        info2: getFormatAddress(listingCreator),
-      };
-    case "new-auction":
-      const auctionCreator =
-        "auctionCreator" in data ? data.auctionCreator : "";
-      const buyoutBidAmount = "buyoutBidAmount" in data ? data.buyoutBidAmount : "";
-
-      return{
-        title1: "Bid Price",
-        title2: "Creator",
-        info1: `${decimalOffChain(buyoutBidAmount)}XFI`,
-        info2: getFormatAddress(auctionCreator),
-      }
-    default:
-      return {
-        title1: "Floor Price",
-        title2: "Volume",
-      };
-  }
-};
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -69,9 +12,10 @@ export function NFTCard(props: NFTCardProps) {
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";
-  console.log("====================================");
-  console.log(data, type, "hello");
-  console.log("====================================");
+
+  // console.log("====================================");
+  // console.log(data, type, "hello");
+  // console.log("====================================");
 
   const { title1, title2, info1, info2 } = getNFTCardInfo({
     type: props.type,

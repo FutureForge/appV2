@@ -103,7 +103,7 @@ export function useAllCollectionsQuery() {
         } catch (error) {}
       }
 
-      return response.data.collections;
+      return response.data.collections.reverse();
     },
     refetchInterval: 5000,
   });
