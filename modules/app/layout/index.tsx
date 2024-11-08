@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { Nav } from "../component/nav";
+import { Footer } from "../component/footer/footer";
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -12,11 +13,11 @@ const Toast = dynamic(() => import("@/modules/components/toast/toast"), {
 });
 export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
   return (
-    <div className="flex isolate flex-col h-screen relative bg-background">
+    <div className="flex isolate flex-col min-h-screen font-space relative bg-background">
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="w-full z-10 font-inter"
+        className="flex-grow w-full min-h-screen pb-16"
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);
@@ -26,6 +27,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
         {children}
         <Toast />
       </div>
+      <Footer />
     </div>
   );
 };
