@@ -11,7 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        inter: ["var(--font-inter)", ...fontFamily.sans],
+        space: ["var(--font-space)", ...fontFamily.sans],
       },
       colors: {
         // background: "var(--background)",
@@ -28,6 +28,7 @@ const config: Config = {
         card: "#101019",
         border: "#292A3E",
         muted: "#6b6b6b",
+        tertiary: "#181825",
       },
     },
   },
