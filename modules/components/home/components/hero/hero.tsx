@@ -102,10 +102,12 @@ export function Hero() {
                 };
                 return (
                   <CollectionsNFTCard
-                    key={collection.collectionAddress}
+                    key={collection._id}
                     collectionAddress={collection.collectionAddress}
                     collectionImage={collection.collectionImage}
                     collectionName={collection.collectionName}
+                    floorPrice={collection.floorPrice}
+                    totalVolume={collection.totalVolume}
                     onClick={handleClick}
                     cta="Shop Collections"
                   />

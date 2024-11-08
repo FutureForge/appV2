@@ -1,5 +1,6 @@
 import { CustomSlider, NFTCard } from "@/modules/app";
 import {
+  useAllAuctionsQuery,
   useAllCollectionsQuery,
   useNewListingsQuery,
   useNewSaleListingsQuery,
@@ -28,9 +29,10 @@ export function Sliders() {
     useNewListingsQuery({});
   const { data: NewSalesListing, isLoading: isNewSalesLoading } =
     useNewSaleListingsQuery({});
+    const { data: AuctionListing } = useAllAuctionsQuery({})
 
   console.log("====================================");
-  console.log(NewSalesListing, "Hello");
+  console.log(AuctionListing, "Hello");
   console.log("====================================");
 
   return (
@@ -82,6 +84,29 @@ export function Sliders() {
         data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
           return <NFTCard key={sale.id} data={sale} type="new-sale-listing" />;
+        }}
+      />
+      {/* Recently Auctioned */}
+      <DataSlider
+        isLoading={isNewSalesLoading}
+        title="Recently Auctioned Listing"
+        cta="View More"
+        href="/collections"
+        data={AuctionListing || []}
+        renderItem={(sale: Listing) => {
+          return <NFTCard key={sale.id} data={sale} type="new-auction" />;
+        }}
+      />
+
+      {/* Recently Sold Auction */}
+      <DataSlider
+        isLoading={isNewSalesLoading}
+        title="Recently Sold Auction"
+        cta="View More"
+        href="/collections"
+        data={AuctionListing || []}
+        renderItem={(sale: Listing) => {
+          return <NFTCard key={sale.id} data={sale} type="new-auction" />;
         }}
       />
     </div>

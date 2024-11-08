@@ -29,6 +29,10 @@ const Nav_Links = [
     name: "Collections",
     link: "/collections",
   },
+  {
+    name: "Browse",
+    link: "/browse",
+  },
 ];
 
 export function Nav() {
