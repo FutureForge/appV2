@@ -4,16 +4,9 @@ import { queryKeys } from "@/modules/query/query-keys";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { isERC721 } from "thirdweb/extensions/erc721";
 import { owner } from "thirdweb/extensions/common";
 import axios from "axios";
 import { backendURL } from "@/utils/configs";
-
-export async function isNFTContract(contractAddress: string) {
-  const contract = await getContractCustom({ contractAddress });
-  const result = await isERC721({ contract });
-  return result;
-}
 
 export function useAddCollectionMutation() {
   const queryClient = useQueryClient();
@@ -41,17 +34,17 @@ export function useAddCollectionMutation() {
         throw new Error("User not connected");
       }
 
-      //   const contract = await getContractCustom({ contractAddress });
+      const contract = await getContractCustom({ contractAddress });
 
-      //   const contractOwner = await owner({ contract });
+      const contractOwner = await owner({ contract });
 
-      //   if (contractOwner !== userAddress) {
-      //     throw new Error("User is not the owner of the contract");
-      //   }
+      if (contractOwner !== userAddress) {
+        throw new Error("User is not the owner of the contract");
+      }
 
-      //   const signMessage = `I am the owner of the contract ${contractAddress} and want to add a new collection. Sign this message to confirm`;
+      const signMessage = `I am the owner of the contract ${contractAddress} and want to add a new collection. Sign this message to confirm`;
 
-      //   await activeAccount?.signMessage({ message: signMessage });
+      await activeAccount?.signMessage({ message: signMessage });
 
       const formData = new FormData();
       formData.append("collectionAddress", contractAddress.toLowerCase());

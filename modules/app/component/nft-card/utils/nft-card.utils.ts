@@ -33,16 +33,15 @@ export const getNFTCardInfo = ({
 }) => {
   switch (type) {
     case "new-sale-listing":
-      const listingCreator =
-        "listingCreator" in data ? data.listingCreator : "";
+      const buyer = "buyer" in data ? data.buyer : "";
       const totalPricePaid =
         "totalPricePaid" in data ? data.totalPricePaid : "";
 
       return {
-        title1: "Listing Price",
-        title2: "Listed By",
+        title1: "Price Paid",
+        title2: "Bought By",
         info1: `${decimalOffChain(totalPricePaid)} XFI`,
-        info2: getFormatAddress(listingCreator),
+        info2: getFormatAddress(buyer),
       };
     case "new-auction":
       const auctionCreator =

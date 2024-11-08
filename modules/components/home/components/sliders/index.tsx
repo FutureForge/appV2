@@ -76,7 +76,7 @@ export function Sliders() {
         }}
       />
 
-      {/* Recently Sold */}
+      {/* Recently Sold Listing */}
       <DataSlider
         isLoading={isNewSalesLoading}
         title="Recently Sold Listing"
