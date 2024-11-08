@@ -76,6 +76,7 @@ export function Footer() {
             />
             <button
               disabled={!email}
+              aria-label="Subscribe to newsletter"
               className="flex justify-end disabled:cursor-not-allowed disabled:opacity-60 "
             >
               <ArrowLeft />

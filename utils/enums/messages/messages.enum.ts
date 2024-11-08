@@ -27,4 +27,8 @@ export enum MessagesEnum {
   CANCEL_LISTING_ERROR = "Error Cancelling Listing",
   BID_PLACED_SUCCESS = "Bid Placed Successfully",
   BID_PLACED_ERROR = "Error Placing Bid",
+  NFT_MINTED_SUCCESS = "NFT Minted Successfully",
+  NFT_MINTED_ERROR = "Error Minting NFT",
+  COLLECTION_CREATED_SUCCESS = "Collection Created Successfully",
+  COLLECTION_CREATED_ERROR = "Error Creating Collection",
 }
