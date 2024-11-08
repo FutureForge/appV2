@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { Nav } from "../component/nav";
 import { Footer } from "../component/footer/footer";
+import { usePathname } from "next/navigation";
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -12,12 +13,13 @@ const Toast = dynamic(() => import("@/modules/components/toast/toast"), {
   ssr: false,
 });
 export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
+  const pathname = usePathname()
   return (
     <div className="flex isolate flex-col min-h-screen font-space relative bg-background">
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="flex-grow w-full min-h-screen pb-16"
+        className="flex-grow w-full min-h-screen"
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);
@@ -27,7 +29,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
         {children}
         <Toast />
       </div>
-      <Footer />
+      {pathname !== "/create" && <Footer />}
     </div>
   );
 };

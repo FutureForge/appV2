@@ -1,5 +1,5 @@
 import "../utils/suppressConsoleErrors";
-import "@/styles/globals.css";
+import "@/styles/globals.scss";
 
 import { QueryProvider } from "@/modules/provider";
 import "slick-carousel/slick/slick.css";
