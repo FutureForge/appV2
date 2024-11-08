@@ -34,7 +34,6 @@ import {
   useCreateListingMutation,
 } from "@/modules/mutation";
 import { useState, ChangeEvent, FormEvent } from "react";
-import { Social } from "@/utils/types/global";
 import DatePicker from "react-datepicker";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
@@ -45,9 +44,6 @@ export default function Test() {
   //   contractAddress: "0x1A35a38630b6F56637268F437493601dbF72E61A",
   // });
   // console.log({ data });
-
-  const { data: userCollections, error, isLoading } = useUserCollectionsQuery();
-  console.log({ userCollections, error, isLoading });
 
   // const { data } = useAllCollectionsQuery();
   // console.log({ data });
@@ -70,8 +66,8 @@ export default function Test() {
 
   // const listingCreator = allListings?.[0]?.listingCreator;
 
-  // const { data: userNFTs } = useUserNFTsQuery();
-  // console.log({ userNFTs });
+  const { data: userNFTs } = useUserNFTsQuery();
+  console.log({ userNFTs });
 
   // const { data: singleNFT } = useSingleNFTQuery({
   //   contractAddress: "0x55babee194af5c59a5f17f9dea47be4a37dfb36d",
@@ -176,17 +172,17 @@ export default function Test() {
     setSelectedDate(newDate);
   };
 
-  // const { data: isApproved } = useCheckApprovedForAllQuery({
-  //   collectionContractAddress: userNFTs?.[8]?.contractAddress!,
-  // });
+  const { data: isApproved } = useCheckApprovedForAllQuery({
+    collectionContractAddress: userNFTs?.[8]?.contractAddress!,
+  });
 
-  // console.log({ isApproved });
+  console.log({ isApproved });
 
   // const createListingMutation = useCreateListingMutation();
   // console.log({ createListingMutation });
 
-  // const createAuctionMutation = useCreateAuctionMutation();
-  // console.log({ createAuctionMutation });
+  const createAuctionMutation = useCreateAuctionMutation();
+  console.log({ createAuctionMutation });
 
   // const bidInAuctionMutation = useBidInAuctionMutation();
   // console.log({ bidInAuctionMutation });
@@ -215,16 +211,16 @@ export default function Test() {
     //     endTimestamp: selectedDate,
     //   },
     // });
-    // createAuctionMutation.mutateAsync({
-    //   auctionDetails: {
-    //     assetContract: userNFTs?.[8]?.contractAddress!,
-    //     tokenId: userNFTs?.[8]?.tokenId!,
-    //     quantity: "1",
-    //     minimumBidAmount: "1",
-    //     buyoutBidAmount: "5",
-    //     endTimestamp: selectedDate,
-    //   },
-    // });
+    createAuctionMutation.mutateAsync({
+      auctionDetails: {
+        assetContract: userNFTs?.[0]?.contractAddress!,
+        tokenId: userNFTs?.[0]?.tokenId!,
+        quantity: "1",
+        minimumBidAmount: "2.3",
+        buyoutBidAmount: "7.9",
+        endTimestamp: selectedDate,
+      },
+    });
     // bidInAuctionMutation.mutateAsync({
     //   auctionId: "6",
     //   bidAmount: "5",

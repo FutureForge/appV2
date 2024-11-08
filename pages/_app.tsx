@@ -35,8 +35,8 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         dangerouslySetInnerHTML={{
           __html: `
           :root {
-            --font-inter: ${space.style.fontFamily};
-            --font-inter: ${space.style.fontFamily};
+            --font-space: ${space.style.fontFamily};
+            --font-space: ${space.style.fontFamily};
             }`,
         }}
       />

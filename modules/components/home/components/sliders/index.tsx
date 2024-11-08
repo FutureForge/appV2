@@ -1,7 +1,8 @@
 import { CustomSlider, NFTCard } from "@/modules/app";
 import {
-  useAllAuctionsQuery,
   useAllCollectionsQuery,
+  useAuctionClosedQuery,
+  useNewAuctionsQuery,
   useNewListingsQuery,
   useNewSaleListingsQuery,
 } from "@/modules/query";
@@ -13,7 +14,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Listing } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
-import { Collection } from "@/utils/types/collection/collection.type";
 
 export function Sliders() {
   const router = useRouter();
@@ -23,17 +23,18 @@ export function Sliders() {
     isError,
   } = useAllCollectionsQuery();
 
-  console.log({ CollectionQuery });
-
   const { data: NewListings, isLoading: isNewListingsLoading } =
     useNewListingsQuery({});
   const { data: NewSalesListing, isLoading: isNewSalesLoading } =
     useNewSaleListingsQuery({});
-    const { data: AuctionListing } = useAllAuctionsQuery({})
+  const { data: AuctionListing, isLoading: isAuctionListingLoading } =
+    useNewAuctionsQuery({});
+  const { data: AuctionClosed, isLoading: isAuctionClosedLoading } =
+    useAuctionClosedQuery({});
 
-  console.log("====================================");
-  console.log(AuctionListing, "Hello");
-  console.log("====================================");
+  // console.log("====================================");
+  // console.log(AuctionListing, "Hello");
+  // console.log("====================================");
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col">
@@ -86,9 +87,10 @@ export function Sliders() {
           return <NFTCard key={sale.id} data={sale} type="new-sale-listing" />;
         }}
       />
+
       {/* Recently Auctioned */}
       <DataSlider
-        isLoading={isNewSalesLoading}
+        isLoading={isAuctionListingLoading}
         title="Recently Auctioned Listing"
         cta="View More"
         href="/collections"
@@ -100,13 +102,13 @@ export function Sliders() {
 
       {/* Recently Sold Auction */}
       <DataSlider
-        isLoading={isNewSalesLoading}
+        isLoading={isAuctionClosedLoading}
         title="Recently Sold Auction"
         cta="View More"
         href="/collections"
-        data={AuctionListing || []}
+        data={AuctionClosed || []}
         renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} data={sale} type="new-auction" />;
+          return <NFTCard key={sale.id} data={sale} type="new-sold-auction" />;
         }}
       />
     </div>
