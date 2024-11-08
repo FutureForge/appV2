@@ -8,8 +8,8 @@ import { MdOutlineDelete } from "react-icons/md";
 /* -------------------------------------------------------------------------------------------------
  * Text Field
  * -----------------------------------------------------------------------------------------------*/
-export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> & {
-  containerClass?: string;
+export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> &  {
+  containerClass?:  string;
   icon?: ReactNode
 };
 
@@ -260,6 +260,7 @@ const FileInput = forwardRef<
         {filePreview && (
           <button
             onClick={handleDelete}
+            aria-label="Delete file"
             className="mt-4 p-2 border border-border backdrop-blur-2xl hover:scale-105 transition-all duration-300 ease-in-out text-white rounded-md absolute top-4 right-4"
           >
             <MdOutlineDelete size={24} className="text-error" />
