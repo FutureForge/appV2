@@ -6,7 +6,7 @@ import {
   TextArea,
   TextField,
 } from "@/modules/app";
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 // icons
 import DownloadIcon from "@/assets/download.svg";
 import X from "@/assets/logo-x-twitter.svg";
@@ -14,9 +14,17 @@ import Discord from "@/assets/discord.svg";
 import Telegram from "@/assets/telegram.svg";
 import { useAddCollectionMutation } from "@/modules/mutation";
 import { Social } from "@/utils/types/global";
+import { isNFTContract, useAllCollectionsQuery } from "@/modules/query";
+
+const SOCIAL_PATTERNS = {
+  twitter: /^https?:\/\/(www\.)?(x\.com|twitter\.com)\/.+/i,
+  discord: /^https?:\/\/(www\.)?(discord\.gg|discord\.com\/invite)\/.+/i,
+  telegram: /^https?:\/\/(www\.)?t\.me\/.+/i,
+};
 
 export function AddCollectionsPage() {
   const addCollectionMutation = useAddCollectionMutation();
+  const { data: collections } = useAllCollectionsQuery();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -31,6 +39,28 @@ export function AddCollectionsPage() {
 
   const [image, setImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
+  const [NFTContract, setNFTContract] = useState<boolean>();
+  const [collectionExist, setCollectionExist] = useState<boolean>();
+  const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
+
+  const validateSocialLink = (socialName: string, value: string): string => {
+    if (!value) return "";
+
+    const pattern = SOCIAL_PATTERNS[socialName as keyof typeof SOCIAL_PATTERNS];
+    if (!pattern.test(value)) {
+      switch (socialName) {
+        case "twitter":
+          return "Invalid Twitter URL. Should be like: https://x.com/... or https://twitter.com/...";
+        case "discord":
+          return "Invalid Discord URL. Should be like: https://discord.gg/... or https://discord.com/invite/...";
+        case "telegram":
+          return "Invalid Telegram URL. Should be like: https://t.me/...";
+        default:
+          return "Invalid URL format";
+      }
+    }
+    return "";
+  };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -47,6 +77,16 @@ export function AddCollectionsPage() {
     field: keyof Social,
     value: string
   ) => {
+    const error = validateSocialLink(
+      formData.collectionSocials[index].socialName,
+      value
+    );
+
+    setSocialErrors((prev) => ({
+      ...prev,
+      [index]: error,
+    }));
+
     setFormData((prev) => {
       const newSocials = [...prev.collectionSocials];
       newSocials[index] = { ...newSocials[index], [field]: value };
@@ -94,6 +134,20 @@ export function AddCollectionsPage() {
             setImage(null);
             setBackgroundImage(null);
           },
+          onError: () => {
+            setFormData({
+              contractAddress: "",
+              name: "",
+              description: "",
+              collectionSocials: [
+                { socialName: "twitter", socialLink: "" },
+                { socialName: "discord", socialLink: "" },
+                { socialName: "telegram", socialLink: "" },
+              ],
+            });
+            setImage(null);
+            setBackgroundImage(null);
+          },
         }
       );
     } catch (error) {
@@ -101,11 +155,32 @@ export function AddCollectionsPage() {
     }
   };
 
+  useEffect(() => {
+    if (collections) {
+      const collectionExist = collections.some(
+        (collection) =>
+          collection.collectionAddress === formData.contractAddress
+      );
+      setCollectionExist(collectionExist);
+    }
+  }, [collections, formData.contractAddress]);
+
+  useEffect(() => {
+    const checkIfNFT721Contract = async () => {
+      if (formData.contractAddress) {
+        const result = await isNFTContract(formData.contractAddress);
+        setNFTContract(result);
+      }
+    };
+    checkIfNFT721Contract();
+  }, [formData.contractAddress]);
+
   const isDisabled =
     !formData.name ||
     !formData.description ||
     !formData.contractAddress ||
-    !addCollectionMutation.isPending;
+    !addCollectionMutation.isPending ||
+    Object.values(socialErrors).some((error) => error !== "");
 
   return (
     <div className="flex flex-col gap-6">
@@ -150,17 +225,21 @@ export function AddCollectionsPage() {
                       onChange={handleInputChange}
                       type="text"
                       id="name"
-                      placeholder="Your e-mail"
+                      name="name"
+                      placeholder="Collection Name"
                       containerClass="bg-border border-0"
+                      required
                     />
                   </div>
                   <div className="flex flex-col gap-4">
                     <Label htmlFor="description">Description</Label>
                     <TextArea
-                      placeholder="Description"
+                      placeholder="Collection Description"
                       value={formData.description}
                       onChange={handleInputChange}
                       id="description"
+                      name="description"
+                      required
                     />
                   </div>
                   <div className="flex flex-col gap-4">
@@ -170,14 +249,26 @@ export function AddCollectionsPage() {
                         value={formData.contractAddress}
                         onChange={handleInputChange}
                         type="text"
-                        id="name"
-                        placeholder="Address"
+                        id="contractAddress"
+                        name="contractAddress"
+                        placeholder="Collection Contract Address"
                         containerClass="bg-border border-0"
+                        required
                       />
+                      {formData.contractAddress && !NFTContract && (
+                        <p style={{ color: "red" }}>
+                          Not a Valid CFC-721 token
+                        </p>
+                      )}
+                      {formData.contractAddress && collectionExist && (
+                        <p style={{ color: "red" }}>
+                          Collection already in Marketplace
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-4">
                       {formData.collectionSocials.map((social, index) => (
-                        <div key={index}>
+                        <div key={index} className="flex flex-col gap-1">
                           <TextField
                             value={social.socialLink}
                             icon={
@@ -199,6 +290,11 @@ export function AddCollectionsPage() {
                               )
                             }
                           />
+                          {socialErrors[index] && (
+                            <span className="text-red-500 text-sm">
+                              {socialErrors[index]}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -213,7 +309,7 @@ export function AddCollectionsPage() {
                 shape="square"
                 className="w-full"
               >
-                Mint NFT
+                Add Collection
               </Button>
             </div>
           </div>

@@ -27,7 +27,7 @@ import {
   getIsAuctionExpired,
 } from "@/modules/blockchain";
 import { to3DP } from "@/utils/functions";
-import { getNFT } from "thirdweb/extensions/erc721";
+import { getNFT, isERC721 } from "thirdweb/extensions/erc721";
 import { useMemo } from "react";
 import {
   CollectionsQueryResponse,
@@ -44,6 +44,12 @@ import {
   filteredAllListingsQuery,
   filteredNewSaleListingsQuery,
 } from "@/utils/graphql/queries/listing.queries";
+
+export async function isNFTContract(contractAddress: string) {
+  const contract = await getContractCustom({ contractAddress });
+  const result = await isERC721({ contract });
+  return result;
+}
 
 // syntax
 export function useAllCollectionsQuery() {
