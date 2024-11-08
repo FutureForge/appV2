@@ -34,7 +34,6 @@ import {
   useCreateListingMutation,
 } from "@/modules/mutation";
 import { useState, ChangeEvent, FormEvent } from "react";
-import { Social } from "@/utils/types/global";
 import DatePicker from "react-datepicker";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
@@ -45,9 +44,6 @@ export default function Test() {
   //   contractAddress: "0x1A35a38630b6F56637268F437493601dbF72E61A",
   // });
   // console.log({ data });
-
-  const { data: userCollections, error, isLoading } = useUserCollectionsQuery();
-  console.log({ userCollections, error, isLoading });
 
   // const { data } = useAllCollectionsQuery();
   // console.log({ data });
