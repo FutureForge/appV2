@@ -26,12 +26,12 @@ import {
   getContractCustom,
   getIsAuctionExpired,
 } from "@/modules/blockchain";
-import { ensureSerializable, to3DP } from "@/utils/functions";
+import { to3DP } from "@/utils/functions";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { useMemo } from "react";
 import {
   CollectionsQueryResponse,
-  SingleCollectionQueryResponse,
+  SingleCollection,
 } from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
 import {
@@ -202,24 +202,44 @@ export function useSingleCollectionQuery({
     queryFn: async () => {
       const [
         collectionResponse,
-        tokenTransfersResponse,
+        collectionTransfersResponse,
+        collectionDetailsResponse,
         collectionFee,
         marketplaceFee,
       ] = await Promise.all([
-        axios.get<SingleCollectionQueryResponse>(
+        axios.get<SingleCollection>(
           `${backendURL}/collection/${contractAddress}`
         ),
         axios.get<NFTActivityResponse>(
           `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
         ),
+        axios.get(`${CROSSFI_API_TESTNET}/tokens/${contractAddress}`),
         getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
         getPlatformFeeInfoCustom({
           contractAddress: MARKETPLACE_ADDRESS_TESTNET,
         }).catch(() => ({})),
       ]);
 
-      const collection = collectionResponse.data;
-      const tokenTransfers = tokenTransfersResponse.data.docs;
+      const { collection, nftLength } = collectionResponse.data;
+      const tokenTransfers = collectionTransfersResponse.data.docs;
+
+      const collectionLength = nftLength;
+      const listedNFTs = allListings?.length;
+      const auctionedNFTs = allAuctions?.length;
+      const percentageOfListed = ((listedNFTs ?? 0) / collectionLength) * 100;
+      const percentageOfAuctioned =
+        ((auctionedNFTs ?? 0) / collectionLength) * 100;
+
+      const collectionDetails = {
+        collectionLength,
+        listedNFTs,
+        auctionedNFTs,
+        percentageOfListed,
+        percentageOfAuctioned,
+        holderCount: collectionDetailsResponse.data.holderCount,
+        totalVolume: formattedTotalVolume,
+        floorPrice,
+      };
 
       const updatedTokenTransfers = tokenTransfers.map((transfer) => {
         const contract = getContractCustom({
@@ -280,9 +300,8 @@ export function useSingleCollectionQuery({
       return {
         collection,
         tokenTransfers: updatedTokenTransfers,
-        totalVolume: formattedTotalVolume,
-        floorPrice,
         marketplaceFee,
+        collectionDetails,
         collectionFee,
         collectionOffers: {
           newOffers: newOffers || [],
@@ -324,6 +343,6 @@ export function useSingleCollectionQuery({
     //     !!isLoadingNewOffers ||
     //     !!isLoadingAllOffers ||
     //     !!isLoadingAcceptedOffers),
-    refetchInterval: 50000000,
+    refetchInterval: 5000,
   });
 }

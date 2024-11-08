@@ -15,12 +15,9 @@ import {
   useSingleAuctionQuery,
   useSingleListingQuery,
   useSingleOfferQuery,
-  useUserExpiredAuctionsQuery,
-  useUserExpiredListingsQuery,
-  useUserExpiredOffersQuery,
 } from "..";
 import { NFTActivityResponse } from "@/utils/types/global";
-import { Auction, Listing, Offer } from "@/utils/types/graphql";
+import { Auction } from "@/utils/types/graphql";
 
 export function useSingleNFTQuery({
   contractAddress,
@@ -47,36 +44,6 @@ export function useSingleNFTQuery({
     contractAddress,
     tokenId,
   });
-
-  const { data: expiredListings, isLoading: isLoadingExpiredListings } =
-    useUserExpiredListingsQuery();
-  const { data: expiredAuctions, isLoading: isLoadingExpiredAuctions } =
-    useUserExpiredAuctionsQuery();
-  const { data: expiredOffers, isLoading: isLoadingExpiredOffers } =
-    useUserExpiredOffersQuery();
-
-  const expiredListing = expiredListings?.expiredListings;
-  const expiredAuction = expiredAuctions?.expiredAuctions;
-  const expiredOffer = expiredOffers?.expiredOffers;
-
-  // const filteredExpiredListing: Listing | undefined = expiredListing?.filter(
-  //   (listing: Listing) => listing.tokenId === tokenId
-  // )[0];
-  // const filteredExpiredAuction: Auction | undefined = expiredAuction?.filter(
-  //   (auction: Auction) => auction.tokenId === tokenId
-  // )[0];
-  // const filteredExpiredOffer: Offer | undefined = expiredOffer?.filter(
-  //   (offer: Offer) => offer.tokenId === tokenId
-  // )[0];
-
-  const hasExpiredListing: boolean =
-    expiredListing?.some((listing: Listing) => listing.tokenId === tokenId) ??
-    false;
-  const hasExpiredAuction: boolean =
-    expiredAuction?.some((auction: Auction) => auction.tokenId === tokenId) ??
-    false;
-  const hasExpiredOffer: boolean =
-    expiredOffer?.some((offer: Offer) => offer.tokenId === tokenId) ?? false;
 
   return useQuery({
     queryKey: [queryKeys.nft.single, contractAddress, tokenId],
@@ -123,7 +90,7 @@ export function useSingleNFTQuery({
       }
 
       const updatedSingleAuction = await Promise.all(
-        (singleAuction ?? []).map(async (auction) => {
+        (singleAuction ?? []).map(async (auction: Auction) => {
           const isExpired = await getIsAuctionExpired({
             auctionId: BigInt(auction.auctionId),
           });
@@ -148,15 +115,12 @@ export function useSingleNFTQuery({
       switch (activeType) {
         case "listing":
           activeTypeData = singleListing;
-          isExpiredActiveType = hasExpiredListing;
           break;
         case "auction":
           activeTypeData = updatedSingleAuction;
-          isExpiredActiveType = hasExpiredListing;
           break;
         default:
           activeTypeData = null;
-          isExpiredActiveType = hasExpiredOffer;
       }
 
       return {
@@ -174,10 +138,7 @@ export function useSingleNFTQuery({
       !!contractAddress &&
       !isLoadingListing &&
       !isLoadingAuction &&
-      !isLoadingOffer &&
-      !isLoadingExpiredListings &&
-      !isLoadingExpiredAuctions &&
-      !isLoadingExpiredOffers,
-    refetchInterval: 50000000,
+      !isLoadingOffer,
+    refetchInterval: 5000,
   });
 }

@@ -21,6 +21,8 @@ import {
   useUserExpiredOffersQuery,
   useUserChainInfo,
   useCheckApprovedForAllQuery,
+  useFilteredAllAuctionsQuery,
+  useUserCollectionsQuery,
 } from "@/modules/query";
 import {
   useAddCollectionMutation,
@@ -39,15 +41,41 @@ import DatePicker from "react-datepicker";
 // 8
 
 export default function Test() {
-  const { data } = useAllCollectionsQuery();
-  console.log({ data });
+  // const { data } = useSingleCollectionQuery({
+  //   contractAddress: "0x1A35a38630b6F56637268F437493601dbF72E61A",
+  // });
+  // console.log({ data });
+
+  const { data: userCollections, error, isLoading } = useUserCollectionsQuery();
+  console.log({ userCollections, error, isLoading });
+
+  // const { data } = useAllCollectionsQuery();
+  // console.log({ data });
+
+  // const { data: allListings } = useAllListingsQuery({});
+  // console.log({ allListings });
+
+  // const { data: filteredListings } = useFilteredAllListingsQuery({
+  //   address: "0xe924512e05c828c0881f46508e27bb59238e87b9",
+  // });
+  // console.log({ filteredListings });
+
+  // const { data: filteredAuctions } = useFilteredAllAuctionsQuery({
+  //   address: "0x348df9bd14475c780a78bf48492b9a29a2032b96",
+  // });
+  // console.log({ filteredAuctions });
+
+  // const { data: allAuctions } = useAllAuctionsQuery({});
+  // console.log({ allAuctions });
+
+  // const listingCreator = allListings?.[0]?.listingCreator;
 
   // const { data: userNFTs } = useUserNFTsQuery();
   // console.log({ userNFTs });
 
   // const { data: singleNFT } = useSingleNFTQuery({
-  //   contractAddress: "0x1a35a38630b6f56637268f437493601dbf72e61a",
-  //   tokenId: "8",
+  //   contractAddress: "0x55babee194af5c59a5f17f9dea47be4a37dfb36d",
+  //   tokenId: "2",
   // });
 
   // console.log({ singleNFT });
@@ -178,7 +206,6 @@ export default function Test() {
     //     collectionContractAddress: userNFTs?.[8]?.contractAddress!,
     //   });
     // }
-
     // createListingMutation.mutateAsync({
     //   directListing: {
     //     assetContract: userNFTs?.[0]?.contractAddress!,
@@ -188,8 +215,6 @@ export default function Test() {
     //     endTimestamp: selectedDate,
     //   },
     // });
-
-
     // createAuctionMutation.mutateAsync({
     //   auctionDetails: {
     //     assetContract: userNFTs?.[8]?.contractAddress!,
@@ -200,12 +225,10 @@ export default function Test() {
     //     endTimestamp: selectedDate,
     //   },
     // });
-
     // bidInAuctionMutation.mutateAsync({
     //   auctionId: "6",
     //   bidAmount: "5",
     // });
-
     // buyListingMutation.mutateAsync({
     //   buyFromListing: {
     //     listingId: "4",
@@ -215,7 +238,6 @@ export default function Test() {
     //     nativeTokenValue: "11",
     //   },
     // });
-
     // collectAuctionPayoutMutation.mutateAsync({
     //   auctionId: "6",
     // });
@@ -223,6 +245,11 @@ export default function Test() {
 
   return (
     <div>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
       <DatePicker
         selected={selectedDate}
         onChange={handleDateChange}

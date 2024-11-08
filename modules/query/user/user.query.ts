@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { queryKeys } from "../query-keys";
 import axios from "axios";
-import { CROSSFI_API_TESTNET } from "@/utils/configs";
+import { backendURL, CROSSFI_API_TESTNET } from "@/utils/configs";
 import { UserNFTResponse } from "@/utils/types/global";
 import {
   useAllOffersQuery,
@@ -11,14 +11,28 @@ import {
   useFilteredAllOffersQuery,
   useFilteredUserNewBidsQuery,
 } from "..";
-import { getContractCustom } from "@/modules/blockchain";
+import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
   ensureSerializable,
   formatBlockchainTimestamp,
+  to3DP,
   tryParseJSON,
 } from "@/utils/functions";
-import { Auction, Listing, Offer } from "@/utils/types/graphql";
+import {
+  AllListingsQueryResponse,
+  Auction,
+  Listing,
+  NewSaleListingsQueryResponse,
+  Offer,
+} from "@/utils/types/graphql";
+import { Collection } from "@/utils/types/collection/collection.type";
+import {
+  filteredAllListingsQuery,
+  filteredNewSaleListingsQuery,
+} from "@/utils/graphql/queries/listing.queries";
+import request from "graphql-request";
+import { indexerEndpoint } from "@/utils/graphql";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -97,7 +111,7 @@ export function useUserNFTsQuery() {
         const nftTokenId = nft.tokenId;
 
         return !userListedNFTs?.some(
-          (listing) =>
+          (listing: Listing) =>
             listing.assetContract.toLowerCase() ===
               nft.contractAddress.toLowerCase() &&
             listing.tokenId.toString() === nftTokenId
@@ -232,19 +246,20 @@ export function useUserExpiredListingsQuery() {
     queryKey: [queryKeys.user.expiredListings],
     queryFn: async () => {
       const expiredListings: Listing[] | undefined = filteredListings?.filter(
-        (listing) => {
+        (listing: Listing) => {
           const endTime = formatBlockchainTimestamp(listing.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
+          // looking for expired listings
           return endTimeFormatted < currentTime;
         }
       );
 
-      return ensureSerializable({
+      return {
         expiredListings,
         expiredListingsLength: expiredListings?.length,
-      });
+      };
     },
     enabled: !!userAddress,
     refetchInterval: 5000000,
@@ -310,5 +325,74 @@ export function useUserExpiredOffersQuery() {
     },
     enabled: !!userAddress,
     refetchInterval: 5000000,
+  });
+}
+
+export function useUserCollectionsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  return useQuery({
+    queryKey: [queryKeys.user.all],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
+      );
+
+      const collections = response.data.collections as Collection[];
+
+      for (const collection of collections) {
+        try {
+          const [newListingResponse, allListingsResponse] = await Promise.all([
+            request<NewSaleListingsQueryResponse>(
+              indexerEndpoint,
+              filteredNewSaleListingsQuery,
+              {
+                contractAddress: collection.collectionAddress.toLowerCase(),
+                address: "",
+              }
+            ),
+            request<AllListingsQueryResponse>(
+              indexerEndpoint,
+              filteredAllListingsQuery,
+              {
+                contractAddress: collection.collectionAddress.toLowerCase(),
+                address: "",
+              }
+            ),
+          ]);
+
+          const newSaleListings = newListingResponse.newSaleListings;
+          const allListings = allListingsResponse.allListings;
+
+          const totalListingVolume =
+            newSaleListings?.reduce((acc, listing) => {
+              const price = parseFloat(
+                decimalOffChain(listing.totalPricePaid) || "0"
+              );
+              return acc + price;
+            }, 0) ?? 0;
+
+          const formattedTotalVolume = to3DP(totalListingVolume || 0);
+
+          const floorPrice = (() => {
+            let floor = 0;
+            for (const listing of allListings || []) {
+              const price = decimalOffChain(listing.pricePerToken) || "0";
+              const listingPrice = parseFloat(price);
+              floor = Math.min(floor, listingPrice);
+            }
+            return floor;
+          })();
+
+          collection.floorPrice = floorPrice;
+          collection.totalVolume = Number(formattedTotalVolume);
+        } catch (error) {}
+      }
+
+      return response.data;
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
   });
 }
