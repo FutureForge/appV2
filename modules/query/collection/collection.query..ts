@@ -51,6 +51,29 @@ export async function isNFTContract(contractAddress: string) {
   return result;
 }
 
+export function useCheckIfItsACollectionQuery({
+  contractAddress,
+}: {
+  contractAddress: string;
+}) {
+  return useQuery({
+    queryKey: ["add-collection", contractAddress],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${CROSSFI_API_TESTNET}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
+      );
+      const nftData = response.data.docs;
+
+      const isCFC721 = nftData.some(
+        (doc: { tokenType: string }) => doc.tokenType === "CFC-721"
+      );
+
+      return { isCFC721, nftData };
+    },
+    enabled: !!contractAddress,
+    refetchInterval: 5000,
+  });
+}
 // syntax
 export function useAllCollectionsQuery() {
   return useQuery({
