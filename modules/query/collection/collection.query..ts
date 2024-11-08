@@ -223,21 +223,20 @@ export function useSingleCollectionQuery({
       const { collection, nftLength } = collectionResponse.data;
       const tokenTransfers = collectionTransfersResponse.data.docs;
 
-      const collectionLength = nftLength;
+      const totalSupply = collectionDetailsResponse.data.totalSupply;
       const listedNFTs = allListings?.length;
       const auctionedNFTs = allAuctions?.length;
-      const percentageOfListed = ((listedNFTs ?? 0) / collectionLength) * 100;
-      const percentageOfAuctioned =
-        ((auctionedNFTs ?? 0) / collectionLength) * 100;
+      const percentageOfListed = ((listedNFTs ?? 0) / totalSupply) * 100;
+      const percentageOfAuctioned = ((auctionedNFTs ?? 0) / totalSupply) * 100;
 
       const collectionDetails = {
-        collectionLength,
         listedNFTs,
         auctionedNFTs,
         percentageOfListed,
         percentageOfAuctioned,
         holderCount: collectionDetailsResponse.data.holderCount,
         totalVolume: formattedTotalVolume,
+        totalSupply,
         floorPrice,
       };
 
