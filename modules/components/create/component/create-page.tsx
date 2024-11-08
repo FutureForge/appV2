@@ -9,6 +9,7 @@ import {
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useCreateNFTMutation } from "@/modules/mutation";
 import React, { useState } from "react";
+import DownloadIcon from "@/assets/download.svg";
 
 type Trait = {
   trait_type: string;
@@ -96,6 +97,7 @@ export function CreatePage() {
               setFile(selectedFile);
             }
           }}
+          icon={<DownloadIcon className="size-[73px]" />}
         />
         <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
       </div>

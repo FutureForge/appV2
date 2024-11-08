@@ -1,20 +1,20 @@
-import React, { forwardRef, useState, useRef } from "react";
+import React, { forwardRef, useState, useRef, ReactElement, ReactNode } from "react";
 import { cn } from "../../utils";
 import Image from "next/image";
 // icons
 import SearchIcon from "@/assets/search-lg.svg";
-import DownloadIcon from "@/assets/download.svg";
 import { MdOutlineDelete } from "react-icons/md";
 
 /* -------------------------------------------------------------------------------------------------
  * Text Field
  * -----------------------------------------------------------------------------------------------*/
-export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> & {
-  containerClass?: string;
+export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> &  {
+  containerClass?:  string;
+  icon?: ReactNode
 };
 
 const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
-  const { type, className, containerClass, ...inputProps } = props;
+  const { type, className, containerClass, icon, ...inputProps } = props;
 
   // Function to prevent negative input
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -31,6 +31,7 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
       )}
     >
       {type === "search" && <SearchIcon className="size-4 text-[#5A5A86]" />}
+      {icon && icon}
       <input
         autoComplete="off"
         type={type}
@@ -114,9 +115,9 @@ Label.displayName = LABEL_NAME;
 
 const FileInput = forwardRef<
   HTMLInputElement,
-  FileInputProps & { key?: string }
+  FileInputProps & { key?: string; title?: string; subTitle?: string; icon:ReactElement }
 >((props, ref) => {
-  const { onChange, ...otherProps } = props;
+  const { onChange, title, subTitle, icon, ...otherProps } = props;
   const [fileName, setFileName] = useState<string | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -242,11 +243,11 @@ const FileInput = forwardRef<
           )
         ) : (
           <div className="flex flex-col items-center  justify-center gap-6 py-8">
-            <h3 className="font-medium text-[28px]">Create an NFT</h3>
+            <h3 className="font-medium text-[28px]">{title}</h3>
 
             <div className="flex flex-col items-center gap-4">
-              <DownloadIcon />
-              <p className="font-medium text-foreground">Drag and drop media</p>
+              {icon}
+              <p className="font-medium text-foreground">{subTitle}</p>
               <span>
                 <p className="text-sm text-muted-foreground">Max size: 50MB</p>
                 <p className="text-sm text-muted-foreground">

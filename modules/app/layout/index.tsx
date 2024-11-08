@@ -13,7 +13,7 @@ const Toast = dynamic(() => import("@/modules/components/toast/toast"), {
   ssr: false,
 });
 export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
-  const pathname = usePathname()
+  const pathname = usePathname();
   return (
     <div className="flex isolate flex-col min-h-screen font-space relative bg-background">
       {/* max-w-[1440px] mx-auto */}
@@ -29,7 +29,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
         {children}
         <Toast />
       </div>
-      {pathname !== "/create" && <Footer />}
+      {pathname !== "/create" && pathname !== "/add_collections" && <Footer />}
     </div>
   );
 };
