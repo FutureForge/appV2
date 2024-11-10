@@ -16,9 +16,11 @@ type CreateNFTMetadata = {
   file: File;
   attributes: Array<{
     trait_type: string;
-    value: string | number;
+    value: string;
   }>;
 };
+
+// https://2551fcbc3ba71a7d708b7442aeb628f9.ipfscdn.io/ipfs/id
 
 export function useCreateNFTMutation() {
   const toast = useToast();
@@ -36,26 +38,48 @@ export function useCreateNFTMutation() {
       //     abi: MinterABI,
       //   });
 
+      console.log({ createNFTData });
+
       const uri = await upload({
         client,
-        files: [createNFTData.file!],
+        files: [createNFTData.file],
         uploadWithoutDirectory: true,
-        metadata: {
-          name: createNFTData.name,
-          description: createNFTData.description,
-        },
+        // metadata: {
+        //   name: createNFTData.name, metadata?: Record<string, string>; 
+        //   description: createNFTData.description, {uri: 'ipfs://QmeWaoYTdtAETwfgJQm41cPi2KewxoeeNWfAEXDPcvHpV9'}  QmWoUSpWQnQJFnGyiQvohobaR589pPMZz3UYVyahhTV16Z
+        // },
       });
 
       console.log({ uri });
       console.log({ createNFTData });
 
       if (uri) {
-        const tokenURI = JSON.stringify({
+        // const tokenURI = JSON.stringify({
+        //   name: createNFTData.name,
+        //   description: createNFTData.description,
+        //   image: uri,
+        //   attributes: createNFTData.attributes,
+        // });
+
+        const metadata = {
           name: createNFTData.name,
           description: createNFTData.description,
           image: uri,
           attributes: createNFTData.attributes,
+        };
+
+        const metadataURI = await upload({
+          client,
+          files: [
+            {
+              name: `${createNFTData.name}-${Math.random()}.json`,
+              data: JSON.stringify(metadata),
+            },
+          ],
+          uploadWithoutDirectory: true,
         });
+
+        console.log({ metadataURI });
 
         // const transaction = await minterContract.populateTransaction.mint(
         //   tokenURI,

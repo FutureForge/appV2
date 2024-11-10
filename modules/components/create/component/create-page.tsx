@@ -61,14 +61,14 @@ export function CreatePage() {
   };
 
   const handleCreateNFT = async () => {
-    if (!name || !description || !file)
-      return toast.error("Please fill out all fields");
+    // if (!name || !description || !file)
+    //   return toast.error("Please fill out all fields");
 
     createNFTMutation.mutate(
       {
         name,
         description,
-        file,
+        file: file!,
         attributes: traits,
       },
       {

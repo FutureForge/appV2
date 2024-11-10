@@ -74,7 +74,7 @@ export function useCheckIfItsACollectionQuery({
     refetchInterval: 5000,
   });
 }
-// syntax
+
 export function useAllCollectionsQuery() {
   return useQuery({
     queryKey: [queryKeys.collection.all],
