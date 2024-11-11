@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Collection() {
   return (
-    <HydrationBoundary>
+    <HydrationBoundary state={dehydrate}>
     <div suppressHydrationWarning className="mt-20 w-full min-h-screen px-6">
       <CollectionPage />
     </div>
