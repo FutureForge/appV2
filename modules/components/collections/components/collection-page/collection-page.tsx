@@ -45,9 +45,8 @@ export function CollectionPage() {
         .includes(searchQuery.toLowerCase())
   );
 
-  console.log({ filteredCollections });
-
-  const totalCount = filteredCollections?.length || 0;
+  const totalCount =
+    filteredCollections?.length || CollectionQuery?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
