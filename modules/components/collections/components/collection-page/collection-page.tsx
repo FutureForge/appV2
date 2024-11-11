@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CollectionsHeader } from "../header/header";
 
 import { NftCardSkeleton } from "@/modules/app";
@@ -15,6 +15,7 @@ export function CollectionPage() {
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [mounted, setMounted] = useState(false);
   const itemsPerPage = 2;
   const fetchLimit = 50;
   const currentBatch = Math.ceil((currentPage * itemsPerPage) / fetchLimit);
@@ -32,6 +33,10 @@ export function CollectionPage() {
   const { width } = useWindowSize();
   const router = useRouter();
   const length = width && width > 1720 ? 5 : 4;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -59,6 +64,10 @@ export function CollectionPage() {
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredCollections?.slice(startIndex, endIndex);
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="pt-12 flex flex-col gap-8 h-screen">
       <CollectionsHeader
@@ -67,52 +76,48 @@ export function CollectionPage() {
         searchQuery={searchQuery}
         handleSearch={handleSearch}
       />
-      <motion.div layout>
-        {!isActive ? (
-          <motion.div>
-            <CollectionTable
-              isCollectionLoading={isLoading || isPending}
-              collectionData={currentPageData ?? []}
-            />
-          </motion.div>
-        ) : (
-          <motion.div className="w-full grid grid-cols-4 gap-5">
-            {isLoading || isPending || isError ? (
-              <>
-                {Array.from({ length }).map((_, index) => (
-                  <NftCardSkeleton />
-                ))}
-              </>
-            ) : (
-              <>
-                {currentPageData
-                  ?.slice(0, length)
-                  .map((collection: Collection) => {
+      {mounted && (
+        <motion.div layout>
+          {!isActive ? (
+            <motion.div>
+              <CollectionTable
+                isCollectionLoading={isLoading || isPending}
+                collectionData={currentPageData ?? []}
+              />
+            </motion.div>
+          ) : (
+            <motion.div className="w-full grid grid-cols-4 gap-5">
+              {isLoading || isPending || isError ? (
+                <>
+                  {Array.from({ length }).map((_, index) => (
+                    <NftCardSkeleton key={index} />
+                  ))}
+                </>
+              ) : (
+                <>
+                  {currentPageData?.slice(0, length).map((collection: Collection) => {
                     const handleClick = () => {
-                      router.push(
-                        `/collections/${collection.collectionAddress}`
-                      );
+                      router.push(`/collections/${collection.collectionAddress}`);
                     };
                     return (
-                      <AnimatePresence mode="popLayout">
-                        <CollectionsNFTCard
-                          key={collection._id}
-                          collectionAddress={collection.collectionAddress}
-                          collectionImage={collection.collectionImage}
-                          collectionName={collection.collectionName}
-                          floorPrice={collection.floorPrice}
-                          totalVolume={collection.totalVolume}
-                          onClick={handleClick}
-                          cta="Shop Collections"
-                        />
-                      </AnimatePresence>
+                      <CollectionsNFTCard
+                        key={collection._id}
+                        collectionAddress={collection.collectionAddress}
+                        collectionImage={collection.collectionImage}
+                        collectionName={collection.collectionName}
+                        floorPrice={collection.floorPrice}
+                        totalVolume={collection.totalVolume}
+                        onClick={handleClick}
+                        cta="Shop Collections"
+                      />
                     );
                   })}
-              </>
-            )}
-          </motion.div>
-        )}
-      </motion.div>
+                </>
+              )}
+            </motion.div>
+          )}
+        </motion.div>
+      )}
       {/* Add pagination controls */}
       <div className="flex justify-center gap-2 mt-4 mb-8">
         {pageNumbers.map((pageNum) => (
