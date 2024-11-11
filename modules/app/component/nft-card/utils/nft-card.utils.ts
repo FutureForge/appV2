@@ -4,6 +4,7 @@ import {
   Listing,
   NewSaleListing,
   NFT,
+  Offer,
 } from "@/utils/types/graphql";
 import { getFormatAddress } from "@/utils/functions";
 import { decimalOffChain } from "@/modules/blockchain";
@@ -14,9 +15,11 @@ export type NFTCardInfo =
   | "new-listing"
   | "new-sale-listing"
   | "new-sold-auction"
+  | "new-accepted-offers"
+  | "new-offers"
   | "new-auction";
 
-type NFTType = Listing | Auction | NewSaleListing | AuctionClosed;
+type NFTType = Listing | Auction | NewSaleListing | AuctionClosed | Offer;
 
 export type NFTCardProps = {
   data: NFTType;
@@ -64,6 +67,26 @@ export const getNFTCardInfo = ({
         title2: "Bought By",
         info1: `${decimalOffChain(bidAmount)} XFI`,
         info2: getFormatAddress(closer),
+      };
+    case "new-offers":
+      const offeror = "offeror" in data ? data.offeror : "";
+      const totalPriceOffer = "totalPrice" in data ? data.totalPrice : "";
+
+      return {
+        title1: "Price Offered",
+        title2: "Offered By",
+        info1: `${decimalOffChain(totalPriceOffer)} XFI`,
+        info2: getFormatAddress(offeror),
+      };
+    case "new-accepted-offers":
+      const seller = "seller" in data ? data.seller : "";
+      const totalPriceAccepted = "totalPricePaid" in data ? data.totalPricePaid : "";
+
+      return {
+        title1: "Price Offered",
+        title2: "Accepted By",
+        info1: `${decimalOffChain(totalPriceAccepted)} XFI`,
+        info2: getFormatAddress(seller as string),
       };
     default:
       return {

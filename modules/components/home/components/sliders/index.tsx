@@ -1,9 +1,11 @@
 import { CustomSlider, NFTCard } from "@/modules/app";
 import {
+  useAcceptedOffersQuery,
   useAllCollectionsQuery,
   useAuctionClosedQuery,
   useNewAuctionsQuery,
   useNewListingsQuery,
+  useNewOffersQuery,
   useNewSaleListingsQuery,
 } from "@/modules/query";
 import React from "react";
@@ -12,7 +14,7 @@ import {
   CollectionsNFTCard,
 } from "../collections-nft-card/collections-nft-card";
 import { useRouter } from "next/navigation";
-import { Listing } from "@/utils/types/graphql";
+import { Listing, Offer } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 
 export function Sliders() {
@@ -31,6 +33,10 @@ export function Sliders() {
     useNewAuctionsQuery({});
   const { data: AuctionClosed, isLoading: isAuctionClosedLoading } =
     useAuctionClosedQuery({});
+  const { data: RecentOffers, isLoading: isRecentOffersLoading } =
+    useNewOffersQuery({});
+  const { data: AcceptedOffers, isLoading: isAcceptedOffersLoading } =
+    useAcceptedOffersQuery({});
 
   // console.log("====================================");
   // console.log(AuctionListing, "Hello");
@@ -109,6 +115,32 @@ export function Sliders() {
         data={AuctionClosed || []}
         renderItem={(sale: Listing) => {
           return <NFTCard key={sale.id} data={sale} type="new-sold-auction" />;
+        }}
+      />
+
+      {/* Recent Offers */}
+      <DataSlider
+        isLoading={isAuctionClosedLoading}
+        title="Recent Offers"
+        cta="View More"
+        href="/collections"
+        data={RecentOffers || []}
+        renderItem={(offer: Offer) => {
+          return <NFTCard key={offer.id} data={offer} type="new-offers" />;
+        }}
+      />
+
+      {/* Accepted Offers */}
+      <DataSlider
+        isLoading={isAcceptedOffersLoading}
+        title="Accepted Offers"
+        cta="View More"
+        href="/collections"
+        data={AcceptedOffers || []}
+        renderItem={(offer: Offer) => {
+          return (
+            <NFTCard key={offer.id} data={offer} type="new-accepted-offers" />
+          );
         }}
       />
     </div>
