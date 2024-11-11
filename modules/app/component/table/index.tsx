@@ -1,8 +1,6 @@
+'use client'
 import { flexRender, Table as ReactTable } from "@tanstack/react-table";
-import { TableEmptyState } from "./empty";
 import { cn } from "../../utils";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import { PointerEvent, useRef } from "react";
 
 type TableProps<T> = {
   table: ReactTable<T>;
@@ -18,8 +16,6 @@ type TableProps<T> = {
 
 export function Table<T>({
   table,
-  fallbackMessage,
-  fallbackTitle,
   hasHover,
   onRowClick,
   isLoading,
@@ -87,18 +83,11 @@ export function Table<T>({
           </>
         )}
       </table>
-
-      {table.getRowModel().rows.length === 0 && (
-        <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
-      )}
     </div>
   );
 }
 
 function Skeleton() {
-  const isMobile = useMediaQuery("(max-width: 600px)");
-  const isTablet = useMediaQuery("(max-width: 1024px)");
-  const columns = isMobile ? 3 : isTablet ? 4 : 5;
   return (
     <div>
       <div className="flex w-full justify-between gap-4 p-4 border-b border-b-border">

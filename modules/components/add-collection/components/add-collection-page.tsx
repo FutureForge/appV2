@@ -14,13 +14,12 @@ import Discord from "@/assets/discord.svg";
 import Telegram from "@/assets/telegram.svg";
 import { useAddCollectionMutation } from "@/modules/mutation";
 import { Social } from "@/utils/types/global";
-import { isNFTContract, useAllCollectionsQuery } from "@/modules/query";
-
-const SOCIAL_PATTERNS = {
-  twitter: /^https?:\/\/(www\.)?(x\.com|twitter\.com)\/.+/i,
-  discord: /^https?:\/\/(www\.)?(discord\.gg|discord\.com\/invite)\/.+/i,
-  telegram: /^https?:\/\/(www\.)?t\.me\/.+/i,
-};
+import {
+  isNFTContract,
+  useAllCollectionsQuery,
+  useCheckIfItsACollectionQuery,
+} from "@/modules/query";
+import { validateSocialLink } from "../add-collection.utils";
 
 export function AddCollectionsPage() {
   const addCollectionMutation = useAddCollectionMutation();
@@ -42,25 +41,11 @@ export function AddCollectionsPage() {
   const [NFTContract, setNFTContract] = useState<boolean>();
   const [collectionExist, setCollectionExist] = useState<boolean>();
   const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
+  const [nftName, setNFTName] = useState("");
 
-  const validateSocialLink = (socialName: string, value: string): string => {
-    if (!value) return "";
-
-    const pattern = SOCIAL_PATTERNS[socialName as keyof typeof SOCIAL_PATTERNS];
-    if (!pattern.test(value)) {
-      switch (socialName) {
-        case "twitter":
-          return "Invalid Twitter URL. Should be like: https://x.com/... or https://twitter.com/...";
-        case "discord":
-          return "Invalid Discord URL. Should be like: https://discord.gg/... or https://discord.com/invite/...";
-        case "telegram":
-          return "Invalid Telegram URL. Should be like: https://t.me/...";
-        default:
-          return "Invalid URL format";
-      }
-    }
-    return "";
-  };
+  const { data: collectionInfo } = useCheckIfItsACollectionQuery({
+    contractAddress: formData.contractAddress,
+  });
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -175,11 +160,17 @@ export function AddCollectionsPage() {
     checkIfNFT721Contract();
   }, [formData.contractAddress]);
 
+  useEffect(() => {
+    setNFTName(collectionInfo?.nftData?.[0]?.name);
+  }, [collectionInfo]);
+
   const isDisabled =
     !formData.name ||
     !formData.description ||
     !formData.contractAddress ||
     !addCollectionMutation.isPending ||
+    (formData.contractAddress && !NFTContract) ||
+    (formData.contractAddress && collectionExist) ||
     Object.values(socialErrors).some((error) => error !== "");
 
   return (
@@ -220,53 +211,53 @@ export function AddCollectionsPage() {
           <ScrollArea>
             <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
               <div className="w-full flex flex-col gap-5">
-                <div className="flex flex-col gap-4">
-                  <Label htmlFor="name">Display Name</Label>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="traits">Contract Address</Label>
                   <TextField
-                    value={formData.name}
+                    value={formData.contractAddress}
                     onChange={handleInputChange}
                     type="text"
-                    id="name"
-                    name="name"
-                    placeholder="Collection Name"
+                    id="contractAddress"
+                    name="contractAddress"
+                    placeholder="Collection Contract Address"
                     containerClass="bg-border border-0"
                     required
                   />
+                  {formData.contractAddress && !NFTContract && (
+                    <p className="text-error text-sm font-medium">
+                      Not a Valid CFC-721 token
+                    </p>
+                  )}
+                  {formData.contractAddress && collectionExist && (
+                    <p className="text-error text-sm font-medium">
+                      Collection already in Marketplace
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-4">
-                  <Label htmlFor="description">Description</Label>
-                  <TextArea
-                    placeholder="Collection Description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    id="description"
-                    name="description"
-                    required
-                  />
-                </div>
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="traits">Contract Address</Label>
+                  <div className="flex flex-col gap-4">
+                    <Label htmlFor="name">Display Name</Label>
                     <TextField
-                      value={formData.contractAddress}
+                      value={nftName || formData.name}
                       onChange={handleInputChange}
                       type="text"
-                      id="contractAddress"
-                      name="contractAddress"
-                      placeholder="Collection Contract Address"
+                      id="name"
+                      name="name"
+                      placeholder="Collection Name"
                       containerClass="bg-border border-0"
                       required
                     />
-                    {formData.contractAddress && !NFTContract && (
-                      <p className="text-error text-sm font-medium">
-                        Not a Valid CFC-721 token
-                      </p>
-                    )}
-                    {formData.contractAddress && collectionExist && (
-                      <p className="text-error text-sm font-medium">
-                        Collection already in Marketplace
-                      </p>
-                    )}
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <Label htmlFor="description">Description</Label>
+                    <TextArea
+                      placeholder="Collection Description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      id="description"
+                      name="description"
+                      required
+                    />
                   </div>
                   <div className="flex items-center gap-4 pb-1">
                     {formData.collectionSocials.map((social, index) => (

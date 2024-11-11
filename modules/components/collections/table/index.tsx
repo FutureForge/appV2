@@ -27,16 +27,16 @@ export function CollectionTable() {
   });
 
   return (
-    <Table
-      onRowClick={(_row) => {
-        const collectionAddress = _row.collectionAddress;
-        router.push(`/collections/${collectionAddress}`);
-      }}
-      isLoading={collectionQuery.isPending}
-      hasHover
-      table={table}
-      fallbackTitle="No collections found"
-      fallbackMessage="Please create a collection"
-    />
+    <div suppressHydrationWarning>
+      <Table
+        onRowClick={(_row) => {
+          const collectionAddress = _row.collectionAddress;
+          router.push(`/collections/${collectionAddress}`);
+        }}
+        isLoading={collectionQuery.isPending}
+        hasHover
+        table={table}
+      />
+    </div>
   );
 }

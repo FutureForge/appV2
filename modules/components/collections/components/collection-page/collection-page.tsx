@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from "react";
 import { Header } from "../header/header";
 
@@ -26,7 +27,7 @@ export function CollectionPage() {
       <Header isActive={isActive} setIsActive={setIsActive} />
       <motion.div layout>
         {!isActive ? (
-          <motion.div layout>
+          <motion.div>
             <CollectionTable />
           </motion.div>
         ) : (
