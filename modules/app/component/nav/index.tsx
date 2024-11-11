@@ -66,7 +66,7 @@ export function Nav() {
     <nav
       className={cn(
         "flex fixed top-0 inset-x-0 z-50 py-3 h-[80px] border-b bg-[#030312E5] w-full md:px-6 px-4 gap-4 justify-between  items-center font-inter",
-        isScrolled ? "border-b-sec-bg" : "border-b-transparent"
+        isScrolled ? "border-b-border backdrop-blur-lg" : "border-b-transparent"
       )}
     >
       <div className="flex items-center justify-between w-[48%]">
