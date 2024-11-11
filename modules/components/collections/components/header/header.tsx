@@ -10,14 +10,15 @@ type HeaderProps = {
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
   searchQuery: string;
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  // setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  handleSearch: (query: string) => void;
 };
 
 export function CollectionsHeader({ 
   isActive, 
   setIsActive, 
   searchQuery,
-  setSearchQuery 
+  handleSearch 
 }: HeaderProps) {
   return (
     <div className="w-full flex items-center justify-between">
@@ -28,7 +29,7 @@ export function CollectionsHeader({
           placeholder="Search by collections"
           containerClass="bg-new-muted-bg w-[300px]"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
         />
         {/* <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
           <ToggleGroup.Root type="single">

@@ -22,8 +22,7 @@ export function Sliders() {
   const {
     data: CollectionQuery,
     isLoading: isCollectionLoading,
-    isError,
-  } = useAllCollectionsQuery();
+  } = useAllCollectionsQuery({});
 
   const { data: NewListings, isLoading: isNewListingsLoading } =
     useNewListingsQuery({});
@@ -50,7 +49,7 @@ export function Sliders() {
         title="Collection List"
         cta="View More"
         href="/collections"
-        data={CollectionQuery || []}
+        data={CollectionQuery?.collections || []}
         renderItem={(collection: CollectionNFTCardProps) => {
           const handleClick = () => {
             router.push(`/collections/${collection.collectionAddress}`);

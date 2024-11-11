@@ -14,23 +14,51 @@ import { AnimatePresence, motion } from "framer-motion";
 export function CollectionPage() {
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+  const fetchLimit = 50;
+  const currentBatch = Math.ceil((currentPage * itemsPerPage) / fetchLimit);
 
   const {
     data: CollectionQuery,
     isLoading,
     isPending,
     isError,
-  } = useAllCollectionsQuery();
+  } = useAllCollectionsQuery({
+    limit: fetchLimit,
+    page: currentBatch,
+  });
 
   const { width } = useWindowSize();
   const router = useRouter();
   const length = width && width > 1720 ? 5 : 4;
 
-  const filteredCollections = CollectionQuery?.filter((collection) =>
-    collection.collectionName.toLowerCase().includes(searchQuery.toLowerCase())
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
+
+  const filteredCollections = CollectionQuery?.collections?.filter(
+    (collection) =>
+      collection.collectionName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
   );
 
   console.log({ filteredCollections });
+
+  const totalCount = filteredCollections?.length || 0;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  const handlePageChange = (pageNum: number) => {
+    setCurrentPage(pageNum);
+    window.scrollTo(0, 0);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = filteredCollections?.slice(startIndex, endIndex);
 
   return (
     <div className="pt-12 flex flex-col gap-8 h-screen">
@@ -38,14 +66,14 @@ export function CollectionPage() {
         isActive={isActive}
         setIsActive={setIsActive}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        handleSearch={handleSearch}
       />
       <motion.div layout>
         {!isActive ? (
           <motion.div>
             <CollectionTable
               isCollectionLoading={isLoading || isPending}
-              collectionData={filteredCollections ?? []}
+              collectionData={currentPageData ?? []}
             />
           </motion.div>
         ) : (
@@ -58,8 +86,9 @@ export function CollectionPage() {
               </>
             ) : (
               <>
-                {filteredCollections?.slice(0, length).map(
-                  (collection: Collection) => {
+                {currentPageData
+                  ?.slice(0, length)
+                  .map((collection: Collection) => {
                     const handleClick = () => {
                       router.push(
                         `/collections/${collection.collectionAddress}`
@@ -79,13 +108,39 @@ export function CollectionPage() {
                         />
                       </AnimatePresence>
                     );
-                  }
-                )}
+                  })}
               </>
             )}
           </motion.div>
         )}
       </motion.div>
+      {/* Add pagination controls */}
+      <div className="flex justify-center gap-2 mt-4 mb-8">
+        {pageNumbers.map((pageNum) => (
+          <button
+            key={pageNum}
+            onClick={() => handlePageChange(pageNum)}
+            className={`w-8 h-8 rounded ${
+              currentPage === pageNum
+                ? "bg-purple-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            {pageNum}
+          </button>
+        ))}
+        {totalPages > 5 && currentPage < totalPages - 2 && (
+          <>
+            <span className="px-2">...</span>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              className="w-8 h-8 rounded bg-gray-200 hover:bg-gray-300"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

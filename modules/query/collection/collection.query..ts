@@ -57,7 +57,7 @@ export function useCheckIfItsACollectionQuery({
   contractAddress: string;
 }) {
   return useQuery({
-    queryKey: ["add-collection", contractAddress],
+    queryKey: [queryKeys.collection.checkContractIsACollection],
     queryFn: async () => {
       const response = await axios.get(
         `${CROSSFI_API_TESTNET}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
@@ -71,16 +71,35 @@ export function useCheckIfItsACollectionQuery({
       return { isCFC721, nftData };
     },
     enabled: !!contractAddress,
+    refetchInterval: 50000,
+  });
+}
+
+export function useCheckCollectionExistsQuery({
+  contractAddress,
+}: {
+  contractAddress: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.collection.checkCollectionExists],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendURL}/collection/check/${contractAddress}`
+      );
+
+      return response.data;
+    },
+    enabled: !!contractAddress,
     refetchInterval: 5000,
   });
 }
 
-export function useAllCollectionsQuery() {
+export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
   return useQuery({
     queryKey: [queryKeys.collection.all],
     queryFn: async () => {
       const response = await axios.get<CollectionsQueryResponse>(
-        `${backendURL}/collection`
+        `${backendURL}/collection?limit=${limit}&page=${page}`
       );
 
       for (const collection of response.data.collections) {
@@ -112,7 +131,6 @@ export function useAllCollectionsQuery() {
           ]);
 
           const holderCount = collectionDetailsResponse.data.holderCount;
-          const totalSupply = collectionDetailsResponse.data.totalSupply;
 
           const newSaleListings = newSaleListingResponse.newSaleListings;
           const allListings = allListingsResponse.allListings;
@@ -143,9 +161,13 @@ export function useAllCollectionsQuery() {
         } catch (error) {}
       }
 
-      return response.data.collections.reverse();
+      return {
+        collections: response.data.collections.reverse(),
+        totalCount: response.data.totalCount
+      };
     },
-    refetchInterval: 5000,
+    enabled: !!limit && !!page,
+    refetchInterval: 60000,
   });
 }
 

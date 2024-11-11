@@ -22,7 +22,7 @@ export function Hero() {
     data: CollectionQuery,
     isLoading,
     isError,
-  } = useAllCollectionsQuery();
+  } = useAllCollectionsQuery({});
 
   const settings: Settings = {
     dots: true,
@@ -95,7 +95,7 @@ export function Hero() {
           </>
         ) : (
           <>
-            {CollectionQuery?.slice(0, length).map(
+            {CollectionQuery?.collections?.slice(0, length).map(
               (collection: Collection) => {
                 const handleClick = () => {
                   router.push(`/collections/${collection.collectionAddress}`);

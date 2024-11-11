@@ -16,14 +16,13 @@ import { useAddCollectionMutation } from "@/modules/mutation";
 import { Social } from "@/utils/types/global";
 import {
   isNFTContract,
-  useAllCollectionsQuery,
   useCheckIfItsACollectionQuery,
+  useCheckCollectionExistsQuery,
 } from "@/modules/query";
 import { validateSocialLink } from "../add-collection.utils";
 
 export function AddCollectionsPage() {
   const addCollectionMutation = useAddCollectionMutation();
-  const { data: collections } = useAllCollectionsQuery();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,11 +38,14 @@ export function AddCollectionsPage() {
   const [image, setImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
   const [NFTContract, setNFTContract] = useState<boolean>();
-  const [collectionExist, setCollectionExist] = useState<boolean>();
   const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
   const [nftName, setNFTName] = useState("");
 
   const { data: collectionInfo } = useCheckIfItsACollectionQuery({
+    contractAddress: formData.contractAddress,
+  });
+
+  const { data: collectionExists } = useCheckCollectionExistsQuery({
     contractAddress: formData.contractAddress,
   });
 
@@ -141,16 +143,6 @@ export function AddCollectionsPage() {
   };
 
   useEffect(() => {
-    if (collections) {
-      const collectionExist = collections.some(
-        (collection) =>
-          collection.collectionAddress === formData.contractAddress
-      );
-      setCollectionExist(collectionExist);
-    }
-  }, [collections, formData.contractAddress]);
-
-  useEffect(() => {
     const checkIfNFT721Contract = async () => {
       if (formData.contractAddress) {
         const result = await isNFTContract(formData.contractAddress);
@@ -170,7 +162,7 @@ export function AddCollectionsPage() {
     !formData.contractAddress ||
     !addCollectionMutation.isPending ||
     (formData.contractAddress && !NFTContract) ||
-    (formData.contractAddress && collectionExist) ||
+    (formData.contractAddress && collectionExists) ||
     Object.values(socialErrors).some((error) => error !== "");
 
   return (
@@ -228,7 +220,7 @@ export function AddCollectionsPage() {
                       Not a Valid CFC-721 token
                     </p>
                   )}
-                  {formData.contractAddress && collectionExist && (
+                  {formData.contractAddress && collectionExists && (
                     <p className="text-error text-sm font-medium">
                       Collection already in Marketplace
                     </p>

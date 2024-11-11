@@ -27,6 +27,8 @@ export const queryKeys = {
   collection: {
     all: ["collection"] as const,
     single: ["single-collection"] as const,
+    checkCollectionExists: ["check-collection-exists"] as const,
+    checkContractIsACollection: ["check-contract-is-a-collection"] as const,
   },
   nft: {
     single: ["single-nft"] as const,

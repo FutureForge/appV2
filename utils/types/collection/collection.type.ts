@@ -38,4 +38,5 @@ export type TokenDetails = {
 
 export type CollectionsQueryResponse = {
   collections: Collection[];
+  totalCount: number;
 };
