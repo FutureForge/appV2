@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { CollectionsHeader } from "../header/header";
 import { NftCardSkeleton } from "@/modules/app";
@@ -8,8 +9,7 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { useRouter } from "next/navigation";
 import { CollectionsNFTCard } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { AnimatePresence, motion } from "framer-motion";
-import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
+import { motion } from "framer-motion";
 import Caret from "@/assets/arrow-left-s-line.svg";
 import { cn } from "@/modules/app/utils";
 
@@ -130,6 +130,7 @@ export function CollectionPage() {
       {/* Add pagination controls */}
       <div className="flex items-center justify-between w-full">
         <button
+          title="previous-page"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={cn(
@@ -168,6 +169,7 @@ export function CollectionPage() {
           )}
         </div>
         <button
+          title="next-page"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className={cn(
