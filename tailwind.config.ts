@@ -30,6 +30,11 @@ const config: Config = {
         muted: "#6b6b6b",
         tertiary: "#181825",
         error: "#E94B4F",
+        "table-hover": "#1C1C25",
+        "new-muted": {
+          bg: "#1C1C2A",
+          text: "#A7A6F21A",
+        },
       },
     },
   },

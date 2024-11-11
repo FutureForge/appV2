@@ -11,3 +11,7 @@ export {Button} from './component/button'
 export {NFTCard} from './component/nft-card/nft-card'
 export {Footer} from './component/footer/footer'
 export {ScrollArea} from './component/scroll-area'
+export {ToggleGroup} from './component/toggle-group'
+export {SwitchView} from './component/switch-view'
+export {Card} from './component/card'
+export { Table } from "./component/table";
