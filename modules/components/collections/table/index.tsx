@@ -1,4 +1,4 @@
-"use client";
+
 import {
   getCoreRowModel,
   getSortedRowModel,
@@ -11,6 +11,8 @@ import { makeYourPositionsColumn } from "./columns";
 import { Table } from "@/modules/app";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { useRouter } from "next/navigation";
+import { dehydrate,  HydrationBoundary, } from "@tanstack/react-query";
+
 
 type CollectionTableProps = {
   isCollectionLoading: boolean;
@@ -33,16 +35,18 @@ export function CollectionTable({
   });
 
   return (
-    <div suppressHydrationWarning>
-      <Table
-        onRowClick={(_row) => {
-          const collectionAddress = _row.collectionAddress;
-          router.push(`/collections/${collectionAddress}`);
-        }}
-        isLoading={isCollectionLoading}
-        hasHover
-        table={table}
-      />
-    </div>
+    <HydrationBoundary state={dehydrate}>
+      <div suppressHydrationWarning>
+        <Table
+          onRowClick={(_row) => {
+            const collectionAddress = _row.collectionAddress;
+            router.push(`/collections/${collectionAddress}`);
+          }}
+          isLoading={isCollectionLoading}
+          hasHover
+          table={table}
+        />
+      </div>
+    </HydrationBoundary>
   );
 }

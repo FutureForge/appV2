@@ -21,7 +21,7 @@ export function Table<T>({
   isLoading,
 }: TableProps<T>) {
   return (
-    <div className="!p-4 bg-card rounded-2xl">
+    <div className="!p-4 bg-card rounded-2xl" suppressHydrationWarning>
       <table className="w-full table-fixed rounded-2xl">
         {isLoading ? (
           <Skeleton />

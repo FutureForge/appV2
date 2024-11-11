@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { CollectionsHeader } from "../header/header";
-
 import { NftCardSkeleton } from "@/modules/app";
 import { CollectionTable } from "../../table";
 import { useAllCollectionsQuery } from "@/modules/query";
@@ -10,6 +9,9 @@ import { Collection } from "@/utils/types/collection/collection.type";
 import { useRouter } from "next/navigation";
 import { CollectionsNFTCard } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { AnimatePresence, motion } from "framer-motion";
+import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
+import Caret from "@/assets/arrow-left-s-line.svg";
+import { cn } from "@/modules/app/utils";
 
 export function CollectionPage() {
   const [isActive, setIsActive] = useState(false);
@@ -69,7 +71,10 @@ export function CollectionPage() {
   }
 
   return (
-    <div className="pt-12 flex flex-col gap-8 h-screen">
+    <div
+      className="pt-12 flex flex-col gap-8 h-screen"
+      suppressHydrationWarning
+    >
       <CollectionsHeader
         isActive={isActive}
         setIsActive={setIsActive}
@@ -95,23 +100,27 @@ export function CollectionPage() {
                 </>
               ) : (
                 <>
-                  {currentPageData?.slice(0, length).map((collection: Collection) => {
-                    const handleClick = () => {
-                      router.push(`/collections/${collection.collectionAddress}`);
-                    };
-                    return (
-                      <CollectionsNFTCard
-                        key={collection._id}
-                        collectionAddress={collection.collectionAddress}
-                        collectionImage={collection.collectionImage}
-                        collectionName={collection.collectionName}
-                        floorPrice={collection.floorPrice}
-                        totalVolume={collection.totalVolume}
-                        onClick={handleClick}
-                        cta="Shop Collections"
-                      />
-                    );
-                  })}
+                  {currentPageData
+                    ?.slice(0, length)
+                    .map((collection: Collection) => {
+                      const handleClick = () => {
+                        router.push(
+                          `/collections/${collection.collectionAddress}`
+                        );
+                      };
+                      return (
+                        <CollectionsNFTCard
+                          key={collection._id}
+                          collectionAddress={collection.collectionAddress}
+                          collectionImage={collection.collectionImage}
+                          collectionName={collection.collectionName}
+                          floorPrice={collection.floorPrice}
+                          totalVolume={collection.totalVolume}
+                          onClick={handleClick}
+                          cta="Shop Collections"
+                        />
+                      );
+                    })}
                 </>
               )}
             </motion.div>
@@ -119,31 +128,58 @@ export function CollectionPage() {
         </motion.div>
       )}
       {/* Add pagination controls */}
-      <div className="flex justify-center gap-2 mt-4 mb-8">
-        {pageNumbers.map((pageNum) => (
-          <button
-            key={pageNum}
-            onClick={() => handlePageChange(pageNum)}
-            className={`w-8 h-8 rounded ${
-              currentPage === pageNum
-                ? "bg-purple-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {pageNum}
-          </button>
-        ))}
-        {totalPages > 5 && currentPage < totalPages - 2 && (
-          <>
-            <span className="px-2">...</span>
+      <div className="flex items-center justify-between w-full">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={cn(
+            "w-8 h-[30px] rounded-lg text-sm flex items-center justify-center bg-transparent hover:bg-tertiary",
+            {
+              "cursor-not-allowed hover:bg-transparent": currentPage === 1,
+            }
+          )}
+        >
+          <Caret />
+        </button>
+        <div className="flex justify-center gap-4 mt-4 mb-8">
+          {pageNumbers.map((pageNum) => (
             <button
-              onClick={() => setCurrentPage(totalPages)}
-              className="w-8 h-8 rounded bg-gray-200 hover:bg-gray-300"
+              key={pageNum}
+              onClick={() => handlePageChange(pageNum)}
+              className={`w-8 h-[30px] rounded-lg text-sm  transition duration-300 ease-in-out ${
+                currentPage === pageNum
+                  ? "bg-primary text-white"
+                  : "bg-transparent border border-border text-muted-foreground hover:bg-tertiary"
+              }`}
             >
-              {totalPages}
+              {pageNum}
             </button>
-          </>
-        )}
+          ))}
+          {totalPages > 5 && currentPage < totalPages - 2 && (
+            <>
+              <span className="text-muted-foreground">...</span>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                className="w-8 h-[30px] rounded-lg bg-transparent border border-border text-muted-foreground hover:bg-tertiary transition duration-300 ease-in-out"
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+        </div>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={cn(
+            "w-8 h-[30px] rounded-lg text-sm flex items-center justify-center bg-transparent hover:bg-tertiary",
+            {
+              "cursor-not-allowed hover:bg-transparent":
+                currentPage === totalPages,
+            }
+          )}
+        >
+          <Caret className="rotate-180" />
+        </button>
       </div>
     </div>
   );
