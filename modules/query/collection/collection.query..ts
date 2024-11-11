@@ -85,7 +85,11 @@ export function useAllCollectionsQuery() {
 
       for (const collection of response.data.collections) {
         try {
-          const [newListingResponse, allListingsResponse] = await Promise.all([
+          const [
+            newSaleListingResponse,
+            allListingsResponse,
+            collectionDetailsResponse,
+          ] = await Promise.all([
             request<NewSaleListingsQueryResponse>(
               indexerEndpoint,
               filteredNewSaleListingsQuery,
@@ -102,9 +106,15 @@ export function useAllCollectionsQuery() {
                 address: "",
               }
             ),
+            axios.get(
+              `${CROSSFI_API_TESTNET}/tokens/${collection.collectionAddress}`
+            ),
           ]);
 
-          const newSaleListings = newListingResponse.newSaleListings;
+          const holderCount = collectionDetailsResponse.data.holderCount;
+          const totalSupply = collectionDetailsResponse.data.totalSupply;
+
+          const newSaleListings = newSaleListingResponse.newSaleListings;
           const allListings = allListingsResponse.allListings;
 
           const totalListingVolume =
@@ -129,6 +139,7 @@ export function useAllCollectionsQuery() {
 
           collection.floorPrice = floorPrice;
           collection.totalVolume = Number(formattedTotalVolume);
+          collection.holderCount = holderCount;
         } catch (error) {}
       }
 

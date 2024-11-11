@@ -1,27 +1,36 @@
 import { Card, SwitchView, TextField, ToggleGroup } from "@/modules/app";
 import React, { useState } from "react";
 // icons
-import List from '@/assets/list.svg'
-import Grid from '@/assets/grid.svg'
+import List from "@/assets/list.svg";
+import Grid from "@/assets/grid.svg";
 import { cn } from "@/modules/app/utils";
 
 type HeaderProps = {
   title?: string;
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 };
-export function Header({isActive, setIsActive}: HeaderProps) {
 
+export function CollectionsHeader({ 
+  isActive, 
+  setIsActive, 
+  searchQuery,
+  setSearchQuery 
+}: HeaderProps) {
   return (
     <div className="w-full flex items-center justify-between">
       <h4 className="font-medium tex-[28px]">Collections</h4>
-      <div className="flex items-center gap-2 w-[80%]">
+      <div className="flex items-center gap-2 justify-end">
         <TextField
           type="search"
           placeholder="Search by collections"
-          containerClass="bg-new-muted-bg "
+          containerClass="bg-new-muted-bg w-[300px]"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
+        {/* <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
           <ToggleGroup.Root type="single">
             {["1H", "1D", "7D", "30D"].map((value) => (
               <ToggleGroup.Item variant="select" value={value}>
@@ -29,7 +38,7 @@ export function Header({isActive, setIsActive}: HeaderProps) {
               </ToggleGroup.Item>
             ))}
           </ToggleGroup.Root>
-        </Card>
+        </Card> */}
         <SwitchView.Root
           falseoption="list"
           trueoption="grid"

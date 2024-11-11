@@ -10,6 +10,7 @@ export type Collection = {
   collectionOwnerAddress: string;
   floorPrice: number;
   totalVolume: number;
+  holderCount: number;
 };
 
 export type SingleCollection = {
@@ -38,4 +39,3 @@ export type TokenDetails = {
 export type CollectionsQueryResponse = {
   collections: Collection[];
 };
-

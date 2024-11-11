@@ -10,16 +10,22 @@ import { makeYourPositionsColumn } from "./columns";
 
 import { Table } from "@/modules/app";
 import { Collection } from "@/utils/types/collection/collection.type";
-import { useAllCollectionsQuery } from "@/modules/query";
 import { useRouter } from "next/navigation";
 
-export function CollectionTable() {
-  const collectionQuery = useAllCollectionsQuery();
+type CollectionTableProps = {
+  isCollectionLoading: boolean;
+  collectionData: Collection[];
+};
+
+export function CollectionTable({
+  isCollectionLoading,
+  collectionData,
+}: CollectionTableProps) {
   const router = useRouter();
 
   const table = useReactTable<Collection>({
     columns: makeYourPositionsColumn(),
-    data: collectionQuery?.data ?? [],
+    data: collectionData ?? [],
     getExpandedRowModel: getExpandedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -33,7 +39,7 @@ export function CollectionTable() {
           const collectionAddress = _row.collectionAddress;
           router.push(`/collections/${collectionAddress}`);
         }}
-        isLoading={collectionQuery.isPending}
+        isLoading={isCollectionLoading}
         hasHover
         table={table}
       />

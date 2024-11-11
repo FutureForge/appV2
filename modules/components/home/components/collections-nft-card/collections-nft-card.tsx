@@ -11,6 +11,7 @@ export type CollectionWithoutOwnerBackground = Omit<
   | "collectionBackgroundImage"
   | "collectionOwnerAddress"
   | "collectionDescription"
+  | "holderCount"
   | "_id"
 >;
 export type CollectionNFTCardProps = CollectionWithoutOwnerBackground & {

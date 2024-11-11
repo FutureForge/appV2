@@ -1,12 +1,11 @@
-'use client'
-import { createColumnHelper } from '@tanstack/react-table'
-import { ColumnHeader } from '@/modules/app/component/table/header'
-import { Collection } from '@/utils/types/collection/collection.type';
-import XFI from '@/assets/xfi.svg'
+"use client";
+import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnHeader } from "@/modules/app/component/table/header";
+import { Collection } from "@/utils/types/collection/collection.type";
+import XFI from "@/assets/xfi.svg";
 
 export function makeYourPositionsColumn() {
   const columns = createColumnHelper<Collection>();
-
 
   /* -------------------------------------------------------------------------------------------------
    * Collection column
@@ -75,5 +74,21 @@ export function makeYourPositionsColumn() {
     ),
   });
 
-  return [ collectionColumn, floorPriceColumn, volumeColumn];
+  /* -------------------------------------------------------------------------------------------------
+   * Holder Count column
+   * -----------------------------------------------------------------------------------------------*/
+  const holderCountColumn = columns.accessor("holderCount", {
+    header: ({ column }) => (
+      <div className="flex min-w-[120px]">
+        <ColumnHeader column={column}>Holder Count</ColumnHeader>
+      </div>
+    ),
+    cell: ({ getValue }) => (
+      <div>
+        <p>{getValue()}</p>
+      </div>
+    ),
+  });
+
+  return [collectionColumn, floorPriceColumn, volumeColumn, holderCountColumn];
 }
