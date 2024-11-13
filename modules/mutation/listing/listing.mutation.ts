@@ -195,11 +195,11 @@ export function useBuyFromDirectListingMutation() {
       const transaction = await getBuyFromDirectListing({
         params: {
           buyFor: buyFromListing.buyFor || activeAccount.address,
-          currency: buyFromListing.currency ?? "",
-          listingId: buyFromListing.listingId ?? "",
-          quantity: buyFromListing.quantity ?? "",
-          nativeTokenValue: buyFromListing.nativeTokenValue ?? "",
-          totalPrice: buyFromListing.totalPrice ?? "",
+          currency: buyFromListing.currency,
+          listingId: buyFromListing.listingId,
+          quantity: buyFromListing.quantity,
+          nativeTokenValue: buyFromListing.nativeTokenValue,
+          totalPrice: buyFromListing.totalPrice,
         },
       });
 

@@ -29,6 +29,18 @@ export type NFTType =
 
 export type NFTStatus = "listed" | "auctioned";
 
+export type Fee = {
+  address: string;
+  percent: number;
+};
+
+export type ExtraProps = {
+  disabled: boolean;
+  price: string;
+  collectionFee: Fee;
+  marketplaceFee: Fee;
+};
+
 export type NFTCardProps = {
   data: NFTType;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -38,6 +50,7 @@ export type NFTCardProps = {
   extraCTA?: string;
   extraOnClick?: React.MouseEventHandler<HTMLButtonElement>;
   ctaStyles?: string;
+  extraProps?: ExtraProps;
 };
 export const getNFTCardInfo = ({
   type,

@@ -1,4 +1,4 @@
-import { useSingleCollectionQuery } from "@/modules/query";
+import { useSingleCollectionQuery, useUserChainInfo } from "@/modules/query";
 import Image from "next/image";
 
 import Link from "next/link";
@@ -26,12 +26,21 @@ import { ImageHolder } from "@/modules/components/home/components/collections-nf
 import { motion } from "framer-motion";
 import { Auction, Listing, Offer } from "@/utils/types/graphql";
 import {
+  ExtraProps,
+  Fee,
   NFTCardInfo,
   NFTStatus,
 } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import { chainInfo } from "@/utils/configs";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
+import {
+  useBidInAuctionMutation,
+  useBuyFromDirectListingMutation,
+} from "@/modules/mutation";
+import { useToast } from "@/modules/app/hooks/useToast";
+import { decimalOffChain } from "@/modules/blockchain";
 
 // icons
 import VerifyIcon from "@/assets/verified.svg";
@@ -41,7 +50,7 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
+
 
 // TODO: * Pagination
 
@@ -79,6 +88,8 @@ const defaultCollectionSocials = [
 const ITEMS_PER_PAGE = 4;
 
 export default function CollectionPage() {
+  const { activeAccount } = useUserChainInfo();
+  const toast = useToast();
   const router = useRouter();
   const { collectionAddress } = router.query;
   const [filter, setFilter] = useState<FilterType>("Items");
@@ -90,6 +101,9 @@ export default function CollectionPage() {
     threshold: 0,
     rootMargin: "100px",
   });
+
+  const bidInAuctionMutation = useBidInAuctionMutation();
+  const buyListingMutation = useBuyFromDirectListingMutation();
 
   useEffect(() => {
     if (inView) {
@@ -123,6 +137,8 @@ export default function CollectionPage() {
     singleCollection?.collectionListings?.completedListings;
   const collectionAuctionSales =
     singleCollection?.collectionAuctions?.auctionClosed;
+  const collectionFee = singleCollection?.collectionFee as Fee;
+  const marketplaceFee = singleCollection?.marketplaceFee as Fee;
 
   const updatedCollectionSocials = collectionSocials?.map((item) => ({
     icon:
@@ -259,6 +275,54 @@ export default function CollectionPage() {
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
+  const handleBuyListingNow = ({
+    listingId,
+    quantity,
+    totalPrice,
+    nativeTokenValue,
+  }: {
+    listingId: string;
+    quantity: string;
+    totalPrice: string;
+    nativeTokenValue: string;
+  }) => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!listingId || !quantity || !totalPrice || !nativeTokenValue)
+      return toast.error("Please fill in all fields");
+
+    buyListingMutation.mutate({
+      buyFromListing: {
+        buyFor: activeAccount.address,
+        listingId,
+        quantity,
+        totalPrice: decimalOffChain(totalPrice) as unknown as string,
+        nativeTokenValue: decimalOffChain(
+          nativeTokenValue
+        ) as unknown as string,
+      },
+    });
+  };
+
+  const handleBuyAuctionNow = ({
+    auctionId,
+    bidAmount,
+  }: {
+    auctionId: string;
+    bidAmount: string;
+  }) => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!auctionId || !bidAmount)
+      return toast.error("Please fill in all fields");
+
+    bidInAuctionMutation.mutate({
+      auctionId,
+      bidAmount: decimalOffChain(bidAmount) as unknown as string,
+    });
+  };
+
+  const isDisabled =
+    bidInAuctionMutation.isPending || buyListingMutation.isPending;
+
   const renderCollectionDetails = () => {
     if (!collectionDetails) return <p>No collection details available</p>;
 
@@ -290,7 +354,7 @@ export default function CollectionPage() {
     <div className="mt-20 w-full min-h-screen px-6">
       <Head>
         <title>
-          Mint Mingle Marketplace - {collection?.collectionName || "Collection"}
+          MintMingles Marketplace - {collection?.collectionName || "Collection"}
         </title>
         <meta
           name="description"
@@ -452,16 +516,42 @@ export default function CollectionPage() {
                   const type = isListed ? "listing" : "auction";
                   const data = isListed ? isListed : isAuctioned;
 
+                  const listingPrice =
+                    data && "pricePerToken" in data ? data.pricePerToken : "";
+                  const auctionPrice =
+                    data && "buyoutBidAmount" in data
+                      ? data.buyoutBidAmount
+                      : "";
+
                   const extraOnClick = isListed
                     ? () => {
-                        console.log("Listing Buy Now Clicked");
+                        handleBuyListingNow({
+                          listingId: isListed?.listingId,
+                          quantity: "1",
+                          totalPrice: listingPrice,
+                          nativeTokenValue: listingPrice,
+                        });
                       }
                     : () => {
-                        console.log("Auction Buy Now Clicked");
+                        if (!isAuctioned) return;
+                        handleBuyAuctionNow({
+                          auctionId: isAuctioned?.auctionId,
+                          bidAmount: auctionPrice,
+                        });
                       };
 
                   const ctaOnClick = () => {
                     console.log("View Clicked");
+                  };
+
+                  const extraProps: ExtraProps = {
+                    disabled: isDisabled,
+                    price: isListed ? listingPrice : auctionPrice,
+                    collectionFee: collectionFee || { address: "", percent: 0 },
+                    marketplaceFee: marketplaceFee || {
+                      address: "",
+                      percent: 0,
+                    },
                   };
 
                   return status !== "" && data ? (
@@ -475,6 +565,7 @@ export default function CollectionPage() {
                       ctaStyles="!bg-border"
                       extraOnClick={extraOnClick}
                       onClick={ctaOnClick}
+                      extraProps={extraProps}
                     />
                   ) : (
                     <CollectionNFTCard
@@ -537,6 +628,10 @@ export default function CollectionPage() {
                       data={sale}
                       type={sale.saleType as NFTCardInfo}
                       status={sale.nftStatus as NFTStatus}
+                      cta="View Item"
+                      onClick={() => {
+                        console.log("View Item Clicked");
+                      }}
                     />
                   );
                 })}
