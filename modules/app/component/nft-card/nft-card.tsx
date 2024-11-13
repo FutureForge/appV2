@@ -11,6 +11,7 @@ import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false); 
   const {
     onClick,
     cta,
@@ -112,7 +113,7 @@ export function NFTCard(props: NFTCardProps) {
             </motion.button>
           )}
           {extraCTA && (
-            <DialogRoot>
+            <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger>
                 <motion.button
                   // onClick={extraOnClick}
