@@ -15,11 +15,12 @@ import { getFormatAddress } from "@/utils/functions";
 import {
   Collection,
   CollectionNFTType,
+  SingleCollection,
 } from "@/utils/types/collection/collection.type";
 import XFI from "@/assets/xfi.svg";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { motion } from "framer-motion";
-import { Auction, Listing } from "@/utils/types/graphql";
+import { Auction, Listing, Offer } from "@/utils/types/graphql";
 import {
   NFTCardInfo,
   NFTStatus,
@@ -34,6 +35,8 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import Head from "next/head";
+
+// TODO: * Pagination
 
 type FilterType =
   | "Items"
@@ -71,7 +74,7 @@ export default function CollectionPage() {
   const { collectionAddress } = router.query;
   const [filter, setFilter] = useState<FilterType>("Items");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("Listed");
+  const [selectedFilter, setSelectedFilter] = useState("All");
   const {
     data: singleCollection,
     isLoading,
@@ -138,6 +141,83 @@ export default function CollectionPage() {
     "percentageOfAuctioned",
     "percentageOfListed",
   ];
+
+  const filteredCollectionNFTs: CollectionNFTType[] =
+    collectionNFTs?.filter((nft) => {
+      // First apply search filter
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace = nft.metadata.name.toLowerCase().replace(/\s+/g, "");
+      const tokenIdNoSpace = nft.tokenId.toLowerCase().replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+      const matchesSearch = combinedField.includes(searchTerm);
+
+      // Then apply type filter
+      const isListed = collectionAllListings?.some(
+        (listing) => listing.tokenId === nft.tokenId
+      );
+      const isAuctioned = collectionAllAuctions?.some(
+        (auction) => auction.tokenId === nft.tokenId
+      );
+
+      switch (selectedFilter) {
+        case "All":
+          return matchesSearch;
+        // case "Token Id":
+        //   return matchesSearch && tokenIdNoSpace.includes(searchTerm);
+        case "Auction":
+          return matchesSearch && isAuctioned;
+        case "Listing":
+          return matchesSearch && isListed;
+        default:
+          return matchesSearch;
+      }
+    }) ?? [];
+
+  const filteredCollectionOffers: Offer[] =
+    collectionAllOffers?.filter((offer) => {
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace = offer.nft.metadata.name
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const tokenIdNoSpace = offer.nft.tokenId
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+      return combinedField.includes(searchTerm);
+    }) ?? [];
+
+  const filteredCollectionSales =
+    collectionSales?.filter((sale) => {
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace = sale.nft.metadata.name
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const tokenIdNoSpace = sale.nft.tokenId.toLowerCase().replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+      return combinedField.includes(searchTerm);
+    }) ?? [];
+
+  const filteredCollectionTokenTransfers =
+    collectionTokenTransfers?.filter((transfer) => {
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace =
+        transfer?.nft?.metadata?.name?.toLowerCase().replace(/\s+/g, "") || "";
+      const tokenIdNoSpace = transfer?.tokenId
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const addressFromNoSpace = transfer?.addressFrom
+        ?.toLowerCase()
+        .replace(/\s+/g, "");
+      const addressToNoSpace = transfer?.addressTo
+        ?.toLowerCase()
+        .replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}${tokenIdNoSpace}${addressFromNoSpace}${addressToNoSpace}`;
+
+      return combinedField.includes(searchTerm);
+    }) ?? [];
 
   const renderCollectionDetails = () => {
     if (!collectionDetails) return <p>No collection details available</p>;
@@ -253,7 +333,9 @@ export default function CollectionPage() {
             <ToggleGroup.Root
               type="single"
               value={filter}
-              onValueChange={(value) => setFilter(value as FilterType)}
+              onValueChange={(value) => {
+                if (value) setFilter(value as FilterType);
+              }}
             >
               {filters.map((value) => (
                 <ToggleGroup.Item
@@ -268,30 +350,39 @@ export default function CollectionPage() {
           </Card>
 
           <div className="flex items-center gap-2">
-            <TextField
-              type="search"
-              placeholder="Search by collections"
-              containerClass="bg-new-muted-bg w-[300px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Select.Root
-              value={selectedFilter}
-              onValueChange={setSelectedFilter}
-            >
-              <Select.Trigger>
-                <IconButton size="xl" variant="ghost">
-                  <FilterIcon className="size-4 text-muted-foreground" />
-                </IconButton>
-              </Select.Trigger>
-              <Select.Content align="end" className="w-[103px]">
-                {["Listed", "Token Id", "Auction", "Listing"].map((item) => (
-                  <Select.Item key={item} value={item}>
-                    {item}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+            {filter !== "Collection Settings" && (
+              <TextField
+                type="search"
+                placeholder="Search by collections"
+                containerClass="bg-new-muted-bg w-[300px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            )}
+            {(filter === "Sales" || filter === "Items") && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
+                  {selectedFilter}
+                </span>
+                <Select.Root
+                  value={selectedFilter}
+                  onValueChange={setSelectedFilter}
+                >
+                  <Select.Trigger>
+                    <IconButton size="xl" variant="ghost">
+                      <FilterIcon className="size-4 text-muted-foreground" />
+                    </IconButton>
+                  </Select.Trigger>
+                  <Select.Content align="end" className="w-[103px]">
+                    {["All", "Auction", "Listing"].map((item) => (
+                      <Select.Item key={item} value={item}>
+                        {item}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -301,8 +392,8 @@ export default function CollectionPage() {
         <div className="mt-6">
           <h3 className="text-xl font-semibold">Items</h3>
           <div>
-            {collectionNFTs &&
-              collectionNFTs.map((nft, index) => {
+            {filteredCollectionNFTs && filteredCollectionNFTs.length > 0 ? (
+              filteredCollectionNFTs.map((nft, index) => {
                 const isListed: Listing | undefined =
                   collectionAllListings?.find(
                     (listing) => listing.tokenId === nft.tokenId
@@ -351,7 +442,14 @@ export default function CollectionPage() {
                     collectionAddress={collectionAddress as string}
                   />
                 );
-              })}
+              })
+            ) : (
+              <div>
+                {searchQuery.length > 0
+                  ? "No items found"
+                  : "No items in this collection"}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -361,12 +459,16 @@ export default function CollectionPage() {
         <div className="mt-6">
           <h3 className="text-xl font-semibold">Offers</h3>
           <div>
-            {collectionAllOffers && collectionAllOffers.length > 0 ? (
-              collectionAllOffers.map((offer, index) => (
+            {filteredCollectionOffers && filteredCollectionOffers.length > 0 ? (
+              filteredCollectionOffers.map((offer, index) => (
                 <NFTCard key={index} data={offer} type="offers" />
               ))
             ) : (
-              <div>No Offers In This Collection</div>
+              <div>
+                {searchQuery.length > 0
+                  ? "No offers found"
+                  : "No offers in this collection"}
+              </div>
             )}
           </div>
         </div>
@@ -377,8 +479,8 @@ export default function CollectionPage() {
         <div className="mt-6">
           <h3 className="text-xl font-semibold">Sales</h3>
           <div>
-            {collectionSales && collectionSales.length > 0 ? (
-              collectionSales.map((sale, index) => {
+            {filteredCollectionSales && filteredCollectionSales.length > 0 ? (
+              filteredCollectionSales.map((sale, index) => {
                 return (
                   <NFTCard
                     key={index}
@@ -389,7 +491,11 @@ export default function CollectionPage() {
                 );
               })
             ) : (
-              <div>No Sales In This Collection</div>
+              <div>
+                {searchQuery.length > 0
+                  ? "No sales found"
+                  : "No sales in this collection"}
+              </div>
             )}
           </div>
         </div>
@@ -397,14 +503,15 @@ export default function CollectionPage() {
 
       {/* Render Activity Content */}
       {filter === "Activity" &&
-        (collectionTokenTransfers && collectionTokenTransfers.length > 0 ? (
+        (filteredCollectionTokenTransfers &&
+        filteredCollectionTokenTransfers.length > 0 ? (
           <div className="mt-6">
             <h3 className="text-xl font-semibold">Collection Activity</h3>
             <br />
             <div>
-              {collectionTokenTransfers &&
+              {filteredCollectionTokenTransfers &&
                 Object.entries(
-                  collectionTokenTransfers.reduce((acc, transfer) => {
+                  filteredCollectionTokenTransfers.reduce((acc, transfer) => {
                     const date = new Date(
                       transfer.timestamp
                     ).toLocaleDateString();
@@ -412,7 +519,7 @@ export default function CollectionPage() {
                       ...acc,
                       [date]: [...(acc[date] || []), transfer],
                     };
-                  }, {} as Record<string, typeof collectionTokenTransfers>)
+                  }, {} as Record<string, typeof filteredCollectionTokenTransfers>)
                 ).map(([date, transfers]) => {
                   return (
                     <div key={date} className="mb-8">
@@ -422,8 +529,6 @@ export default function CollectionPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {transfers.map((transfer, index) => {
-                          console.log({ transfer });
-
                           const image = transfer.nft?.metadata.image;
                           const name = transfer.nft?.metadata.name;
 
@@ -488,7 +593,11 @@ export default function CollectionPage() {
             </div>
           </div>
         ) : (
-          <div>No Activity In This Collection</div>
+          <div>
+            {searchQuery.length > 0
+              ? "No items found"
+              : "No activity in this collection"}
+          </div>
         ))}
 
       {/* Render Collection Settings Content */}
