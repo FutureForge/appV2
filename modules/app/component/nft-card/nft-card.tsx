@@ -9,8 +9,6 @@ import XFI from "@/assets/xfi.svg";
 import { cn } from "../../utils";
 import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 
-
-
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const {
@@ -22,6 +20,7 @@ export function NFTCard(props: NFTCardProps) {
     extraCTA,
     extraOnClick,
     ctaStyles,
+    extraProps,
   } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
@@ -116,7 +115,7 @@ export function NFTCard(props: NFTCardProps) {
             <DialogRoot>
               <DialogTrigger>
                 <motion.button
-                  onClick={extraOnClick}
+                  // onClick={extraOnClick}
                   initial={{ y: "-100%", opacity: 0 }}
                   animate={{
                     y: isHovered ? 0 : 40,
@@ -130,10 +129,24 @@ export function NFTCard(props: NFTCardProps) {
               </DialogTrigger>
               <DialogContent className="w-[564px]">
                 {status === "listed" && (
-                  <ListingDialog src={image} alt={name} />
+                  <ListingDialog
+                    src={image}
+                    onClick={extraOnClick}
+                    alt={name}
+                    name={name}
+                    tokenId={tokenId}
+                    props={extraProps!}
+                  />
                 )}
                 {status === "auctioned" && (
-                  <AuctionDialog src={image} alt={name} />
+                  <AuctionDialog
+                    src={image}
+                    onClick={extraOnClick}
+                    alt={name}
+                    name={name}
+                    tokenId={tokenId}
+                    props={extraProps!}
+                  />
                 )}
               </DialogContent>
             </DialogRoot>

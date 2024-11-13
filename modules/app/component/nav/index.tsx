@@ -75,7 +75,7 @@ export function Nav() {
           className="text-white font-medium flex-1 flex gap-1 items-center"
         >
           <Logo />
-          <span className="hidden sm:block">MintMingle</span>
+          <span className="hidden sm:block">MintMingles</span>
         </Link>
 
         <ul className="min-[1170px]:flex hidden items-center justify-end gap-8 w-full">

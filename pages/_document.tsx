@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <link rel="icon" sizes="any" href="/logo.svg" />
-        <meta property="og:title" content="MintMingle" />
+        <meta property="og:title" content="MintMingles" />
       </Head>
       <body className="antialiased">
         <Main />
