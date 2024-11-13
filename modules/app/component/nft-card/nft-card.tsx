@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { getNFTCardInfo, NFTCardProps } from "./utils/nft-card.utils";
+import { DialogContent, DialogRoot, DialogTrigger } from "../..";
 
 // icons
 import XFI from "@/assets/xfi.svg";
 import { cn } from "../../utils";
+import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
+
+
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -79,7 +83,7 @@ export function NFTCard(props: NFTCardProps) {
       <div className="flex items-center w-full justify-between">
         <div>
           <div className="flex items-center gap-1">
-            <XFI />
+            <XFI className="size-4" />
             <p className="text-lg font-medium text-white">{info1}</p>
           </div>
           <p className="text-sm text-muted-foreground">{title1}</p>
@@ -109,18 +113,30 @@ export function NFTCard(props: NFTCardProps) {
             </motion.button>
           )}
           {extraCTA && (
-            <motion.button
-              onClick={extraOnClick}
-              initial={{ y: "-100%", opacity: 0 }}
-              animate={{
-                y: isHovered ? 0 : 40,
-                opacity: isHovered ? 1 : 0,
-              }}
-              transition={{ duration: 0.3 }}
-              className="bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium"
-            >
-              {extraCTA}
-            </motion.button>
+            <DialogRoot>
+              <DialogTrigger>
+                <motion.button
+                  onClick={extraOnClick}
+                  initial={{ y: "-100%", opacity: 0 }}
+                  animate={{
+                    y: isHovered ? 0 : 40,
+                    opacity: isHovered ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium"
+                >
+                  {extraCTA}
+                </motion.button>
+              </DialogTrigger>
+              <DialogContent className="w-[564px]">
+                {status === "listed" && (
+                  <ListingDialog src={image} alt={name} />
+                )}
+                {status === "auctioned" && (
+                  <AuctionDialog src={image} alt={name} />
+                )}
+              </DialogContent>
+            </DialogRoot>
           )}
         </div>
       )}

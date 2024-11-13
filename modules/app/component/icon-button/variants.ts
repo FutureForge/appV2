@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 export const iconButtonStyles = tv(
   {
-    base: "bg-secondary border border-border flex justify-center items-center disabled:cursor-default size-10 flex-shrink-0 hover:bg-background/25 duration-200 ease-out",
+    base: "bg-tertiary border border-border flex justify-center items-center disabled:cursor-default size-10 flex-shrink-0 hover:bg-background/25 duration-200 ease-out",
     variants: {
       variant: {
         ghost: "border-new-muted-text hover:bg-hover bg-new-muted-bg",

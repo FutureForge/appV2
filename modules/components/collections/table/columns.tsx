@@ -52,7 +52,7 @@ export function makeYourPositionsColumn() {
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
-        <XFI />
+        <XFI className="size-4" />
         <p>{getValue()} XFI</p>
       </div>
     ),

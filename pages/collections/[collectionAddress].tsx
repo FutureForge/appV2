@@ -235,7 +235,7 @@ export default function CollectionPage() {
         <div key={key}>
           {shouldShowSymbol ? (
             <div className="flex items-center gap-2">
-              <XFI />
+              <XFI className="size-4" />
               {displayValue || 0} {symbol}
             </div>
           ) : (

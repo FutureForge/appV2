@@ -17,3 +17,15 @@ export {Card} from './component/card'
 export { Table } from "./component/table";
 export {IconButton} from './component/icon-button'
 export {Select} from './component/select'
+export {
+  Dialog,
+  Root as DialogRoot,
+  Trigger as DialogTrigger,
+  Content as DialogContent,
+  Header as DialogHeader,
+  Body as DialogBody,
+  Footer as DialogFooter,
+  Title as DialogTitle,
+  Description as DialogDescription,
+  Close as DialogClose,
+} from "./component/dialog/dialog";
