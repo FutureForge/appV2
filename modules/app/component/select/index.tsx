@@ -109,7 +109,7 @@ export const Item = forwardRef<ItemElement, ItemProps>((props, ref) => {
         </div>
       </RadixSelect.ItemText>
       <RadixSelect.ItemIndicator className="SelectItemIndicator">
-        <div className="size-1.5 bg-[#23BA97] rounded-full" />
+        <div className="size-1.5 bg-primary rounded-full" />
       </RadixSelect.ItemIndicator>
     </RadixSelect.Item>
   );

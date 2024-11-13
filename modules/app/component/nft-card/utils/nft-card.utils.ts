@@ -37,6 +37,7 @@ export type NFTCardProps = {
   status?: NFTStatus;
   extraCTA?: string;
   extraOnClick?: React.MouseEventHandler<HTMLButtonElement>;
+  ctaStyles?: string;
 };
 export const getNFTCardInfo = ({
   type,

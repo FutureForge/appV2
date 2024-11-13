@@ -95,21 +95,27 @@ export function CollectionsNFTCard(props: CollectionNFTCardProps) {
   );
 }
 
+type ImageHolderProps = {
+  src: string;
+  alt: string;
+  className?: string;
+  width?: string | number | undefined;
+  height?: string | number | undefined;
+};
+
 export function ImageHolder({
   src,
   alt,
   className,
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-}) {
+  width = "263px",
+  height = "221px",
+}: ImageHolderProps) {
   return (
     <div
       style={{
         position: "relative",
-        width: "263px",
-        height: "221px",
+        width,
+        height,
         overflow: "hidden",
       }}
     >
@@ -136,8 +142,8 @@ export function ImageHolder({
           position: "absolute",
           top: "0",
           left: "0",
-          width: "263px",
-          height: "221px",
+          width: '100%',
+          height: '100%',
           objectFit: "cover",
           clipPath: "url(#clip-path)",
         }}

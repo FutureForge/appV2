@@ -5,10 +5,20 @@ import { getNFTCardInfo, NFTCardProps } from "./utils/nft-card.utils";
 
 // icons
 import XFI from "@/assets/xfi.svg";
+import { cn } from "../../utils";
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { onClick, cta, data, type, status, extraCTA, extraOnClick } = props;
+  const {
+    onClick,
+    cta,
+    data,
+    type,
+    status,
+    extraCTA,
+    extraOnClick,
+    ctaStyles,
+  } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";
@@ -37,11 +47,13 @@ export function NFTCard(props: NFTCardProps) {
         </p>
         {status && (
           <span
-            className={`
-            px-2 py-1 rounded-md text-xs font-medium w-fit first-letter:capitalize
-            ${status === "auctioned" ? "bg-purple-500/20 text-purple-400" : ""}
-            ${status === "listed" ? "bg-green-500/20 text-green-400" : ""}
-          `}
+            className={cn(
+              "px-2 py-1 text-xs font-medium rounded-full w-fit first-letter:capitalize",
+              {
+                "bg-primary text-white": status === "auctioned",
+                "bg-success text-white": status === "listed",
+              }
+            )}
           >
             {status}
           </span>
@@ -56,7 +68,7 @@ export function NFTCard(props: NFTCardProps) {
         />
         {isHovered && (
           <div
-            className="bg-black/50 absolute inset-0 group-hover:scale-[1.01]"
+            className="bg-black/70 absolute inset-0 group-hover:scale-[1.01] backdrop-blur-sm"
             style={{
               clipPath:
                 "path('M240.781 1H168.03C165.188 1 162.48 2.20945 160.583 4.32607L158.91 6.19251C157.013 8.30913 154.305 9.51859 151.463 9.51859H125.602C122.421 9.51859 119.43 8.00545 117.546 5.44303L117.275 5.07556C115.391 2.51314 112.4 1 109.219 1H11C5.47716 1 1 5.47715 1 11V66.5511C1 69.0143 1.90906 71.3907 3.55294 73.225L7.47338 77.5996C9.11726 79.434 10.0263 81.8104 10.0263 84.2736V138.909C10.0263 141.372 9.11726 143.749 7.47339 145.583L5.2145 148.103C3.57062 149.938 2.66156 152.314 2.66156 154.777V210.329C2.66156 215.851 7.13872 220.329 12.6616 220.329H104.243C107.086 220.329 109.794 219.119 111.69 217.002L114.171 214.234C116.068 212.117 118.776 210.908 121.618 210.908H150.916C153.763 210.908 156.475 212.121 158.372 214.244L160.672 216.817C162.569 218.94 165.281 220.153 168.128 220.153H247.217C252.74 220.153 257.217 215.676 257.217 210.153V153.373C257.217 151.073 258.069 148.854 259.609 147.144V147.144C261.148 145.434 262 143.215 262 140.914V81.807C262 79.8581 261.431 77.9516 260.362 76.322L258.856 74.0266C257.787 72.397 257.217 70.4906 257.217 68.5417V11C257.217 5.47716 252.74 1 247.217 1H240.781Z')",
@@ -88,7 +100,10 @@ export function NFTCard(props: NFTCardProps) {
                 opacity: isHovered ? 1 : 0,
               }}
               transition={{ duration: 0.3 }}
-              className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+              className={cn(
+                "bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium hover:bg-primary/95",
+                ctaStyles
+              )}
             >
               {cta}
             </motion.button>
@@ -102,7 +117,7 @@ export function NFTCard(props: NFTCardProps) {
                 opacity: isHovered ? 1 : 0,
               }}
               transition={{ duration: 0.3 }}
-              className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+              className="bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium"
             >
               {extraCTA}
             </motion.button>
