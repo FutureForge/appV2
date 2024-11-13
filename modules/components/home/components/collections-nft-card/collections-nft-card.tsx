@@ -12,12 +12,21 @@ export type CollectionWithoutOwnerBackground = Omit<
   | "collectionOwnerAddress"
   | "collectionDescription"
   | "holderCount"
+  | "collectionSocials"
+  | "isPromoted"
+  | "promotionBackgroundImage"
+  | "promotionStartDate"
+  | "promotionEndDate"
+  | "createdAt"
+  | "updatedAt"
   | "_id"
 >;
+
 export type CollectionNFTCardProps = CollectionWithoutOwnerBackground & {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   cta?: string;
 };
+
 export function CollectionsNFTCard(props: CollectionNFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const {

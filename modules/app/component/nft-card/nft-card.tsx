@@ -8,17 +8,20 @@ import XFI from "@/assets/xfi.svg";
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const { onClick, cta, data, type } = props;
+  const { onClick, cta, data, type, status, extraCTA, extraOnClick } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";
+  const tokenId = data.tokenId || "";
+
+  // console.log({ data, type, status });
 
   // console.log("====================================");
   // console.log(data, type, "hello");
   // console.log("====================================");
 
   const { title1, title2, info1, info2 } = getNFTCardInfo({
-    type: props.type,
+    type: type,
     data,
   });
 
@@ -28,7 +31,22 @@ export function NFTCard(props: NFTCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       className="bg-card w-[293px] border group cursor-pointer border-border rounded-2xl  flex flex-col gap-6 p-4 backdrop-blur-2xl"
     >
-      <p className="font-medium text-white">{name}</p>
+      <div className="flex items-center justify-between">
+        <p className="font-medium text-white">
+          {name} - {tokenId}
+        </p>
+        {status && (
+          <span
+            className={`
+            px-2 py-1 rounded-md text-xs font-medium w-fit first-letter:capitalize
+            ${status === "auctioned" ? "bg-purple-500/20 text-purple-400" : ""}
+            ${status === "listed" ? "bg-green-500/20 text-green-400" : ""}
+          `}
+          >
+            {status}
+          </span>
+        )}
+      </div>
 
       <div className="w-[261px] h-[220px] relative overflow-hidden">
         <ImageHolder
@@ -59,20 +77,36 @@ export function NFTCard(props: NFTCardProps) {
           <p className="text-sm text-muted-foreground">{title2}</p>
         </div>
       </div>
-      {cta && (
-        <div className="w-full flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <motion.button
-            onClick={onClick}
-            initial={{ y: "-100%", opacity: 0 }}
-            animate={{
-              y: isHovered ? 0 : 40,
-              opacity: isHovered ? 1 : 0,
-            }}
-            transition={{ duration: 0.3 }}
-            className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
-          >
-            {cta}
-          </motion.button>
+      {(cta || extraCTA) && (
+        <div className="w-full flex items-center justify-center gap-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          {cta && (
+            <motion.button
+              onClick={onClick}
+              initial={{ y: "-100%", opacity: 0 }}
+              animate={{
+                y: isHovered ? 0 : 40,
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+              className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+            >
+              {cta}
+            </motion.button>
+          )}
+          {extraCTA && (
+            <motion.button
+              onClick={extraOnClick}
+              initial={{ y: "-100%", opacity: 0 }}
+              animate={{
+                y: isHovered ? 0 : 40,
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+              className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+            >
+              {extraCTA}
+            </motion.button>
+          )}
         </div>
       )}
     </div>

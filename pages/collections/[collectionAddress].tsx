@@ -6,11 +6,26 @@ import { useRef, useState } from "react";
 import {
   Card,
   IconButton,
+  NFTCard,
   Select,
   TextField,
   ToggleGroup,
 } from "@/modules/app";
 import { getFormatAddress } from "@/utils/functions";
+import {
+  Collection,
+  CollectionNFTType,
+} from "@/utils/types/collection/collection.type";
+import XFI from "@/assets/xfi.svg";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import { motion } from "framer-motion";
+import { Auction, Listing } from "@/utils/types/graphql";
+import {
+  NFTCardInfo,
+  NFTStatus,
+} from "@/modules/app/component/nft-card/utils/nft-card.utils";
+import { chainInfo } from "@/utils/configs";
+
 // icons
 import VerifyIcon from "@/assets/verified.svg";
 import X from "@/assets/logo-x-twitter.svg";
@@ -18,13 +33,7 @@ import Telegram from "@/assets/telegram.svg";
 import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
-import { Collection } from "@/utils/types/collection/collection.type";
-
-const collectionSocials = [
-  { icon: <X className="size-[14px]" />, link: "" },
-  { icon: <Discord className="size-[14px]" />, link: "" },
-  { icon: <Telegram className="size-[14px]" />, link: "" },
-];
+import Head from "next/head";
 
 type FilterType =
   | "Items"
@@ -32,6 +41,7 @@ type FilterType =
   | "Sales"
   | "Activity"
   | "Collection Settings";
+
 const filters: FilterType[] = [
   "Items",
   "Offers",
@@ -39,15 +49,23 @@ const filters: FilterType[] = [
   "Activity",
   "Collection Settings",
 ];
-const formatTimestamp = (timestamp: string): string => {
-  const date = new Date(timestamp);
-  return date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short", 
-    day: "2-digit", 
-    year: "numeric", 
-  });
-};
+
+// const formatTimestamp = (timestamp: string): string => {
+//   const date = new Date(timestamp);
+//   return date.toLocaleDateString("en-US", {
+//     weekday: "short",
+//     month: "short",
+//     day: "2-digit",
+//     year: "numeric",
+//   });
+// };
+
+const defaultCollectionSocials = [
+  { icon: <X className="size-[14px]" />, link: "" },
+  { icon: <Discord className="size-[14px]" />, link: "" },
+  { icon: <Telegram className="size-[14px]" />, link: "" },
+];
+
 export default function CollectionPage() {
   const router = useRouter();
   const { collectionAddress } = router.query;
@@ -61,16 +79,54 @@ export default function CollectionPage() {
   } = useSingleCollectionQuery({
     contractAddress: collectionAddress as string,
   });
+
   const collection = singleCollection?.collection;
+  const collectionSocials = singleCollection?.collection?.collectionSocials;
   const collectionDetails = singleCollection?.collectionDetails;
-  console.log(singleCollection?.tokenTransfers, "Activity");
+  const collectionTokenTransfers = singleCollection?.tokenTransfers;
+  const collectionNFTs = singleCollection?.collectionNFTs;
+  const collectionAllAuctions =
+    singleCollection?.collectionAuctions?.allAuctions;
+  const collectionAllListings =
+    singleCollection?.collectionListings?.allListings;
+  const collectionAllOffers = singleCollection?.collectionOffers?.allOffers;
+  const collectionListingSales =
+    singleCollection?.collectionListings?.completedListings;
+  const collectionAuctionSales =
+    singleCollection?.collectionAuctions?.auctionClosed;
+
+  const updatedCollectionSocials = collectionSocials?.map((item) => ({
+    icon:
+      item.socialName === "twitter" ? (
+        <X className="size-[14px]" />
+      ) : item.socialName === "discord" ? (
+        <Discord className="size-[14px]" />
+      ) : (
+        <Telegram className="size-[14px]" />
+      ),
+    link: item.socialLink,
+  }));
+
+  const collectionSales = [
+    ...(collectionListingSales?.map((sale) => ({
+      ...sale,
+      saleType: "completed-listing",
+      nftStatus: "listed",
+    })) || []),
+    ...(collectionAuctionSales?.map((sale) => ({
+      ...sale,
+      saleType: "new-sold-auction",
+      nftStatus: "auctioned",
+    })) || []),
+  ].flat();
+
   const collectionLabels = {
     floorPrice: "Floor Price",
     holderCount: "Holders",
     listedNFTs: "Listed",
-    percentageOfAuctioned: "Unique Holers",
-    percentageOfListed: "Total Listed",
-    totalVolume: "Volume",
+    percentageOfAuctioned: "Auction %",
+    percentageOfListed: "Listed %",
+    totalVolume: "Total Volume",
   };
 
   // Define the order of the properties
@@ -89,12 +145,21 @@ export default function CollectionPage() {
     return displayOrder.map((key) => {
       const value = collectionDetails[key as keyof typeof collectionDetails];
       const label = collectionLabels[key as keyof typeof collectionLabels];
+      const symbol = "XFI";
 
       const displayValue = value === undefined ? 0 : value;
+      const shouldShowSymbol = key === "floorPrice" || key === "totalVolume";
 
       return (
         <div key={key}>
-          <h4 className="text-lg font-medium">{displayValue}</h4>
+          {shouldShowSymbol ? (
+            <>
+              <XFI />
+              {displayValue || 0} {symbol}
+            </>
+          ) : (
+            displayValue || 0
+          )}
           <p className="text-sm text-muted-foreground">{label}</p>
         </div>
       );
@@ -103,6 +168,17 @@ export default function CollectionPage() {
 
   return (
     <div className="mt-20 w-full min-h-screen px-6">
+      <Head>
+        <title>
+          Mint Mingle Marketplace - {collection?.collectionName || "Collection"}
+        </title>
+        <meta
+          name="description"
+          content={`Collection: ${
+            collection?.collectionName || "Collection"
+          } on Mint Mingle Marketplace`}
+        />
+      </Head>
       <div className="h-[395px] relative w-full px-[35px] py-10 flex items-end">
         <Image
           src={collection?.collectionBackgroundImage || ""}
@@ -125,21 +201,35 @@ export default function CollectionPage() {
               />
               <div className="z-40 flex flex-col gap-3">
                 <h4 className="text-2xl font-medium flex gap-2 items-center">
-                  {collection?.collectionName} <VerifyIcon />
+                  {collection?.collectionName || "Collection Name"}{" "}
+                  <VerifyIcon />
                 </h4>
                 <div className="flex items-center gap-2">
-                  {collectionSocials.map((item, index) => {
-                    const { icon, link } = item;
-                    return (
-                      <Link
-                        key={`collection-social-${index}`}
-                        href={link}
-                        className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
-                      >
-                        {icon}
-                      </Link>
-                    );
-                  })}
+                  {updatedCollectionSocials
+                    ? updatedCollectionSocials.map((item, index) => {
+                        const { icon, link } = item;
+                        return (
+                          <Link
+                            key={`collection-social-${index}`}
+                            href={link}
+                            className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
+                          >
+                            {icon}
+                          </Link>
+                        );
+                      })
+                    : defaultCollectionSocials.map((item, index) => {
+                        const { icon, link } = item;
+                        return (
+                          <Link
+                            key={`collection-social-${index}`}
+                            href={link}
+                            className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
+                          >
+                            {icon}
+                          </Link>
+                        );
+                      })}
                 </div>
               </div>
             </div>
@@ -155,6 +245,7 @@ export default function CollectionPage() {
           </div>
         </div>
       </div>
+
       {/* filter */}
       <div className="mt-7">
         <div className="w-full flex justify-between items-center">
@@ -205,55 +296,209 @@ export default function CollectionPage() {
         </div>
       </div>
 
-      {/* Render Activity Content */}
-      {filter === "Activity" && singleCollection?.tokenTransfers && (
+      {/* Render Items Content */}
+      {filter === "Items" && (
         <div className="mt-6">
-          <h3 className="text-xl font-semibold">Activity</h3>
+          <h3 className="text-xl font-semibold">Items</h3>
           <div>
-            {singleCollection.tokenTransfers.length === 0 ? (
-              <p>No activity found</p>
-            ) : (
-              singleCollection.tokenTransfers.map((transfer, index) => (
-                <div key={index} className="mb-6">
-                  <div className="bg-card w-full py-2 px-3 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      {formatTimestamp(transfer.timestamp)}
-                    </p>
-                  </div>
-                  <div className="mt-4 bg-card rounded-2xl p-4 w-[242px] flex items-center gap-2.5">
-                    <div>
-                      <Image
-                        src={"/nft.png"}
-                        alt="nft image"
-                        width={50}
-                        height={50}
-                      />
-                    </div>
-                    <div>
-                      <p className="font-medium">Received NFT</p>
-                      <span className="flex items-center gap-2">
-                        <p className="text-sm text-muted-foreground">
-                          From: {getFormatAddress(transfer.addressFrom)}
-                        </p>
-                        <Link href="/">
-                          <LinkIcon className="size-[14px] text-muted-foreground" />
-                        </Link>
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            {collectionNFTs &&
+              collectionNFTs.map((nft, index) => {
+                const isListed: Listing | undefined =
+                  collectionAllListings?.find(
+                    (listing) => listing.tokenId === nft.tokenId
+                  );
+                const isAuctioned: Auction | undefined =
+                  collectionAllAuctions?.find(
+                    (auction) => auction.tokenId === nft.tokenId
+                  );
+
+                const status = isListed
+                  ? "listed"
+                  : isAuctioned
+                  ? "auctioned"
+                  : "";
+
+                const type = isListed ? "listing" : "auction";
+                const data = isListed ? isListed : isAuctioned;
+
+                const extraOnClick = isListed
+                  ? () => {
+                      console.log("Listing Buy Now Clicked");
+                    }
+                  : () => {
+                      console.log("Auction Buy Now Clicked");
+                    };
+
+                const ctaOnClick = () => {
+                  console.log("View Clicked");
+                };
+
+                return status !== "" && data ? (
+                  <NFTCard
+                    key={index}
+                    data={data}
+                    status={status}
+                    type={type}
+                    cta="View Item"
+                    extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
+                    extraOnClick={extraOnClick}
+                    onClick={ctaOnClick}
+                  />
+                ) : (
+                  <CollectionNFTCard
+                    key={index}
+                    nft={nft}
+                    collectionAddress={collectionAddress as string}
+                  />
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Render Offers Content */}
+      {filter === "Offers" && (
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold">Offers</h3>
+          <div>
+            {collectionAllOffers && collectionAllOffers.length > 0 ? (
+              collectionAllOffers.map((offer, index) => (
+                <NFTCard key={index} data={offer} type="offers" />
               ))
+            ) : (
+              <div>No Offers In This Collection</div>
             )}
           </div>
         </div>
       )}
 
-      {filter === 'Collection Settings' && singleCollection?.collection && (
+      {/* Render Sales Content */}
+      {filter === "Sales" && (
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold">Sales</h3>
+          <div>
+            {collectionSales && collectionSales.length > 0 ? (
+              collectionSales.map((sale, index) => {
+                return (
+                  <NFTCard
+                    key={index}
+                    data={sale}
+                    type={sale.saleType as NFTCardInfo}
+                    status={sale.nftStatus as NFTStatus}
+                  />
+                );
+              })
+            ) : (
+              <div>No Sales In This Collection</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Render Activity Content */}
+      {filter === "Activity" &&
+        (collectionTokenTransfers && collectionTokenTransfers.length > 0 ? (
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold">Collection Activity</h3>
+            <br />
+            <div>
+              {collectionTokenTransfers &&
+                Object.entries(
+                  collectionTokenTransfers.reduce((acc, transfer) => {
+                    const date = new Date(
+                      transfer.timestamp
+                    ).toLocaleDateString();
+                    return {
+                      ...acc,
+                      [date]: [...(acc[date] || []), transfer],
+                    };
+                  }, {} as Record<string, typeof collectionTokenTransfers>)
+                ).map(([date, transfers]) => {
+                  return (
+                    <div key={date} className="mb-8">
+                      <div className="bg-card w-full py-2 px-3 rounded-lg mb-4">
+                        <p className="text-sm font-medium">{date}</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {transfers.map((transfer, index) => {
+                          console.log({ transfer });
+
+                          const image = transfer.nft?.metadata.image;
+                          const name = transfer.nft?.metadata.name;
+
+                          return (
+                            <div
+                              key={index}
+                              className="bg-card rounded-2xl p-4 flex items-center gap-4"
+                            >
+                              <div className="flex-shrink-0">
+                                {/* <Image
+                                  src={image!}
+                                  alt="nft image"
+                                  width={80}
+                                  height={80}
+                                  className="rounded-lg object-cover"
+                                /> */}
+                                <ImageHolder
+                                  src={image!}
+                                  alt={name!}
+                                  className="rounded-lg object-cover"
+                                />
+                              </div>
+                              <div className="flex-grow min-w-0">
+                                <p className="font-medium text-lg mb-2">
+                                  Received NFT
+                                </p>
+                                <p className="text-sm text-muted-foreground truncate">
+                                  From{" "}
+                                  <span className="text-foreground font-medium">
+                                    {getFormatAddress(transfer.addressFrom)}
+                                  </span>
+                                </p>
+                                <p className="text-sm text-muted-foreground truncate">
+                                  To{" "}
+                                  <span className="text-foreground font-medium">
+                                    {getFormatAddress(transfer.addressTo)}
+                                  </span>
+                                </p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <p className="text-sm text-muted-foreground">
+                                    {new Date(
+                                      transfer.timestamp
+                                    ).toLocaleTimeString()}
+                                  </p>
+                                  <Link
+                                    href={`${chainInfo.blockExplorers?.[0]?.url}/tx/${transfer.txHash}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex-shrink-0"
+                                  >
+                                    <LinkIcon className="size-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        ) : (
+          <div>No Activity In This Collection</div>
+        ))}
+
+      {/* Render Collection Settings Content */}
+      {filter === "Collection Settings" && singleCollection?.collection && (
         <CollectionSettings collection={singleCollection.collection} />
       )}
     </div>
   );
 }
+
 type CollectionSettingsProps = {
   collection: Collection;
 };
@@ -328,6 +573,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
             onClick={() => imageFileInputRef.current?.click()}
           />
           <input
+            placeholder="Collection Image"
             type="file"
             accept="image/*"
             ref={imageFileInputRef}
@@ -356,6 +602,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
             onClick={() => backgroundFileInputRef.current?.click()}
           />
           <input
+            placeholder="Collection Background Image"
             type="file"
             accept="image/*"
             ref={backgroundFileInputRef}
@@ -370,6 +617,83 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CollectionNFTCard({
+  nft,
+  collectionAddress,
+}: {
+  nft: CollectionNFTType;
+  collectionAddress: string;
+}) {
+  const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+  const { metadata, tokenId, owner } = nft || {};
+  const { name, image } = metadata || {};
+  const cta = "View Item";
+
+  const handleClick = () => {
+    router.push(`/nfts/${collectionAddress}/${tokenId}`);
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="bg-card w-[293px] border group cursor-pointer border-border rounded-2xl  flex flex-col gap-6 p-4 backdrop-blur-2xl"
+    >
+      <p className="font-medium text-white">
+        {name} - {tokenId}
+      </p>
+
+      <div className="w-[261px] h-[220px] relative overflow-hidden">
+        <ImageHolder
+          src={image}
+          alt={name}
+          className="group-hover:scale-[1.01]"
+        />
+        {isHovered && (
+          <div
+            className="bg-black/50 absolute inset-0 group-hover:scale-[1.01]"
+            style={{
+              clipPath:
+                "path('M240.781 1H168.03C165.188 1 162.48 2.20945 160.583 4.32607L158.91 6.19251C157.013 8.30913 154.305 9.51859 151.463 9.51859H125.602C122.421 9.51859 119.43 8.00545 117.546 5.44303L117.275 5.07556C115.391 2.51314 112.4 1 109.219 1H11C5.47716 1 1 5.47715 1 11V66.5511C1 69.0143 1.90906 71.3907 3.55294 73.225L7.47338 77.5996C9.11726 79.434 10.0263 81.8104 10.0263 84.2736V138.909C10.0263 141.372 9.11726 143.749 7.47339 145.583L5.2145 148.103C3.57062 149.938 2.66156 152.314 2.66156 154.777V210.329C2.66156 215.851 7.13872 220.329 12.6616 220.329H104.243C107.086 220.329 109.794 219.119 111.69 217.002L114.171 214.234C116.068 212.117 118.776 210.908 121.618 210.908H150.916C153.763 210.908 156.475 212.121 158.372 214.244L160.672 216.817C162.569 218.94 165.281 220.153 168.128 220.153H247.217C252.74 220.153 257.217 215.676 257.217 210.153V153.373C257.217 151.073 258.069 148.854 259.609 147.144V147.144C261.148 145.434 262 143.215 262 140.914V81.807C262 79.8581 261.431 77.9516 260.362 76.322L258.856 74.0266C257.787 72.397 257.217 70.4906 257.217 68.5417V11C257.217 5.47716 252.74 1 247.217 1H240.781Z')",
+            }}
+          />
+        )}
+      </div>
+      <div className="flex items-center w-full justify-between">
+        <div>
+          <div className="flex items-center gap-1">
+            <p className="text-lg font-medium text-white">Owner</p>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {getFormatAddress(owner)}
+          </p>
+        </div>
+        {/* <div>
+          <p className="text-lg font-medium text-white">{"info2"}</p>
+          <p className="text-sm text-muted-foreground">{"title2"}</p>
+        </div> */}
+      </div>
+      {cta && (
+        <div className="w-full flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <motion.button
+            onClick={handleClick}
+            initial={{ y: "-100%", opacity: 0 }}
+            animate={{
+              y: isHovered ? 0 : 40,
+              opacity: isHovered ? 1 : 0,
+            }}
+            transition={{ duration: 0.3 }}
+            className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+          >
+            {cta}
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 }

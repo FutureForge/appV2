@@ -163,7 +163,7 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
 
       return {
         collections: response.data.collections.reverse(),
-        totalCount: response.data.totalCount
+        totalCount: response.data.totalCount,
       };
     },
     enabled: !!limit && !!page,
@@ -282,7 +282,7 @@ export function useSingleCollectionQuery({
         }).catch(() => ({})),
       ]);
 
-      const { collection, nftLength } = collectionResponse.data;
+      const { collection, nftLength, nfts } = collectionResponse.data;
       const tokenTransfers = collectionTransfersResponse.data.docs;
 
       const totalSupply = collectionDetailsResponse.data.totalSupply;
@@ -302,22 +302,31 @@ export function useSingleCollectionQuery({
         floorPrice,
       };
 
-      const updatedTokenTransfers = tokenTransfers.map((transfer) => {
-        const contract = getContractCustom({
-          contractAddress: contractAddress,
-        });
+      const updatedTokenTransfers = await Promise.all(
+        tokenTransfers.map(async (transfer) => {
+          try {
+            const contract = getContractCustom({
+              contractAddress: contractAddress,
+            });
 
-        const nft = getNFT({
-          contract,
-          tokenId: BigInt(transfer.tokenId),
-          includeOwner: true,
-        });
+            const nft = await getNFT({
+              contract,
+              tokenId: BigInt(transfer.tokenId),
+              includeOwner: true,
+            });
 
-        return {
-          ...transfer,
-          nft,
-        };
-      });
+            return {
+              ...transfer,
+              nft,
+            };
+          } catch (error) {
+            return {
+              ...transfer,
+              nft: null,
+            };
+          }
+        })
+      );
 
       const updatedAllAuctions = await Promise.all(
         (allAuctions ?? []).map(async (auction) => {
@@ -360,6 +369,7 @@ export function useSingleCollectionQuery({
 
       return {
         collection,
+        collectionNFTs: nfts,
         tokenTransfers: updatedTokenTransfers,
         marketplaceFee,
         collectionDetails,

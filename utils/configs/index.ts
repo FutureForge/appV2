@@ -17,6 +17,9 @@ export const client = createThirdwebClient({
 export const MARKETPLACE_ADDRESS_TESTNET =
   "0xf0423D62bA0F73C31a95bEb1Dfc48A033469a0D9";
 
+export const WRAPPED_TOKEN_CONTRACT =
+  "0x10e6414ddea2e2be27e23584c651bc0a49e11e07";
+
 export const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
 export const nativeCurrency = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -58,6 +61,7 @@ export const crossFiMainnet = defineChain({
   blockExplorers: {
     default: { name: "Explorer", url: "https://xfiscan.com/" },
   },
+  // blockExplorers: [{ name: "Explorer", url: "https://xfiscan.com/" }],
 });
 
 export const chainInfo =
