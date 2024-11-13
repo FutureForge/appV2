@@ -2,7 +2,7 @@ import { useSingleCollectionQuery } from "@/modules/query";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Card,
   IconButton,
@@ -18,6 +18,7 @@ import Telegram from "@/assets/telegram.svg";
 import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
+import { Collection } from "@/utils/types/collection/collection.type";
 
 const collectionSocials = [
   { icon: <X className="size-[14px]" />, link: "" },
@@ -246,15 +247,129 @@ export default function CollectionPage() {
           </div>
         </div>
       )}
+
+      {filter === 'Collection Settings' && singleCollection?.collection && (
+        <CollectionSettings collection={singleCollection.collection} />
+      )}
     </div>
   );
 }
+type CollectionSettingsProps = {
+  collection: Collection;
+};
 
+function CollectionSettings({ collection }: CollectionSettingsProps) {
+  const [newCollectionImage, setNewCollectionImage] = useState<string | null>(
+    null
+  );
+  const [newCollectionBackgroundImage, setNewCollectionBackgroundImage] =
+    useState<string | null>(null);
 
-function CollectionSettings(){
-  return(
-    <div>
-      
+  // Refs for file inputs
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const backgroundFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Max file size and valid types
+  const MAX_FILE_SIZE_MB = 5; // Maximum file size (in MB)
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const VALID_FILE_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/avif",
+  ];
+
+  const handleImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "image" | "background"
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!VALID_FILE_TYPES.includes(file.type)) {
+        alert(
+          "Invalid file type. Please upload a JPG, PNG, GIF, WEBP, or AVIF file."
+        );
+        return;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+        return;
+      }
+
+      // If the file passes validation, read and preview it
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (type === "image") {
+          setNewCollectionImage(reader.result as string);
+        } else {
+          setNewCollectionBackgroundImage(reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <div className="flex items-center w-full gap-8 mt-8">
+      <div className="flex items-center gap-4">
+        {/* Collection Image */}
+        <div className="relative w-[392px] h-[447px]">
+          <div className="absolute inset-0 bg-black/60 z-10" />
+          <Image
+            src={newCollectionImage || collection.collectionImage}
+            alt="Collection Image"
+            layout="fill"
+            className="object-cover rounded-lg cursor-pointer"
+            onClick={() => imageFileInputRef.current?.click()}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            ref={imageFileInputRef}
+            onChange={(e) => handleImageChange(e, "image")}
+            style={{ display: "none" }}
+          />
+          <button
+            onClick={() => imageFileInputRef.current?.click()}
+            className="absolute top-1/2 left-1/2 transform z-20 text-sm -translate-x-1/2 -translate-y-1/2 p-2 bg-card border border-border text-white rounded-lg"
+          >
+            Change Image
+          </button>
+        </div>
+
+        {/* Collection Background Image */}
+        <div className="relative w-[392px] h-[447px]">
+          <div className="absolute inset-0 bg-black/60 z-10" />
+          <Image
+            src={
+              newCollectionBackgroundImage ||
+              collection.collectionBackgroundImage
+            }
+            layout="fill"
+            alt="Collection Background"
+            className="object-cover rounded-lg cursor-pointer"
+            onClick={() => backgroundFileInputRef.current?.click()}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            ref={backgroundFileInputRef}
+            onChange={(e) => handleImageChange(e, "background")}
+            style={{ display: "none" }} // Hide the file input
+          />
+          <button
+            onClick={() => backgroundFileInputRef.current?.click()}
+            className="absolute top-1/2 left-1/2 text-sm transform z-20 -translate-x-1/2 -translate-y-1/2 p-2 bg-card border border-border text-white rounded-lg"
+          >
+            Change Background
+          </button>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
