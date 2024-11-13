@@ -32,32 +32,34 @@ export function QueryProvider({ children }: QueryProviderProps) {
               description: string;
             };
 
+            toast.dismiss(mutation?.mutationId);
+
             toast.success(
               successMessage
                 ? successMessage.description
                 : "Transaction was Successful",
               {
-                id: mutation?.mutationId,
+                id: `${mutation?.mutationId}-success`,
                 duration: 5000,
               }
             );
           },
           onError: (error, _variables, _context, mutation) => {
-            // console.log('query provider error: ', error)
+            console.log("query provider error: ", error);
 
             const errorMessage = mutation?.meta?.errorMessage as {
               title?: string;
               description: string;
             };
 
-            // console.log({ errorMessage, error })
+            toast.dismiss(mutation?.mutationId);
 
             toast.error(
               errorMessage
                 ? `${errorMessage.description} - ${error.message}`
                 : error.message,
               {
-                id: mutation?.mutationId,
+                id: `${mutation?.mutationId}-error`,
                 duration: 5000,
               }
             );
