@@ -50,6 +50,7 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
+import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 
 
 // TODO: * Pagination
@@ -118,6 +119,7 @@ export default function CollectionPage() {
   const {
     data: singleCollection,
     isLoading,
+    isPending,
     isError,
   } = useSingleCollectionQuery({
     contractAddress: collectionAddress as string,
@@ -363,390 +365,411 @@ export default function CollectionPage() {
           } on Mint Mingle Marketplace`}
         />
       </Head>
-      <div className="h-[395px] relative w-full px-[35px] py-10 flex items-end">
-        <Image
-          src={collection?.collectionBackgroundImage || ""}
-          alt={collection?.collectionName || ""}
-          layout="fill"
-          quality={100}
-          priority
-          className="w-full h-full object-cover rounded-3xl"
-        />
-        <div className="bg-gradient-to-tr from-background via-background/95 to-transparent absolute inset-0 z-10" />
-        <div className="z-40 flex items-end justify-between w-full">
-          <div className="z-30 flex flex-col gap-6 w-[40%]">
-            <div className="flex flex-col gap-4 z-40">
-              <Image
-                src={collection?.collectionImage || ""}
-                alt={collection?.collectionName || ""}
-                width={123}
-                height={123}
-                className="size-[123px] rounded-[22px] z-40"
-              />
-              <div className="z-40 flex flex-col gap-3">
-                <h4 className="text-2xl font-medium flex gap-2 items-center">
-                  {collection?.collectionName || "Collection Name"}{" "}
-                  <VerifyIcon />
-                </h4>
-                <div className="flex items-center gap-2">
-                  {updatedCollectionSocials
-                    ? updatedCollectionSocials.map((item, index) => {
-                        const { icon, link } = item;
-                        return (
-                          <Link
-                            key={`collection-social-${index}`}
-                            href={link}
-                            className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
-                          >
-                            {icon}
-                          </Link>
-                        );
-                      })
-                    : defaultCollectionSocials.map((item, index) => {
-                        const { icon, link } = item;
-                        return (
-                          <Link
-                            key={`collection-social-${index}`}
-                            href={link}
-                            className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
-                          >
-                            {icon}
-                          </Link>
-                        );
-                      })}
+      {isPending ? (
+        <SingleCollectionSkeleton />
+      ) : (
+        <>
+          <div className="h-[395px] relative w-full px-[35px] py-10 flex items-end">
+            <Image
+              src={collection?.collectionBackgroundImage || ""}
+              alt={collection?.collectionName || ""}
+              layout="fill"
+              quality={100}
+              priority
+              className="w-full h-full object-cover rounded-3xl"
+            />
+            <div className="bg-gradient-to-tr from-background via-background/95 to-transparent absolute inset-0 z-10" />
+            <div className="z-40 flex items-end justify-between w-full">
+              <div className="z-30 flex flex-col gap-6 w-[40%]">
+                <div className="flex flex-col gap-4 z-40">
+                  <Image
+                    src={collection?.collectionImage || ""}
+                    alt={collection?.collectionName || ""}
+                    width={123}
+                    height={123}
+                    className="size-[123px] rounded-[22px] z-40"
+                  />
+                  <div className="z-40 flex flex-col gap-3">
+                    <h4 className="text-2xl font-medium flex gap-2 items-center">
+                      {collection?.collectionName || "Collection Name"}{" "}
+                      <VerifyIcon />
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      {updatedCollectionSocials
+                        ? updatedCollectionSocials.map((item, index) => {
+                            const { icon, link } = item;
+                            return (
+                              <Link
+                                key={`collection-social-${index}`}
+                                href={link}
+                                className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
+                              >
+                                {icon}
+                              </Link>
+                            );
+                          })
+                        : defaultCollectionSocials.map((item, index) => {
+                            const { icon, link } = item;
+                            return (
+                              <Link
+                                key={`collection-social-${index}`}
+                                href={link}
+                                className="bg-tertiary rounded-lg size-7 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out flex items-center justify-center hover:bg-table-hover"
+                              >
+                                {icon}
+                              </Link>
+                            );
+                          })}
+                    </div>
+                  </div>
+                </div>
+                <div className="z-40">
+                  <p>
+                    {collection?.collectionDescription ||
+                      "Lorem ipsum dolor sit amet consectetur. Orci proin elementum faucibus tincidunt id."}
+                  </p>
                 </div>
               </div>
-            </div>
-            <div className="z-40">
-              <p>
-                {collection?.collectionDescription ||
-                  "Lorem ipsum dolor sit amet consectetur. Orci proin elementum faucibus tincidunt id."}
-              </p>
-            </div>
-          </div>
-          <div className="z-40 flex items-center justify-between flex-1">
-            {renderCollectionDetails()}
-          </div>
-        </div>
-      </div>
-
-      {/* filter */}
-      <div className="mt-7">
-        <div className="w-full flex justify-between items-center">
-          <Card className="bg-transparent border border-new-muted-text p-1 rounded-xl h-10">
-            <ToggleGroup.Root
-              type="single"
-              value={filter}
-              onValueChange={(value) => {
-                if (value) setFilter(value as FilterType);
-              }}
-            >
-              {filters.map((value) => (
-                <ToggleGroup.Item
-                  variant="select"
-                  value={value}
-                  className="data-[state=on]:bg-tertiary data-[state=on]:text-primary"
-                >
-                  {value}
-                </ToggleGroup.Item>
-              ))}
-            </ToggleGroup.Root>
-          </Card>
-
-          <div className="flex items-center gap-2">
-            {filter !== "Collection Settings" && (
-              <TextField
-                type="search"
-                placeholder="Search by collections"
-                containerClass="bg-new-muted-bg w-[300px]"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            )}
-            {(filter === "Sales" || filter === "Items") && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm h-[42px] flex items-center justify-center text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
-                  {selectedFilter}
-                </span>
-                <Select.Root
-                  value={selectedFilter}
-                  onValueChange={setSelectedFilter}
-                >
-                  <Select.Trigger>
-                    <IconButton size="xl" variant="ghost">
-                      <FilterIcon className="size-4 text-muted-foreground" />
-                    </IconButton>
-                  </Select.Trigger>
-                  <Select.Content align="end" className="w-[103px]">
-                    {["All", "Auction", "Listing"].map((item) => (
-                      <Select.Item key={item} value={item}>
-                        {item}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Root>
+              <div className="z-40 flex items-center justify-between flex-1">
+                {renderCollectionDetails()}
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Render Items Content */}
-      {filter === "Items" && (
-        <div className="mt-6">
-          <div className="flex items-center gap-8 flex-wrap">
-            {paginatedCollectionNFTs && paginatedCollectionNFTs.length > 0 ? (
-              <>
-                {paginatedCollectionNFTs.map((nft, index) => {
-                  const isListed: Listing | undefined =
-                    collectionAllListings?.find(
-                      (listing) => listing.tokenId === nft.tokenId
-                    );
-                  const isAuctioned: Auction | undefined =
-                    collectionAllAuctions?.find(
-                      (auction) => auction.tokenId === nft.tokenId
-                    );
+          {/* filter */}
+          <div className="mt-7">
+            <div className="w-full flex justify-between items-center">
+              <Card className="bg-transparent border border-new-muted-text p-1 rounded-xl h-10">
+                <ToggleGroup.Root
+                  type="single"
+                  value={filter}
+                  onValueChange={(value) => {
+                    if (value) setFilter(value as FilterType);
+                  }}
+                >
+                  {filters.map((value) => (
+                    <ToggleGroup.Item
+                      variant="select"
+                      value={value}
+                      className="data-[state=on]:bg-tertiary data-[state=on]:text-primary"
+                    >
+                      {value}
+                    </ToggleGroup.Item>
+                  ))}
+                </ToggleGroup.Root>
+              </Card>
 
-                  const status = isListed
-                    ? "listed"
-                    : isAuctioned
-                    ? "auctioned"
-                    : "";
+              <div className="flex items-center gap-2">
+                {filter !== "Collection Settings" && (
+                  <TextField
+                    type="search"
+                    placeholder="Search by collections"
+                    containerClass="bg-new-muted-bg w-[300px]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                )}
+                {(filter === "Sales" || filter === "Items") && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm h-[42px] flex items-center justify-center text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
+                      {selectedFilter}
+                    </span>
+                    <Select.Root
+                      value={selectedFilter}
+                      onValueChange={setSelectedFilter}
+                    >
+                      <Select.Trigger>
+                        <IconButton size="xl" variant="ghost">
+                          <FilterIcon className="size-4 text-muted-foreground" />
+                        </IconButton>
+                      </Select.Trigger>
+                      <Select.Content align="end" className="w-[103px]">
+                        {["All", "Auction", "Listing"].map((item) => (
+                          <Select.Item key={item} value={item}>
+                            {item}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-                  const type = isListed ? "listing" : "auction";
-                  const data = isListed ? isListed : isAuctioned;
+          {/* Render Items Content */}
+          {filter === "Items" && (
+            <div className="mt-6">
+              <div className="flex items-center gap-8 flex-wrap">
+                {paginatedCollectionNFTs &&
+                paginatedCollectionNFTs.length > 0 ? (
+                  <>
+                    {paginatedCollectionNFTs.map((nft, index) => {
+                      const isListed: Listing | undefined =
+                        collectionAllListings?.find(
+                          (listing) => listing.tokenId === nft.tokenId
+                        );
+                      const isAuctioned: Auction | undefined =
+                        collectionAllAuctions?.find(
+                          (auction) => auction.tokenId === nft.tokenId
+                        );
 
-                  const listingPrice =
-                    data && "pricePerToken" in data ? data.pricePerToken : "";
-                  const auctionPrice =
-                    data && "buyoutBidAmount" in data
-                      ? data.buyoutBidAmount
-                      : "";
+                      const status = isListed
+                        ? "listed"
+                        : isAuctioned
+                        ? "auctioned"
+                        : "";
 
-                  const extraOnClick = isListed
-                    ? () => {
-                        handleBuyListingNow({
-                          listingId: isListed?.listingId,
-                          quantity: "1",
-                          totalPrice: listingPrice,
-                          nativeTokenValue: listingPrice,
-                        });
-                      }
-                    : () => {
-                        if (!isAuctioned) return;
-                        handleBuyAuctionNow({
-                          auctionId: isAuctioned?.auctionId,
-                          bidAmount: auctionPrice,
-                        });
+                      const type = isListed ? "listing" : "auction";
+                      const data = isListed ? isListed : isAuctioned;
+
+                      const listingPrice =
+                        data && "pricePerToken" in data
+                          ? data.pricePerToken
+                          : "";
+                      const auctionPrice =
+                        data && "buyoutBidAmount" in data
+                          ? data.buyoutBidAmount
+                          : "";
+
+                      const extraOnClick = isListed
+                        ? () => {
+                            handleBuyListingNow({
+                              listingId: isListed?.listingId,
+                              quantity: "1",
+                              totalPrice: listingPrice,
+                              nativeTokenValue: listingPrice,
+                            });
+                          }
+                        : () => {
+                            if (!isAuctioned) return;
+                            handleBuyAuctionNow({
+                              auctionId: isAuctioned?.auctionId,
+                              bidAmount: auctionPrice,
+                            });
+                          };
+
+                      const ctaOnClick = () => {
+                        console.log("View Clicked");
                       };
 
-                  const ctaOnClick = () => {
-                    console.log("View Clicked");
-                  };
+                      const extraProps: ExtraProps = {
+                        disabled: isDisabled,
+                        price: isListed ? listingPrice : auctionPrice,
+                        collectionFee: collectionFee || {
+                          address: "",
+                          percent: 0,
+                        },
+                        marketplaceFee: marketplaceFee || {
+                          address: "",
+                          percent: 0,
+                        },
+                      };
 
-                  const extraProps: ExtraProps = {
-                    disabled: isDisabled,
-                    price: isListed ? listingPrice : auctionPrice,
-                    collectionFee: collectionFee || { address: "", percent: 0 },
-                    marketplaceFee: marketplaceFee || {
-                      address: "",
-                      percent: 0,
-                    },
-                  };
-
-                  return status !== "" && data ? (
-                    <NFTCard
-                      key={index}
-                      data={data}
-                      status={status}
-                      type={type}
-                      cta="View Item"
-                      extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
-                      ctaStyles="!bg-border"
-                      extraOnClick={extraOnClick}
-                      onClick={ctaOnClick}
-                      extraProps={extraProps}
-                    />
-                  ) : (
-                    <CollectionNFTCard
-                      key={index}
-                      nft={nft}
-                      collectionAddress={collectionAddress as string}
-                    />
-                  );
-                })}
-                {filteredCollectionNFTs.length > displayCount && (
-                  <div ref={loadMoreRef} className="w-full h-20" />
+                      return status !== "" && data ? (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          status={status}
+                          type={type}
+                          cta="View Item"
+                          extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
+                          ctaStyles="!bg-border"
+                          extraOnClick={extraOnClick}
+                          onClick={ctaOnClick}
+                          extraProps={extraProps}
+                        />
+                      ) : (
+                        <CollectionNFTCard
+                          key={index}
+                          nft={nft}
+                          collectionAddress={collectionAddress as string}
+                        />
+                      );
+                    })}
+                    {filteredCollectionNFTs.length > displayCount && (
+                      <div ref={loadMoreRef} className="w-full h-20" />
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full items-center justify-center flex h-52">
+                    {searchQuery.length > 0
+                      ? "No items found"
+                      : "No items in this collection"}
+                  </div>
                 )}
-              </>
+              </div>
+            </div>
+          )}
+
+          {/* Render Offers Content */}
+          {filter === "Offers" && (
+            <div className="mt-6">
+              <div className="flex items-center gap-8 flex-wrap">
+                {paginatedCollectionOffers &&
+                paginatedCollectionOffers.length > 0 ? (
+                  <>
+                    {paginatedCollectionOffers.map((offer, index) => (
+                      <NFTCard key={index} data={offer} type="offers" />
+                    ))}
+                    {filteredCollectionOffers.length > displayCount && (
+                      <div ref={loadMoreRef} className="w-full h-20" />
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full items-center justify-center flex h-52">
+                    {searchQuery.length > 0
+                      ? "No offers found"
+                      : "No offers in this collection"}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Render Sales Content */}
+          {filter === "Sales" && (
+            <div className="mt-6">
+              <div className="flex items-center gap-8 flex-wrap">
+                {paginatedCollectionSales &&
+                paginatedCollectionSales.length > 0 ? (
+                  <>
+                    {paginatedCollectionSales.map((sale, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={sale}
+                          type={sale.saleType as NFTCardInfo}
+                          status={sale.nftStatus as NFTStatus}
+                          cta="View Item"
+                          onClick={() => {
+                            console.log("View Item Clicked");
+                          }}
+                        />
+                      );
+                    })}
+                    {filteredCollectionSales.length > displayCount && (
+                      <div ref={loadMoreRef} className="w-full h-20" />
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full items-center justify-center flex h-52">
+                    {searchQuery.length > 0
+                      ? "No sales found"
+                      : "No sales in this collection"}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Render Activity Content */}
+          {filter === "Activity" &&
+            (filteredCollectionTokenTransfers &&
+            filteredCollectionTokenTransfers.length > 0 ? (
+              <div className="mt-6">
+                <div>
+                  {paginatedCollectionTokenTransfers &&
+                    Object.entries(
+                      paginatedCollectionTokenTransfers.reduce(
+                        (acc, transfer) => {
+                          const date = new Date(
+                            transfer.timestamp
+                          ).toLocaleDateString();
+                          return {
+                            ...acc,
+                            [date]: [...(acc[date] || []), transfer],
+                          };
+                        },
+                        {} as Record<
+                          string,
+                          typeof paginatedCollectionTokenTransfers
+                        >
+                      )
+                    ).map(([date, transfers]) => {
+                      return (
+                        <div key={date} className="mb-8">
+                          <div className="bg-card w-full py-2 px-3 rounded-lg mb-4">
+                            <p className="text-sm font-medium">{date}</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {transfers.map((transfer, index) => {
+                              const image = transfer.nft?.metadata.image;
+                              const name = transfer.nft?.metadata.name;
+
+                              return (
+                                <div
+                                  key={index}
+                                  className="bg-card rounded-2xl p-4 flex items-center gap-4"
+                                >
+                                  <div className="flex-shrink-0">
+                                    <ImageHolder
+                                      src={image!}
+                                      alt={name!}
+                                      className="rounded-lg object-cover size-20"
+                                      width="80px"
+                                      height="80px"
+                                    />
+                                  </div>
+                                  <div className="flex-grow min-w-0">
+                                    <p className="font-medium text-lg mb-2">
+                                      Received NFT
+                                    </p>
+                                    <span className="flex items-center w-full justify-between">
+                                      <p className="text-sm text-muted-foreground truncate">
+                                        From{" "}
+                                        <span className="text-foreground font-medium">
+                                          {getFormatAddress(
+                                            transfer.addressFrom
+                                          )}
+                                        </span>
+                                      </p>
+                                      <p className="text-sm text-muted-foreground truncate">
+                                        To{" "}
+                                        <span className="text-foreground font-medium">
+                                          {getFormatAddress(transfer.addressTo)}
+                                        </span>
+                                      </p>
+                                    </span>
+
+                                    <div className="flex items-center justify-between mt-2">
+                                      <p className="text-sm text-muted-foreground">
+                                        {new Date(
+                                          transfer.timestamp
+                                        ).toLocaleTimeString()}
+                                      </p>
+                                      <Link
+                                        href={`${chainInfo.blockExplorers?.[0]?.url}/tx/${transfer.txHash}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="flex-shrink-0 "
+                                      >
+                                        <LinkIcon className="size-5 text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out" />
+                                      </Link>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  {filteredCollectionTokenTransfers.length > displayCount && (
+                    <div ref={loadMoreRef} className="w-full h-20" />
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="w-full items-center justify-center flex h-52">
                 {searchQuery.length > 0
                   ? "No items found"
-                  : "No items in this collection"}
+                  : "No activity in this collection"}
               </div>
-            )}
-          </div>
-        </div>
+            ))}
+        </>
       )}
-
-      {/* Render Offers Content */}
-      {filter === "Offers" && (
-        <div className="mt-6">
-          <div className="flex items-center gap-8 flex-wrap">
-            {paginatedCollectionOffers &&
-            paginatedCollectionOffers.length > 0 ? (
-              <>
-                {paginatedCollectionOffers.map((offer, index) => (
-                  <NFTCard key={index} data={offer} type="offers" />
-                ))}
-                {filteredCollectionOffers.length > displayCount && (
-                  <div ref={loadMoreRef} className="w-full h-20" />
-                )}
-              </>
-            ) : (
-              <div className="w-full items-center justify-center flex h-52">
-                {searchQuery.length > 0
-                  ? "No offers found"
-                  : "No offers in this collection"}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Render Sales Content */}
-      {filter === "Sales" && (
-        <div className="mt-6">
-          <div className="flex items-center gap-8 flex-wrap">
-            {paginatedCollectionSales && paginatedCollectionSales.length > 0 ? (
-              <>
-                {paginatedCollectionSales.map((sale, index) => {
-                  return (
-                    <NFTCard
-                      key={index}
-                      data={sale}
-                      type={sale.saleType as NFTCardInfo}
-                      status={sale.nftStatus as NFTStatus}
-                      cta="View Item"
-                      onClick={() => {
-                        console.log("View Item Clicked");
-                      }}
-                    />
-                  );
-                })}
-                {filteredCollectionSales.length > displayCount && (
-                  <div ref={loadMoreRef} className="w-full h-20" />
-                )}
-              </>
-            ) : (
-              <div className="w-full items-center justify-center flex h-52">
-                {searchQuery.length > 0
-                  ? "No sales found"
-                  : "No sales in this collection"}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Render Activity Content */}
-      {filter === "Activity" &&
-        (filteredCollectionTokenTransfers &&
-        filteredCollectionTokenTransfers.length > 0 ? (
-          <div className="mt-6">
-            <div>
-              {paginatedCollectionTokenTransfers &&
-                Object.entries(
-                  paginatedCollectionTokenTransfers.reduce((acc, transfer) => {
-                    const date = new Date(
-                      transfer.timestamp
-                    ).toLocaleDateString();
-                    return {
-                      ...acc,
-                      [date]: [...(acc[date] || []), transfer],
-                    };
-                  }, {} as Record<string, typeof paginatedCollectionTokenTransfers>)
-                ).map(([date, transfers]) => {
-                  return (
-                    <div key={date} className="mb-8">
-                      <div className="bg-card w-full py-2 px-3 rounded-lg mb-4">
-                        <p className="text-sm font-medium">{date}</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {transfers.map((transfer, index) => {
-                          const image = transfer.nft?.metadata.image;
-                          const name = transfer.nft?.metadata.name;
-
-                          return (
-                            <div
-                              key={index}
-                              className="bg-card rounded-2xl p-4 flex items-center gap-4"
-                            >
-                              <div className="flex-shrink-0">
-                                <ImageHolder
-                                  src={image!}
-                                  alt={name!}
-                                  className="rounded-lg object-cover size-20"
-                                  width="80px"
-                                  height="80px"
-                                />
-                              </div>
-                              <div className="flex-grow min-w-0">
-                                <p className="font-medium text-lg mb-2">
-                                  Received NFT
-                                </p>
-                                <span className="flex items-center w-full justify-between">
-                                  <p className="text-sm text-muted-foreground truncate">
-                                    From{" "}
-                                    <span className="text-foreground font-medium">
-                                      {getFormatAddress(transfer.addressFrom)}
-                                    </span>
-                                  </p>
-                                  <p className="text-sm text-muted-foreground truncate">
-                                    To{" "}
-                                    <span className="text-foreground font-medium">
-                                      {getFormatAddress(transfer.addressTo)}
-                                    </span>
-                                  </p>
-                                </span>
-
-                                <div className="flex items-center justify-between mt-2">
-                                  <p className="text-sm text-muted-foreground">
-                                    {new Date(
-                                      transfer.timestamp
-                                    ).toLocaleTimeString()}
-                                  </p>
-                                  <Link
-                                    href={`${chainInfo.blockExplorers?.[0]?.url}/tx/${transfer.txHash}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="flex-shrink-0 "
-                                  >
-                                    <LinkIcon className="size-5 text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out" />
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              {filteredCollectionTokenTransfers.length > displayCount && (
-                <div ref={loadMoreRef} className="w-full h-20" />
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="w-full items-center justify-center flex h-52">
-            {searchQuery.length > 0
-              ? "No items found"
-              : "No activity in this collection"}
-          </div>
-        ))}
 
       {/* Render Collection Settings Content */}
       {filter === "Collection Settings" && singleCollection?.collection && (
