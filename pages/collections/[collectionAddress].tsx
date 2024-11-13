@@ -2,7 +2,8 @@ import { useSingleCollectionQuery } from "@/modules/query";
 import Image from "next/image";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import {
   Card,
   IconButton,
@@ -70,12 +71,28 @@ const defaultCollectionSocials = [
   { icon: <Telegram className="size-[14px]" />, link: "" },
 ];
 
+const ITEMS_PER_PAGE = 3;
+
 export default function CollectionPage() {
   const router = useRouter();
   const { collectionAddress } = router.query;
   const [filter, setFilter] = useState<FilterType>("Items");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
+
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
+  const { ref: loadMoreRef, inView } = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
+    }
+  }, [inView]);
+
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [filter, searchQuery, selectedFilter]);
+
   const {
     data: singleCollection,
     isLoading,
@@ -133,7 +150,6 @@ export default function CollectionPage() {
     totalVolume: "Total Volume",
   };
 
-  // Define the order of the properties
   const displayOrder = [
     "floorPrice",
     "totalVolume",
@@ -219,6 +235,21 @@ export default function CollectionPage() {
 
       return combinedField.includes(searchTerm);
     }) ?? [];
+
+  const paginatedCollectionNFTs = filteredCollectionNFTs?.slice(
+    0,
+    displayCount
+  );
+  const paginatedCollectionOffers = filteredCollectionOffers?.slice(
+    0,
+    displayCount
+  );
+  const paginatedCollectionSales = filteredCollectionSales?.slice(
+    0,
+    displayCount
+  );
+  const paginatedCollectionTokenTransfers =
+    filteredCollectionTokenTransfers?.slice(0, displayCount);
 
   const renderCollectionDetails = () => {
     if (!collectionDetails) return <p>No collection details available</p>;
@@ -506,9 +537,9 @@ export default function CollectionPage() {
         filteredCollectionTokenTransfers.length > 0 ? (
           <div className="mt-6">
             <div>
-              {filteredCollectionTokenTransfers &&
+              {paginatedCollectionTokenTransfers &&
                 Object.entries(
-                  filteredCollectionTokenTransfers.reduce((acc, transfer) => {
+                  paginatedCollectionTokenTransfers.reduce((acc, transfer) => {
                     const date = new Date(
                       transfer.timestamp
                     ).toLocaleDateString();
@@ -516,7 +547,7 @@ export default function CollectionPage() {
                       ...acc,
                       [date]: [...(acc[date] || []), transfer],
                     };
-                  }, {} as Record<string, typeof filteredCollectionTokenTransfers>)
+                  }, {} as Record<string, typeof paginatedCollectionTokenTransfers>)
                 ).map(([date, transfers]) => {
                   return (
                     <div key={date} className="mb-8">
@@ -585,6 +616,9 @@ export default function CollectionPage() {
                     </div>
                   );
                 })}
+              {filteredCollectionTokenTransfers.length > displayCount && (
+                <div ref={loadMoreRef} className="h-10" />
+              )}
             </div>
           </div>
         ) : (
