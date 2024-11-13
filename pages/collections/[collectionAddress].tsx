@@ -71,7 +71,7 @@ const defaultCollectionSocials = [
   { icon: <Telegram className="size-[14px]" />, link: "" },
 ];
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 4;
 
 export default function CollectionPage() {
   const router = useRouter();
@@ -423,58 +423,63 @@ export default function CollectionPage() {
       {filter === "Items" && (
         <div className="mt-6">
           <div className="flex items-center gap-8 flex-wrap">
-            {filteredCollectionNFTs && filteredCollectionNFTs.length > 0 ? (
-              filteredCollectionNFTs.map((nft, index) => {
-                const isListed: Listing | undefined =
-                  collectionAllListings?.find(
-                    (listing) => listing.tokenId === nft.tokenId
+            {paginatedCollectionNFTs && paginatedCollectionNFTs.length > 0 ? (
+              <>
+                {paginatedCollectionNFTs.map((nft, index) => {
+                  const isListed: Listing | undefined =
+                    collectionAllListings?.find(
+                      (listing) => listing.tokenId === nft.tokenId
+                    );
+                  const isAuctioned: Auction | undefined =
+                    collectionAllAuctions?.find(
+                      (auction) => auction.tokenId === nft.tokenId
+                    );
+
+                  const status = isListed
+                    ? "listed"
+                    : isAuctioned
+                    ? "auctioned"
+                    : "";
+
+                  const type = isListed ? "listing" : "auction";
+                  const data = isListed ? isListed : isAuctioned;
+
+                  const extraOnClick = isListed
+                    ? () => {
+                        console.log("Listing Buy Now Clicked");
+                      }
+                    : () => {
+                        console.log("Auction Buy Now Clicked");
+                      };
+
+                  const ctaOnClick = () => {
+                    console.log("View Clicked");
+                  };
+
+                  return status !== "" && data ? (
+                    <NFTCard
+                      key={index}
+                      data={data}
+                      status={status}
+                      type={type}
+                      cta="View Item"
+                      extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
+                      ctaStyles="!bg-border"
+                      extraOnClick={extraOnClick}
+                      onClick={ctaOnClick}
+                    />
+                  ) : (
+                    <CollectionNFTCard
+                      key={index}
+                      nft={nft}
+                      collectionAddress={collectionAddress as string}
+                    />
                   );
-                const isAuctioned: Auction | undefined =
-                  collectionAllAuctions?.find(
-                    (auction) => auction.tokenId === nft.tokenId
-                  );
-
-                const status = isListed
-                  ? "listed"
-                  : isAuctioned
-                  ? "auctioned"
-                  : "";
-
-                const type = isListed ? "listing" : "auction";
-                const data = isListed ? isListed : isAuctioned;
-
-                const extraOnClick = isListed
-                  ? () => {
-                      console.log("Listing Buy Now Clicked");
-                    }
-                  : () => {
-                      console.log("Auction Buy Now Clicked");
-                    };
-
-                const ctaOnClick = () => {
-                  console.log("View Clicked");
-                };
-
-                return status !== "" && data ? (
-                  <NFTCard
-                    key={index}
-                    data={data}
-                    status={status}
-                    type={type}
-                    cta="View Item"
-                    extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
-                    ctaStyles="!bg-border"
-                    extraOnClick={extraOnClick}
-                    onClick={ctaOnClick}
-                  />
-                ) : (
-                  <CollectionNFTCard
-                    key={index}
-                    nft={nft}
-                    collectionAddress={collectionAddress as string}
-                  />
-                );
-              })
+                })}
+                {filteredCollectionOffers.length > displayCount && (
+                  <div ref={loadMoreRef} className="h-10" />
+                )}
+              </>
             ) : (
               <div className="w-full items-center justify-center flex h-52">
                 {searchQuery.length > 0
@@ -490,10 +495,16 @@ export default function CollectionPage() {
       {filter === "Offers" && (
         <div className="mt-6">
           <div className="flex items-center gap-8 flex-wrap">
-            {filteredCollectionOffers && filteredCollectionOffers.length > 0 ? (
-              filteredCollectionOffers.map((offer, index) => (
-                <NFTCard key={index} data={offer} type="offers" />
-              ))
+            {paginatedCollectionOffers &&
+            paginatedCollectionOffers.length > 0 ? (
+              <>
+                {paginatedCollectionOffers.map((offer, index) => (
+                  <NFTCard key={index} data={offer} type="offers" />
+                ))}
+                {filteredCollectionOffers.length > displayCount && (
+                  <div ref={loadMoreRef} className="h-10" />
+                )}
+              </>
             ) : (
               <div className="w-full items-center justify-center flex h-52">
                 {searchQuery.length > 0
@@ -509,17 +520,22 @@ export default function CollectionPage() {
       {filter === "Sales" && (
         <div className="mt-6">
           <div className="flex items-center gap-8 flex-wrap">
-            {filteredCollectionSales && filteredCollectionSales.length > 0 ? (
-              filteredCollectionSales.map((sale, index) => {
-                return (
-                  <NFTCard
-                    key={index}
-                    data={sale}
-                    type={sale.saleType as NFTCardInfo}
-                    status={sale.nftStatus as NFTStatus}
-                  />
-                );
-              })
+            {paginatedCollectionSales && paginatedCollectionSales.length > 0 ? (
+              <>
+                {paginatedCollectionSales.map((sale, index) => {
+                  return (
+                    <NFTCard
+                      key={index}
+                      data={sale}
+                      type={sale.saleType as NFTCardInfo}
+                      status={sale.nftStatus as NFTStatus}
+                    />
+                  );
+                })}
+                {filteredCollectionSales.length > displayCount && (
+                  <div ref={loadMoreRef} className="h-10" />
+                )}
+              </>
             ) : (
               <div className="w-full items-center justify-center flex h-52">
                 {searchQuery.length > 0
