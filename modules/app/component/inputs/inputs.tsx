@@ -11,10 +11,11 @@ import { MdOutlineDelete } from "react-icons/md";
 export type TextFieldProps = React.ComponentPropsWithoutRef<"input"> &  {
   containerClass?:  string;
   icon?: ReactNode
+  collectionIcon?: ReactNode;
 };
 
 const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
-  const { type, className, containerClass, icon, ...inputProps } = props;
+  const { type, className, containerClass, icon, collectionIcon, ...inputProps } = props;
 
   // Function to prevent negative input
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -44,6 +45,7 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
         onKeyDown={handleKeyDown}
         {...inputProps}
       />
+      {collectionIcon && collectionIcon}
     </div>
   );
 });

@@ -5,10 +5,13 @@ import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import {
+  Button,
   Card,
   IconButton,
+  Label,
   NFTCard,
   Select,
+  TextArea,
   TextField,
   ToggleGroup,
 } from "@/modules/app";
@@ -27,6 +30,8 @@ import {
   NFTStatus,
 } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import { chainInfo } from "@/utils/configs";
+import Head from "next/head";
+import { useRouter } from "next/router";
 
 // icons
 import VerifyIcon from "@/assets/verified.svg";
@@ -35,8 +40,8 @@ import Telegram from "@/assets/telegram.svg";
 import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
-import Head from "next/head";
-import { useRouter } from "next/router";
+import CopyIcon from "@/assets/copy.svg";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 // TODO: * Pagination
 
@@ -83,7 +88,7 @@ export default function CollectionPage() {
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
-    rootMargin: '100px',
+    rootMargin: "100px",
   });
 
   useEffect(() => {
@@ -396,7 +401,7 @@ export default function CollectionPage() {
             )}
             {(filter === "Sales" || filter === "Items") && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
+                <span className="text-sm h-[42px] flex items-center justify-center text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
                   {selectedFilter}
                 </span>
                 <Select.Root
@@ -666,7 +671,25 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
   );
   const [newCollectionBackgroundImage, setNewCollectionBackgroundImage] =
     useState<string | null>(null);
-
+  const [name, setName] = useState(collection.collectionName);
+  const [description, setDescription] = useState(
+    collection.collectionDescription
+  );
+  const [contractAddress, setContractAddress] = useState(
+    collection.collectionAddress
+  );
+  const copyToClipboard = useCopyToClipboard()[1];
+  const handleCopy = (content: string) => {
+    if (content) {
+      copyToClipboard(content);
+    }
+  };
+const isEdited =
+  name !== collection.collectionName ||
+  description !== collection.collectionDescription ||
+  contractAddress !== collection.collectionAddress ||
+  newCollectionImage !== null ||
+  newCollectionBackgroundImage !== null;
   // Refs for file inputs
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const backgroundFileInputRef = useRef<HTMLInputElement>(null);
@@ -717,8 +740,8 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
   };
 
   return (
-    <div className="flex items-center w-full gap-8 mt-8">
-      <div className="flex items-center gap-4">
+    <div className="flex items-start w-full gap-8 mt-8">
+      <div className="flex items-center gap-4 flex-1">
         {/* Collection Image */}
         <div className="relative w-[392px] h-[447px]">
           <div className="absolute inset-0 bg-black/60 z-10" />
@@ -772,6 +795,89 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
           >
             Change Background
           </button>
+        </div>
+      </div>
+
+      <div className="w-[50%] flex flex-col h-[447px]">
+        <div className="flex items-center gap-5 w-full">
+          <div className="flex flex-col gap-3 w-full">
+            <Label htmlFor="name">Collection Name</Label>
+            <TextField
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="text-muted-foreground"
+              containerClass="bg-tertiary  border-0"
+              collectionIcon={
+                <CopyIcon
+                  onClick={() => handleCopy(name)}
+                  className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
+                />
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-3 w-full">
+            <Label htmlFor="contract">Project Contract</Label>
+            <TextField
+              id="contract"
+              value={getFormatAddress(contractAddress)}
+              onChange={(e) => setContractAddress(e.target.value)}
+              className="text-muted-foreground"
+              containerClass="bg-tertiary  border-0"
+              collectionIcon={
+                <CopyIcon
+                  onClick={() => handleCopy(contractAddress)}
+                  className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
+                />
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3 w-full mt-4">
+          <Label htmlFor="description">Description</Label>
+          <TextArea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="text-muted-foreground border-0 bg-tertiary"
+          />
+        </div>
+
+        <div className="flex w-full flex-col gap-6 items-end mt-auto">
+          <div className="flex items-start justify-start gap-4">
+            {collection?.collectionSocials?.map((social, index) => (
+              <div key={index} className="flex flex-col gap-1">
+                <TextField
+                  value={social.socialLink}
+                  icon={
+                    <span className="size-7 rounded-lg min-w-7 flex items-center justify-center">
+                      {social.socialName === "twitter" ? (
+                        <X className="size-3 text-muted-foreground" />
+                      ) : social.socialName === "discord" ? (
+                        <Discord className="size-3 text-muted-foreground" />
+                      ) : (
+                        <Telegram className="size-3 text-muted-foreground" />
+                      )}
+                    </span>
+                  }
+                  // onChange={(e) =>
+                  //   handleSocialChange(index, "socialLink", e.target.value)
+                  // }
+                  containerClass="bg-transparent px-2 text-muted-foreground"
+                />
+                {/* {socialErrors[index] && (
+                  <span className="text-error text-sm">
+                    {socialErrors[index]}
+                  </span>
+                )} */}
+              </div>
+            ))}
+          </div>
+          <div className="w-full">
+            <Button disabled={!isEdited} className="w-full" shape="square">
+              Update Collection Details
+            </Button>
+          </div>
         </div>
       </div>
     </div>
