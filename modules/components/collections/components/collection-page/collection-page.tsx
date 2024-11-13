@@ -45,12 +45,16 @@ export function CollectionPage() {
     setCurrentPage(1);
   };
 
-  const filteredCollections = CollectionQuery?.collections?.filter(
-    (collection) =>
-      collection.collectionName
+  const filteredCollections =
+    CollectionQuery?.collections?.filter((collection) => {
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace = collection.collectionName
         .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-  );
+        .replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}`;
+
+      return combinedField.includes(searchTerm);
+    }) ?? [];
 
   const totalCount =
     filteredCollections?.length || CollectionQuery?.totalCount || 0;

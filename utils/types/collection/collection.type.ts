@@ -11,18 +11,24 @@ export type Collection = {
   floorPrice: number;
   totalVolume: number;
   holderCount: number;
+  collectionSocials: ISocial[];
+  isPromoted: boolean;
+  promotionBackgroundImage: string;
+  promotionStartDate: Date;
+  promotionEndDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
+
+interface ISocial {
+  socialName: string;
+  socialLink: string;
+}
 
 export type SingleCollection = {
   collection: Collection;
   nftLength: number;
-  nfts: {
-    tokenId: string;
-    owner: string;
-    type: string;
-    tokenURI: string;
-    metadata: NFTMetadata;
-  }[];
+  nfts: CollectionNFTType[];
 };
 
 export type TokenDetails = {
@@ -39,4 +45,12 @@ export type TokenDetails = {
 export type CollectionsQueryResponse = {
   collections: Collection[];
   totalCount: number;
+};
+
+export type CollectionNFTType = {
+  tokenId: string;
+  owner: string;
+  type: string;
+  tokenURI: string;
+  metadata: NFTMetadata;
 };

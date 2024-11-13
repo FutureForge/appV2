@@ -1,11 +1,6 @@
 "use client";
 import { CollectionPage } from "@/modules/components/collections";
-import {
-  dehydrate,
-  DehydratedState,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { HydrationBoundary } from "@tanstack/react-query";
 import React from "react";
 
 export default function Collection() {

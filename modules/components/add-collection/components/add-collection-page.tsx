@@ -259,11 +259,11 @@ export function AddCollectionsPage() {
                           icon={
                             <span className="bg-tertiary size-7 rounded-lg min-w-7 flex items-center justify-center">
                               {social.socialName === "twitter" ? (
-                                <X />
+                                <X className="size-3 text-muted-foreground" />
                               ) : social.socialName === "discord" ? (
-                                <Discord />
+                                <Discord className="size-3 text-muted-foreground" />
                               ) : (
-                                <Telegram />
+                                <Telegram className="size-3 text-muted-foreground" />
                               )}
                             </span>
                           }
