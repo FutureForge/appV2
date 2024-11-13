@@ -97,8 +97,9 @@ export function Hero() {
           <>
             {CollectionQuery?.collections?.slice(0, length).map(
               (collection: Collection) => {
+                const contractAddress = collection.collectionAddress;
                 const handleClick = () => {
-                  router.push(`/collections/${collection.collectionAddress}`);
+                  router.push(`/collections/${contractAddress}`);
                 };
                 return (
                   <CollectionsNFTCard
