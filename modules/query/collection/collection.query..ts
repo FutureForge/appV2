@@ -163,7 +163,7 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
 
       return {
         collections: response.data.collections.reverse(),
-        totalCount: response.data.totalCount
+        totalCount: response.data.totalCount,
       };
     },
     enabled: !!limit && !!page,
@@ -176,6 +176,7 @@ export function useSingleCollectionQuery({
 }: {
   contractAddress: string;
 }) {
+  console.log({ contractAddress });
   /**
    * GETTING COLLECTION LISTING DATA
    */
