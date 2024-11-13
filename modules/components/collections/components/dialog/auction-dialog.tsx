@@ -22,8 +22,9 @@ export function AuctionDialog({
       </DialogHeader>
       <DialogBody>
         <div className="flex w-full gap-6">
-          <div>
+          <div className="relative">
             <ImageHolder src={src} alt={alt} />
+            <div className="bg-gradient-to-t from-background rounded-[10px] to-transparent absolute bottom-0 h-20 right-0 left-0 z-40" />
           </div>
           <div className="w-1/2 flex flex-col">
             <div className="bg-gradient-to-r rounded-xl border border-border from-border to-transparent p-3 flex flex-col gap-2">
