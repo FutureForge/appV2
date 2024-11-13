@@ -52,9 +52,6 @@ import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
 import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 
-
-// TODO: * Pagination
-
 type FilterType =
   | "Items"
   | "Offers"
@@ -802,12 +799,12 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
       copyToClipboard(content);
     }
   };
-const isEdited =
-  name !== collection.collectionName ||
-  description !== collection.collectionDescription ||
-  contractAddress !== collection.collectionAddress ||
-  newCollectionImage !== null ||
-  newCollectionBackgroundImage !== null;
+  const isEdited =
+    name !== collection.collectionName ||
+    description !== collection.collectionDescription ||
+    contractAddress !== collection.collectionAddress ||
+    newCollectionImage !== null ||
+    newCollectionBackgroundImage !== null;
   // Refs for file inputs
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const backgroundFileInputRef = useRef<HTMLInputElement>(null);
