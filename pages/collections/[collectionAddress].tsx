@@ -81,7 +81,10 @@ export default function CollectionPage() {
   const [selectedFilter, setSelectedFilter] = useState("All");
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
-  const { ref: loadMoreRef, inView } = useInView();
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '100px',
+  });
 
   useEffect(() => {
     if (inView) {
@@ -476,8 +479,8 @@ export default function CollectionPage() {
                     />
                   );
                 })}
-                {filteredCollectionOffers.length > displayCount && (
-                  <div ref={loadMoreRef} className="h-10" />
+                {filteredCollectionNFTs.length > displayCount && (
+                  <div ref={loadMoreRef} className="w-full h-20" />
                 )}
               </>
             ) : (
@@ -502,7 +505,7 @@ export default function CollectionPage() {
                   <NFTCard key={index} data={offer} type="offers" />
                 ))}
                 {filteredCollectionOffers.length > displayCount && (
-                  <div ref={loadMoreRef} className="h-10" />
+                  <div ref={loadMoreRef} className="w-full h-20" />
                 )}
               </>
             ) : (
@@ -533,7 +536,7 @@ export default function CollectionPage() {
                   );
                 })}
                 {filteredCollectionSales.length > displayCount && (
-                  <div ref={loadMoreRef} className="h-10" />
+                  <div ref={loadMoreRef} className="w-full h-20" />
                 )}
               </>
             ) : (
@@ -633,7 +636,7 @@ export default function CollectionPage() {
                   );
                 })}
               {filteredCollectionTokenTransfers.length > displayCount && (
-                <div ref={loadMoreRef} className="h-10" />
+                <div ref={loadMoreRef} className="w-full h-20" />
               )}
             </div>
           </div>
