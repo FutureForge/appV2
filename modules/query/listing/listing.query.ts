@@ -32,19 +32,19 @@ export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      const updatedListings = response.allListings.filter((listing) => {
-        const { endTimestamp } = listing;
-        const endTime = formatBlockchainTimestamp(endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+      // const updatedListings = response.allListings.filter((listing) => {
+      //   const { endTimestamp } = listing;
+      //   const endTime = formatBlockchainTimestamp(endTimestamp);
+      //   const endTimeFormatted = new Date(endTime).getTime();
+      //   const currentTime = new Date().getTime();
 
-        // looking for active listings
-        return endTimeFormatted > currentTime;
-      });
+      //   // looking for active listings
+      //   return endTimeFormatted > currentTime;
+      // });
 
-      return updatedListings;
+      // return updatedListings;
 
-      // return response.allListings;
+      return response.allListings;
     },
     enabled: !!limit || limit === 0 || limit === 50,
     refetchInterval: 5000,

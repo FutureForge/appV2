@@ -3,8 +3,11 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
 import { Auction, Listing } from "@/utils/types/graphql";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
+import { decimalOffChain } from "@/modules/blockchain";
 
-export function makeYourPositionsColumn() {
+export function makeRecentlyAuctionedColumns() {
   const columns = createColumnHelper<Auction>();
 
   /* -------------------------------------------------------------------------------------------------
@@ -18,14 +21,14 @@ export function makeYourPositionsColumn() {
       </div>
     ),
     cell: ({ row, getValue }) => {
-      const { name, imageUrl } = row.original.nft.metadata;
+      const { name, image } = row.original.nft.metadata;
 
       return (
         <div className="flex items-center gap-3 w-full">
           <div className="text-center min-w-[30px]">{row.index + 1}</div>
           <div className="flex items-center">
-            <img
-              src={imageUrl}
+            <ImageHolder
+              src={image}
               alt={name}
               className="mr-3 size-10 rounded-xl"
             />
@@ -40,19 +43,54 @@ export function makeYourPositionsColumn() {
     },
   });
 
+  // minimumBidAmount
+
+    /* -------------------------------------------------------------------------------------------------
+   * Bid Price column
+   * -----------------------------------------------------------------------------------------------*/
+  const minimumBidAmountColumn = columns.accessor("minimumBidAmount", {
+    header: ({ column }) => (
+      <div className="min-w-[120px]">
+        <ColumnHeader column={column}>Minimum Bid</ColumnHeader>
+      </div>
+    ),
+      cell: ({ getValue }) => (
+        <div className="flex gap-2">
+        <XFI className="size-4" />
+        <p>{decimalOffChain(getValue())} XFI</p>
+      </div>
+    ),
+  });
+
   /* -------------------------------------------------------------------------------------------------
    * Bid Price column
    * -----------------------------------------------------------------------------------------------*/
   const buyoutBidAmountColumn = columns.accessor("buyoutBidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>Bid Price</ColumnHeader>
+        <ColumnHeader column={column}>Buyout Bid</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{getValue()} XFI</p>
+        <p>{decimalOffChain(getValue())} XFI</p>
+      </div>
+    ),
+  });
+
+  /* -------------------------------------------------------------------------------------------------
+   * Creator column
+   * -----------------------------------------------------------------------------------------------*/
+  const auctionCreatorColumn = columns.accessor("auctionCreator", {
+    header: ({ column }) => (
+      <div className="flex min-w-[120px]">
+        <ColumnHeader column={column}>End Time</ColumnHeader>
+      </div>
+    ),
+    cell: ({ getValue }) => (
+      <div>
+        <p>{getFormatAddress(getValue())}</p>
       </div>
     ),
   });
@@ -68,27 +106,16 @@ export function makeYourPositionsColumn() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{getValue()}</p>
+        <p>{formatBlockchainTimestamp(getValue())}</p>
       </div>
     ),
   });
 
-
-  /* -------------------------------------------------------------------------------------------------
-   * Creator column
-   * -----------------------------------------------------------------------------------------------*/
-  const auctionCreatorColumn = columns.accessor("auctionCreator", {
-    header: ({ column }) => (
-      <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>End Time</ColumnHeader>
-      </div>
-    ),
-    cell: ({ getValue }) => (
-      <div>
-        <p>{getValue()}</p>
-      </div>
-    ),
-  });
-
-  return [collectionColumn, buyoutBidAmountColumn, endTimestampColumn, auctionCreatorColumn];
+  return [
+    collectionColumn,
+    auctionCreatorColumn,
+    minimumBidAmountColumn,
+    buyoutBidAmountColumn,
+    endTimestampColumn,
+  ];
 }

@@ -96,7 +96,10 @@ export type AuctionClosed = {
   assetContract: string;
   auctionCreator: string;
   auctionId: string;
+  auctionStatus: string;
+  bidAmount: string;
   closer: string;
+  currency: string;
   id: string;
   tokenId: string;
   transactionHash: string;

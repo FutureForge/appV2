@@ -2,11 +2,13 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { Auction } from "@/utils/types/graphql";
+import { AuctionClosed } from "@/utils/types/graphql";
 import { getFormatAddress } from "@/utils/functions";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import { decimalOffChain } from "@/modules/blockchain";
 
-export function makeYourPositionsColumn() {
-  const columns = createColumnHelper<Auction>();
+export function makeRecentlySoldAuctionColumns() {
+  const columns = createColumnHelper<AuctionClosed>();
 
   /* -------------------------------------------------------------------------------------------------
    * Collection column
@@ -19,21 +21,20 @@ export function makeYourPositionsColumn() {
       </div>
     ),
     cell: ({ row, getValue }) => {
-      const { name, imageUrl } = row.original.nft.metadata;
+      const { name, image } = row.original.nft.metadata;
+
       return (
         <div className="flex items-center gap-3 w-full">
           <div className="text-center min-w-[30px]">{row.index + 1}</div>
           <div className="flex items-center">
-            <img
-              src={imageUrl}
+            <ImageHolder
+              src={image}
               alt={name}
               className="mr-3 size-10 rounded-xl"
             />
             <div className="flex flex-col gap-1.5">
               <div className="text-sm">
-                <span>
-                  {name}
-                </span>
+                <span>{name}</span>
               </div>
             </div>
           </div>
@@ -45,18 +46,17 @@ export function makeYourPositionsColumn() {
   /* -------------------------------------------------------------------------------------------------
    * Sold Price column
    * -----------------------------------------------------------------------------------------------*/
-  const winningBidColumn = columns.accessor("winningBid", {
+  const winningBidColumn = columns.accessor("bidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
         <ColumnHeader column={column}>Sold Price</ColumnHeader>
       </div>
     ),
-    cell: ({row }) => {
-      const {bidAmount} = row.original.winningBid;
+    cell: ({ getValue }) => {
       return (
         <div className="flex gap-2">
           <XFI className="size-4" />
-          <p>{bidAmount} XFI</p>
+          <p>{decimalOffChain(getValue())} XFI</p>
         </div>
       );
     },
@@ -65,23 +65,20 @@ export function makeYourPositionsColumn() {
   /* -------------------------------------------------------------------------------------------------
    * Buyer column
    * -----------------------------------------------------------------------------------------------*/
-  const buyerColumn = columns.accessor("winningBid", {
+  const buyerColumn = columns.accessor("closer", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
         <ColumnHeader column={column}>Buyer</ColumnHeader>
       </div>
     ),
-    cell: ({row }) => {
-      const { bidder } = row.original.winningBid;
+    cell: ({ getValue }) => {
       return (
         <div>
-          <p>{getFormatAddress(bidder)}</p>
+          <p>{getFormatAddress(getValue())}</p>
         </div>
       );
     },
   });
-
-
 
   return [collectionColumn, winningBidColumn, buyerColumn];
 }

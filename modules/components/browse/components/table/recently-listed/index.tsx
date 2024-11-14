@@ -1,4 +1,3 @@
-
 import {
   getCoreRowModel,
   getSortedRowModel,
@@ -6,29 +5,28 @@ import {
   getFilteredRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { makeYourPositionsColumn } from "./columns";
+import { makeRecentlyListedColumn } from "./columns";
 
 import { Table } from "@/modules/app";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { useRouter } from "next/navigation";
-import { dehydrate,  HydrationBoundary, } from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Listing } from "@/utils/types/graphql";
 
-
-type CollectionTableProps = {
-  isCollectionLoading: boolean;
-  collectionData: Listing[];
+type RecentlyListedTableProps = {
+  isLoading: boolean;
+  data: Listing[];
 };
 
-export function ListingTable({
-  isCollectionLoading,
-  collectionData,
-}: CollectionTableProps) {
+export function RecentlyListedTable({
+  isLoading,
+  data,
+}: RecentlyListedTableProps) {
   const router = useRouter();
 
   const table = useReactTable<Listing>({
-    columns: makeYourPositionsColumn(),
-    data: collectionData ?? [],
+    columns: makeRecentlyListedColumn(),
+    data: data ?? [],
     getExpandedRowModel: getExpandedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -43,7 +41,7 @@ export function ListingTable({
           //   const collectionAddress = _row.collectionAddress;
           //   router.push(`/collections/${collectionAddress}`);
           // }}
-          isLoading={isCollectionLoading}
+          isLoading={isLoading}
           hasHover
           table={table}
         />
