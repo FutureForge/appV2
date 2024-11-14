@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
+import { Collection } from "@/utils/types/collection/collection.type";
 // icons
 import XFI from "@/assets/xfi.svg";
-import { Collection } from "@/utils/types/collection/collection.type";
+import LinkIcon from "@/assets/link-external-02.svg";
+import { cn } from "@/modules/app/utils";
 
 export type CollectionWithoutOwnerBackground = Omit<
   Collection,
@@ -85,9 +87,11 @@ export function CollectionsNFTCard(props: CollectionNFTCardProps) {
               opacity: isHovered ? 1 : 0,
             }}
             transition={{ duration: 0.3 }}
-            className="bg-white text-black w-fit rounded-lg py-2 px-3 text-sm font-medium"
+            className={cn(
+              "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95"
+            )}
           >
-            {cta}
+            {cta} <LinkIcon className="size-4 text-foreground" />
           </motion.button>
         </div>
       )}
@@ -142,8 +146,8 @@ export function ImageHolder({
           position: "absolute",
           top: "0",
           left: "0",
-          width: '100%',
-          height: '100%',
+          width: "100%",
+          height: "100%",
           objectFit: "cover",
           clipPath: "url(#clip-path)",
         }}

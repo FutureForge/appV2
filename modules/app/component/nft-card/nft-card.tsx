@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { getNFTCardInfo, NFTCardProps } from "./utils/nft-card.utils";
 import { DialogContent, DialogRoot, DialogTrigger } from "../..";
-
-// icons
-import XFI from "@/assets/xfi.svg";
 import { cn } from "../../utils";
 import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
+// icons
+import XFI from "@/assets/xfi.svg";
+import LinkIcon from '@/assets/link-external-02.svg'
+
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -105,11 +106,12 @@ export function NFTCard(props: NFTCardProps) {
               }}
               transition={{ duration: 0.3 }}
               className={cn(
-                "bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium hover:bg-primary/95",
-                ctaStyles
+                "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
+                ctaStyles,
+                { "bg-border": extraCTA }
               )}
             >
-              {cta}
+              {cta} <LinkIcon className="size-4 text-foreground" />
             </motion.button>
           )}
           {extraCTA && (
@@ -123,9 +125,9 @@ export function NFTCard(props: NFTCardProps) {
                     opacity: isHovered ? 1 : 0,
                   }}
                   transition={{ duration: 0.3 }}
-                  className="bg-primary text-white w-fit rounded-lg py-2 px-3 text-sm font-medium"
+                  className="bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium"
                 >
-                  {extraCTA}
+                  {extraCTA} <LinkIcon className="size-4 text-foreground" />
                 </motion.button>
               </DialogTrigger>
               <DialogContent className="w-[564px]">
