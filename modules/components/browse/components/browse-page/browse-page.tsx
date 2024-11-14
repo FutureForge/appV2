@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { BrowsePageHeader } from "../header/header";
 import {
   useAllAuctionsQuery,
   useAllListingsQuery,
@@ -9,7 +8,7 @@ import {
   useNewSaleListingsQuery,
 } from "@/modules/query";
 import Head from "next/head";
-import { NFTCard } from "@/modules/app";
+import { Header, NFTCard } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { cn } from "@/modules/app/utils";
 import Caret from "@/assets/arrow-left-s-line.svg";
@@ -242,7 +241,7 @@ export function BrowsePage() {
           content={`Browse all listings and auctions on Mint Mingle Marketplace`}
         />
       </Head>
-      <BrowsePageHeader
+      <Header
         isActive={isActive}
         setIsActive={setIsActive}
         searchQuery={searchQuery}
