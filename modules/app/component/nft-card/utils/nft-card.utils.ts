@@ -85,7 +85,7 @@ export const getNFTCardInfo = ({
       };
     case "new-sold-auction":
       const closer = "closer" in data ? data.closer : "";
-      const bidAmount = "bidAmount" in data ? (data.bidAmount as bigint) : "";
+      const bidAmount = "bidAmount" in data ? (data.bidAmount as string) : "";
 
       return {
         title1: "Buyout Price",
