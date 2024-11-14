@@ -176,7 +176,6 @@ export function useSingleCollectionQuery({
 }: {
   contractAddress: string;
 }) {
-  console.log({ contractAddress });
   /**
    * GETTING COLLECTION LISTING DATA
    */

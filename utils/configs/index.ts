@@ -9,6 +9,7 @@ if (!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID) {
 }
 
 export const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+// export const backendURL = "http://localhost:7090/api/v1";
 
 export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,

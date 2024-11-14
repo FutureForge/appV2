@@ -35,10 +35,9 @@ export function useAddCollectionMutation() {
       }
 
       const contract = await getContractCustom({ contractAddress });
-
       const contractOwner = await owner({ contract });
 
-      if (contractOwner !== userAddress) {
+      if (contractOwner.toLowerCase() !== userAddress.toLowerCase()) {
         throw new Error("User is not the owner of the contract");
       }
 
@@ -65,7 +64,9 @@ export function useAddCollectionMutation() {
         }
       );
 
-      // TODO: Add router to push it to the new collection page
+      if (response.status === 200) {
+        router.push(`/collections/${contractAddress}`);
+      }
 
       return response.data;
     },
@@ -103,12 +104,12 @@ export function useUpdateCollectionMutation() {
       backgroundImage,
       collectionSocials,
     }: {
-      collectionId: string;
+      collectionId: number;
       contractAddress: string;
       name: string;
       description: string;
-      image: File;
-      backgroundImage: File;
+      image: File | null;
+      backgroundImage: File | null;
       collectionSocials: { socialName: string; socialLink: string }[];
     }) => {
       if (!userAddress) {
@@ -118,7 +119,7 @@ export function useUpdateCollectionMutation() {
       const contract = await getContractCustom({ contractAddress });
       const contractOwner = await owner({ contract });
 
-      if (contractOwner !== userAddress) {
+      if (contractOwner.toLowerCase() !== userAddress.toLowerCase()) {
         throw new Error("User is not the owner of the contract");
       }
 
@@ -127,16 +128,18 @@ export function useUpdateCollectionMutation() {
       await activeAccount?.signMessage({ message: signMessage });
 
       const formData = new FormData();
-      formData.append("collectionAddress", contractAddress.toLowerCase());
       formData.append("collectionName", name);
       formData.append("collectionDescription", description);
-      formData.append("collectionImage", image);
-      formData.append("collectionBackgroundImage", backgroundImage);
-      formData.append("collectionOwnerAddress", userAddress.toLowerCase());
+      if (image) {
+        formData.append("collectionImage", image);
+      }
+      if (backgroundImage) {
+        formData.append("collectionBackgroundImage", backgroundImage);
+      }
       formData.append("collectionSocials", JSON.stringify(collectionSocials));
 
-      const response = await axios.put(
-        `${backendURL}/collection/update-collection/${collectionId}`,
+      const response = await axios.patch(
+        `${backendURL}/collection/${collectionId}`,
         formData,
         {
           headers: {

@@ -1,8 +1,9 @@
-import { useSingleCollectionQuery, useUserChainInfo } from "@/modules/query";
 import Image from "next/image";
-
 import Link from "next/link";
+import Head from "next/head";
+
 import { useRef, useState, useEffect } from "react";
+import { useSingleCollectionQuery, useUserChainInfo } from "@/modules/query";
 import { useInView } from "react-intersection-observer";
 import {
   Button,
@@ -19,7 +20,6 @@ import { getFormatAddress } from "@/utils/functions";
 import {
   Collection,
   CollectionNFTType,
-  SingleCollection,
 } from "@/utils/types/collection/collection.type";
 import XFI from "@/assets/xfi.svg";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
@@ -32,15 +32,18 @@ import {
   NFTStatus,
 } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import { chainInfo } from "@/utils/configs";
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import {
   useBidInAuctionMutation,
   useBuyFromDirectListingMutation,
+  useUpdateCollectionMutation,
 } from "@/modules/mutation";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { decimalOffChain } from "@/modules/blockchain";
+import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
+import { validateSocialLink } from "@/modules/components/add-collection/add-collection.utils";
+import { Social } from "@/utils/types/global";
 
 // icons
 import VerifyIcon from "@/assets/verified.svg";
@@ -50,7 +53,6 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
-import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 
 type FilterType =
   | "Items"
@@ -137,6 +139,10 @@ export default function CollectionPage() {
     singleCollection?.collectionAuctions?.auctionClosed;
   const collectionFee = singleCollection?.collectionFee as Fee;
   const marketplaceFee = singleCollection?.marketplaceFee as Fee;
+
+  const isCollectionOwner =
+    collection?.collectionOwnerAddress.toLowerCase() ===
+    activeAccount?.address.toLowerCase();
 
   const updatedCollectionSocials = collectionSocials?.map((item) => ({
     icon:
@@ -361,7 +367,7 @@ export default function CollectionPage() {
           } on Mint Mingle Marketplace`}
         />
       </Head>
-      {isPending ? (
+      {isPending || isLoading ? (
         <SingleCollectionSkeleton />
       ) : (
         <>
@@ -443,15 +449,20 @@ export default function CollectionPage() {
                     if (value) setFilter(value as FilterType);
                   }}
                 >
-                  {filters.map((value) => (
-                    <ToggleGroup.Item
-                      variant="select"
-                      value={value}
-                      className="data-[state=on]:bg-tertiary data-[state=on]:text-primary"
-                    >
-                      {value}
-                    </ToggleGroup.Item>
-                  ))}
+                  {filters
+                    .filter(
+                      (value) =>
+                        isCollectionOwner || value !== "Collection Settings"
+                    )
+                    .map((value) => (
+                      <ToggleGroup.Item
+                        variant="select"
+                        value={value}
+                        className="data-[state=on]:bg-tertiary data-[state=on]:text-primary"
+                      >
+                        {value}
+                      </ToggleGroup.Item>
+                    ))}
                 </ToggleGroup.Root>
               </Card>
 
@@ -768,9 +779,11 @@ export default function CollectionPage() {
       )}
 
       {/* Render Collection Settings Content */}
-      {filter === "Collection Settings" && singleCollection?.collection && (
-        <CollectionSettings collection={singleCollection.collection} />
-      )}
+      {isCollectionOwner &&
+        filter === "Collection Settings" &&
+        singleCollection?.collection && (
+          <CollectionSettings collection={singleCollection.collection} />
+        )}
     </div>
   );
 }
@@ -780,36 +793,38 @@ type CollectionSettingsProps = {
 };
 
 function CollectionSettings({ collection }: CollectionSettingsProps) {
-  const [newCollectionImage, setNewCollectionImage] = useState<string | null>(
+  const updateCollectionMutation = useUpdateCollectionMutation();
+
+  const [newCollectionImage, setNewCollectionImage] = useState<File | null>(
     null
   );
   const [newCollectionBackgroundImage, setNewCollectionBackgroundImage] =
-    useState<string | null>(null);
-  const [name, setName] = useState(collection.collectionName);
-  const [description, setDescription] = useState(
-    collection.collectionDescription
-  );
-  const [contractAddress, setContractAddress] = useState(
-    collection.collectionAddress
-  );
-  const copyToClipboard = useCopyToClipboard()[1];
-  const handleCopy = (content: string) => {
-    if (content) {
-      copyToClipboard(content);
-    }
-  };
-  const isEdited =
-    name !== collection.collectionName ||
-    description !== collection.collectionDescription ||
-    contractAddress !== collection.collectionAddress ||
-    newCollectionImage !== null ||
-    newCollectionBackgroundImage !== null;
-  // Refs for file inputs
+    useState<File | null>(null);
+  const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
+
+  const [formData, setFormData] = useState({
+    name: collection.collectionName,
+    description: collection.collectionDescription,
+    collectionSocials: [
+      {
+        socialName: "twitter",
+        socialLink: `${collection.collectionSocials?.[0]?.socialLink ?? ""}`,
+      },
+      {
+        socialName: "discord",
+        socialLink: `${collection.collectionSocials?.[1]?.socialLink ?? ""}`,
+      },
+      {
+        socialName: "telegram",
+        socialLink: `${collection.collectionSocials?.[2]?.socialLink ?? ""}`,
+      },
+    ],
+  });
+
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const backgroundFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Max file size and valid types
-  const MAX_FILE_SIZE_MB = 5; // Maximum file size (in MB)
+  const MAX_FILE_SIZE_MB = 5;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
   const VALID_FILE_TYPES = [
     "image/jpeg",
@@ -820,13 +835,19 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
     "image/avif",
   ];
 
+  const copyToClipboard = useCopyToClipboard()[1];
+  const handleCopy = (content: string) => {
+    if (content) {
+      copyToClipboard(content);
+    }
+  };
+
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "image" | "background"
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!VALID_FILE_TYPES.includes(file.type)) {
         alert(
           "Invalid file type. Please upload a JPG, PNG, GIF, WEBP, or AVIF file."
@@ -834,23 +855,92 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
         return;
       }
 
-      // Validate file size
       if (file.size > MAX_FILE_SIZE_BYTES) {
         alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
         return;
       }
 
-      // If the file passes validation, read and preview it
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === "image") {
-          setNewCollectionImage(reader.result as string);
-        } else {
-          setNewCollectionBackgroundImage(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      if (type === "image") {
+        setNewCollectionImage(file);
+      } else {
+        setNewCollectionBackgroundImage(file);
+      }
     }
+  };
+
+  const isEdited =
+    formData.name !== collection.collectionName ||
+    formData.description !== collection.collectionDescription ||
+    newCollectionImage !== null ||
+    newCollectionBackgroundImage !== null ||
+    JSON.stringify(formData.collectionSocials) !==
+      JSON.stringify(collection.collectionSocials);
+
+  const isDisabled =
+    Object.values(socialErrors).some((error) => error !== "") ||
+    !isEdited ||
+    updateCollectionMutation.isPending;
+
+  const handleSocialChange = (
+    index: number,
+    field: keyof Social,
+    value: string
+  ) => {
+    const error = validateSocialLink(
+      formData.collectionSocials[index].socialName,
+      value
+    );
+
+    setSocialErrors((prev) => ({
+      ...prev,
+      [index]: error,
+    }));
+
+    setFormData((prev) => {
+      const newSocials = [...prev.collectionSocials];
+      newSocials[index] = { ...newSocials[index], [field]: value };
+      return { ...prev, collectionSocials: newSocials };
+    });
+  };
+
+  const handleSubmit = () => {
+    updateCollectionMutation.mutate(
+      {
+        ...formData,
+        collectionId: collection._id,
+        contractAddress: collection.collectionAddress,
+        image: newCollectionImage,
+        backgroundImage: newCollectionBackgroundImage,
+      },
+      {
+        onSuccess: () => {
+          setFormData({
+            name: collection.collectionName,
+            description: collection.collectionDescription,
+            collectionSocials: [
+              { socialName: "twitter", socialLink: "" },
+              { socialName: "discord", socialLink: "" },
+              { socialName: "telegram", socialLink: "" },
+            ],
+          });
+          setNewCollectionImage(null);
+          setNewCollectionBackgroundImage(null);
+        },
+        onError: () => {
+          setFormData({
+            name: collection.collectionName,
+            description: collection.collectionDescription,
+            collectionSocials: [
+              { socialName: "twitter", socialLink: "" },
+              { socialName: "discord", socialLink: "" },
+              { socialName: "telegram", socialLink: "" },
+            ],
+          });
+          setNewCollectionImage(null);
+          setNewCollectionBackgroundImage(null);
+        },
+      }
+    );
   };
 
   return (
@@ -860,7 +950,11 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
         <div className="relative w-[392px] h-[447px]">
           <div className="absolute inset-0 bg-black/60 z-10" />
           <Image
-            src={newCollectionImage || collection.collectionImage}
+            src={
+              newCollectionImage
+                ? URL.createObjectURL(newCollectionImage)
+                : collection.collectionImage
+            }
             alt="Collection Image"
             layout="fill"
             className="object-cover rounded-lg cursor-pointer"
@@ -887,8 +981,9 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
           <div className="absolute inset-0 bg-black/60 z-10" />
           <Image
             src={
-              newCollectionBackgroundImage ||
-              collection.collectionBackgroundImage
+              newCollectionBackgroundImage
+                ? URL.createObjectURL(newCollectionBackgroundImage)
+                : collection.collectionBackgroundImage
             }
             layout="fill"
             alt="Collection Background"
@@ -901,7 +996,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
             accept="image/*"
             ref={backgroundFileInputRef}
             onChange={(e) => handleImageChange(e, "background")}
-            style={{ display: "none" }} // Hide the file input
+            style={{ display: "none" }}
           />
           <button
             onClick={() => backgroundFileInputRef.current?.click()}
@@ -918,13 +1013,15 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
             <Label htmlFor="name">Collection Name</Label>
             <TextField
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+              }
               className="text-muted-foreground"
               containerClass="bg-tertiary  border-0"
               collectionIcon={
                 <CopyIcon
-                  onClick={() => handleCopy(name)}
+                  onClick={() => handleCopy(formData.name)}
                   className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
                 />
               }
@@ -934,13 +1031,13 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
             <Label htmlFor="contract">Project Contract</Label>
             <TextField
               id="contract"
-              value={getFormatAddress(contractAddress)}
-              onChange={(e) => setContractAddress(e.target.value)}
+              value={getFormatAddress(collection.collectionAddress)}
+              disabled
               className="text-muted-foreground"
               containerClass="bg-tertiary  border-0"
               collectionIcon={
                 <CopyIcon
-                  onClick={() => handleCopy(contractAddress)}
+                  onClick={() => handleCopy(collection.collectionAddress)}
                   className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
                 />
               }
@@ -951,15 +1048,17 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
           <Label htmlFor="description">Description</Label>
           <TextArea
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formData.description}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, description: e.target.value }))
+            }
             className="text-muted-foreground border-0 bg-tertiary"
           />
         </div>
 
         <div className="flex w-full flex-col gap-6 items-end mt-auto">
           <div className="flex items-start justify-start gap-4">
-            {collection?.collectionSocials?.map((social, index) => (
+            {formData.collectionSocials.map((social, index) => (
               <div key={index} className="flex flex-col gap-1">
                 <TextField
                   value={social.socialLink}
@@ -974,21 +1073,26 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
                       )}
                     </span>
                   }
-                  // onChange={(e) =>
-                  //   handleSocialChange(index, "socialLink", e.target.value)
-                  // }
+                  onChange={(e) =>
+                    handleSocialChange(index, "socialLink", e.target.value)
+                  }
                   containerClass="bg-transparent px-2 text-muted-foreground"
                 />
-                {/* {socialErrors[index] && (
+                {socialErrors[index] && (
                   <span className="text-error text-sm">
                     {socialErrors[index]}
                   </span>
-                )} */}
+                )}
               </div>
             ))}
           </div>
           <div className="w-full">
-            <Button disabled={!isEdited} className="w-full" shape="square">
+            <Button
+              disabled={isDisabled}
+              className="w-full"
+              shape="square"
+              onClick={handleSubmit}
+            >
               Update Collection Details
             </Button>
           </div>
