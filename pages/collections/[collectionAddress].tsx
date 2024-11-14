@@ -118,6 +118,7 @@ export default function CollectionPage() {
   const {
     data: singleCollection,
     isPending,
+    isLoading,
     isError,
   } = useSingleCollectionQuery({
     contractAddress: collectionAddress as string,

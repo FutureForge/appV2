@@ -47,7 +47,7 @@ export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
       // return response.allListings;
     },
     enabled: !!limit || limit === 0 || limit === 50,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 

@@ -1,5 +1,6 @@
 import { Card, SwitchView, TextField, ToggleGroup } from "@/modules/app";
 import React, { useState } from "react";
+
 // icons
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
