@@ -86,7 +86,7 @@ export function CollectionPage() {
         handleSearch={handleSearch}
       />
       {mounted && (
-        <motion.div layout>
+        <motion.div>
           {!isActive ? (
             <motion.div>
               <CollectionTable

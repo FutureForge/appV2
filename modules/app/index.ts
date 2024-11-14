@@ -29,3 +29,4 @@ export {
   Description as DialogDescription,
   Close as DialogClose,
 } from "./component/dialog/dialog";
+export {Header} from './component/header/header'

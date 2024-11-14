@@ -115,7 +115,6 @@ export default function CollectionPage() {
 
   const {
     data: singleCollection,
-    isLoading,
     isPending,
     isError,
   } = useSingleCollectionQuery({
