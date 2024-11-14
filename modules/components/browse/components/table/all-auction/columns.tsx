@@ -20,23 +20,15 @@ export function makeAllAuctionsColumn() {
         <ColumnHeader column={column}>NFT</ColumnHeader>
       </div>
     ),
-    cell: ({ row, getValue }) => {
+    cell: ({ row }) => {
       const { name, image } = row.original.nft.metadata;
 
       return (
         <div className="flex items-center gap-3 w-full">
           <div className="text-center min-w-[30px]">{row.index + 1}</div>
-          <div className="flex items-center">
-            <ImageHolder
-              src={image}
-              alt={name}
-              className="mr-3 size-10 rounded-xl"
-            />
-            <div className="flex flex-col gap-1.5">
-              <div className="text-sm">
-                <span>{name}</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            <ImageHolder src={image} alt={name} width={40} height={40} />
+            <span className="text-sm">{name}</span>
           </div>
         </div>
       );
@@ -83,7 +75,7 @@ export function makeAllAuctionsColumn() {
   const auctionCreatorColumn = columns.accessor("auctionCreator", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>End Time</ColumnHeader>
+        <ColumnHeader column={column}>Creator</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (

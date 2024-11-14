@@ -251,313 +251,315 @@ export function BrowsePage() {
         filters={filters}
       />
       {/* Conditionally render based on selectedFilter */}
-      {/* All Listings */}
-      {selectedFilter === filters[0] && (
-        <motion.div>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <AllListingTable
-                  isLoading={isAllListingsLoading}
-                  data={currentPageData as Listing[]}
+      <div className="mt-8 w-full">
+        {/* All Listings */}
+        {selectedFilter === filters[0] && (
+          <motion.div>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AllListingTable
+                    isLoading={isAllListingsLoading}
+                    data={currentPageData as Listing[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((listing, index) => {
+                      console.log({ listing });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
+                      const handleBuyNow = () => {
+                        console.log("buy now clicked");
+                      };
+
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="listing"
+                          cta="View Item"
+                          extraCTA="Buy Now"
+                          onClick={handleClick}
+                          extraOnClick={handleBuyNow}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((listing, index) => {
-                    console.log({ listing });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
-                    const handleBuyNow = () => {
-                      console.log("buy now clicked");
-                    };
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No listings found"}
+              </div>
+            )}
+          </motion.div>
+        )}
 
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={listing}
-                        type="listing"
-                        cta="View Item"
-                        extraCTA="Buy Now"
-                        onClick={handleClick}
-                        extraOnClick={handleBuyNow}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No listings found"}
-            </>
-          )}
-        </motion.div>
-      )}
+        {/* All Auctions */}
+        {selectedFilter === filters[1] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AllAuctionTable
+                    isLoading={isAllAuctionsLoading}
+                    data={currentPageData as Auction[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((auction, index) => {
+                      console.log({ auction });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
+                      const handleBuyAuction = () => {
+                        console.log("buy auction clicked");
+                      };
 
-      {/* All Auctions */}
-      {selectedFilter === filters[1] && (
-        <>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <AllAuctionTable
-                  isLoading={isAllAuctionsLoading}
-                  data={currentPageData as Auction[]}
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="auction"
+                          cta="View Item"
+                          extraCTA="Buy Auction"
+                          onClick={handleClick}
+                          extraOnClick={handleBuyAuction}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((auction, index) => {
-                    console.log({ auction });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
-                    const handleBuyAuction = () => {
-                      console.log("buy auction clicked");
-                    };
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No auctions found"}
+              </div>
+            )}
+          </>
+        )}
 
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={auction}
-                        type="auction"
-                        cta="View Item"
-                        extraCTA="Buy Auction"
-                        onClick={handleClick}
-                        extraOnClick={handleBuyAuction}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No auctions found"}
-            </>
-          )}
-        </>
-      )}
+        {/* Recently Listed */}
+        {selectedFilter === filters[2] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <RecentlyListedTable
+                    isLoading={isNewListingsLoading}
+                    data={currentPageData as Listing[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((listing, index) => {
+                      console.log({ listing });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
+                      const handleBuyNow = () => {
+                        console.log("buy now clicked");
+                      };
 
-      {/* Recently Listed */}
-      {selectedFilter === filters[2] && (
-        <>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <RecentlyListedTable
-                  isLoading={isNewListingsLoading}
-                  data={currentPageData as Listing[]}
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="new-listing"
+                          cta="View Item"
+                          extraCTA="Buy Now"
+                          onClick={handleClick}
+                          extraOnClick={handleBuyNow}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((listing, index) => {
-                    console.log({ listing });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
-                    const handleBuyNow = () => {
-                      console.log("buy now clicked");
-                    };
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No recently listed items found"}
+              </div>
+            )}
+          </>
+        )}
 
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={listing}
-                        type="new-listing"
-                        cta="View Item"
-                        extraCTA="Buy Now"
-                        onClick={handleClick}
-                        extraOnClick={handleBuyNow}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No recently listed items found"}
-            </>
-          )}
-        </>
-      )}
+        {/* Recently Sold Listing */}
+        {selectedFilter === filters[3] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <RecentlySoldListingTable
+                    isLoading={isNewSaleListingsLoading}
+                    data={currentPageData as NewSaleListing[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((listing, index) => {
+                      console.log({ listing });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
 
-      {/* Recently Sold Listing */}
-      {selectedFilter === filters[3] && (
-        <>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <RecentlySoldListingTable
-                  isLoading={isNewSaleListingsLoading}
-                  data={currentPageData as NewSaleListing[]}
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="new-sale-listing"
+                          cta="View Item"
+                          onClick={handleClick}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((listing, index) => {
-                    console.log({ listing });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No recently sold listings found"}
+              </div>
+            )}
+          </>
+        )}
 
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={listing}
-                        type="new-sale-listing"
-                        cta="View Item"
-                        onClick={handleClick}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No recently sold listings found"}
-            </>
-          )}
-        </>
-      )}
+        {/* Recently Auctioned */}
+        {selectedFilter === filters[4] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <RecentlyAuctionedTable
+                    isLoading={isNewAuctionedLoading}
+                    data={currentPageData as Auction[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((auction, index) => {
+                      console.log({ auction });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
+                      const handleBuyAuction = () => {
+                        console.log("buy auction clicked");
+                      };
 
-      {/* Recently Auctioned */}
-      {selectedFilter === filters[4] && (
-        <>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <RecentlyAuctionedTable
-                  isLoading={isNewAuctionedLoading}
-                  data={currentPageData as Auction[]}
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="new-auction"
+                          cta="View Item"
+                          extraCTA="Buy Auction"
+                          onClick={handleClick}
+                          extraOnClick={handleBuyAuction}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((auction, index) => {
-                    console.log({ auction });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
-                    const handleBuyAuction = () => {
-                      console.log("buy auction clicked");
-                    };
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No recently auctioned items found"}
+              </div>
+            )}
+          </>
+        )}
 
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={auction}
-                        type="new-auction"
-                        cta="View Item"
-                        extraCTA="Buy Auction"
-                        onClick={handleClick}
-                        extraOnClick={handleBuyAuction}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No recently auctioned items found"}
-            </>
-          )}
-        </>
-      )}
+        {/* Recently Sold Auction */}
+        {selectedFilter === filters[5] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <RecentlySoldAuctionTable
+                    isLoading={isAuctionClosedLoading}
+                    data={currentPageData as AuctionClosed[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((auction, index) => {
+                      console.log({ auction });
+                      const handleClick = () => {
+                        // router.push(`/listing/${listing.listingId}`);
+                        console.log("clicked");
+                      };
 
-      {/* Recently Sold Auction */}
-      {selectedFilter === filters[5] && (
-        <>
-          {currentPageData && currentPageData.length > 0 ? (
-            <>
-              {!isActive ? (
-                <RecentlySoldAuctionTable
-                  isLoading={isAuctionClosedLoading}
-                  data={currentPageData as AuctionClosed[]}
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="new-sold-auction"
+                          cta="View Item"
+                          onClick={handleClick}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
                 />
-              ) : (
-                <>
-                  {currentPageData?.map((auction, index) => {
-                    console.log({ auction });
-                    const handleClick = () => {
-                      // router.push(`/listing/${listing.listingId}`);
-                      console.log("clicked");
-                    };
-
-                    return (
-                      <NFTCard
-                        key={index}
-                        data={auction}
-                        type="new-sold-auction"
-                        cta="View Item"
-                        onClick={handleClick}
-                      />
-                    );
-                  })}
-                </>
-              )}
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                pageNumbers={pageNumbers}
-              />
-            </>
-          ) : (
-            <>
-              {searchQuery.length > 0
-                ? "No items found according to your search"
-                : "No recently sold auctions found"}
-            </>
-          )}
-        </>
-      )}
+              </>
+            ) : (
+              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
+                {searchQuery.length > 0
+                  ? "No items found according to your search"
+                  : "No recently sold auctions found"}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 export const toggleItemStyles = tv(
   {
-    base: 'text-muted-foreground rounded-lg h-[30px] transition duration-200 ease-out flex-shrink-0 px-2 flex items-center text-xs font-medium',
+    base: 'text-muted-foreground rounded-lg h-[30px] transition duration-200 ease-out flex-shrink-0 px-2 flex items-center text-sm font-medium',
     variants: {
       variant: {
         filled:

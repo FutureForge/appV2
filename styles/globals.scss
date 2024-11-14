@@ -104,13 +104,12 @@ body {
 }
 
 .skeleton-el {
-  @apply bg-muted/50 w-32;
-  @apply bg-gradient-to-r from-transparent via-muted/75 to-transparent;
+  @apply bg-tertiary w-32;
+  @apply bg-gradient-to-r from-transparent via-sec-bg/75 to-transparent;
   border-radius: 6px;
   min-height: 20px;
   padding: 0.375rem;
   font-size: 0.875rem;
-  /* background-size: 80px 80px; */
   background-size: 80px 100%;
   background-repeat: no-repeat;
   background-position: -200px 0;
