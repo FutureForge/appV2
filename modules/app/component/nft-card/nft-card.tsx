@@ -7,7 +7,7 @@ import { cn } from "../../utils";
 import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 // icons
 import XFI from "@/assets/xfi.svg";
-import LinkIcon from '@/assets/link-external-02.svg'
+import LinkIcon from "@/assets/arrow-right-up-line.svg";
 
 
 export function NFTCard(props: NFTCardProps) {
