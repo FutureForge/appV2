@@ -115,7 +115,7 @@ export function NFTCard(props: NFTCardProps) {
               className={cn(
                 "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
                 ctaStyles,
-                { "bg-border": extraCTA }
+                { "bg-border hover:bg-border/95": extraCTA }
               )}
             >
               {cta} <LinkIcon className="size-4 text-foreground" />

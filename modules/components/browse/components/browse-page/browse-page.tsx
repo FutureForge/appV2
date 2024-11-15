@@ -8,7 +8,7 @@ import {
   useNewSaleListingsQuery,
 } from "@/modules/query";
 import Head from "next/head";
-import { Header, NFTCard } from "@/modules/app";
+import { EmptyState, Header, NFTCard } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { cn } from "@/modules/app/utils";
 import Caret from "@/assets/arrow-left-s-line.svg";
@@ -295,11 +295,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No listings found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No listings found"
+                }
+              />
             )}
           </motion.div>
         )}
@@ -348,11 +350,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No auctions found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No auctions found"
+                }
+              />
             )}
           </>
         )}
@@ -401,11 +405,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No recently listed items found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No recently listed items found"
+                }
+              />
             )}
           </>
         )}
@@ -449,11 +455,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No recently sold listings found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No recently sold listings found"
+                }
+              />
             )}
           </>
         )}
@@ -502,11 +510,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No recently auctioned items found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No recently auctioned items found"
+                }
+              />
             )}
           </>
         )}
@@ -550,11 +560,13 @@ export function BrowsePage() {
                 />
               </>
             ) : (
-              <div className="w-full !p-4 bg-card rounded-2xl items-center justify-center flex h-64">
-                {searchQuery.length > 0
-                  ? "No items found according to your search"
-                  : "No recently sold auctions found"}
-              </div>
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No recently sold auctions found"
+                }
+              />
             )}
           </>
         )}

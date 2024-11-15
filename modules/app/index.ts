@@ -30,3 +30,5 @@ export {
   Close as DialogClose,
 } from "./component/dialog/dialog";
 export {Header} from './component/header/header'
+export {EmptyState} from './component/empty-state/empty-state'
+export {Checkbox} from './component/checkbox'
