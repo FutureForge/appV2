@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { getFormatAddress } from "@/utils/functions";
-import { useCopyToClipboard, useWindowSize } from "@uidotdev/usehooks";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useInView } from "react-intersection-observer";
 import {
   useUserAuctionsQuery,
@@ -19,7 +19,16 @@ import {
   useUserOffersQuery,
   useUserOffersReceivedQuery,
 } from "@/modules/query";
-import { Checkbox, EmptyState, Header, NFTCard, NftCardSkeleton } from "@/modules/app";
+import {
+  Checkbox,
+  EmptyState,
+  Header,
+  NFTCard,
+  NftCardSkeleton,
+} from "@/modules/app";
+
+import { ConnectButton } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 
 import { motion } from "framer-motion";
 import {
@@ -37,7 +46,7 @@ import {
   NFTMetadata,
   Offer,
 } from "@/utils/types/graphql";
-import { chainInfo } from "@/utils/configs";
+import { chainInfo, client } from "@/utils/configs";
 
 // Icons
 import CopyIcon from "@/assets/copy.svg";
@@ -59,18 +68,19 @@ const filters = [
 export function ProfilePage() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
+
+  const [mounted, setMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(filters[0]);
   const [selectedOption, setSelectedOption] = useState<
     "Expired Listing" | "Expired Auction" | "Expired Offer"
   >("Expired Listing");
- const options = [
-   "Expired Listing",
-   "Expired Auction",
-   "Expired Offer",
- ] as const;
-
+  const options = [
+    "Expired Listing",
+    "Expired Auction",
+    "Expired Offer",
+  ] as const;
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const { ref: loadMoreRef, inView } = useInView({
@@ -91,7 +101,7 @@ export function ProfilePage() {
   const {
     data: userNFTs,
     isLoading: isUserNFTsLoading,
-    isPending: iserNFTsPending,
+    isPending: isUserNFTsPending,
   } = useUserNFTsQuery();
   const { data: userListings, isLoading: isUserListingsLoading } =
     useUserListingsQuery();
@@ -269,6 +279,14 @@ export function ProfilePage() {
   const paginatedCollectionsData = userCollections?.slice(0, displayCount);
   const paginatedNFTActivitiesData = userNFTActivities?.slice(0, displayCount);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="mt-20 w-full min-h-screen px-6 pb-20">
       <Head>
@@ -338,7 +356,13 @@ export function ProfilePage() {
                     checked={selectedOption === option}
                     onCheckedChange={() => setSelectedOption(option)}
                   />
-                  <label className={selectedOption === option ? 'text-primary' : 'text-muted-foreground'}>
+                  <label
+                    className={
+                      selectedOption === option
+                        ? "text-primary"
+                        : "text-muted-foreground"
+                    }
+                  >
                     {option}
                   </label>
                 </div>
@@ -349,11 +373,10 @@ export function ProfilePage() {
 
         {userAddress ? (
           <div className="flex flex-wrap items-center gap-6 w-full">
-            {/* render data here */}
             {/* User NFTS */}
             {selectedFilter === filters[0] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {iserNFTsPending || isUserNFTsLoading ? (
+                {isUserNFTsLoading || isUserNFTsPending ? (
                   <div className="grid grid-cols-4 w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
@@ -717,6 +740,16 @@ export function ProfilePage() {
         ) : (
           <div className="w-full h-[80vh] flex items-center justify-center">
             Please connect wallet to continue
+            <ConnectButton
+              client={client}
+              chain={chainInfo}
+              wallets={[createWallet("io.metamask")]}
+              connectButton={{
+                label: "Connect Wallet",
+                className:
+                  "!font-space !rounded-lg !p-2 max-sm:!w-full !w-fit !text-sm !min-w-0 !flex !items-center !max-w-[28] !justify-center hover:!bg-primary/85 !duration-300 !ease-in-out !transition !bg-primary !text-white !h-[34px]",
+              }}
+            />
           </div>
         )}
       </div>
