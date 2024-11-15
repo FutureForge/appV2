@@ -61,9 +61,7 @@ export default function Profile() {
   const userAddress = activeAccount?.address;
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedFilter, setSelectedFilter] = useState(filters[0]);
-
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const { ref: loadMoreRef, inView } = useInView({
@@ -110,12 +108,10 @@ export default function Profile() {
   };
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1);
   };
 
   const handleFilterClick = (filter: string) => {
     if (filter) setSelectedFilter(filter);
-    setSelectedFilter(filter);
   };
 
   const getFilteredData = () => {
@@ -359,7 +355,6 @@ export default function Profile() {
                   <>
                     <>
                       {paginatedData?.map((listing, index) => {
-                        console.log({ listing });
                         const data = listing as Listing;
                         return (
                           <NFTCard
