@@ -9,10 +9,9 @@ import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
 
-
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     onClick,
     cta,
@@ -23,6 +22,8 @@ export function NFTCard(props: NFTCardProps) {
     extraOnClick,
     ctaStyles,
     extraProps,
+    extraTitle,
+    extraInfo,
   } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
@@ -85,13 +86,19 @@ export function NFTCard(props: NFTCardProps) {
         <div>
           <div className="flex items-center gap-1">
             <XFI className="size-4" />
-            <p className="text-lg font-medium text-white">{info1}</p>
+            <p className="text-lg font-medium text-white">
+              {info1 || extraInfo}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">{title1}</p>
+          <p className="text-sm text-muted-foreground">
+            {title1 || extraTitle}
+          </p>
         </div>
         <div>
-          <p className="text-lg font-medium text-white">{info2}</p>
-          <p className="text-sm text-muted-foreground">{title2}</p>
+          <p className="text-lg font-medium text-white">{info2 || extraInfo}</p>
+          <p className="text-sm text-muted-foreground">
+            {title2 || extraTitle}
+          </p>
         </div>
       </div>
       {(cta || extraCTA) && (
