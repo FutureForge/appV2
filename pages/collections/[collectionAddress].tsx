@@ -280,6 +280,17 @@ export default function CollectionPage() {
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
+  const handleViewItemClick = ({
+    contractAddress,
+    tokenId,
+  }: {
+    contractAddress: string;
+    tokenId: string;
+  }) => {
+    // router.push(`/item/${contractAddress}/${tokenId}`);
+    console.log("view item", { contractAddress, tokenId });
+  };
+
   const handleBuyListingNow = ({
     listingId,
     quantity,
@@ -556,10 +567,6 @@ export default function CollectionPage() {
                             });
                           };
 
-                      const ctaOnClick = () => {
-                        console.log("View Clicked");
-                      };
-
                       const extraProps: ExtraProps = {
                         disabled: isDisabled,
                         price: isListed ? listingPrice : auctionPrice,
@@ -583,7 +590,12 @@ export default function CollectionPage() {
                           extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
                           ctaStyles="!bg-border"
                           extraOnClick={extraOnClick}
-                          onClick={ctaOnClick}
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
                           extraProps={extraProps}
                         />
                       ) : (
@@ -617,7 +629,18 @@ export default function CollectionPage() {
                 paginatedCollectionOffers.length > 0 ? (
                   <>
                     {paginatedCollectionOffers.map((offer, index) => (
-                      <NFTCard key={index} data={offer} type="offers" />
+                      <NFTCard
+                        key={index}
+                        data={offer}
+                        type="offers"
+                        cta="View Items"
+                        onClick={() => {
+                          handleViewItemClick({
+                            contractAddress: offer.assetContract,
+                            tokenId: offer.tokenId,
+                          });
+                        }}
+                      />
                     ))}
                     {filteredCollectionOffers.length > displayCount && (
                       <div ref={loadMoreRef} className="w-full h-20" />
@@ -650,7 +673,10 @@ export default function CollectionPage() {
                           status={sale.nftStatus as NFTStatus}
                           cta="View Item"
                           onClick={() => {
-                            console.log("View Item Clicked");
+                            handleViewItemClick({
+                              contractAddress: sale.assetContract,
+                              tokenId: sale.tokenId,
+                            });
                           }}
                         />
                       );

@@ -15,6 +15,7 @@ export type NFTCardInfo =
   | "auction"
   | "user-auction"
   | "offers"
+  | "user-offers"
   | "user-offers-received"
   | "new-listing"
   | "bids"
@@ -60,6 +61,9 @@ export type NFTCardProps = {
   extraProps?: ExtraProps;
   extraTitle?: string;
   extraInfo?: number | string;
+  actionCTA?: string;
+  actionOnClick?: React.MouseEventHandler<HTMLButtonElement>;
+  isDisabled?: boolean;
 };
 
 export const getNFTCardInfo = ({
@@ -185,6 +189,14 @@ export const getNFTCardInfo = ({
         title2: "Offered By",
         info1: `${decimalOffChain(totalPrice as string)} WXFI`,
         info2: getFormatAddress(offeror),
+      };
+
+    case "user-offers":
+      const totalPriceUserOffers = "totalPrice" in data ? data.totalPrice : "";
+
+      return {
+        title1: "Price Offered",
+        info1: `${decimalOffChain(totalPriceUserOffers as string)} WXFI`,
       };
 
     case "user-offers-received":

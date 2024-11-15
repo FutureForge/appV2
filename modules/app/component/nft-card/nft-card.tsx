@@ -24,6 +24,9 @@ export function NFTCard(props: NFTCardProps) {
     extraProps,
     extraTitle,
     extraInfo,
+    actionCTA,
+    actionOnClick,
+    isDisabled,
   } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
@@ -115,12 +118,32 @@ export function NFTCard(props: NFTCardProps) {
               className={cn(
                 "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
                 ctaStyles,
-                { "bg-border hover:bg-border/95": extraCTA }
+                { "bg-border hover:bg-border/95": extraCTA || actionCTA }
               )}
             >
               {cta} <LinkIcon className="size-4 text-foreground" />
             </motion.button>
           )}
+
+          {actionCTA && (
+            <motion.button
+              onClick={actionOnClick}
+              initial={{ y: "-100%", opacity: 0 }}
+              animate={{
+                y: isHovered ? 0 : 40,
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
+                ctaStyles,
+              )}
+              disabled={isDisabled}
+            >
+              {actionCTA} <LinkIcon className="size-4 text-foreground" />
+            </motion.button>
+          )}
+
           {extraCTA && (
             <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger>

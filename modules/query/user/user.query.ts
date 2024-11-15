@@ -14,13 +14,14 @@ import {
 import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
-  ensureSerializable,
   formatBlockchainTimestamp,
   to3DP,
   tryParseJSON,
 } from "@/utils/functions";
 import {
+  AllAuctionsQueryResponse,
   AllListingsQueryResponse,
+  AllOffersQueryResponse,
   Auction,
   Listing,
   NewSaleListingsQueryResponse,
@@ -33,6 +34,8 @@ import {
 } from "@/utils/graphql/queries/listing.queries";
 import request from "graphql-request";
 import { indexerEndpoint } from "@/utils/graphql";
+import { filteredAllAuctionsQuery } from "@/utils/graphql/queries/auction.queries";
+import { filteredAllOffersQuery } from "@/utils/graphql/queries/offers.queries";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -121,7 +124,7 @@ export function useUserNFTsQuery() {
       return userNFTsNotListed;
     },
     enabled: !!userAddress,
-    refetchInterval: 1000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -257,23 +260,27 @@ export function useUserExpiredListingsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredListings } = useFilteredAllListingsQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredListings],
     queryFn: async () => {
-      const expiredListings: Listing[] | undefined = filteredListings?.filter(
-        (listing: Listing) => {
+      const response = await request<AllListingsQueryResponse>(
+        indexerEndpoint,
+        filteredAllListingsQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredListings: Listing[] | undefined =
+        response.allListings?.filter((listing: Listing) => {
           const endTime = formatBlockchainTimestamp(listing.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
           // looking for expired listings
           return endTimeFormatted < currentTime;
-        }
-      );
+        });
 
       return {
         expiredListings,
@@ -289,22 +296,26 @@ export function useUserExpiredAuctionsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredAuctions } = useFilteredAllAuctionsQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredAuctions],
     queryFn: async () => {
-      const expiredAuctions: Auction[] | undefined = filteredAuctions?.filter(
-        (auction) => {
+      const response = await request<AllAuctionsQueryResponse>(
+        indexerEndpoint,
+        filteredAllAuctionsQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredAuctions: Auction[] | undefined =
+        response.allAuctions?.filter((auction) => {
           const endTime = formatBlockchainTimestamp(auction.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
           return endTimeFormatted < currentTime;
-        }
-      );
+        });
 
       return {
         expiredAuctions,
@@ -320,14 +331,19 @@ export function useUserExpiredOffersQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredOffers } = useFilteredAllOffersQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredAuctions],
     queryFn: async () => {
-      const expiredOffers: Offer[] | undefined = filteredOffers?.filter(
+      const response = await request<AllOffersQueryResponse>(
+        indexerEndpoint,
+        filteredAllOffersQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredOffers: Offer[] | undefined = response.allOffers?.filter(
         (offer) => {
           const endTime = formatBlockchainTimestamp(offer.expirationTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
