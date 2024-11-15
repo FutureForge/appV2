@@ -99,17 +99,8 @@ export function ProfilePage() {
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
     rootMargin: "100px",
+    delay: 100,
   });
-
-  useEffect(() => {
-    if (inView) {
-      setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
-    }
-  }, [inView]);
-
-  useEffect(() => {
-    setDisplayCount(ITEMS_PER_PAGE);
-  }, [searchQuery, selectedFilter]);
 
   const {
     data: userNFTs,
@@ -333,6 +324,28 @@ export function ProfilePage() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (inView && filteredData && filteredData.length > displayCount) {
+      const timeoutId = setTimeout(() => {
+        setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    inView,
+    filteredData,
+    paginatedData,
+    expiredAuctions,
+    expiredListings,
+    expiredOffers,
+    displayCount,
+  ]);
+
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [searchQuery, selectedFilter, selectedOption]);
+
   if (!mounted) {
     return null;
   }
@@ -442,7 +455,11 @@ export function ProfilePage() {
                       return <CustomNFTCard key={nft.tokenId} data={data} />;
                     })}
                     {filteredData?.length > displayCount && (
-                      <div ref={loadMoreRef} className="w-full h-20" />
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
                     )}
                   </>
                 ) : (
@@ -486,7 +503,11 @@ export function ProfilePage() {
                         );
                       })}
                       {filteredData?.length > displayCount && (
-                        <div ref={loadMoreRef} className="w-full h-20" />
+                        <div
+                          ref={loadMoreRef}
+                          className="w-full h-20 col-span-full"
+                          style={{ gridColumn: "1 / -1" }}
+                        />
                       )}
                     </>
                   </>
@@ -532,7 +553,11 @@ export function ProfilePage() {
                         );
                       })}
                       {filteredData?.length > displayCount && (
-                        <div ref={loadMoreRef} className="w-full h-20" />
+                        <div
+                          ref={loadMoreRef}
+                          className="w-full h-20 col-span-full"
+                          style={{ gridColumn: "1 / -1" }}
+                        />
                       )}
                     </>
                   </>
@@ -580,7 +605,11 @@ export function ProfilePage() {
                         );
                       })}
                       {filteredData?.length > displayCount && (
-                        <div ref={loadMoreRef} className="w-full h-20" />
+                        <div
+                          ref={loadMoreRef}
+                          className="w-full h-20 col-span-full"
+                          style={{ gridColumn: "1 / -1" }}
+                        />
                       )}
                     </>
                   </>
@@ -623,7 +652,11 @@ export function ProfilePage() {
                         );
                       })}
                       {filteredData?.length > displayCount && (
-                        <div ref={loadMoreRef} className="w-full h-20" />
+                        <div
+                          ref={loadMoreRef}
+                          className="w-full h-20 col-span-full"
+                          style={{ gridColumn: "1 / -1" }}
+                        />
                       )}
                     </>
                   </>
@@ -663,7 +696,11 @@ export function ProfilePage() {
                         );
                       })}
                       {filteredData?.length > displayCount && (
-                        <div ref={loadMoreRef} className="w-full h-20" />
+                        <div
+                          ref={loadMoreRef}
+                          className="w-full h-20 col-span-full"
+                          style={{ gridColumn: "1 / -1" }}
+                        />
                       )}
                     </>
                   </>
@@ -768,7 +805,11 @@ export function ProfilePage() {
                         );
                       })}
                     {userNFTActivities.length > displayCount && (
-                      <div ref={loadMoreRef} className="w-full h-20" />
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
                     )}
                   </div>
                 ) : (
@@ -821,7 +862,11 @@ export function ProfilePage() {
                             }
                           )}
                           {expiredListings?.length > displayCount && (
-                            <div ref={loadMoreRef} className="w-full h-20" />
+                            <div
+                              ref={loadMoreRef}
+                              className="w-full h-20 col-span-full"
+                              style={{ gridColumn: "1 / -1" }}
+                            />
                           )}
                         </>
                       </>
@@ -872,7 +917,11 @@ export function ProfilePage() {
                             }
                           )}
                           {expiredAuctions?.length > displayCount && (
-                            <div ref={loadMoreRef} className="w-full h-20" />
+                            <div
+                              ref={loadMoreRef}
+                              className="w-full h-20 col-span-full"
+                              style={{ gridColumn: "1 / -1" }}
+                            />
                           )}
                         </>
                       </>
@@ -921,7 +970,11 @@ export function ProfilePage() {
                             );
                           })}
                           {expiredOffers?.length > displayCount && (
-                            <div ref={loadMoreRef} className="w-full h-20" />
+                            <div
+                              ref={loadMoreRef}
+                              className="w-full h-20 col-span-full"
+                              style={{ gridColumn: "1 / -1" }}
+                            />
                           )}
                         </>
                       </>
@@ -963,7 +1016,11 @@ export function ProfilePage() {
                       );
                     })}
                     {userCollections?.length > displayCount && (
-                      <div ref={loadMoreRef} className="w-full h-20" />
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
                     )}
                   </>
                 ) : (
