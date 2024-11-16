@@ -163,7 +163,7 @@ export function useCancelDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.nft.single],
+        queryKey: [queryKeys.nft.single, queryKeys.user.expiredListings],
       });
     },
     onError: () => {},

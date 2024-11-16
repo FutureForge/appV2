@@ -17,7 +17,7 @@ export function makeRecentlySoldAuctionColumns() {
     header: ({ column }) => (
       <div className="flex items-center gap-3 min-w-[193px]">
         <div className="text-center min-w-[30px] text-muted-foreground">#</div>{" "}
-        <ColumnHeader column={column}>Collection</ColumnHeader>
+        <ColumnHeader column={column}>NFT</ColumnHeader>
       </div>
     ),
     cell: ({ row, getValue }) => {

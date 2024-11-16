@@ -16,6 +16,7 @@ type HeaderProps = {
   onFilterClick: (filter: string) => void;
   showDurationToggle?: boolean;
   showRightSide?: boolean;
+  renderDurationToggle?: boolean
 };
 
 export function Header({
@@ -27,6 +28,7 @@ export function Header({
   onFilterClick,
   showDurationToggle = false,
   showRightSide = false,
+  renderDurationToggle = false
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
@@ -61,7 +63,7 @@ export function Header({
         </Card>
       </div>
 
-      {showRightSide && (
+      {!showRightSide && (
         <div className="flex items-center gap-2 justify-end">
           <TextField
             type="search"

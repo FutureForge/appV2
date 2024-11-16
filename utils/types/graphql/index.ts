@@ -70,6 +70,27 @@ export type NewSaleListing = {
   nft: NFT;
 };
 
+export type NewBid = {
+  assetContract: string;
+  auctionCreator: string;
+  auctionId: string;
+  bidAmount: string;
+  bidBufferBps: number;
+  bidder: string;
+  buyoutBidAmount: string;
+  currency: string;
+  endTimestamp: string;
+  id: string;
+  minimumBidAmount: string;
+  quantity: string;
+  startTimestamp: string;
+  status: number;
+  timeBufferInSeconds: number;
+  tokenId: string;
+  tokenType: number;
+  nft: NFT;
+};
+
 export type Auction = {
   assetContract: string;
   auctionCreator: string;
@@ -200,9 +221,9 @@ export type NewOffersQueryResponse = {
 };
 
 export type NewBidsQueryResponse = {
-  newBids: Auction[];
+  newBids: NewBid[];
 };
 
 export type NewBidsUserQueryResponse = {
-  newBids: Auction[];
+  newBids: NewBid[];
 };

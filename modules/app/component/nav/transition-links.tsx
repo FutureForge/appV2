@@ -46,7 +46,7 @@ export function TransitionLinks({
         {children}
       </Link>
       {isTransitioning && (
-        <div className="fixed inset-0 bg-background/30 h-screen backdrop-blur-sm transition-opacity duration-300 ease-in-out z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-background/30 h-screen backdrop-blur-sm transition-opacity duration-300 ease-in-out z-[999] flex items-center justify-center">
           <Image
             src={"/logo.svg"}
             alt="logo"

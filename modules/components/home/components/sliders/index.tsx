@@ -4,6 +4,7 @@ import {
   useAllCollectionsQuery,
   useAuctionClosedQuery,
   useNewAuctionsQuery,
+  useNewBidsQuery,
   useNewListingsQuery,
   useNewOffersQuery,
   useNewSaleListingsQuery,
@@ -14,32 +15,40 @@ import {
   CollectionsNFTCard,
 } from "../collections-nft-card/collections-nft-card";
 import { useRouter } from "next/navigation";
-import { Listing, Offer } from "@/utils/types/graphql";
+import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 
 export function Sliders() {
   const router = useRouter();
-  const {
-    data: CollectionQuery,
-    isLoading: isCollectionLoading,
-  } = useAllCollectionsQuery({});
+  const { data: CollectionQuery, isLoading: isCollectionLoading } =
+    useAllCollectionsQuery({});
 
   const { data: NewListings, isLoading: isNewListingsLoading } =
-    useNewListingsQuery({});
+    useNewListingsQuery({ limit: 15 });
   const { data: NewSalesListing, isLoading: isNewSalesLoading } =
-    useNewSaleListingsQuery({});
+    useNewSaleListingsQuery({ limit: 15 });
   const { data: AuctionListing, isLoading: isAuctionListingLoading } =
-    useNewAuctionsQuery({});
+    useNewAuctionsQuery({ limit: 15 });
   const { data: AuctionClosed, isLoading: isAuctionClosedLoading } =
-    useAuctionClosedQuery({});
+    useAuctionClosedQuery({ limit: 15 });
   const { data: RecentOffers, isLoading: isRecentOffersLoading } =
-    useNewOffersQuery({});
+    useNewOffersQuery({ limit: 15 });
   const { data: AcceptedOffers, isLoading: isAcceptedOffersLoading } =
-    useAcceptedOffersQuery({});
+    useAcceptedOffersQuery({ limit: 15 });
+  const { data: NewBids, isLoading: isNewBidsLoading } = useNewBidsQuery({
+    limit: 15,
+  });
 
-  // console.log("====================================");
-  // console.log(AuctionListing, "Hello");
-  // console.log("====================================");
+  const handleViewItem = ({
+    contractAddress,
+    tokenId,
+  }: {
+    contractAddress: string;
+    tokenId: string;
+  }) => {
+    // router.push(`/item/${contractAddress}/${tokenId}`);
+    console.log("view item", { contractAddress, tokenId });
+  };
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col">
@@ -77,7 +86,70 @@ export function Sliders() {
         href="/collections"
         data={NewListings || []}
         renderItem={(listing: Listing) => {
-          return <NFTCard key={listing.id} data={listing} type="new-listing" />;
+          return (
+            <NFTCard
+              key={listing.id}
+              data={listing}
+              type="new-listing"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: listing.assetContract,
+                  tokenId: listing.tokenId,
+                });
+              }}
+            />
+          );
+        }}
+      />
+
+      {/* Recently Auctioned */}
+      <DataSlider
+        isLoading={isAuctionListingLoading}
+        title="Recently Auctioned Listing"
+        cta="View More"
+        href="/collections"
+        data={AuctionListing || []}
+        renderItem={(auction: Auction) => {
+          return (
+            <NFTCard
+              key={auction.id}
+              data={auction}
+              type="new-auction"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: auction.assetContract,
+                  tokenId: auction.tokenId,
+                });
+              }}
+            />
+          );
+        }}
+      />
+
+      {/* Recent Bids */}
+      <DataSlider
+        isLoading={isNewBidsLoading}
+        title="Recent Bids"
+        cta="View More"
+        href="/collections"
+        data={NewBids || []}
+        renderItem={(bid: NewBid) => {
+          return (
+            <NFTCard
+              key={bid.id}
+              data={bid}
+              type="bids"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: bid.assetContract,
+                  tokenId: bid.tokenId,
+                });
+              }}
+            />
+          );
         }}
       />
 
@@ -89,19 +161,20 @@ export function Sliders() {
         href="/collections"
         data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} data={sale} type="new-sale-listing" />;
-        }}
-      />
-
-      {/* Recently Auctioned */}
-      <DataSlider
-        isLoading={isAuctionListingLoading}
-        title="Recently Auctioned Listing"
-        cta="View More"
-        href="/collections"
-        data={AuctionListing || []}
-        renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} data={sale} type="new-auction" />;
+          return (
+            <NFTCard
+              key={sale.id}
+              data={sale}
+              type="new-sale-listing"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: sale.assetContract,
+                  tokenId: sale.tokenId,
+                });
+              }}
+            />
+          );
         }}
       />
 
@@ -112,8 +185,21 @@ export function Sliders() {
         cta="View More"
         href="/collections"
         data={AuctionClosed || []}
-        renderItem={(sale: Listing) => {
-          return <NFTCard key={sale.id} data={sale} type="new-sold-auction" />;
+        renderItem={(auction: Auction) => {
+          return (
+            <NFTCard
+              key={auction.id}
+              data={auction}
+              type="new-sold-auction"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: auction.assetContract,
+                  tokenId: auction.tokenId,
+                });
+              }}
+            />
+          );
         }}
       />
 
@@ -125,7 +211,20 @@ export function Sliders() {
         href="/collections"
         data={RecentOffers || []}
         renderItem={(offer: Offer) => {
-          return <NFTCard key={offer.id} data={offer} type="new-offers" />;
+          return (
+            <NFTCard
+              key={offer.id}
+              data={offer}
+              type="new-offers"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: offer.assetContract,
+                  tokenId: offer.tokenId,
+                });
+              }}
+            />
+          );
         }}
       />
 
@@ -138,7 +237,18 @@ export function Sliders() {
         data={AcceptedOffers || []}
         renderItem={(offer: Offer) => {
           return (
-            <NFTCard key={offer.id} data={offer} type="new-accepted-offers" />
+            <NFTCard
+              key={offer.id}
+              data={offer}
+              type="new-accepted-offers"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: offer.assetContract,
+                  tokenId: offer.tokenId,
+                });
+              }}
+            />
           );
         }}
       />

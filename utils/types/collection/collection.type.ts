@@ -48,9 +48,23 @@ export type CollectionsQueryResponse = {
 };
 
 export type CollectionNFTType = {
+  id?: bigint | string | number;
   tokenId: string;
   owner: string;
   type: string;
   tokenURI: string;
   metadata: NFTMetadata;
+};
+
+export type UserNFTData = {
+  address: string;
+  balance: string;
+  blockNumber: number;
+  contractAddress: string;
+  nft: CollectionNFTType;
+  timestamp: string;
+  tokenId: string;
+  tokenIds: string[];
+  tokenType: string;
+  type: string;
 };
