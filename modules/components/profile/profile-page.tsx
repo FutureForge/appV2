@@ -172,8 +172,7 @@ export function ProfilePage() {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   const handleCancelListing = ({ listingId }: { listingId: string }) => {
@@ -1134,8 +1133,7 @@ function CustomNFTCard({ data }: { data: UserNFTData }) {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   return (

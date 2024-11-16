@@ -5,24 +5,29 @@ import {
   getFilteredRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { makeAllAuctionsColumn } from "./columns";
+import { makeOffersColumn } from "./columns";
 import { Table } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Offer } from "@/utils/types/graphql";
 
-type ListedTableProps = {
+type OffersTableProps = {
   isLoading: boolean;
   data: Offer[];
+  isOwner: boolean;
+  userAddress: string;
 };
 
-export function ListedTable({ isLoading, data }: ListedTableProps) {
+export function OffersTable({
+  isLoading,
+  data,
+  isOwner,
+  userAddress,
+}: OffersTableProps) {
   const router = useRouter();
 
-  console.log({ data });
-
   const table = useReactTable<Offer>({
-    columns: makeAllAuctionsColumn(),
+    columns: makeOffersColumn({ isOwner, userAddress }),
     data: data ?? [],
     getExpandedRowModel: getExpandedRowModel(),
     getCoreRowModel: getCoreRowModel(),

@@ -5,24 +5,22 @@ import {
   getFilteredRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { makeAllAuctionsColumn } from "./columns";
+import { makeWinningBidColumn } from "./columns";
 import { Table } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Auction } from "@/utils/types/graphql";
+import { WinningBid } from "@/utils/types/graphql";
 
-type AuctionTableProps = {
+type WinningBidTableProps = {
   isLoading: boolean;
-  data: Auction[];
+  data: WinningBid[];
 };
 
-export function AuctionTable({ isLoading, data }: AuctionTableProps) {
+export function WinningBidTable({ isLoading, data }: WinningBidTableProps) {
   const router = useRouter();
 
-  console.log({ data });
-
-  const table = useReactTable<Auction>({
-    columns: makeAllAuctionsColumn(),
+  const table = useReactTable<WinningBid>({
+    columns: makeWinningBidColumn(),
     data: data ?? [],
     getExpandedRowModel: getExpandedRowModel(),
     getCoreRowModel: getCoreRowModel(),
@@ -38,7 +36,7 @@ export function AuctionTable({ isLoading, data }: AuctionTableProps) {
           hasHover
           table={table}
           isSingleNFT
-          fallbackMessage="No Offers available yet"
+          fallbackMessage="No Winning Bid"
         />
       </div>
     </HydrationBoundary>

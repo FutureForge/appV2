@@ -7,7 +7,13 @@ import { decimalOffChain } from "@/modules/blockchain";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { Button } from "@/modules/app";
 
-export function makeAllAuctionsColumn() {
+export function makeOffersColumn({
+  isOwner,
+  userAddress,
+}: {
+  isOwner: boolean;
+  userAddress: string;
+}) {
   const columns = createColumnHelper<Offer>();
 
   /* -------------------------------------------------------------------------------------------------
@@ -16,12 +22,11 @@ export function makeAllAuctionsColumn() {
   const offerorColumn = columns.accessor("offeror", {
     header: ({ column }) => (
       <div className="flex items-center gap-3 min-w-[193px]">
-        <ColumnHeader column={column}>offeror</ColumnHeader>
+        <ColumnHeader column={column}>Offeror</ColumnHeader>
       </div>
     ),
     cell: ({ row }) => {
       const { offeror } = row.original;
-
       return <div className="flex items-center gap-3 w-full ">{offeror}</div>;
     },
   });
@@ -66,13 +71,17 @@ export function makeAllAuctionsColumn() {
   const actionsColumns = columns.display({
     id: "actions",
     header: () => <div className="min-w-[125px] pr-6" />,
-    cell: (props) => (
-      <div className="pr-6 flex justify-center items-center gap-2">
-        <Button shape="square" >
-          Cancel
-        </Button>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const { offeror } = row.original;
+      const isOfferor = offeror.toLowerCase() === userAddress.toLowerCase();
+
+      return (
+        <div className="pr-6 flex justify-center items-center gap-2">
+          {isOwner && <Button shape="square">Accept Offer</Button>}
+          {isOfferor && <Button shape="square">Cancel Offer</Button>}
+        </div>
+      );
+    },
   });
 
   return [offerorColumn, amountColumn, endTimestampColumn, actionsColumns];

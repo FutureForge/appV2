@@ -13,10 +13,11 @@ type HeaderProps = {
   searchQuery?: string;
   handleSearch?: (query: string) => void;
   filters: string[];
-  onFilterClick: (filter: string) => void;
+  onFilterClick?: (filter: string) => void;
   showDurationToggle?: boolean;
   showRightSide?: boolean;
-  renderDurationToggle?: boolean
+  renderDurationToggle?: boolean;
+  selectedFilter?: string;
 };
 
 export function Header({
@@ -27,8 +28,9 @@ export function Header({
   filters,
   onFilterClick,
   showDurationToggle = false,
-  showRightSide = false,
-  renderDurationToggle = false
+  showRightSide = true,
+  renderDurationToggle = false,
+  selectedFilter,
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
@@ -39,10 +41,10 @@ export function Header({
         <Card className="bg-transparent w-full border border-new-muted-text p-1 rounded-xl h-10">
           <ToggleGroup.Root
             type="single"
-            value={filter}
+            value={selectedFilter ? selectedFilter : filter}
             onValueChange={(value) => {
               if (value) setFilter(value);
-              onFilterClick(value);
+              onFilterClick && onFilterClick(value);
             }}
             className={cn({ "justify-between": !showRightSide })}
           >
@@ -51,8 +53,10 @@ export function Header({
                 key={value}
                 variant="select"
                 value={value}
+                disabled={!!selectedFilter}
                 className={cn(
                   "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
+                  "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",
                   { "min-w-[142px] justify-center": !showRightSide }
                 )}
               >
@@ -63,7 +67,7 @@ export function Header({
         </Card>
       </div>
 
-      {!showRightSide && (
+      {showRightSide && (
         <div className="flex items-center gap-2 justify-end">
           <TextField
             type="search"

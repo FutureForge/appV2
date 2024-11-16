@@ -287,8 +287,7 @@ export default function CollectionPage() {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   const handleBuyListingNow = ({
@@ -1142,7 +1141,7 @@ function CollectionNFTCard({
   const cta = "View Item";
 
   const handleClick = () => {
-    router.push(`/nfts/${collectionAddress}/${tokenId}`);
+    router.push(`/nft/${collectionAddress}/${tokenId}`);
   };
 
   return (
