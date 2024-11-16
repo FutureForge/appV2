@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Button,
   FileInput,
@@ -8,7 +9,6 @@ import {
 } from "@/modules/app";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useCreateNFTMutation } from "@/modules/mutation";
-import React, { useState } from "react";
 import DownloadIcon from "@/assets/download.svg";
 
 type Trait = {

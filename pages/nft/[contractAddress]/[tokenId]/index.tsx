@@ -1,7 +1,9 @@
+import Head from "next/head";
+import React from "react";
+import { useRouter } from "next/router";
+
 import { Details, TraitsOffers } from "@/modules/components/single-NFT";
 import { useSingleNFTQuery } from "@/modules/query";
-import { useRouter } from "next/router";
-import React from "react";
 
 export default function SingleNFTPage() {
   const router = useRouter();
@@ -16,8 +18,15 @@ export default function SingleNFTPage() {
   console.log("====================================");
   return (
     <div className="mt-20 w-full min-h-screen px-6 max-w-[1355px] mx-auto flex flex-col gap-12">
+      <Head>
+        <title>MintMingles Marketplace - Single NFT</title>
+        <meta
+          name="description"
+          content={`Single NFT on Mint Mingle Marketplace`}
+        />
+      </Head>
       <Details />
-      <TraitsOffers/>
+      <TraitsOffers />
     </div>
   );
 }

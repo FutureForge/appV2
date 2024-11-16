@@ -9,7 +9,6 @@ import {
   useNewSaleListingsQuery,
   useUserChainInfo,
 } from "@/modules/query";
-import Head from "next/head";
 import { EmptyState, Header, NFTCard } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { cn } from "@/modules/app/utils";
@@ -339,15 +338,6 @@ export function BrowsePage() {
 
   return (
     <div className="pt-[17px]">
-      <Head>
-        <title>
-          MintMingles Marketplace - Browse All Listings and Auctions
-        </title>
-        <meta
-          name="description"
-          content={`Browse all listings and auctions on Mint Mingle Marketplace`}
-        />
-      </Head>
       <Header
         isActive={isActive}
         setIsActive={setIsActive}

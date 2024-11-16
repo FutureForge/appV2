@@ -33,12 +33,6 @@ export function NFTCard(props: NFTCardProps) {
   const name = metadata?.name || "";
   const tokenId = data.tokenId || "";
 
-  // console.log({ data, type, status });
-
-  // console.log("====================================");
-  // console.log(data, type, "hello");
-  // console.log("====================================");
-
   const { title1, title2, info1, info2 } = getNFTCardInfo({
     type: type,
     data,

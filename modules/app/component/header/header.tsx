@@ -72,7 +72,7 @@ export function Header({
             value={searchQuery}
             onChange={(e) => handleSearch && handleSearch(e.target.value)}
           />
-          {!showDurationToggle && (
+          {showDurationToggle && (
             <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
               <ToggleGroup.Root
                 value={duration}
