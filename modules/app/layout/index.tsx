@@ -15,11 +15,11 @@ const Toast = dynamic(() => import("@/modules/components/toast/toast"), {
 export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
   const pathname = usePathname();
   return (
-    <div className="flex isolate flex-col min-h-screen font-space relative bg-background">
+    <div className="flex isolate flex-col min-h-screen font-space relative overflow-y-auto bg-background">
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="flex-grow w-full min-h-screen"
+        className="flex-grow w-full min-h-screen max-w-[1730px] mx-auto"
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);

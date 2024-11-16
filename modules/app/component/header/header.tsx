@@ -14,6 +14,8 @@ type HeaderProps = {
   handleSearch: (query: string) => void;
   filters: string[];
   onFilterClick: (filter: string) => void;
+  showRightSide?: boolean;
+  renderDurationToggle?: boolean
 };
 
 export function Header({
@@ -23,6 +25,8 @@ export function Header({
   handleSearch,
   filters,
   onFilterClick,
+  showRightSide = false,
+  renderDurationToggle = false
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
@@ -53,59 +57,64 @@ export function Header({
         </Card>
       </div>
 
-      <div className="flex items-center gap-2 justify-end">
-        <TextField
-          type="search"
-          placeholder="Search by collections"
-          containerClass="bg-new-muted-bg w-[300px]"
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-        <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
-          <ToggleGroup.Root
-            value={duration}
-            onValueChange={(value) => {
-              if (value) {
-                setDuration(value);
-              }
-            }}
-            type="single"
+      {!showRightSide && (
+        <div className="flex items-center gap-2 justify-end">
+          <TextField
+            type="search"
+            placeholder="Search by collections"
+            containerClass="bg-new-muted-bg w-[300px]"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+          {renderDurationToggle && (
+            <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
+              <ToggleGroup.Root
+                value={duration}
+                onValueChange={(value) => {
+                  if (value) {
+                    setDuration(value);
+                  }
+                }}
+                type="single"
+              >
+                {["1H", "1D", "7D", "30D"].map((value) => (
+                  <ToggleGroup.Item variant="select" value={value}>
+                    {value}
+                  </ToggleGroup.Item>
+                ))}
+              </ToggleGroup.Root>
+            </Card>
+          )}
+
+          <SwitchView.Root
+            falseoption="list"
+            trueoption="grid"
+            active={isActive}
+            onChange={() => setIsActive(!isActive)}
           >
-            {["1H", "1D", "7D", "30D"].map((value) => (
-              <ToggleGroup.Item variant="select" value={value}>
-                {value}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup.Root>
-        </Card>
-        <SwitchView.Root
-          falseoption="list"
-          trueoption="grid"
-          active={isActive}
-          onChange={() => setIsActive(!isActive)}
-        >
-          <SwitchView.FirstOption>
-            <div
-              className={cn(
-                "duration-300 ease-out text-muted-foreground size-8 text-center flex items-center justify-center",
-                { "text-white": !isActive }
-              )}
-            >
-              <List className="size-4" />
-            </div>
-          </SwitchView.FirstOption>
-          <SwitchView.SecondOption>
-            <div
-              className={cn(
-                "duration-300 ease-out text-muted-foreground size-8 text-center justify-center flex items-center",
-                { "text-white": isActive }
-              )}
-            >
-              <Grid />
-            </div>
-          </SwitchView.SecondOption>
-        </SwitchView.Root>
-      </div>
+            <SwitchView.FirstOption>
+              <div
+                className={cn(
+                  "duration-300 ease-out text-muted-foreground size-8 text-center flex items-center justify-center",
+                  { "text-white": !isActive }
+                )}
+              >
+                <List className="size-4" />
+              </div>
+            </SwitchView.FirstOption>
+            <SwitchView.SecondOption>
+              <div
+                className={cn(
+                  "duration-300 ease-out text-muted-foreground size-8 text-center justify-center flex items-center",
+                  { "text-white": isActive }
+                )}
+              >
+                <Grid />
+              </div>
+            </SwitchView.SecondOption>
+          </SwitchView.Root>
+        </div>
+      )}
     </div>
   );
 }

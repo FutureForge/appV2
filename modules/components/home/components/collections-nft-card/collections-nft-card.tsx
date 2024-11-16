@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import { Collection } from "@/utils/types/collection/collection.type";
+import { cn } from "@/modules/app/utils";
 // icons
 import XFI from "@/assets/xfi.svg";
-import LinkIcon from "@/assets/link-external-02.svg";
-import { cn } from "@/modules/app/utils";
+import LinkIcon from "@/assets/arrow-right-up-line.svg";
+
 
 export type CollectionWithoutOwnerBackground = Omit<
   Collection,

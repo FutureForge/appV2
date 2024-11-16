@@ -3,7 +3,7 @@ import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { queryKeys } from "../query-keys";
 import axios from "axios";
 import { backendURL, CROSSFI_API_TESTNET } from "@/utils/configs";
-import { UserNFTResponse } from "@/utils/types/global";
+import { NFTActivityResponse, UserNFTResponse } from "@/utils/types/global";
 import {
   useAllOffersQuery,
   useFilteredAllAuctionsQuery,
@@ -14,13 +14,14 @@ import {
 import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
-  ensureSerializable,
   formatBlockchainTimestamp,
   to3DP,
   tryParseJSON,
 } from "@/utils/functions";
 import {
+  AllAuctionsQueryResponse,
   AllListingsQueryResponse,
+  AllOffersQueryResponse,
   Auction,
   Listing,
   NewSaleListingsQueryResponse,
@@ -33,6 +34,8 @@ import {
 } from "@/utils/graphql/queries/listing.queries";
 import request from "graphql-request";
 import { indexerEndpoint } from "@/utils/graphql";
+import { filteredAllAuctionsQuery } from "@/utils/graphql/queries/auction.queries";
+import { filteredAllOffersQuery } from "@/utils/graphql/queries/offers.queries";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -94,9 +97,9 @@ export function useUserNFTsQuery() {
 
               return {
                 ...nfts,
-                nft: updatedNFT,
+                nft: { ...updatedNFT, tokenId: ids },
                 type: "NFTs",
-                tokenId: nft.id.toString(),
+                tokenId: ids,
               };
             })
           );
@@ -118,10 +121,10 @@ export function useUserNFTsQuery() {
         );
       });
 
-      return ensureSerializable(userNFTsNotListed);
+      return userNFTsNotListed;
     },
     enabled: !!userAddress,
-    refetchInterval: 1000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -136,10 +139,10 @@ export function useUserOffersQuery() {
   return useQuery({
     queryKey: [queryKeys.user.offers],
     queryFn: async () => {
-      return ensureSerializable({
+      return {
         userOffers,
         offerLength: userOffers?.length,
-      });
+      };
     },
     enabled: !!userAddress,
     refetchInterval: 5000,
@@ -157,10 +160,10 @@ export function useUserAuctionsQuery() {
   return useQuery({
     queryKey: [queryKeys.user.auctions],
     queryFn: async () => {
-      return ensureSerializable({
+      return {
         userAuctions,
         auctionLength: userAuctions?.length,
-      });
+      };
     },
     enabled: !!userAddress,
     refetchInterval: 5000,
@@ -178,13 +181,13 @@ export function useUserListingsQuery() {
   return useQuery({
     queryKey: [queryKeys.user.listings],
     queryFn: async () => {
-      return ensureSerializable({
+      return {
         userListings,
         userListingsLength: userListings?.length,
-      });
+      };
     },
     enabled: !!userAddress,
-    refetchInterval: 1000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -199,13 +202,13 @@ export function useUserBidsQuery() {
   return useQuery({
     queryKey: [queryKeys.user.listings],
     queryFn: async () => {
-      return ensureSerializable({
+      return {
         userBids,
         userBidsLength: userBids?.length,
-      });
+      };
     },
     enabled: !!userAddress,
-    refetchInterval: 1000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -215,22 +218,41 @@ export function useUserOffersReceivedQuery() {
 
   const { data: allOffers } = useAllOffersQuery({});
 
+  // First filter offers received by the user
   const userOffersReceived = allOffers?.filter((offer) => {
     const offerOwner = offer.nft.owner.toLowerCase();
-
     return offerOwner === userAddress?.toLowerCase();
   });
 
   return useQuery({
     queryKey: [queryKeys.user.offersReceived],
     queryFn: async () => {
-      return ensureSerializable({
-        userOffersReceived,
-        userOffersReceivedLength: userOffersReceived?.length,
+      // Group offers by tokenId and assetContract
+      const groupedOffers = userOffersReceived?.reduce((acc, offer) => {
+        const key = `${offer.nft.assetContract}_${offer.nft.tokenId}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(offer);
+        return acc;
+      }, {} as Record<string, typeof userOffersReceived>);
+
+      // Get highest offer for each NFT
+      const highestOffers = Object.values(groupedOffers || {}).map((offers) => {
+        return offers.reduce((highest, current) => {
+          const highestPrice = parseFloat(highest.totalPrice);
+          const currentPrice = parseFloat(current.totalPrice);
+          return currentPrice > highestPrice ? current : highest;
+        });
       });
+
+      return {
+        userOffersReceived: highestOffers,
+        userOffersReceivedLength: highestOffers?.length,
+      };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -238,23 +260,27 @@ export function useUserExpiredListingsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredListings } = useFilteredAllListingsQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredListings],
     queryFn: async () => {
-      const expiredListings: Listing[] | undefined = filteredListings?.filter(
-        (listing: Listing) => {
+      const response = await request<AllListingsQueryResponse>(
+        indexerEndpoint,
+        filteredAllListingsQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredListings: Listing[] | undefined =
+        response.allListings?.filter((listing: Listing) => {
           const endTime = formatBlockchainTimestamp(listing.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
           // looking for expired listings
           return endTimeFormatted < currentTime;
-        }
-      );
+        });
 
       return {
         expiredListings,
@@ -262,7 +288,7 @@ export function useUserExpiredListingsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -270,30 +296,34 @@ export function useUserExpiredAuctionsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredAuctions } = useFilteredAllAuctionsQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredAuctions],
     queryFn: async () => {
-      const expiredAuctions: Auction[] | undefined = filteredAuctions?.filter(
-        (auction) => {
+      const response = await request<AllAuctionsQueryResponse>(
+        indexerEndpoint,
+        filteredAllAuctionsQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredAuctions: Auction[] | undefined =
+        response.allAuctions?.filter((auction) => {
           const endTime = formatBlockchainTimestamp(auction.endTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
           const currentTime = new Date().getTime();
 
           return endTimeFormatted < currentTime;
-        }
-      );
+        });
 
-      return ensureSerializable({
+      return {
         expiredAuctions,
         expiredAuctionsLength: expiredAuctions?.length,
-      });
+      };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -301,14 +331,19 @@ export function useUserExpiredOffersQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: filteredOffers } = useFilteredAllOffersQuery({
-    address: userAddress?.toLowerCase(),
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.expiredAuctions],
     queryFn: async () => {
-      const expiredOffers: Offer[] | undefined = filteredOffers?.filter(
+      const response = await request<AllOffersQueryResponse>(
+        indexerEndpoint,
+        filteredAllOffersQuery,
+        {
+          contractAddress: "",
+          address: userAddress?.toLowerCase(),
+        }
+      );
+
+      const expiredOffers: Offer[] | undefined = response.allOffers?.filter(
         (offer) => {
           const endTime = formatBlockchainTimestamp(offer.expirationTimestamp);
           const endTimeFormatted = new Date(endTime).getTime();
@@ -318,13 +353,13 @@ export function useUserExpiredOffersQuery() {
         }
       );
 
-      return ensureSerializable({
+      return {
         expiredOffers,
         expiredOffersLength: expiredOffers?.length,
-      });
+      };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000000,
+    refetchInterval: 5000,
   });
 }
 
@@ -339,7 +374,7 @@ export function useUserCollectionsQuery() {
         `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
       );
 
-      const collections = response.data.collections as Collection[];
+      const collections = response.data.filteredCollections as Collection[];
 
       for (const collection of collections) {
         try {
@@ -390,7 +425,53 @@ export function useUserCollectionsQuery() {
         } catch (error) {}
       }
 
-      return response.data;
+      return collections;
+    },
+    enabled: !!userAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserNFTActivitiesQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  return useQuery({
+    queryKey: [queryKeys.user.nftActivities],
+    queryFn: async () => {
+      const response = await axios.get<NFTActivityResponse>(
+        `${CROSSFI_API_TESTNET}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
+      );
+
+      const tokenTransfers = response.data.docs;
+
+      const updatedTokenTransfers = await Promise.all(
+        tokenTransfers.map(async (transfer) => {
+          try {
+            const contract = getContractCustom({
+              contractAddress: transfer.contractAddress,
+            });
+
+            const nft = await getNFT({
+              contract,
+              tokenId: BigInt(transfer.tokenId),
+              includeOwner: true,
+            });
+
+            return {
+              ...transfer,
+              nft,
+            };
+          } catch (error) {
+            return {
+              ...transfer,
+              nft: null,
+            };
+          }
+        })
+      );
+
+      return updatedTokenTransfers;
     },
     enabled: !!userAddress,
     refetchInterval: 5000,

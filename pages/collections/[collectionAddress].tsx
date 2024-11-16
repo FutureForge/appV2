@@ -85,7 +85,7 @@ const defaultCollectionSocials = [
   { icon: <Telegram className="size-[14px]" />, link: "" },
 ];
 
-const ITEMS_PER_PAGE = 4;
+export const ITEMS_PER_PAGE = 4;
 
 export default function CollectionPage() {
   const { activeAccount } = useUserChainInfo();
@@ -280,6 +280,17 @@ export default function CollectionPage() {
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
+  const handleViewItemClick = ({
+    contractAddress,
+    tokenId,
+  }: {
+    contractAddress: string;
+    tokenId: string;
+  }) => {
+    // router.push(`/item/${contractAddress}/${tokenId}`);
+    console.log("view item", { contractAddress, tokenId });
+  };
+
   const handleBuyListingNow = ({
     listingId,
     quantity,
@@ -452,8 +463,7 @@ export default function CollectionPage() {
                 >
                   {filters
                     .filter(
-                      (value) =>
-                        isCollectionOwner || value !== "Collection Settings"
+                      (value) => isCollectionOwner || value !== filters[4]
                     )
                     .map((value) => (
                       <ToggleGroup.Item
@@ -468,7 +478,7 @@ export default function CollectionPage() {
               </Card>
 
               <div className="flex items-center gap-2">
-                {filter !== "Collection Settings" && (
+                {filter !== filters[4] && (
                   <TextField
                     type="search"
                     placeholder="Search by collections"
@@ -477,7 +487,7 @@ export default function CollectionPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 )}
-                {(filter === "Sales" || filter === "Items") && (
+                {(filter === filters[2] || filter === filters[0]) && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm h-[42px] flex items-center justify-center text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
                       {selectedFilter}
@@ -506,7 +516,7 @@ export default function CollectionPage() {
           </div>
 
           {/* Render Items Content */}
-          {filter === "Items" && (
+          {filter === filters[0] && (
             <div className="mt-6">
               <div className="flex items-center gap-8 flex-wrap">
                 {paginatedCollectionNFTs &&
@@ -557,10 +567,6 @@ export default function CollectionPage() {
                             });
                           };
 
-                      const ctaOnClick = () => {
-                        console.log("View Clicked");
-                      };
-
                       const extraProps: ExtraProps = {
                         disabled: isDisabled,
                         price: isListed ? listingPrice : auctionPrice,
@@ -584,7 +590,12 @@ export default function CollectionPage() {
                           extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
                           ctaStyles="!bg-border"
                           extraOnClick={extraOnClick}
-                          onClick={ctaOnClick}
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
                           extraProps={extraProps}
                         />
                       ) : (
@@ -611,14 +622,25 @@ export default function CollectionPage() {
           )}
 
           {/* Render Offers Content */}
-          {filter === "Offers" && (
+          {filter === filters[1] && (
             <div className="mt-6">
               <div className="flex items-center gap-8 flex-wrap">
                 {paginatedCollectionOffers &&
                 paginatedCollectionOffers.length > 0 ? (
                   <>
                     {paginatedCollectionOffers.map((offer, index) => (
-                      <NFTCard key={index} data={offer} type="offers" />
+                      <NFTCard
+                        key={index}
+                        data={offer}
+                        type="offers"
+                        cta="View Items"
+                        onClick={() => {
+                          handleViewItemClick({
+                            contractAddress: offer.assetContract,
+                            tokenId: offer.tokenId,
+                          });
+                        }}
+                      />
                     ))}
                     {filteredCollectionOffers.length > displayCount && (
                       <div ref={loadMoreRef} className="w-full h-20" />
@@ -636,7 +658,7 @@ export default function CollectionPage() {
           )}
 
           {/* Render Sales Content */}
-          {filter === "Sales" && (
+          {filter === filters[2] && (
             <div className="mt-6">
               <div className="flex items-center gap-8 flex-wrap">
                 {paginatedCollectionSales &&
@@ -651,7 +673,10 @@ export default function CollectionPage() {
                           status={sale.nftStatus as NFTStatus}
                           cta="View Item"
                           onClick={() => {
-                            console.log("View Item Clicked");
+                            handleViewItemClick({
+                              contractAddress: sale.assetContract,
+                              tokenId: sale.tokenId,
+                            });
                           }}
                         />
                       );
@@ -672,7 +697,7 @@ export default function CollectionPage() {
           )}
 
           {/* Render Activity Content */}
-          {filter === "Activity" &&
+          {filter === filters[3] &&
             (filteredCollectionTokenTransfers &&
             filteredCollectionTokenTransfers.length > 0 ? (
               <div className="mt-6">
@@ -781,7 +806,7 @@ export default function CollectionPage() {
 
       {/* Render Collection Settings Content */}
       {isCollectionOwner &&
-        filter === "Collection Settings" &&
+        filter === filters[4] &&
         singleCollection?.collection && (
           <CollectionSettings collection={singleCollection.collection} />
         )}

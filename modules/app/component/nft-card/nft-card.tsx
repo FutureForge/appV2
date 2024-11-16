@@ -7,12 +7,11 @@ import { cn } from "../../utils";
 import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 // icons
 import XFI from "@/assets/xfi.svg";
-import LinkIcon from '@/assets/link-external-02.svg'
-
+import LinkIcon from "@/assets/arrow-right-up-line.svg";
 
 export function NFTCard(props: NFTCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     onClick,
     cta,
@@ -23,6 +22,11 @@ export function NFTCard(props: NFTCardProps) {
     extraOnClick,
     ctaStyles,
     extraProps,
+    extraTitle,
+    extraInfo,
+    actionCTA,
+    actionOnClick,
+    isDisabled,
   } = props;
   const { metadata } = data.nft || {};
   const image = metadata?.image || "";
@@ -85,13 +89,19 @@ export function NFTCard(props: NFTCardProps) {
         <div>
           <div className="flex items-center gap-1">
             <XFI className="size-4" />
-            <p className="text-lg font-medium text-white">{info1}</p>
+            <p className="text-lg font-medium text-white">
+              {info1 || extraInfo}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">{title1}</p>
+          <p className="text-sm text-muted-foreground">
+            {title1 || extraTitle}
+          </p>
         </div>
         <div>
-          <p className="text-lg font-medium text-white">{info2}</p>
-          <p className="text-sm text-muted-foreground">{title2}</p>
+          <p className="text-lg font-medium text-white">{info2 || extraInfo}</p>
+          <p className="text-sm text-muted-foreground">
+            {title2 || extraTitle}
+          </p>
         </div>
       </div>
       {(cta || extraCTA) && (
@@ -108,12 +118,32 @@ export function NFTCard(props: NFTCardProps) {
               className={cn(
                 "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
                 ctaStyles,
-                { "bg-border": extraCTA }
+                { "bg-border hover:bg-border/95": extraCTA || actionCTA }
               )}
             >
               {cta} <LinkIcon className="size-4 text-foreground" />
             </motion.button>
           )}
+
+          {actionCTA && (
+            <motion.button
+              onClick={actionOnClick}
+              initial={{ y: "-100%", opacity: 0 }}
+              animate={{
+                y: isHovered ? 0 : 40,
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
+                ctaStyles,
+              )}
+              disabled={isDisabled}
+            >
+              {actionCTA} <LinkIcon className="size-4 text-foreground" />
+            </motion.button>
+          )}
+
           {extraCTA && (
             <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger>
@@ -138,7 +168,7 @@ export function NFTCard(props: NFTCardProps) {
                     alt={name}
                     name={name}
                     tokenId={tokenId}
-                    props={extraProps!}
+                    props={extraProps}
                   />
                 )}
                 {status === "auctioned" && (
