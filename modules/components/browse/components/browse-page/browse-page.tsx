@@ -265,9 +265,11 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      console.log({ listing });
+                      console.log({ listing} , 'listing');
                       const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
+                        router.push(
+                          `/nft/${listing?.assetContract}/${listing?.tokenId}`
+                        );
                         console.log("clicked");
                       };
                       const handleBuyNow = () => {

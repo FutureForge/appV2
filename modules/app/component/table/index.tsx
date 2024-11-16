@@ -1,6 +1,7 @@
 'use client'
 import { flexRender, Table as ReactTable } from "@tanstack/react-table";
 import { cn } from "../../utils";
+import { TableEmptyState } from "./empty";
 
 type TableProps<T> = {
   table: ReactTable<T>;
@@ -12,6 +13,7 @@ type TableProps<T> = {
   isLoading?: boolean;
   onRowPointerEnter?: (event: PointerEvent) => void;
   onRowPointerLeave?: (event?: PointerEvent) => void;
+  isSingleNFT?:boolean
 };
 
 export function Table<T>({
@@ -19,6 +21,9 @@ export function Table<T>({
   hasHover,
   onRowClick,
   isLoading,
+  isSingleNFT = false,
+  fallbackTitle,
+  fallbackMessage
 }: TableProps<T>) {
   return (
     <div className="!p-4 bg-card rounded-2xl" suppressHydrationWarning>
@@ -83,6 +88,12 @@ export function Table<T>({
           </>
         )}
       </table>
+      {/* {table.getRowModel().rows.length === 0 && isSingleNFT && (
+        <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
+      )} */}
+      {table.getRowModel().rows.length === 0 && (
+        <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
+      )}
     </div>
   );
 }

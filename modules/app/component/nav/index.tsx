@@ -108,7 +108,7 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-8">
-          <TransitionLinks href="/profile" className={cn("font-medium")}>
+          <TransitionLinks href="/profile" className={cn("font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out", {'text-foreground': pathname==='/profile'})}>
             Profile
           </TransitionLinks>
           {!walletAddress ? (

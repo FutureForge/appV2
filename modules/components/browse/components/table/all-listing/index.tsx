@@ -33,10 +33,11 @@ export function AllListingTable({ isLoading, data }: AllListingTableProps) {
     <HydrationBoundary state={dehydrate}>
       <div suppressHydrationWarning>
         <Table
-          // onRowClick={(_row) => {
-          //   const collectionAddress = _row.collectionAddress;
-          //   router.push(`/nft/${collectionAddress}`);
-          // }}
+          onRowClick={(_row) => {
+            const collectionAddress = _row.assetContract;
+            const tokenId = _row.tokenId
+            router.push(`/nft/${collectionAddress}/${tokenId}`);
+          }}
           isLoading={isLoading}
           hasHover
           table={table}
