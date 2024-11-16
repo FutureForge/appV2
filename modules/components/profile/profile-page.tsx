@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getFormatAddress } from "@/utils/functions";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
@@ -20,6 +21,11 @@ import {
   useUserOffersReceivedQuery,
 } from "@/modules/query";
 import {
+  useCancelAuctionMutation,
+  useCancelDirectListingMutation,
+  useCancelOfferMutation,
+} from "@/modules/mutation";
+import {
   Checkbox,
   EmptyState,
   Header,
@@ -37,28 +43,15 @@ import {
 } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import {
   Collection,
-  CollectionNFTType,
   UserNFTData,
 } from "@/utils/types/collection/collection.type";
-import {
-  Auction,
-  Listing,
-  NewBid,
-  NFTMetadata,
-  Offer,
-} from "@/utils/types/graphql";
+import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
 import { chainInfo, client } from "@/utils/configs";
+import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
 
 // Icons
 import CopyIcon from "@/assets/copy.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
-import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
-import {
-  useCancelAuctionMutation,
-  useCancelDirectListingMutation,
-  useCancelOfferMutation,
-} from "@/modules/mutation";
-import { useRouter } from "next/navigation";
 
 const filters = [
   "NFTS",
@@ -107,25 +100,56 @@ export function ProfilePage() {
     isLoading: isUserNFTsLoading,
     isPending: isUserNFTsPending,
   } = useUserNFTsQuery();
-  const { data: userListings, isLoading: isUserListingsLoading } =
-    useUserListingsQuery();
-  const { data: userAuctions, isLoading: isUserAuctionsLoading } =
-    useUserAuctionsQuery();
-  const { data: userOffers, isLoading: isUserOffersLoading } =
-    useUserOffersQuery();
-  const { data: userOffersReceived, isLoading: isUserOffersReceivedLoading } =
-    useUserOffersReceivedQuery();
-  const { data: userBids, isLoading: isUserBidsLoading } = useUserBidsQuery();
-  const { data: userExpiredListings, isLoading: isUserExpiredListingsLoading } =
-    useUserExpiredListingsQuery();
-  const { data: userExpiredAuctions, isLoading: isUserExpiredAuctionsLoading } =
-    useUserExpiredAuctionsQuery();
-  const { data: userExpiredOffers, isLoading: isUserExpiredOffersLoading } =
-    useUserExpiredOffersQuery();
-  const { data: userCollections, isLoading: isUserCollectionsLoading } =
-    useUserCollectionsQuery();
-  const { data: userNFTActivities, isLoading: isUserNFTActivitiesLoading } =
-    useUserNFTActivitiesQuery();
+  const {
+    data: userListings,
+    isLoading: isUserListingsLoading,
+    isPending: isUserListingsPending,
+  } = useUserListingsQuery();
+  const {
+    data: userAuctions,
+    isLoading: isUserAuctionsLoading,
+    isPending: isUserAuctionsPending,
+  } = useUserAuctionsQuery();
+  const {
+    data: userOffers,
+    isLoading: isUserOffersLoading,
+    isPending: isUserOffersPending,
+  } = useUserOffersQuery();
+  const {
+    data: userOffersReceived,
+    isLoading: isUserOffersReceivedLoading,
+    isPending: isUserOffersReceivedPending,
+  } = useUserOffersReceivedQuery();
+  const {
+    data: userBids,
+    isLoading: isUserBidsLoading,
+    isPending: isUserBidsPending,
+  } = useUserBidsQuery();
+  const {
+    data: userExpiredListings,
+    isLoading: isUserExpiredListingsLoading,
+    isPending: isUserExpiredListingsPending,
+  } = useUserExpiredListingsQuery();
+  const {
+    data: userExpiredAuctions,
+    isLoading: isUserExpiredAuctionsLoading,
+    isPending: isUserExpiredAuctionsPending,
+  } = useUserExpiredAuctionsQuery();
+  const {
+    data: userExpiredOffers,
+    isLoading: isUserExpiredOffersLoading,
+    isPending: isUserExpiredOffersPending,
+  } = useUserExpiredOffersQuery();
+  const {
+    data: userCollections,
+    isLoading: isUserCollectionsLoading,
+    isPending: isUserCollectionsPending,
+  } = useUserCollectionsQuery();
+  const {
+    data: userNFTActivities,
+    isLoading: isUserNFTActivitiesLoading,
+    isPending: isUserNFTActivitiesPending,
+  } = useUserNFTActivitiesQuery();
 
   const copyToClipboard = useCopyToClipboard()[1];
   const handleCopy = (content: string) => {
@@ -475,41 +499,47 @@ export function ProfilePage() {
             {/* Listed NFTS */}
             {selectedFilter === filters[1] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {filteredData && paginatedData && paginatedData.length > 0 ? (
+                {isUserListingsLoading || isUserListingsPending ? (
+                  <div className="grid grid-cols-4 w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
                   <>
-                    <>
-                      {paginatedData?.map((listing, index) => {
-                        const data = listing as Listing;
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={data}
-                            type="user-listing"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItemClick({
-                                contractAddress: data.assetContract,
-                                tokenId: data.tokenId,
-                              });
-                            }}
-                            actionCTA="Cancel Listing"
-                            actionOnClick={() => {
-                              handleCancelListing({
-                                listingId: data.listingId,
-                              });
-                            }}
-                            isDisabled={isDisabled}
-                          />
-                        );
-                      })}
-                      {filteredData?.length > displayCount && (
-                        <div
-                          ref={loadMoreRef}
-                          className="w-full h-20 col-span-full"
-                          style={{ gridColumn: "1 / -1" }}
+                    {paginatedData?.map((listing, index) => {
+                      const data = listing as Listing;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-listing"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          actionCTA="Cancel Listing"
+                          actionOnClick={() => {
+                            handleCancelListing({
+                              listingId: data.listingId,
+                            });
+                          }}
+                          isDisabled={isDisabled}
                         />
-                      )}
-                    </>
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
                   </>
                 ) : (
                   <EmptyState
@@ -524,42 +554,48 @@ export function ProfilePage() {
             {/* Auctioned NFTS */}
             {selectedFilter === filters[2] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {filteredData && paginatedData && paginatedData.length > 0 ? (
+                {isUserAuctionsLoading || isUserAuctionsPending ? (
+                  <div className="grid grid-cols-4 w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
                   <>
-                    <>
-                      {paginatedData?.map((auction, index) => {
-                        console.log({ auction });
-                        const data = auction as Auction;
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={data}
-                            type="user-auction"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItemClick({
-                                contractAddress: data.assetContract,
-                                tokenId: data.tokenId,
-                              });
-                            }}
-                            actionCTA="Cancel Auction"
-                            actionOnClick={() => {
-                              handleCancelAuction({
-                                auctionId: data.auctionId,
-                              });
-                            }}
-                            isDisabled={isDisabled}
-                          />
-                        );
-                      })}
-                      {filteredData?.length > displayCount && (
-                        <div
-                          ref={loadMoreRef}
-                          className="w-full h-20 col-span-full"
-                          style={{ gridColumn: "1 / -1" }}
+                    {paginatedData?.map((auction, index) => {
+                      console.log({ auction });
+                      const data = auction as Auction;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-auction"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          actionCTA="Cancel Auction"
+                          actionOnClick={() => {
+                            handleCancelAuction({
+                              auctionId: data.auctionId,
+                            });
+                          }}
+                          isDisabled={isDisabled}
                         />
-                      )}
-                    </>
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
                   </>
                 ) : (
                   <EmptyState
@@ -576,42 +612,48 @@ export function ProfilePage() {
             {/* Offers NFTS */}
             {selectedFilter === filters[3] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {filteredData && paginatedData && paginatedData.length > 0 ? (
+                {isUserOffersLoading || isUserOffersPending ? (
+                  <div className="grid grid-cols-4 w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
                   <>
-                    <>
-                      {paginatedData?.map((offer, index) => {
-                        console.log({ offer });
-                        const data = offer as Offer;
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={data}
-                            type="offers"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItemClick({
-                                contractAddress: data.assetContract,
-                                tokenId: data.tokenId,
-                              });
-                            }}
-                            actionCTA="Cancel Offer"
-                            actionOnClick={() => {
-                              handleCancelOffer({
-                                offerId: data.offerId,
-                              });
-                            }}
-                            isDisabled={isDisabled}
-                          />
-                        );
-                      })}
-                      {filteredData?.length > displayCount && (
-                        <div
-                          ref={loadMoreRef}
-                          className="w-full h-20 col-span-full"
-                          style={{ gridColumn: "1 / -1" }}
+                    {paginatedData?.map((offer, index) => {
+                      console.log({ offer });
+                      const data = offer as Offer;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="offers"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          actionCTA="Cancel Offer"
+                          actionOnClick={() => {
+                            handleCancelOffer({
+                              offerId: data.offerId,
+                            });
+                          }}
+                          isDisabled={isDisabled}
                         />
-                      )}
-                    </>
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
                   </>
                 ) : (
                   <EmptyState
@@ -626,39 +668,45 @@ export function ProfilePage() {
             {/* Offers Received NFTS */}
             {selectedFilter === filters[4] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {filteredData && paginatedData && paginatedData.length > 0 ? (
+                {isUserOffersReceivedLoading || isUserOffersReceivedPending ? (
+                  <div className="grid grid-cols-4 w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
                   <>
-                    <>
-                      {paginatedData?.map((offer, index) => {
-                        console.log({ offer });
-                        const data = offer as Offer;
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={data}
-                            type="user-offers-received"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItemClick({
-                                contractAddress: data.assetContract,
-                                tokenId: data.tokenId,
-                              });
-                            }}
-                            extraTitle="Total Offers"
-                            extraInfo={
-                              userOffersReceived?.userOffersReceivedLength
-                            }
-                          />
-                        );
-                      })}
-                      {filteredData?.length > displayCount && (
-                        <div
-                          ref={loadMoreRef}
-                          className="w-full h-20 col-span-full"
-                          style={{ gridColumn: "1 / -1" }}
+                    {paginatedData?.map((offer, index) => {
+                      console.log({ offer });
+                      const data = offer as Offer;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-offers-received"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          extraTitle="Total Offers"
+                          extraInfo={
+                            userOffersReceived?.userOffersReceivedLength
+                          }
                         />
-                      )}
-                    </>
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
                   </>
                 ) : (
                   <EmptyState
@@ -675,34 +723,40 @@ export function ProfilePage() {
             {/* Bids NFTS */}
             {selectedFilter === filters[5] && (
               <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                {filteredData && paginatedData && paginatedData.length > 0 ? (
+                {isUserBidsLoading || isUserBidsPending ? (
+                  <div className="grid grid-cols-4 w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
                   <>
-                    <>
-                      {paginatedData?.map((bid, index) => {
-                        const data = bid as NewBid;
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={data}
-                            type="user-bids"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItemClick({
-                                contractAddress: data.assetContract,
-                                tokenId: data.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                      {filteredData?.length > displayCount && (
-                        <div
-                          ref={loadMoreRef}
-                          className="w-full h-20 col-span-full"
-                          style={{ gridColumn: "1 / -1" }}
+                    {paginatedData?.map((bid, index) => {
+                      const data = bid as NewBid;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-bids"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
                         />
-                      )}
-                    </>
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
                   </>
                 ) : (
                   <EmptyState
@@ -830,45 +884,48 @@ export function ProfilePage() {
                 {/** Expired Listings */}
                 {selectedOption === options[0] && (
                   <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                    {expiredListings &&
-                    paginatedExpiredListingsData &&
-                    paginatedExpiredListingsData.length > 0 ? (
+                    {isUserExpiredListingsLoading ||
+                    isUserExpiredListingsPending ? (
+                      <div className="grid grid-cols-4 w-full">
+                        {Array.from({ length: 4 }, (_, index) => (
+                          <NftCardSkeleton key={index} />
+                        ))}
+                      </div>
+                    ) : expiredListings &&
+                      paginatedExpiredListingsData &&
+                      paginatedExpiredListingsData.length > 0 ? (
                       <>
-                        <>
-                          {paginatedExpiredListingsData?.map(
-                            (listing, index) => {
-                              const data = listing as Listing;
-                              return (
-                                <NFTCard
-                                  key={index}
-                                  data={data}
-                                  type="user-listing"
-                                  cta="View Item"
-                                  onClick={() => {
-                                    handleViewItemClick({
-                                      contractAddress: data.assetContract,
-                                      tokenId: data.tokenId,
-                                    });
-                                  }}
-                                  actionCTA="Cancel Listing"
-                                  actionOnClick={() => {
-                                    handleCancelListing({
-                                      listingId: data.listingId,
-                                    });
-                                  }}
-                                  isDisabled={isDisabled}
-                                />
-                              );
-                            }
-                          )}
-                          {expiredListings?.length > displayCount && (
-                            <div
-                              ref={loadMoreRef}
-                              className="w-full h-20 col-span-full"
-                              style={{ gridColumn: "1 / -1" }}
+                        {paginatedExpiredListingsData?.map((listing, index) => {
+                          const data = listing as Listing;
+                          return (
+                            <NFTCard
+                              key={index}
+                              data={data}
+                              type="user-listing"
+                              cta="View Item"
+                              onClick={() => {
+                                handleViewItemClick({
+                                  contractAddress: data.assetContract,
+                                  tokenId: data.tokenId,
+                                });
+                              }}
+                              actionCTA="Cancel Listing"
+                              actionOnClick={() => {
+                                handleCancelListing({
+                                  listingId: data.listingId,
+                                });
+                              }}
+                              isDisabled={isDisabled}
                             />
-                          )}
-                        </>
+                          );
+                        })}
+                        {expiredListings?.length > displayCount && (
+                          <div
+                            ref={loadMoreRef}
+                            className="w-full h-20 col-span-full"
+                            style={{ gridColumn: "1 / -1" }}
+                          />
+                        )}
                       </>
                     ) : (
                       <EmptyState
@@ -885,45 +942,48 @@ export function ProfilePage() {
                 {/** Expired Auctions */}
                 {selectedOption === options[1] && (
                   <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                    {expiredAuctions &&
-                    paginatedExpiredAuctionsData &&
-                    paginatedExpiredAuctionsData.length > 0 ? (
+                    {isUserExpiredAuctionsLoading ||
+                    isUserExpiredAuctionsPending ? (
+                      <div className="grid grid-cols-4 w-full">
+                        {Array.from({ length: 4 }, (_, index) => (
+                          <NftCardSkeleton key={index} />
+                        ))}
+                      </div>
+                    ) : expiredAuctions &&
+                      paginatedExpiredAuctionsData &&
+                      paginatedExpiredAuctionsData.length > 0 ? (
                       <>
-                        <>
-                          {paginatedExpiredAuctionsData?.map(
-                            (auction, index) => {
-                              const data = auction as Auction;
-                              return (
-                                <NFTCard
-                                  key={index}
-                                  data={data}
-                                  type="user-auction"
-                                  cta="View Item"
-                                  onClick={() => {
-                                    handleViewItemClick({
-                                      contractAddress: data.assetContract,
-                                      tokenId: data.tokenId,
-                                    });
-                                  }}
-                                  actionCTA="Cancel Auction"
-                                  actionOnClick={() => {
-                                    handleCancelAuction({
-                                      auctionId: data.auctionId,
-                                    });
-                                  }}
-                                  isDisabled={isDisabled}
-                                />
-                              );
-                            }
-                          )}
-                          {expiredAuctions?.length > displayCount && (
-                            <div
-                              ref={loadMoreRef}
-                              className="w-full h-20 col-span-full"
-                              style={{ gridColumn: "1 / -1" }}
+                        {paginatedExpiredAuctionsData?.map((auction, index) => {
+                          const data = auction as Auction;
+                          return (
+                            <NFTCard
+                              key={index}
+                              data={data}
+                              type="user-auction"
+                              cta="View Item"
+                              onClick={() => {
+                                handleViewItemClick({
+                                  contractAddress: data.assetContract,
+                                  tokenId: data.tokenId,
+                                });
+                              }}
+                              actionCTA="Cancel Auction"
+                              actionOnClick={() => {
+                                handleCancelAuction({
+                                  auctionId: data.auctionId,
+                                });
+                              }}
+                              isDisabled={isDisabled}
                             />
-                          )}
-                        </>
+                          );
+                        })}
+                        {expiredAuctions?.length > displayCount && (
+                          <div
+                            ref={loadMoreRef}
+                            className="w-full h-20 col-span-full"
+                            style={{ gridColumn: "1 / -1" }}
+                          />
+                        )}
                       </>
                     ) : (
                       <EmptyState
@@ -940,43 +1000,48 @@ export function ProfilePage() {
                 {/** Expired Offers */}
                 {selectedOption === options[2] && (
                   <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
-                    {expiredOffers &&
-                    paginatedExpiredOffersData &&
-                    paginatedExpiredOffersData.length > 0 ? (
+                    {isUserExpiredOffersLoading ||
+                    isUserExpiredOffersPending ? (
+                      <div className="grid grid-cols-4 w-full">
+                        {Array.from({ length: 4 }, (_, index) => (
+                          <NftCardSkeleton key={index} />
+                        ))}
+                      </div>
+                    ) : expiredOffers &&
+                      paginatedExpiredOffersData &&
+                      paginatedExpiredOffersData.length > 0 ? (
                       <>
-                        <>
-                          {paginatedExpiredOffersData?.map((offer, index) => {
-                            const data = offer as Offer;
-                            return (
-                              <NFTCard
-                                key={index}
-                                data={data}
-                                type="user-offers"
-                                cta="View Item"
-                                onClick={() => {
-                                  handleViewItemClick({
-                                    contractAddress: data.assetContract,
-                                    tokenId: data.tokenId,
-                                  });
-                                }}
-                                actionCTA="Cancel Offer"
-                                actionOnClick={() => {
-                                  handleCancelOffer({
-                                    offerId: data.offerId,
-                                  });
-                                }}
-                                isDisabled={isDisabled}
-                              />
-                            );
-                          })}
-                          {expiredOffers?.length > displayCount && (
-                            <div
-                              ref={loadMoreRef}
-                              className="w-full h-20 col-span-full"
-                              style={{ gridColumn: "1 / -1" }}
+                        {paginatedExpiredOffersData?.map((offer, index) => {
+                          const data = offer as Offer;
+                          return (
+                            <NFTCard
+                              key={index}
+                              data={data}
+                              type="user-offers"
+                              cta="View Item"
+                              onClick={() => {
+                                handleViewItemClick({
+                                  contractAddress: data.assetContract,
+                                  tokenId: data.tokenId,
+                                });
+                              }}
+                              actionCTA="Cancel Offer"
+                              actionOnClick={() => {
+                                handleCancelOffer({
+                                  offerId: data.offerId,
+                                });
+                              }}
+                              isDisabled={isDisabled}
                             />
-                          )}
-                        </>
+                          );
+                        })}
+                        {expiredOffers?.length > displayCount && (
+                          <div
+                            ref={loadMoreRef}
+                            className="w-full h-20 col-span-full"
+                            style={{ gridColumn: "1 / -1" }}
+                          />
+                        )}
                       </>
                     ) : (
                       <EmptyState
