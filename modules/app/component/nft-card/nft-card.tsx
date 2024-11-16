@@ -168,7 +168,7 @@ export function NFTCard(props: NFTCardProps) {
                     alt={name}
                     name={name}
                     tokenId={tokenId}
-                    props={extraProps!}
+                    props={extraProps}
                   />
                 )}
                 {status === "auctioned" && (

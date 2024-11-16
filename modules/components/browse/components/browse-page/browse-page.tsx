@@ -4,8 +4,10 @@ import {
   useAllListingsQuery,
   useAuctionClosedQuery,
   useNewAuctionsQuery,
+  useNewBidsQuery,
   useNewListingsQuery,
   useNewSaleListingsQuery,
+  useUserChainInfo,
 } from "@/modules/query";
 import Head from "next/head";
 import { EmptyState, Header, NFTCard } from "@/modules/app";
@@ -16,6 +18,7 @@ import {
   Auction,
   AuctionClosed,
   Listing,
+  NewBid,
   NewSaleListing,
 } from "@/utils/types/graphql";
 import { motion } from "framer-motion";
@@ -25,17 +28,33 @@ import { RecentlyListedTable } from "../table/recently-listed";
 import { RecentlySoldListingTable } from "../table/recently-sold";
 import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
+import { RecentBidsTable } from "../table/recent-bids";
+import { ExtraProps } from "@/modules/app/component/nft-card/utils/nft-card.utils";
+import {
+  useBidInAuctionMutation,
+  useBuyFromDirectListingMutation,
+} from "@/modules/mutation";
+import { useToast } from "@/modules/app/hooks/useToast";
+import { decimalOffChain } from "@/modules/blockchain";
 
 const filters = [
   "All Listings",
   "All Auctions",
-  "Recently Listed",
-  "Recently Sold Listing",
-  "Recently Auctioned",
-  "Recently Sold Auction",
+  "Recent Listings",
+  "Recent Sales",
+  "Recent Auctions",
+  "Recent Sold Auctions",
+  "Recent Bids",
 ];
 
+// TODO: run the get platform fee and collection fee queries
+
 export function BrowsePage() {
+  const bidInAuctionMutation = useBidInAuctionMutation();
+  const buyListingMutation = useBuyFromDirectListingMutation();
+
+  const { activeAccount } = useUserChainInfo();
+  const toast = useToast();
   const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,7 +103,11 @@ export function BrowsePage() {
     isError: isAuctionClosedError,
   } = useAuctionClosedQuery({ limit: fetchLimit });
 
-  console.log({ AllListings, AllAuctions });
+  const {
+    data: NewBids,
+    isLoading: isNewBidsLoading,
+    isError: isNewBidsError,
+  } = useNewBidsQuery({ limit: fetchLimit });
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -116,6 +139,7 @@ export function BrowsePage() {
           }) ?? [];
 
         return filteredAllListings as Listing[];
+
       case filters[1]:
         const filteredAllAuctions =
           AllAuctions?.filter((auction) => {
@@ -135,6 +159,7 @@ export function BrowsePage() {
           }) ?? [];
 
         return filteredAllAuctions as Auction[];
+
       case filters[2]:
         const filteredNewListings = NewListings?.filter((listing) => {
           const searchTerm = searchQuery
@@ -154,6 +179,7 @@ export function BrowsePage() {
         });
 
         return filteredNewListings as Listing[];
+
       case filters[3]:
         const filteredNewSaleListings = NewSaleListings?.filter((listing) => {
           const searchTerm = searchQuery
@@ -173,6 +199,7 @@ export function BrowsePage() {
         });
 
         return filteredNewSaleListings as NewSaleListing[];
+
       case filters[4]:
         const filteredNewAuctioned = NewAuctioned?.filter((auction) => {
           const searchTerm = searchQuery
@@ -192,6 +219,7 @@ export function BrowsePage() {
         });
 
         return filteredNewAuctioned as Auction[];
+
       case filters[5]:
         const filteredNewSoldAuction = AuctionClosed?.filter((auction) => {
           const searchTerm = searchQuery
@@ -211,6 +239,26 @@ export function BrowsePage() {
         });
 
         return filteredNewSoldAuction as AuctionClosed[];
+
+      case filters[6]:
+        const filteredNewBids = NewBids?.filter((bid) => {
+          const searchTerm = searchQuery
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "");
+
+          const nameNoSpace = bid.nft.metadata.name
+            .toLowerCase()
+            .replace(/\s+/g, "");
+          const tokenIdNoSpace = bid.nft.tokenId
+            .toLowerCase()
+            .replace(/\s+/g, "");
+          const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+          return combinedField.includes(searchTerm);
+        });
+
+        return filteredNewBids as NewBid[];
       default:
         return null;
     }
@@ -229,6 +277,65 @@ export function BrowsePage() {
     setCurrentPage(pageNum);
     window.scrollTo(0, 0);
   };
+
+  const handleViewItem = ({
+    contractAddress,
+    tokenId,
+  }: {
+    contractAddress: string;
+    tokenId: string;
+  }) => {
+    // router.push(`/item/${contractAddress}/${tokenId}`);
+    console.log("view item", { contractAddress, tokenId });
+  };
+
+  const handleBuyListingNow = ({
+    listingId,
+    quantity,
+    totalPrice,
+    nativeTokenValue,
+  }: {
+    listingId: string;
+    quantity: string;
+    totalPrice: string;
+    nativeTokenValue: string;
+  }) => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!listingId || !quantity || !totalPrice || !nativeTokenValue)
+      return toast.error("Please fill in all fields");
+
+    buyListingMutation.mutate({
+      buyFromListing: {
+        buyFor: activeAccount.address,
+        listingId,
+        quantity,
+        totalPrice: decimalOffChain(totalPrice) as unknown as string,
+        nativeTokenValue: decimalOffChain(
+          nativeTokenValue
+        ) as unknown as string,
+      },
+    });
+  };
+
+  const handleBuyAuctionNow = ({
+    auctionId,
+    bidAmount,
+  }: {
+    auctionId: string;
+    bidAmount: string;
+  }) => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!auctionId || !bidAmount)
+      return toast.error("Please fill in all fields");
+
+    bidInAuctionMutation.mutate({
+      auctionId,
+      bidAmount: decimalOffChain(bidAmount) as unknown as string,
+    });
+  };
+
+  const isDisabled =
+    bidInAuctionMutation.isPending || buyListingMutation.isPending;
 
   return (
     <div className="pt-[17px]">
@@ -264,13 +371,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      console.log({ listing });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-                      const handleBuyNow = () => {
-                        console.log("buy now clicked");
+                      const listingId =
+                        "listingId" in listing ? listing.listingId : "";
+                      const quantity =
+                        "quantity" in listing ? listing.quantity : "";
+                      const totalPrice =
+                        "pricePerToken" in listing ? listing.pricePerToken : "";
+
+                      const extraProps: ExtraProps = {
+                        disabled: isDisabled,
+                        price: totalPrice,
+                        collectionFee: { address: "", percent: 0 },
+                        marketplaceFee: { address: "", percent: 0 },
                       };
 
                       return (
@@ -280,8 +392,21 @@ export function BrowsePage() {
                           type="listing"
                           cta="View Item"
                           extraCTA="Buy Now"
-                          onClick={handleClick}
-                          extraOnClick={handleBuyNow}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
+                          extraOnClick={() =>
+                            handleBuyListingNow({
+                              listingId: listingId,
+                              quantity: quantity,
+                              totalPrice: totalPrice,
+                              nativeTokenValue: totalPrice,
+                            })
+                          }
+                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -320,12 +445,18 @@ export function BrowsePage() {
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((auction, index) => {
                       console.log({ auction });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-                      const handleBuyAuction = () => {
-                        console.log("buy auction clicked");
+                      const buyoutBidAmount =
+                        "buyoutBidAmount" in auction
+                          ? auction.buyoutBidAmount
+                          : "";
+                      const auctionId =
+                        "auctionId" in auction ? auction.auctionId : "";
+
+                      const extraProps: ExtraProps = {
+                        disabled: isDisabled,
+                        price: buyoutBidAmount,
+                        collectionFee: { address: "", percent: 0 },
+                        marketplaceFee: { address: "", percent: 0 },
                       };
 
                       return (
@@ -335,8 +466,19 @@ export function BrowsePage() {
                           type="auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
-                          onClick={handleClick}
-                          extraOnClick={handleBuyAuction}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
+                          extraOnClick={() =>
+                            handleBuyAuctionNow({
+                              auctionId,
+                              bidAmount: buyoutBidAmount,
+                            })
+                          }
+                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -361,7 +503,7 @@ export function BrowsePage() {
           </>
         )}
 
-        {/* Recently Listed */}
+        {/* Recent Listings */}
         {selectedFilter === filters[2] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
@@ -374,13 +516,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      console.log({ listing });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-                      const handleBuyNow = () => {
-                        console.log("buy now clicked");
+                      const listingId =
+                        "listingId" in listing ? listing.listingId : "";
+                      const quantity =
+                        "quantity" in listing ? listing.quantity : "";
+                      const totalPrice =
+                        "pricePerToken" in listing ? listing.pricePerToken : "";
+
+                      const extraProps: ExtraProps = {
+                        disabled: isDisabled,
+                        price: totalPrice,
+                        collectionFee: { address: "", percent: 0 },
+                        marketplaceFee: { address: "", percent: 0 },
                       };
 
                       return (
@@ -390,8 +537,21 @@ export function BrowsePage() {
                           type="new-listing"
                           cta="View Item"
                           extraCTA="Buy Now"
-                          onClick={handleClick}
-                          extraOnClick={handleBuyNow}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
+                          extraOnClick={() =>
+                            handleBuyListingNow({
+                              listingId: listingId,
+                              quantity: quantity,
+                              totalPrice: totalPrice,
+                              nativeTokenValue: totalPrice,
+                            })
+                          }
+                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -416,7 +576,7 @@ export function BrowsePage() {
           </>
         )}
 
-        {/* Recently Sold Listing */}
+        {/* Recently Sold Listings */}
         {selectedFilter === filters[3] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
@@ -429,19 +589,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      console.log({ listing });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-
                       return (
                         <NFTCard
                           key={index}
                           data={listing}
                           type="new-sale-listing"
                           cta="View Item"
-                          onClick={handleClick}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
                         />
                       );
                     })}
@@ -466,7 +625,7 @@ export function BrowsePage() {
           </>
         )}
 
-        {/* Recently Auctioned */}
+        {/* Recent Auctions */}
         {selectedFilter === filters[4] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
@@ -479,13 +638,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((auction, index) => {
-                      console.log({ auction });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-                      const handleBuyAuction = () => {
-                        console.log("buy auction clicked");
+                      const buyoutBidAmount =
+                        "buyoutBidAmount" in auction
+                          ? auction.buyoutBidAmount
+                          : "";
+                      const auctionId =
+                        "auctionId" in auction ? auction.auctionId : "";
+
+                      const extraProps: ExtraProps = {
+                        disabled: isDisabled,
+                        price: buyoutBidAmount,
+                        collectionFee: { address: "", percent: 0 },
+                        marketplaceFee: { address: "", percent: 0 },
                       };
 
                       return (
@@ -495,8 +659,19 @@ export function BrowsePage() {
                           type="new-auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
-                          onClick={handleClick}
-                          extraOnClick={handleBuyAuction}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
+                          extraOnClick={() =>
+                            handleBuyAuctionNow({
+                              auctionId,
+                              bidAmount: buyoutBidAmount,
+                            })
+                          }
+                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -521,7 +696,7 @@ export function BrowsePage() {
           </>
         )}
 
-        {/* Recently Sold Auction */}
+        {/* Recent Sold Auctions */}
         {selectedFilter === filters[5] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
@@ -534,19 +709,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((auction, index) => {
-                      console.log({ auction });
-                      const handleClick = () => {
-                        // router.push(`/listing/${listing.listingId}`);
-                        console.log("clicked");
-                      };
-
                       return (
                         <NFTCard
                           key={index}
                           data={auction}
                           type="new-sold-auction"
                           cta="View Item"
-                          onClick={handleClick}
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
                         />
                       );
                     })}
@@ -565,6 +739,55 @@ export function BrowsePage() {
                   searchQuery.length > 0
                     ? "No items found according to your search"
                     : "No recently sold auctions found"
+                }
+              />
+            )}
+          </>
+        )}
+
+        {/* Recent Bids */}
+        {selectedFilter === filters[6] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <RecentBidsTable
+                    isLoading={isNewBidsLoading}
+                    data={currentPageData as NewBid[]}
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-6">
+                    {currentPageData?.map((bid, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={bid}
+                          type="bids"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: bid.assetContract,
+                              tokenId: bid.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageNumbers={pageNumbers}
+                />
+              </>
+            ) : (
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No item found according to your search"
+                    : "No recently bid items found"
                 }
               />
             )}
