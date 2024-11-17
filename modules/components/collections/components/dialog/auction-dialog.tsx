@@ -12,6 +12,7 @@ type AuctionDialogProps = {
   name: string;
   tokenId: string;
   props: ExtraProps;
+  cta?:string
 };
 
 export function AuctionDialog({
@@ -21,6 +22,7 @@ export function AuctionDialog({
   name,
   tokenId,
   props,
+  cta= 'Buy Auction'
 }: AuctionDialogProps) {
   const { collectionFee, disabled, marketplaceFee, price } = props;
 
@@ -65,7 +67,7 @@ export function AuctionDialog({
                 shape="square"
                 className="w-full"
               >
-                Buy Auction
+                {cta}
               </Button>
             </div>
           </div>

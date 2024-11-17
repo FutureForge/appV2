@@ -13,9 +13,10 @@ import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
-import { ListingDialog } from "@/modules/components/collections";
+import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 import { MakeOfferDialog } from "../dialogs/make-offer";
 import { DetailsSkeleton } from "../skeleton/details-skeleton";
+import { PlaceBidDialog } from "../dialogs/place-bid";
 
 export const singleNFTFilters = ["Not Listed", "Listed", "Auction", "Expired"];
 
@@ -171,39 +172,29 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                 className="object-cover w-full absolute inset-0 size-full"
               />
               <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
-              <div className="absolute bottom-4 px-8 w-full flex justify-between items-center">
-                <span>
-                  <p className="font-medium">{name || "No Name"}</p>
-                  <p className="text-muted-foreground text-sm  mt-2">
-                    Owned By:{" "}
-                    <span className="font-medium text-primary">
-                      {getFormatAddress(nft?.owner?.toLowerCase() || "")}
-                    </span>
-                  </p>
-                </span>
-
-                <span>
-                  <p className="font-medium">
-                    {collectionDetails?.collectionName || "Unknown Collection"}
-                  </p>
-                  <p className="font-medium text-xs text-muted-foreground mt-2">
-                    Collection Name
-                  </p>
-                </span>
-              </div>
             </div>
           </div>
 
           {/* details section */}
           <div className="flex-1 flex flex-col gap-6 h-fit">
-            <Header
-              isActive={isActive}
-              setIsActive={setIsActive}
-              filters={singleNFTFilters}
-              showRightSide={false}
-              selectedFilter={selectedFilter}
-            />
-
+            <div className="flex w-full items-center justify-between">
+              <span>
+                <p className="font-medium">{name || "No Name"}</p>
+                <p className="text-muted-foreground text-sm  mt-2">
+                  Owned By:{" "}
+                  <span className="font-medium text-primary">
+                    {getFormatAddress(nft?.owner?.toLowerCase() || "")}
+                  </span>
+                </p>
+              </span>
+              <p className="text-muted-foreground">
+                Status:{" "}
+                <span className="text-foreground font-medium">
+                  {selectedFilter}
+                </span>
+              </p>
+            </div>
+            <Line />
             <div className="flex flex-col gap-6">
               <p>{description || "No Description"}</p>
               <Line />
@@ -402,12 +393,44 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
               )}
               {selectedFilter === singleNFTFilters[2] && (
                 <>
-                  <Button variant="secondary" shape="square" className="w-1/2">
-                    Buy Auction
-                  </Button>
-                  <Button shape="square" className="w-1/2">
-                    Place Bid
-                  </Button>
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button
+                        variant="secondary"
+                        shape="square"
+                        className="w-1/2"
+                      >
+                        Buy Auction
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <AuctionDialog
+                        src={image || ""}
+                        // onClick={extraOnClick}
+                        alt={name || ""}
+                        name={name || ""}
+                        tokenId={tokenId}
+                        props={extraProps}
+                        cta="Confirm"
+                      />
+                    </DialogContent>
+                  </DialogRoot>
+
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button shape="square" className="w-1/2">
+                        Place Bid
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[700px]">
+                      <PlaceBidDialog
+                        src={image || ""}
+                        alt={name || ""}
+                        name={name || ""}
+                        tokenId={tokenId}
+                      />
+                    </DialogContent>
+                  </DialogRoot>
                 </>
               )}
 
