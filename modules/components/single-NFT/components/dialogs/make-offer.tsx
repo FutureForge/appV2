@@ -15,6 +15,7 @@ import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
+import { useUserChainInfo } from "@/modules/query";
 
 type MakeOfferDialogProps = {
   src: string;
@@ -32,13 +33,20 @@ const notes = [
 
   ["You can also", "swap for WXFI", "manually."],
 ];
+
+// TODO: add the logic to make an offer
+
 export function MakeOfferDialog({
   src,
   alt,
   name,
   tokenId,
 }: MakeOfferDialogProps) {
+  const { activeAccount } = useUserChainInfo();
   const [value, setValue] = useState("");
+
+  const isDisabled = !value || !activeAccount;
+
   return (
     <>
       <DialogHeader>
@@ -108,7 +116,9 @@ export function MakeOfferDialog({
             </form>
 
             <div className="flex w-full items-end justify-end mt-6">
-              <Button disabled={!value} className="w-full" shape="square">Make Offer</Button>
+              <Button disabled={isDisabled} className="w-full" shape="square">
+                {!activeAccount ? "Connect Your Wallet" : "Make Offer"}
+              </Button>
             </div>
           </div>
         </div>

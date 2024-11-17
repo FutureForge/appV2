@@ -193,7 +193,10 @@ export function ProfilePage() {
     cancelOfferMutation.mutate({ offerId });
   };
 
-  const isDisabled = cancelListingMutation.isPending;
+  const isDisabled =
+    cancelListingMutation.isPending ||
+    cancelAuctionMutation.isPending ||
+    cancelOfferMutation.isPending;
 
   const getFilteredData = () => {
     switch (selectedFilter) {

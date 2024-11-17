@@ -10,7 +10,7 @@ import { getNFT } from "thirdweb/extensions/erc721";
 import { getContractCustom, getIsAuctionExpired } from "@/modules/blockchain";
 import ERC721ABI from "@/utils/abi/erc721.json";
 import { NFT } from "thirdweb";
-import { tryParseJSON } from "@/utils/functions";
+import { formatBlockchainTimestamp, tryParseJSON } from "@/utils/functions";
 import {
   useSingleAuctionQuery,
   useSingleCollectionWithoutNFTsQuery,
@@ -110,26 +110,33 @@ export function useSingleNFTQuery({
           })
         );
 
-        const activeType =
-          singleListing?.length! > 0
-            ? "listing"
-            : singleAuction?.length! > 0
-            ? "auction"
-            : "none";
+        const isAuctionExpired =
+          updatedSingleAuction?.some((auction) => {
+            const endTime = formatBlockchainTimestamp(auction.endTimestamp);
+            const endTimeFormatted = new Date(endTime).getTime();
+            const currentTime = new Date().getTime();
 
-        let isExpiredActiveType;
-        // let activeTypeData;
+            return endTimeFormatted < currentTime;
+          }) ?? false;
 
-        // switch (activeType) {
-        //   case "listing":
-        //     activeTypeData = singleListing?.flat();
-        //     break;
-        //   case "auction":
-        //     activeTypeData = updatedSingleAuction.flat();
-        //     break;
-        //   default:
-        //     activeTypeData = null;
-        // }
+        const isListingExpired =
+          singleListing?.some((listing) => {
+            const endTime = formatBlockchainTimestamp(listing.endTimestamp);
+            const endTimeFormatted = new Date(endTime).getTime();
+            const currentTime = new Date().getTime();
+
+            return endTimeFormatted < currentTime;
+          }) ?? false;
+
+        const isActiveTypeExpired = isAuctionExpired || isListingExpired;
+
+        const activeType = isActiveTypeExpired
+          ? "expired"
+          : singleListing?.length! > 0
+          ? "listing"
+          : singleAuction?.length! > 0
+          ? "auction"
+          : "none";
 
         return {
           collectionFee,
@@ -137,9 +144,8 @@ export function useSingleNFTQuery({
           nftActivity,
           nft: updatedNFT,
           activeType,
+          isActiveTypeExpired,
           offers: singleOffer,
-          // activeTypeData,
-          isExpiredActiveType,
           collectionDetails: collectionWithoutNFTs?.collection as Collection,
           listingData: singleListing?.flat() as Listing[],
           auctionData: updatedSingleAuction.flat() as Auction[],
@@ -148,12 +154,7 @@ export function useSingleNFTQuery({
         console.log("single nft error", { error });
       }
     },
-    enabled:
-      !!contractAddress &&
-      !!tokenId &&
-      !isLoadingListing &&
-      !isLoadingAuction &&
-      !isLoadingOffer,
+    enabled: !isLoadingListing && !isLoadingAuction && !isLoadingOffer,
     refetchInterval: 5000,
   });
 }

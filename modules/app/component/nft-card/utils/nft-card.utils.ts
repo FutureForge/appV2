@@ -37,18 +37,6 @@ export type NFTType =
 
 export type NFTStatus = "listed" | "auctioned";
 
-export type Fee = {
-  address: string;
-  percent: number;
-};
-
-export type ExtraProps = {
-  disabled: boolean;
-  price: string;
-  collectionFee: Fee;
-  marketplaceFee: Fee;
-};
-
 export type NFTCardProps = {
   data: NFTType;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -58,21 +46,11 @@ export type NFTCardProps = {
   ctaStyles?: string;
   extraTitle?: string;
   extraInfo?: number | string;
+  extraCTA?: string;
   actionCTA?: string;
   actionOnClick?: React.MouseEventHandler<HTMLButtonElement>;
   isDisabled?: boolean;
-} & (
-  | {
-      extraCTA: string;
-      extraOnClick: React.MouseEventHandler<HTMLButtonElement>;
-      extraProps: ExtraProps;
-    }
-  | {
-      extraCTA?: never;
-      extraOnClick?: never;
-      extraProps?: never;
-    }
-);
+};
 
 export const getNFTCardInfo = ({
   type,
@@ -177,13 +155,13 @@ export const getNFTCardInfo = ({
 
     case "user-auction":
       const minimumBidAmountUserAuction =
-        "minimumBidAmount" in data ? data.auctionCreator : "";
+        "minimumBidAmount" in data ? data.minimumBidAmount : "";
       const buyoutBidAmountUserAuction =
         "buyoutBidAmount" in data ? data.buyoutBidAmount : "";
 
       return {
         title1: "Buyout Price",
-        title2: "Auctioned By",
+        title2: "Minimum Bid",
         info1: `${decimalOffChain(buyoutBidAmountUserAuction as string)} XFI`,
         info2: `${decimalOffChain(minimumBidAmountUserAuction as string)} XFI`,
       };

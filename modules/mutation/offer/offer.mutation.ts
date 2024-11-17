@@ -272,7 +272,7 @@ export function useCollectAuctionPayoutMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.newBids, queryKeys.nft.single],
+        queryKey: [queryKeys.nft.single],
       });
     },
     onError: () => {},

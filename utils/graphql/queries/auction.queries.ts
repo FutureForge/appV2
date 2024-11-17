@@ -429,7 +429,7 @@ export const auctionClosedQuery = gql`
     auctionCloseds(
       orderBy: auctionId_DESC
       limit: $limit
-      where: { auctionStatus_containsInsensitive: "claimed" }
+      # where: { auctionStatus_containsInsensitive: "claimed" }
     ) {
       assetContract
       auctionCreator
@@ -481,7 +481,7 @@ export const filteredAuctionClosedQuery = gql`
         OR: {
           assetContract_eq: $contractAddress
           OR: { auctionCreator_eq: $address }
-          AND: { auctionStatus_contains: "payout-claimed" }
+          # AND: { auctionStatus_contains: "payout-claimed" }
         }
       }
     ) {

@@ -11,6 +11,11 @@ import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
+import { useUserChainInfo } from "@/modules/query";
+import { useAuctionInfoStore } from "@/modules/components/now-dialog/store";
+import { useToast } from "@/modules/app/hooks/useToast";
+import { useBidInAuctionMutation } from "@/modules/mutation";
+import { decimalOffChain } from "@/modules/blockchain";
 
 type PlaceBidDialogProps = {
   src: string;
@@ -20,16 +25,47 @@ type PlaceBidDialogProps = {
   tokenId: string;
 };
 
-const notes = [
-  [
-    "Offers are made in WXFI.",
-    "Don’t have WXFI? Don’t worry, we’ll handle the conversion for you.",
-  ],
-
-  ["You can also", "swap for WXFI", "manually."],
-];
-export function PlaceBidDialog({ src, alt, name, tokenId }: PlaceBidDialogProps) {
+export function PlaceBidDialog() {
   const [value, setValue] = useState("");
+  const [error, setError] = useState<string>("");
+  const toast = useToast();
+  const { activeAccount } = useUserChainInfo();
+  const { auctionInfo } = useAuctionInfoStore();
+  const { auctionId, tokenId, nft, buyoutBidAmount, minimumBidAmount } =
+    auctionInfo;
+  const { metadata } = nft || {};
+  const { image, name } = metadata || {};
+
+  const bidInAuctionMutation = useBidInAuctionMutation();
+
+  const handleBuyAuctionNow = () => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!auctionId || !buyoutBidAmount)
+      return toast.error("Please fill in all fields");
+
+    bidInAuctionMutation.mutate({
+      auctionId,
+      bidAmount: value,
+    });
+  };
+
+  const isDisabled =
+    bidInAuctionMutation.isPending || 
+    !value || 
+    !auctionId || 
+    !buyoutBidAmount ||
+    error !== "";
+
+  const notes = [
+    [
+      "Bids must be greater than the minimum bid amount.",
+      `Minimum bid amount: ${decimalOffChain(minimumBidAmount as string)} XFI`,
+    ],
+    [
+      "Bids must be less than the buyout price.",
+      `Buyout price: ${decimalOffChain(buyoutBidAmount as string)} XFI`,
+    ],
+  ];
   return (
     <>
       <DialogHeader>
@@ -42,9 +78,9 @@ export function PlaceBidDialog({ src, alt, name, tokenId }: PlaceBidDialogProps)
           <div className="relative w-1/2">
             <div className="w-full relative h-full gradient-box z-40 rounded-2xl">
               <MediaRenderer
-                src={src}
+                src={image!}
                 client={client}
-                alt={alt}
+                alt={name!}
                 className="object-cover w-full absolute inset-0 size-full"
               />
               <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
@@ -92,15 +128,36 @@ export function PlaceBidDialog({ src, alt, name, tokenId }: PlaceBidDialogProps)
               <Label>Bid Amount</Label>
               <TextField
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  const minBid = Number(decimalOffChain(minimumBidAmount as string));
+                  const maxBid = Number(decimalOffChain(buyoutBidAmount as string));
+                  
+                  setValue(newValue);
+                  
+                  if (Number(newValue) < minBid) {
+                    setError(`Bid must be at least ${minBid} XFI`);
+                  } else if (Number(newValue) > maxBid) {
+                    setError(`Bid cannot exceed ${maxBid} XFI`);
+                  } else {
+                    setError("");
+                  }
+                }}
                 containerClass="bg-transparent rounded-lg"
-                placeholder="Amount"
+                placeholder="Bid Amount"
+                type="number"
               />
+              {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
             </form>
 
             <div className="flex w-full items-end justify-end mt-6">
-              <Button disabled={!value} className="w-full" shape="square">
-                Make Offer
+              <Button
+                disabled={isDisabled}
+                className="w-full"
+                shape="square"
+                onClick={handleBuyAuctionNow}
+              >
+                Make Bid
               </Button>
             </div>
           </div>

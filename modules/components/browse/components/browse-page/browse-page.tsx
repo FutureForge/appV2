@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAllAuctionsQuery,
   useAllListingsQuery,
@@ -28,13 +28,11 @@ import { RecentlySoldListingTable } from "../table/recently-sold";
 import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
-import { ExtraProps } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import {
   useBidInAuctionMutation,
   useBuyFromDirectListingMutation,
 } from "@/modules/mutation";
 import { useToast } from "@/modules/app/hooks/useToast";
-import { decimalOffChain } from "@/modules/blockchain";
 
 const filters = [
   "All Listings",
@@ -76,6 +74,8 @@ export function BrowsePage() {
   } = useAllAuctionsQuery({
     limit: fetchLimit,
   });
+
+  console.log("AllAuctions", AllAuctions);
 
   // const recentlyListed = AllListings?.slice(-5);
   const {
@@ -288,54 +288,6 @@ export function BrowsePage() {
     console.log("view item", { contractAddress, tokenId });
   };
 
-  const handleBuyListingNow = ({
-    listingId,
-    quantity,
-    totalPrice,
-    nativeTokenValue,
-  }: {
-    listingId: string;
-    quantity: string;
-    totalPrice: string;
-    nativeTokenValue: string;
-  }) => {
-    if (!activeAccount) return toast.error("Please connect your wallet");
-    if (!listingId || !quantity || !totalPrice || !nativeTokenValue)
-      return toast.error("Please fill in all fields");
-
-    buyListingMutation.mutate({
-      buyFromListing: {
-        buyFor: activeAccount.address,
-        listingId,
-        quantity,
-        totalPrice: decimalOffChain(totalPrice) as unknown as string,
-        nativeTokenValue: decimalOffChain(
-          nativeTokenValue
-        ) as unknown as string,
-      },
-    });
-  };
-
-  const handleBuyAuctionNow = ({
-    auctionId,
-    bidAmount,
-  }: {
-    auctionId: string;
-    bidAmount: string;
-  }) => {
-    if (!activeAccount) return toast.error("Please connect your wallet");
-    if (!auctionId || !bidAmount)
-      return toast.error("Please fill in all fields");
-
-    bidInAuctionMutation.mutate({
-      auctionId,
-      bidAmount: decimalOffChain(bidAmount) as unknown as string,
-    });
-  };
-
-  const isDisabled =
-    bidInAuctionMutation.isPending || buyListingMutation.isPending;
-
   return (
     <div className="pt-[17px]">
       <Header
@@ -361,20 +313,6 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      const listingId =
-                        "listingId" in listing ? listing.listingId : "";
-                      const quantity =
-                        "quantity" in listing ? listing.quantity : "";
-                      const totalPrice =
-                        "pricePerToken" in listing ? listing.pricePerToken : "";
-
-                      const extraProps: ExtraProps = {
-                        disabled: isDisabled,
-                        price: totalPrice,
-                        collectionFee: { address: "", percent: 0 },
-                        marketplaceFee: { address: "", percent: 0 },
-                      };
-
                       return (
                         <NFTCard
                           key={index}
@@ -382,21 +320,13 @@ export function BrowsePage() {
                           type="listing"
                           cta="View Item"
                           extraCTA="Buy Now"
+                          status="listed"
                           onClick={() => {
                             handleViewItem({
                               contractAddress: listing.assetContract,
                               tokenId: listing.nft.tokenId,
                             });
                           }}
-                          extraOnClick={() =>
-                            handleBuyListingNow({
-                              listingId: listingId,
-                              quantity: quantity,
-                              totalPrice: totalPrice,
-                              nativeTokenValue: totalPrice,
-                            })
-                          }
-                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -434,21 +364,6 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((auction, index) => {
-                      console.log({ auction });
-                      const buyoutBidAmount =
-                        "buyoutBidAmount" in auction
-                          ? auction.buyoutBidAmount
-                          : "";
-                      const auctionId =
-                        "auctionId" in auction ? auction.auctionId : "";
-
-                      const extraProps: ExtraProps = {
-                        disabled: isDisabled,
-                        price: buyoutBidAmount,
-                        collectionFee: { address: "", percent: 0 },
-                        marketplaceFee: { address: "", percent: 0 },
-                      };
-
                       return (
                         <NFTCard
                           key={index}
@@ -456,19 +371,13 @@ export function BrowsePage() {
                           type="auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
+                          status="auctioned"
                           onClick={() => {
                             handleViewItem({
                               contractAddress: auction.assetContract,
                               tokenId: auction.nft.tokenId,
                             });
                           }}
-                          extraOnClick={() =>
-                            handleBuyAuctionNow({
-                              auctionId,
-                              bidAmount: buyoutBidAmount,
-                            })
-                          }
-                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -506,20 +415,6 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((listing, index) => {
-                      const listingId =
-                        "listingId" in listing ? listing.listingId : "";
-                      const quantity =
-                        "quantity" in listing ? listing.quantity : "";
-                      const totalPrice =
-                        "pricePerToken" in listing ? listing.pricePerToken : "";
-
-                      const extraProps: ExtraProps = {
-                        disabled: isDisabled,
-                        price: totalPrice,
-                        collectionFee: { address: "", percent: 0 },
-                        marketplaceFee: { address: "", percent: 0 },
-                      };
-
                       return (
                         <NFTCard
                           key={index}
@@ -527,21 +422,13 @@ export function BrowsePage() {
                           type="new-listing"
                           cta="View Item"
                           extraCTA="Buy Now"
+                          status="listed"
                           onClick={() => {
                             handleViewItem({
                               contractAddress: listing.assetContract,
                               tokenId: listing.nft.tokenId,
                             });
                           }}
-                          extraOnClick={() =>
-                            handleBuyListingNow({
-                              listingId: listingId,
-                              quantity: quantity,
-                              totalPrice: totalPrice,
-                              nativeTokenValue: totalPrice,
-                            })
-                          }
-                          extraProps={extraProps}
                         />
                       );
                     })}
@@ -628,20 +515,6 @@ export function BrowsePage() {
                 ) : (
                   <div className="flex flex-wrap gap-6">
                     {currentPageData?.map((auction, index) => {
-                      const buyoutBidAmount =
-                        "buyoutBidAmount" in auction
-                          ? auction.buyoutBidAmount
-                          : "";
-                      const auctionId =
-                        "auctionId" in auction ? auction.auctionId : "";
-
-                      const extraProps: ExtraProps = {
-                        disabled: isDisabled,
-                        price: buyoutBidAmount,
-                        collectionFee: { address: "", percent: 0 },
-                        marketplaceFee: { address: "", percent: 0 },
-                      };
-
                       return (
                         <NFTCard
                           key={index}
@@ -649,19 +522,13 @@ export function BrowsePage() {
                           type="new-auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
+                          status="auctioned"
                           onClick={() => {
                             handleViewItem({
                               contractAddress: auction.assetContract,
                               tokenId: auction.nft.tokenId,
                             });
                           }}
-                          extraOnClick={() =>
-                            handleBuyAuctionNow({
-                              auctionId,
-                              bidAmount: buyoutBidAmount,
-                            })
-                          }
-                          extraProps={extraProps}
                         />
                       );
                     })}

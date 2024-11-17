@@ -6,27 +6,95 @@ import {
   Label,
   TextField,
 } from "@/modules/app";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
+import {
+  useApprovedForAllMutation,
+  useCreateListingMutation,
+} from "@/modules/mutation";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import Calendar from "@/assets/calendar.svg";
+import Check from "@/assets/Checkbox [1.0].svg";
 
 type ListDialogProps = {
   src: string;
   alt: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   name: string;
   tokenId: string;
+  isApproved: boolean;
+  assetContract: string;
 };
 
-export function ListDialog({ src, alt, name, tokenId }: ListDialogProps) {
-  const [value, setValue] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+const notes = [
+  [
+    "Listing must have a duration of at least 7 days.",
+    "You can cancel and update the listing details at any time before the first bid is placed. Once a bid is made, the listing cannot be cancelled.",
+  ],
+];
 
-  const startDateRef = useRef<HTMLInputElement>(null);
-  const endDateRef = useRef<HTMLInputElement>(null);
+export function ListDialog({
+  src,
+  alt,
+  name,
+  tokenId,
+  isApproved,
+  assetContract,
+}: ListDialogProps) {
+  console.log({ isApproved });
+
+  const [value, setValue] = useState("");
+  const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const [selectedDate, setSelectedDate] = useState<Date>(oneWeekFromNow);
+
+  console.log({ selectedDate });
+
+  const createListingMutation = useCreateListingMutation();
+  const approveMutation = useApprovedForAllMutation();
+
+  const isDisabled = !isApproved
+    ? false
+    : !value || !selectedDate || createListingMutation.isPending;
+
+  const handleDateChange = (date: Date | null) => {
+    const newDate = date || oneWeekFromNow;
+    setSelectedDate(newDate);
+  };
+
+  const handleCreateListing = () => {
+    if (!value) return;
+
+    createListingMutation.mutate(
+      {
+        directListing: {
+          assetContract,
+          tokenId,
+          quantity: "1",
+          pricePerToken: value,
+          endTimestamp: selectedDate,
+        },
+      },
+      {
+        onSuccess: () => {
+          setValue("");
+        },
+        onError() {
+          setValue("");
+        },
+      }
+    );
+  };
+
+  const handleApproveSpending = () => {
+    if (isApproved) return;
+
+    approveMutation.mutate({
+      collectionContractAddress: assetContract,
+    });
+  };
+
   return (
     <>
       <DialogHeader>
@@ -35,68 +103,72 @@ export function ListDialog({ src, alt, name, tokenId }: ListDialogProps) {
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex w-full gap-6 items-start">
-          <div className="relative w-1/2 h-[350px]">
-            <div className="w-full relative h-full min-h-[350px] gradient-box z-40 rounded-2xl">
+        <div className="flex gap-6">
+          <div className="w-[384px]">
+            <div className="gradient-box rounded-2xl overflow-hidden">
               <MediaRenderer
                 src={src}
                 client={client}
                 alt={alt}
-                className="object-cover w-full absolute inset-0 size-full"
+                className="w-full h-full object-cover aspect-square"
               />
-              <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
             </div>
           </div>
-          <div className="w-1/2 flex flex-col h-[350px]">
-            <form className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <Label>Listing Price</Label>
+
+          <div className="flex-1">
+            <div className="bg-[#0F1629] rounded-2xl p-4 mb-6">
+              <p className="font-medium mb-4">Note:</p>
+              <div className="flex flex-col gap-4">
+                {notes[0].map((note) => (
+                  <div key={note} className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-white" />
+                    <span className="text-sm text-white">{note}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <Label className="mb-2 block">Listing Price</Label>
                 <TextField
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  containerClass="bg-transparent rounded-lg"
-                  placeholder="Amount"
+                  className="w-full bg-transparent"
+                  placeholder="Listing Price"
                 />
               </div>
 
-              <div className="flex flex-col gap-2 bg-gradient-to-r from-border to-transparent p-3 rounded-xl">
-                <Label>Duration</Label>
+              <div className="flex flex-col gap-3">
+                <Label className="mb-2 block">Duration</Label>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={handleDateChange}
+                  placeholderText="Select date"
+                  className="w-full bg-[#0F1629] text-white border border-[#1F2937] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  minDate={oneWeekFromNow}
+                  showPopperArrow={false}
+                />
 
-                <span className="flex">
-                  <TextField
-                    icon={
-                      <span className="min-w-[14px]">
-                        {" "}
-                        <Calendar
-                          onClick={() => startDateRef.current?.showPicker()}
-                        />
-                      </span>
-                    }
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    containerClass="bg-transparent rounded-lg"
-                    //   placeholder="Amount"
-                  />
-                  <TextField
-                    icon={
-                      <Calendar
-                        onClick={() => endDateRef.current?.showPicker()}
-                      />
-                    }
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    containerClass="bg-transparent rounded-lg"
-                    //   placeholder="Amount"
-                  />
-                </span>
+                <div className="bg-[#0F1629] border border-[#1F2937] rounded-xl flex justify-between py-2 px-4">
+                  <p className="font-medium text-sm text-white">
+                    {selectedDate ? selectedDate.toDateString() : "Select Date"}
+                  </p>
+                  <p className="font-medium text-sm text-white">
+                    {selectedDate ? selectedDate.toLocaleTimeString() : "Time"}
+                  </p>
+                </div>
               </div>
-            </form>
 
-            <div className="flex w-full items-end justify-end mt-auto">
-              <Button disabled={!value} className="w-full" shape="square">
-                Make Offer
+              <Button
+                disabled={isDisabled}
+                onClick={
+                  !isApproved ? handleApproveSpending : handleCreateListing
+                }
+                className="w-full mt-6"
+                variant="primary"
+              >
+                {!isApproved ? "Approve Spending" : "List NFT"}
               </Button>
             </div>
           </div>

@@ -26,8 +26,6 @@ import { ImageHolder } from "@/modules/components/home/components/collections-nf
 import { motion } from "framer-motion";
 import { Auction, Listing, Offer } from "@/utils/types/graphql";
 import {
-  ExtraProps,
-  Fee,
   NFTCardInfo,
   NFTStatus,
 } from "@/modules/app/component/nft-card/utils/nft-card.utils";
@@ -53,6 +51,10 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
+import {
+  useAuctionInfoStore,
+  useListingInfoStore,
+} from "@/modules/components/now-dialog/store";
 
 type FilterType =
   | "Items"
@@ -102,9 +104,6 @@ export default function CollectionPage() {
     rootMargin: "100px",
   });
 
-  const bidInAuctionMutation = useBidInAuctionMutation();
-  const buyListingMutation = useBuyFromDirectListingMutation();
-
   useEffect(() => {
     if (inView) {
       setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
@@ -138,8 +137,6 @@ export default function CollectionPage() {
     singleCollection?.collectionListings?.completedListings;
   const collectionAuctionSales =
     singleCollection?.collectionAuctions?.auctionClosed;
-  const collectionFee = singleCollection?.collectionFee as Fee;
-  const marketplaceFee = singleCollection?.marketplaceFee as Fee;
 
   const isCollectionOwner =
     collection?.collectionOwnerAddress.toLowerCase() ===
@@ -289,54 +286,6 @@ export default function CollectionPage() {
   }) => {
     router.push(`/nft/${contractAddress}/${tokenId}`);
   };
-
-  const handleBuyListingNow = ({
-    listingId,
-    quantity,
-    totalPrice,
-    nativeTokenValue,
-  }: {
-    listingId: string;
-    quantity: string;
-    totalPrice: string;
-    nativeTokenValue: string;
-  }) => {
-    if (!activeAccount) return toast.error("Please connect your wallet");
-    if (!listingId || !quantity || !totalPrice || !nativeTokenValue)
-      return toast.error("Please fill in all fields");
-
-    buyListingMutation.mutate({
-      buyFromListing: {
-        buyFor: activeAccount.address,
-        listingId,
-        quantity,
-        totalPrice: decimalOffChain(totalPrice) as unknown as string,
-        nativeTokenValue: decimalOffChain(
-          nativeTokenValue
-        ) as unknown as string,
-      },
-    });
-  };
-
-  const handleBuyAuctionNow = ({
-    auctionId,
-    bidAmount,
-  }: {
-    auctionId: string;
-    bidAmount: string;
-  }) => {
-    if (!activeAccount) return toast.error("Please connect your wallet");
-    if (!auctionId || !bidAmount)
-      return toast.error("Please fill in all fields");
-
-    bidInAuctionMutation.mutate({
-      auctionId,
-      bidAmount: decimalOffChain(bidAmount) as unknown as string,
-    });
-  };
-
-  const isDisabled =
-    bidInAuctionMutation.isPending || buyListingMutation.isPending;
 
   const renderCollectionDetails = () => {
     if (!collectionDetails) return <p>No collection details available</p>;
@@ -540,44 +489,12 @@ export default function CollectionPage() {
                       const type = isListed ? "listing" : "auction";
                       const data = isListed ? isListed : isAuctioned;
 
-                      const listingPrice =
-                        data && "pricePerToken" in data
-                          ? data.pricePerToken
-                          : "";
-                      const auctionPrice =
-                        data && "buyoutBidAmount" in data
-                          ? data.buyoutBidAmount
-                          : "";
-
-                      const extraOnClick = isListed
-                        ? () => {
-                            handleBuyListingNow({
-                              listingId: isListed?.listingId,
-                              quantity: "1",
-                              totalPrice: listingPrice,
-                              nativeTokenValue: listingPrice,
-                            });
-                          }
-                        : () => {
-                            if (!isAuctioned) return;
-                            handleBuyAuctionNow({
-                              auctionId: isAuctioned?.auctionId,
-                              bidAmount: auctionPrice,
-                            });
-                          };
-
-                      const extraProps: ExtraProps = {
-                        disabled: isDisabled,
-                        price: isListed ? listingPrice : auctionPrice,
-                        collectionFee: collectionFee || {
-                          address: "",
-                          percent: 0,
-                        },
-                        marketplaceFee: marketplaceFee || {
-                          address: "",
-                          percent: 0,
-                        },
-                      };
+                      // if (status === "listed") {
+                      //   setListingInfo(data as Listing);
+                      // } else {
+                      //   console.log("auctioned", data);
+                      //   setAuctionInfo(data as Auction);
+                      // }
 
                       return status !== "" && data ? (
                         <NFTCard
@@ -588,14 +505,12 @@ export default function CollectionPage() {
                           cta="View Item"
                           extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
                           ctaStyles="!bg-border"
-                          extraOnClick={extraOnClick}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
                               tokenId: data.tokenId,
                             });
                           }}
-                          extraProps={extraProps}
                         />
                       ) : (
                         <CollectionNFTCard

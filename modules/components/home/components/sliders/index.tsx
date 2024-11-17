@@ -39,6 +39,8 @@ export function Sliders() {
     limit: 15,
   });
 
+  console.log({ AuctionClosed });
+
   const handleViewItem = ({
     contractAddress,
     tokenId,
@@ -46,8 +48,7 @@ export function Sliders() {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   return (
@@ -90,7 +91,7 @@ export function Sliders() {
             <NFTCard
               key={listing.id}
               data={listing}
-              type="new-listing"
+              type="listing"
               cta="View Item"
               onClick={() => {
                 handleViewItem({

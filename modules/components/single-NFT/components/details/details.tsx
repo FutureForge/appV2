@@ -8,22 +8,42 @@ import {
 import React, { useEffect, useState } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
-import { useSingleNFTQuery, useUserChainInfo } from "@/modules/query";
-import { Fee } from "@/modules/app/component/nft-card/utils/nft-card.utils";
+import {
+  useCheckApprovedForAllQuery,
+  useSingleNFTQuery,
+  useUserChainInfo,
+} from "@/modules/query";
 import { decimalOffChain } from "@/modules/blockchain";
 import { MediaRenderer } from "thirdweb/react";
-import { client } from "@/utils/configs";
+import { chainInfo, client } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
+import { MakeOfferDialog } from "../dialogs/make-offer";
+import { DetailsSkeleton } from "../skeleton/details-skeleton";
+import { PlaceBidDialog } from "../dialogs/place-bid";
+import { ListDialog } from "../dialogs/list-dialog";
+import Link from "next/link";
+import { AuctionDialog } from "../dialogs/auction-dialog";
+import {
+  BuyNowAuctionDialog,
+  BuyNowListingDialog,
+} from "@/modules/components/collections";
+import {
+  Fee,
+  useAuctionInfoStore,
+  useListingInfoStore,
+} from "@/modules/components/now-dialog/store";
+import { Auction, Listing } from "@/utils/types/graphql";
 
 // icons
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
-import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
-import { MakeOfferDialog } from "../dialogs/make-offer";
-import { DetailsSkeleton } from "../skeleton/details-skeleton";
-import { PlaceBidDialog } from "../dialogs/place-bid";
-import { ListDialog } from "../dialogs/list-dialog";
+import {
+  useCancelAuctionMutation,
+  useCancelDirectListingMutation,
+  useCancelOfferMutation,
+  useCollectAuctionPayoutMutation,
+} from "@/modules/mutation";
 
 export const singleNFTFilters = ["Not Listed", "Listed", "Auction", "Expired"];
 
@@ -53,15 +73,30 @@ const NFTDetailItem = ({
   label,
   value,
   icon,
+  link,
 }: {
   label: string;
   value: string | number;
   icon?: React.ReactNode;
+  link?: string;
 }) => (
   <div>
     <span className="flex items-center gap-2">
       {icon}
-      <p className="font-medium">{value}</p>
+      <p className="font-medium">
+        {link ? (
+          <Link
+            href={link}
+            className="font-medium text-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {value}
+          </Link>
+        ) : (
+          value
+        )}
+      </p>
     </span>
     <p className="text-muted-foreground capitalize text-sm">{label}</p>
   </div>
@@ -98,9 +133,16 @@ const PricingDetailItem = ({
 export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
-  const [isActive, setIsActive] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const { selectedFilter, setSelectedFilter } = useFilterStore();
+  const { setListingInfo, listingInfo } = useListingInfoStore();
+  const { setAuctionInfo, auctionInfo } = useAuctionInfoStore();
+
+  console.log({ listingInfo, auctionInfo });
+
+  const cancelListingMutation = useCancelDirectListingMutation();
+  const cancelAuctionMutation = useCancelAuctionMutation();
+  const cancelOfferMutation = useCancelOfferMutation();
+  const collectAuctionPayoutMutation = useCollectAuctionPayoutMutation();
 
   const {
     data: nftData,
@@ -113,31 +155,80 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     tokenId: tokenId as string,
   });
 
+  const { data: isApproved } = useCheckApprovedForAllQuery({
+    collectionContractAddress: contractAddress as string,
+  });
+
   const activeType = nftData?.activeType;
   const collectionFee = nftData?.collectionFee as Fee;
   const marketplaceFee = nftData?.marketplaceFee as Fee;
   const collectionDetails = nftData?.collectionDetails;
-  const listingPricingData = nftData?.listingData;
-  const auctionPricingData = nftData?.auctionData;
+  const listingPricingData = nftData?.listingData?.[0];
+  const auctionPricingData = nftData?.auctionData?.[0];
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
-  const disabled = false;
-  const price = listingPricingData?.[0]?.pricePerToken || "N/A";
-  const extraProps = {
-    collectionFee,
-    disabled,
-    marketplaceFee,
-    price,
+
+  console.log({ nftData });
+
+  const isAuctionExpired = auctionInfo?.isAuctionExpired;
+  const isOwner =
+    listingInfo !== undefined
+      ? userAddress?.toLowerCase() ===
+        listingInfo?.listingCreator?.toLowerCase()
+      : auctionInfo !== undefined
+      ? userAddress?.toLowerCase() ===
+        auctionInfo?.auctionCreator?.toLowerCase()
+      : userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
+
+  const owner =
+    listingInfo !== undefined
+      ? listingInfo.listingCreator?.toLowerCase()
+      : auctionInfo !== undefined
+      ? auctionInfo.auctionCreator?.toLowerCase()
+      : nft?.owner?.toLowerCase();
+
+  const isWinningBidder =
+    userAddress?.toLowerCase() ===
+    auctionInfo?.winningBid?.bidder?.toLowerCase();
+
+  console.log({ isOwner, owner });
+  console.log({ isWinningBidder, isAuctionExpired });
+
+  const getListingStatus = () => {
+    if (activeType === "listing")
+      return { type: "Direct Listing", color: "text-green-500" };
+    if (activeType === "auction")
+      return { type: "English Auction", color: "text-blue-500" };
+    if (activeType === "expired")
+      return { type: "Expired", color: "text-red-500" };
+    return { type: "Not Listed", color: "text-gray-500" };
   };
 
-  console.log("====================================");
-  console.log(nftData, "image");
-  console.log("====================================");
+  const handleCancelListing = () => {
+    cancelListingMutation.mutate({ listingId: listingInfo.listingId });
+  };
 
-  const isOwner = userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
-  console.log({ isOwner });
+  const handleCancelAuction = () => {
+    cancelAuctionMutation.mutate({ auctionId: auctionInfo.auctionId });
+  };
+
+  const handleCancelOffer = ({ offerId }: { offerId: string }) => {
+    if (!offerId) return;
+
+    cancelOfferMutation.mutate({ offerId });
+  };
+
+  const handleCollectAuctionPayout = () => {
+    collectAuctionPayoutMutation.mutate({ auctionId: auctionInfo.auctionId });
+  };
+
+  const isDisabled =
+    cancelListingMutation.isPending ||
+    cancelAuctionMutation.isPending ||
+    collectAuctionPayoutMutation.isPending ||
+    cancelOfferMutation.isPending;
 
   useEffect(() => {
     const filter =
@@ -145,9 +236,16 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
         ? singleNFTFilters[1]
         : activeType === "auction"
         ? singleNFTFilters[2]
+        : activeType === "expired"
+        ? singleNFTFilters[3]
         : singleNFTFilters[0];
     setSelectedFilter(filter);
   }, [activeType, nftData]);
+
+  useEffect(() => {
+    setListingInfo(listingPricingData as Listing);
+    setAuctionInfo(auctionPricingData as Auction);
+  }, [listingPricingData, auctionPricingData]);
 
   return (
     <div className="flex gap-6 pt-14">
@@ -159,21 +257,25 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
         <>
           {/* image section */}
           <div className="w-[40%] flex flex-col gap-6">
-            <div className="w-full bg-tertiary p-4 rounded-xl flex items-center justify-between">
-              <span>
-                <p className="font-medium">
-                  {collectionDetails?.collectionName}
-                </p>
-                <p className="text-muted-foreground text-sm mt-2">Collection</p>
-              </span>
-              <TransitionLinks
-                href={`/collections/${collectionDetails?.collectionAddress}`}
-                className="text-muted-foreground hover:text-foreground group duration-300 transition-all ease-in-out flex items-center gap-1"
-              >
-                View Collection{" "}
-                <LinkIcon className="size-4 text-muted-foreground group-hover:text-foreground duration-300 transition-all ease-in-out" />
-              </TransitionLinks>
-            </div>
+            {collectionDetails && (
+              <div className="w-full bg-tertiary p-4 rounded-xl flex items-center justify-between">
+                <span>
+                  <p className="font-medium">
+                    {collectionDetails?.collectionName}
+                  </p>
+                  <p className="text-muted-foreground text-sm mt-2">
+                    Collection
+                  </p>
+                </span>
+                <TransitionLinks
+                  href={`/collections/${collectionDetails?.collectionAddress}`}
+                  className="text-muted-foreground hover:text-foreground group duration-300 transition-all ease-in-out flex items-center gap-1"
+                >
+                  View Collection{" "}
+                  <LinkIcon className="size-4 text-muted-foreground group-hover:text-foreground duration-300 transition-all ease-in-out" />
+                </TransitionLinks>
+              </div>
+            )}
             <div className="w-full relative h-full gradient-box z-40 rounded-2xl">
               <MediaRenderer
                 src={image}
@@ -187,24 +289,33 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
           {/* details section */}
           <div className="flex-1 flex flex-col gap-6 h-full">
+            {/** name section */}
             <div className="flex w-full items-center justify-between">
               <span>
                 <p className="font-medium">{name || "No Name"}</p>
                 <p className="text-muted-foreground text-sm  mt-2">
                   Owned By:{" "}
-                  <span className="font-medium text-primary">
-                    {getFormatAddress(nft?.owner?.toLowerCase() || "")}
-                  </span>
+                  <Link
+                    href={`${chainInfo?.blockExplorers?.[0]?.url}/address/${owner}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary"
+                  >
+                    {getFormatAddress(owner || "")}
+                  </Link>
                 </p>
               </span>
-              <p className="text-muted-foreground">
-                Status:{" "}
-                <span className="text-foreground font-medium">
-                  {selectedFilter}
-                </span>
-              </p>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  getListingStatus().color
+                }`}
+              >
+                {getListingStatus().type}
+              </span>
             </div>
             <Line />
+
+            {/** description section */}
             <div className="flex flex-col gap-6">
               <p>{description || "No Description"}</p>
               <Line />
@@ -214,6 +325,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   {
                     label: "Contract Address",
                     value: getFormatAddress(contractAddress),
+                    link: `${chainInfo?.blockExplorers?.[0]?.url}/address/${contractAddress}`,
                   },
                   { label: "Token Id", value: `#${tokenId}` },
                   { label: "Token Standard", value: "CRC-721" },
@@ -228,11 +340,13 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                     label={item.label}
                     value={item.value}
                     icon={item.icon}
+                    link={item.link}
                   />
                 ))}
               </div>
             </div>
 
+            {/** pricing section */}
             <div className="bg-gradient-to-r w-full from-border via-black/70 to-transparent p-3 rounded-2xl flex items-center justify-between gap-6 border border-border">
               <div className="w-1/2 flex flex-col gap-6 p-3">
                 <p className="font-medium">Pricing Details</p>
@@ -243,12 +357,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       <PricingDetailItem
                         value={
                           activeType === "listing"
-                            ? decimalOffChain(
-                                listingPricingData?.[0]?.pricePerToken || "0"
-                              )!
-                            : decimalOffChain(
-                                auctionPricingData?.[0]?.minimumBidAmount || "0"
-                              )!
+                            ? decimalOffChain(listingInfo?.pricePerToken)!
+                            : decimalOffChain(auctionInfo?.minimumBidAmount)!
                         }
                         label={
                           activeType === "listing"
@@ -260,11 +370,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       {/* Buyout Price (Auction only) */}
                       {activeType === "auction" && (
                         <PricingDetailItem
-                          value={
-                            decimalOffChain(
-                              auctionPricingData?.[0]?.buyoutBidAmount || "0"
-                            )!
-                          }
+                          value={decimalOffChain(auctionInfo?.buyoutBidAmount)!}
                           label="Buyout Price"
                         />
                       )}
@@ -275,10 +381,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         value={
                           activeType === "listing"
                             ? formatBlockchainTimestamp(
-                                listingPricingData?.[0]?.startTimestamp || ""
+                                listingInfo?.startTimestamp
                               )
                             : formatBlockchainTimestamp(
-                                auctionPricingData?.[0]?.startTimestamp || ""
+                                auctionInfo?.startTimestamp
                               )
                         }
                         label={
@@ -294,10 +400,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         value={
                           activeType === "listing"
                             ? formatBlockchainTimestamp(
-                                listingPricingData?.[0]?.endTimestamp || ""
+                                listingInfo?.endTimestamp
                               )
                             : formatBlockchainTimestamp(
-                                auctionPricingData?.[0]?.endTimestamp || ""
+                                auctionInfo?.endTimestamp
                               )
                         }
                         label={
@@ -308,8 +414,23 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   )}
 
                   {selectedFilter === singleNFTFilters[0] && (
-                    <div>No Pricing Data</div>
+                    <div className="flex items-center w-full p-4 bg-tertiary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground font-medium">
+                        This NFT is Neither Auctioned Nor Listed. You can always
+                        make an offer
+                      </p>
+                    </div>
                   )}
+
+                  {/* {selectedFilter === singleNFTFilters[3] && (
+                    <div className="flex items-center w-full p-4 bg-tertiary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground font-medium">
+                        {activeType === "listing"
+                          ? "Listing Expired"
+                          : "Auction Expired"}
+                      </p>
+                    </div>
+                  )} */}
                 </div>
               </div>
 
@@ -340,8 +461,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               </div>
             </div>
 
+            {/** actions section */}
             <div className="w-full flex items-center gap-3">
-              {selectedFilter === singleNFTFilters[0] && (
+              {/** make offer section for non-owner*/}
+              {selectedFilter === singleNFTFilters[0] && !isOwner && (
                 <DialogRoot>
                   <DialogTrigger>
                     <Button shape="square" className="w-full">
@@ -350,27 +473,61 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   </DialogTrigger>
                   <DialogContent className="w-[700px]">
                     <MakeOfferDialog
-                      src={image || ""}
-                      alt={name || ""}
-                      name={name || ""}
+                      src={image!}
+                      alt={name!}
+                      name={name!}
                       tokenId={tokenId}
                     />
                   </DialogContent>
                 </DialogRoot>
               )}
 
+              {/** list section for nft owner*/}
               {selectedFilter === singleNFTFilters[0] && isOwner && (
                 <>
-                  <Button shape="square" className="w-1/2" variant="secondary">
-                    Auction
-                  </Button>
-                  <Button shape="square" className="w-1/2">
-                    List
-                  </Button>
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button
+                        shape="square"
+                        className="w-full"
+                        variant="secondary"
+                      >
+                        List NFT
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[700px]">
+                      <ListDialog
+                        src={image!}
+                        alt={name!}
+                        name={name!}
+                        isApproved={isApproved!}
+                        tokenId={tokenId}
+                        assetContract={contractAddress}
+                      />
+                    </DialogContent>
+                  </DialogRoot>
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button shape="square" className="w-full">
+                        Auction NFT
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[700px]">
+                      <AuctionDialog
+                        src={image!}
+                        alt={name!}
+                        name={name!}
+                        isApproved={isApproved!}
+                        tokenId={tokenId}
+                        assetContract={contractAddress}
+                      />
+                    </DialogContent>
+                  </DialogRoot>
                 </>
               )}
 
-              {selectedFilter === singleNFTFilters[1] && (
+              {/** make offer section for listing for non-owner*/}
+              {selectedFilter === singleNFTFilters[1] && !isOwner && (
                 <>
                   <DialogRoot>
                     <DialogTrigger>
@@ -383,19 +540,11 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[700px]">
-                      {/* <MakeOfferDialog
-                        src={image || ""}
-                        alt={name || ""}
-                        name={name || ""}
+                      <MakeOfferDialog
+                        src={image!}
+                        alt={name!}
+                        name={name!}
                         tokenId={tokenId}
-                      /> */}
-                      <ListDialog
-                        src={image || ""}
-                        // onClick={extraOnClick}
-                        alt={name || ""}
-                        name={name || ""}
-                        tokenId={tokenId}
-                        // props={extraProps}
                       />
                     </DialogContent>
                   </DialogRoot>
@@ -407,26 +556,82 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[564px]">
-                      <ListingDialog
-                        src={image || ""}
-                        // onClick={extraOnClick}
-                        alt={name || ""}
-                        name={name || ""}
-                        tokenId={tokenId}
-                        props={extraProps}
-                        cta="Confirm"
-                      />
+                      <BuyNowListingDialog />
                     </DialogContent>
                   </DialogRoot>
                 </>
               )}
-              {selectedFilter === singleNFTFilters[1] && isOwner && (
-                <Button shape="square" className="w-full" variant="error">
-                  Cancel Listing
-                </Button>
-              )}
 
-              {selectedFilter === singleNFTFilters[2] && (
+              {/* cancel listing/auction section for owner */}
+              {(selectedFilter === singleNFTFilters[1] ||
+                selectedFilter === singleNFTFilters[2]) &&
+                isOwner && (
+                  <Button
+                    disabled={isDisabled}
+                    shape="square"
+                    className="w-full"
+                    variant="error"
+                    onClick={() => {
+                      if (activeType === "listing") {
+                        handleCancelListing();
+                      }
+
+                      if (activeType === "auction") {
+                        handleCancelAuction();
+                      }
+                    }}
+                  >
+                    Cancel {activeType === "listing" ? "Listing" : "Auction"}
+                  </Button>
+                )}
+
+              {/* listing expired for non-owner */}
+              {selectedFilter === singleNFTFilters[3] &&
+                !isOwner &&
+                listingInfo !== undefined &&
+                nftData?.isActiveTypeExpired && (
+                  <Button disabled={true} shape="square" className="w-full">
+                    Listing Expired
+                  </Button>
+                )}
+
+              {/* auction payout for auction bidder */}
+              {selectedFilter === singleNFTFilters[3] &&
+                isWinningBidder &&
+                auctionInfo !== undefined &&
+                isAuctionExpired && (
+                  <Button
+                    disabled={isDisabled}
+                    shape="square"
+                    className="w-full"
+                    onClick={handleCollectAuctionPayout}
+                  >
+                    Claim Auction Payout
+                  </Button>
+                )}
+
+              {/* auction expired for owner */}
+              {selectedFilter === singleNFTFilters[3] &&
+                isOwner &&
+                auctionInfo !== undefined &&
+                isAuctionExpired && (
+                  <Button disabled={true} shape="square" className="w-full">
+                    Waiting for Winning Bidder to Claim
+                  </Button>
+                )}
+
+              {/* auction expired for non-owner */}
+              {selectedFilter === singleNFTFilters[3] &&
+                !isOwner &&
+                !isWinningBidder &&
+                auctionInfo !== undefined &&
+                isAuctionExpired && (
+                  <Button disabled={true} shape="square" className="w-full">
+                    Auction Expired
+                  </Button>
+                )}
+
+              {selectedFilter === singleNFTFilters[2] && !isOwner && (
                 <>
                   <DialogRoot>
                     <DialogTrigger>
@@ -439,15 +644,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <AuctionDialog
-                        src={image || ""}
-                        // onClick={extraOnClick}
-                        alt={name || ""}
-                        name={name || ""}
-                        tokenId={tokenId}
-                        props={extraProps}
-                        cta="Confirm"
-                      />
+                      <BuyNowAuctionDialog />
                     </DialogContent>
                   </DialogRoot>
 
@@ -458,36 +655,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[700px]">
-                      <PlaceBidDialog
-                        src={image || ""}
-                        alt={name || ""}
-                        name={name || ""}
-                        tokenId={tokenId}
-                      />
+                      <PlaceBidDialog />
                     </DialogContent>
                   </DialogRoot>
                 </>
-              )}
-              {selectedFilter === singleNFTFilters[2] && isOwner && (
-                <Button shape="square" className="w-full" variant="error">
-                  Cancel Auction
-                </Button>
-              )}
-
-              {selectedFilter === singleNFTFilters[3] && (
-                <div className="w-full">
-                  {activeType === "listing"
-                    ? "Listing Expired"
-                    : "Auction Expired"}
-                </div>
-              )}
-
-              {selectedFilter === singleNFTFilters[3] && isOwner && (
-                <Button shape="square" variant="error" className="w-full">
-                  {activeType === "listing"
-                    ? "Cancel Listing"
-                    : "Cancel Auction"}
-                </Button>
               )}
             </div>
           </div>

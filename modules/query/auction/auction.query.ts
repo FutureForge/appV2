@@ -36,19 +36,21 @@ export function useAllAuctionsQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      const updatedAuctions = response.allAuctions.filter((auction) => {
-        const { endTimestamp } = auction;
-        const endTime = formatBlockchainTimestamp(endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+      // const updatedAuctions = response.allAuctions.filter((auction) => {
+      //   const { endTimestamp } = auction;
+      //   const endTime = formatBlockchainTimestamp(endTimestamp);
+      //   const endTimeFormatted = new Date(endTime).getTime();
+      //   const currentTime = new Date().getTime();
 
-        return endTimeFormatted > currentTime;
-      });
+      //   return endTimeFormatted > currentTime;
+      // });
 
-      return updatedAuctions;
+      // return updatedAuctions;
+
+      return response.allAuctions;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -83,7 +85,7 @@ export function useFilteredAllAuctionsQuery({
       return updatedAuctions;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -119,7 +121,7 @@ export function useSingleAuctionQuery({
       return updatedAuction;
     },
     enabled: !!contractAddress || !!tokenId,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -158,7 +160,7 @@ export function useFilteredCompletedAuctionsQuery({
       return response.completedAuctions;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -174,7 +176,7 @@ export function useNewAuctionsQuery({ limit = 50 }: { limit?: number }) {
       return response.newAuctions;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -199,7 +201,7 @@ export function useFilteredNewAuctionsQuery({
       return response.newAuctions;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -216,7 +218,7 @@ export function useAuctionClosedQuery({ limit = 50 }: { limit?: number }) {
       return response.auctionCloseds;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -242,7 +244,7 @@ export function useFilteredAuctionClosedQuery({
       return response.auctionCloseds;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -259,7 +261,7 @@ export function useNewBidsQuery({ limit = 50 }: { limit?: number }) {
       return response.newBids;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -282,6 +284,6 @@ export function useFilteredUserNewBidsQuery({
       return response.newBids;
     },
     enabled: !!address,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }

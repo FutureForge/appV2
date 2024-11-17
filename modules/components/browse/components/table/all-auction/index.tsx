@@ -19,8 +19,6 @@ type AllAuctionTableProps = {
 export function AllAuctionTable({ isLoading, data }: AllAuctionTableProps) {
   const router = useRouter();
 
-  console.log({ data });
-
   const table = useReactTable<Auction>({
     columns: makeAllAuctionsColumn(),
     data: data ?? [],
@@ -34,10 +32,11 @@ export function AllAuctionTable({ isLoading, data }: AllAuctionTableProps) {
     <HydrationBoundary state={dehydrate}>
       <div suppressHydrationWarning>
         <Table
-          // onRowClick={(_row) => {
-          //   const collectionAddress = _row.collectionAddress;
-          //   router.push(`/collections/${collectionAddress}`);
-          // }}
+          onRowClick={(_row) => {
+            const collectionAddress = _row.assetContract;
+            const tokenId = _row.nft.tokenId;
+            router.push(`/nft/${collectionAddress}/${tokenId}`);
+          }}
           isLoading={isLoading}
           hasHover
           table={table}

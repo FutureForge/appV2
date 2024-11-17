@@ -38,8 +38,8 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   const auctionPricingData = nftData?.auctionData;
   const winningBid = auctionPricingData?.[0]?.winningBid;
 
-  console.log({ nftActivities });
-  console.log({ nftOffers });
+  // console.log({ nftActivities });
+  // console.log({ nftOffers });
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};

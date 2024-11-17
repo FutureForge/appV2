@@ -115,7 +115,7 @@ export function useSingleOfferQuery({
       return updatedOffers;
     },
     enabled: !!contractAddress || !!tokenId,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -131,7 +131,7 @@ export function useAcceptedOffersQuery({ limit = 50 }: { limit?: number }) {
       return response.acceptedOffers;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -156,7 +156,7 @@ export function useFilteredAcceptedOffersQuery({
       return response.acceptedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -195,7 +195,7 @@ export function useFilteredCompletedOffersQuery({
       return response.completedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -220,7 +220,7 @@ export function useNewOffersQuery({ limit = 50 }: { limit?: number }) {
       return updatedOffers;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -255,6 +255,6 @@ export function useFilteredNewOffersQuery({
       return updatedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
