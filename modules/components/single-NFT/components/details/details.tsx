@@ -1,15 +1,21 @@
-import { Button, Header } from "@/modules/app";
-import Image from "next/image";
+import { Button, DialogContent, DialogRoot, DialogTrigger, Header } from "@/modules/app";
 import React, { useEffect, useState } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
 import { useSingleNFTQuery, useUserChainInfo } from "@/modules/query";
 import { Fee } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import { decimalOffChain } from "@/modules/blockchain";
+import { MediaRenderer } from "thirdweb/react";
+import { client } from "@/utils/configs";
+import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 
 // icons
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
+import LinkIcon from "@/assets/arrow-right-up-line.svg";
+import { ListingDialog } from "@/modules/components/collections";
+import { MakeOfferDialog } from "../dialogs/make-offer";
+import { DetailsSkeleton } from "../skeleton/details-skeleton";
 
 export const singleNFTFilters = ["Not Listed", "Listed", "Auction", "Expired"];
 
@@ -61,15 +67,25 @@ const PricingDetailItem = ({
   icon?: React.ReactNode;
   value: string | number;
   label: string;
-}) => (
-  <div className="flex flex-col gap-2">
-    <span className="flex items-center gap-2">
-      {icon}
-      <p className="font-medium text-sm">{value} XFI</p>
-    </span>
-    <p className="text-muted-foreground capitalize text-sm">{label}</p>
-  </div>
-);
+}) => {
+  const noSymbol =
+    label !== "Available From" &&
+    label !== "Starts From" &&
+    label !== "Expires On" &&
+    label !== "Ends On";
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="flex items-center gap-2">
+        {icon && icon}
+        <p className="font-medium text-sm">
+          {value}
+          {noSymbol && " XFI"}
+        </p>
+      </span>
+      <p className="text-muted-foreground capitalize text-sm">{label}</p>
+    </div>
+  );
+};
 
 export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { activeAccount } = useUserChainInfo();
@@ -99,6 +115,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
+const disabled = false
+const price = listingPricingData?.[0]?.pricePerToken || "N/A";
+  const extraProps = {
+    collectionFee, disabled, marketplaceFee, price
+  }
+
+  console.log("====================================");
+  console.log(nftData, "image");
+  console.log("====================================");
 
   const isOwner = userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
   console.log({ isOwner });
@@ -117,30 +142,55 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     <div className="flex gap-6 pt-14">
       {isNFTDataLoading || isNFTDataPending ? (
         <>
-          <div>Loading...</div>
+          <DetailsSkeleton />
         </>
       ) : (
         <>
           {/* image section */}
-          <div className="w-[40%] relative h-[620px] gradient-box z-40 rounded-2xl">
-            <Image
-              src={"/nft_1.png"}
-              width={500}
-              height={700}
-              alt="nft"
-              className="object-cover relative size-full"
-            />
-            <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
-            <div className="absolute bottom-4 px-8 w-full flex justify-between items-center">
-              <p className="font-medium">{name || "No Name"}</p>
+          <div className="w-[40%] flex flex-col gap-6">
+            <div className="w-full bg-tertiary p-4 rounded-xl flex items-center justify-between">
               <span>
                 <p className="font-medium">
-                  {collectionDetails?.collectionName || "Unknown Collection"}
+                  {collectionDetails?.collectionName}
                 </p>
-                <p className="font-medium text-xs text-muted-foreground">
-                  Collection Name
-                </p>
+                <p className="text-muted-foreground text-sm mt-2">Collection</p>
               </span>
+              <TransitionLinks
+                href={`/collections/${collectionDetails?.collectionAddress}`}
+                className="text-muted-foreground hover:text-foreground group duration-300 transition-all ease-in-out flex items-center gap-1"
+              >
+                View Collection{" "}
+                <LinkIcon className="size-4 text-muted-foreground group-hover:text-foreground duration-300 transition-all ease-in-out" />
+              </TransitionLinks>
+            </div>
+            <div className="w-full relative h-[550px] gradient-box z-40 rounded-2xl">
+              <MediaRenderer
+                src={image}
+                client={client}
+                alt={name}
+                className="object-cover w-full absolute inset-0 size-full"
+              />
+              <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
+              <div className="absolute bottom-4 px-8 w-full flex justify-between items-center">
+                <span>
+                  <p className="font-medium">{name || "No Name"}</p>
+                  <p className="text-muted-foreground text-sm  mt-2">
+                    Owned By:{" "}
+                    <span className="font-medium text-primary">
+                      {getFormatAddress(nft?.owner?.toLowerCase() || "")}
+                    </span>
+                  </p>
+                </span>
+
+                <span>
+                  <p className="font-medium">
+                    {collectionDetails?.collectionName || "Unknown Collection"}
+                  </p>
+                  <p className="font-medium text-xs text-muted-foreground mt-2">
+                    Collection Name
+                  </p>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -153,6 +203,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               showRightSide={false}
               selectedFilter={selectedFilter}
             />
+
             <div className="flex flex-col gap-6">
               <p>{description || "No Description"}</p>
               <Line />
@@ -219,6 +270,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
                       {/* Start Time */}
                       <PricingDetailItem
+                        icon={null}
                         value={
                           activeType === "listing"
                             ? formatBlockchainTimestamp(
@@ -237,6 +289,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
                       {/* End Time */}
                       <PricingDetailItem
+                        icon={null}
                         value={
                           activeType === "listing"
                             ? formatBlockchainTimestamp(
@@ -253,7 +306,9 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                     </>
                   )}
 
-                  {selectedFilter === singleNFTFilters[0] && <div>No Pricing Data</div>}
+                  {selectedFilter === singleNFTFilters[0] && (
+                    <div>No Pricing Data</div>
+                  )}
                 </div>
               </div>
 
@@ -293,12 +348,44 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
               {selectedFilter === singleNFTFilters[1] && (
                 <>
-                  <Button variant="secondary" shape="square" className="w-1/2">
-                    Make Offer
-                  </Button>
-                  <Button shape="square" className="w-1/2">
-                    Buy Now
-                  </Button>
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button
+                        variant="secondary"
+                        shape="square"
+                        className="w-1/2"
+                      >
+                        Make Offer
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[700px]">
+                      <MakeOfferDialog
+                        src={image || ""}
+                        alt={name || ""}
+                        name={name || ""}
+                        tokenId={tokenId}
+                      />
+                    </DialogContent>
+                  </DialogRoot>
+
+                  <DialogRoot>
+                    <DialogTrigger>
+                      <Button shape="square" className="w-1/2">
+                        Buy Now
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="w-[564px]">
+                      <ListingDialog
+                        src={image || ""}
+                        // onClick={extraOnClick}
+                        alt={name || ""}
+                        name={name || ""}
+                        tokenId={tokenId}
+                        props={extraProps}
+                        cta="Confirm"
+                      />
+                    </DialogContent>
+                  </DialogRoot>
                 </>
               )}
               {selectedFilter === singleNFTFilters[2] && (

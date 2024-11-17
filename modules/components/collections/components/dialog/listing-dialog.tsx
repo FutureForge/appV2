@@ -12,6 +12,7 @@ type ListingDialogProps = {
   name: string;
   tokenId: string;
   props: ExtraProps;
+  cta?: string;
 };
 
 export function ListingDialog({
@@ -21,6 +22,7 @@ export function ListingDialog({
   name,
   tokenId,
   props,
+  cta = "Buy Listing",
 }: ListingDialogProps) {
   const { collectionFee, disabled, marketplaceFee, price } = props;
 
@@ -65,7 +67,7 @@ export function ListingDialog({
                 shape="square"
                 className="w-full"
               >
-                Buy Listing
+                {cta}
               </Button>
             </div>
           </div>

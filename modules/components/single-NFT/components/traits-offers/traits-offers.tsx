@@ -11,6 +11,7 @@ import { chainInfo } from "@/utils/configs";
 import { singleNFTFilters } from "../details/details";
 import { WinningBidTable } from "../tables/winning-bid";
 import { OffersTable } from "../tables/offers-table";
+import { TraitsSkeleton } from "../skeleton/traits-skeleton";
 
 type Traits_OffersProps = {
   contractAddress: string;
@@ -51,7 +52,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   return (
     <>
       {isNFTDataLoading || isNFTDataPending ? (
-        <div>Loading...</div>
+        <TraitsSkeleton/>
       ) : (
         <>
           <div className="flex w-full items-start justify-between gap-10">
@@ -60,12 +61,12 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
                 <p>Traits</p>
                 <div className="flex  items-center w-full justify-between">
                   {attributes.map((trait, index) => (
-                    <div key={`trait-key-${index}`}>
+                    <div key={`trait-key-${index}`} className="bg-tertiary px-4 py-2.5 rounded-lg">
                       <span>
                         <p className="capitalize font-medium text-sm">
                           {trait.trait_type}
                         </p>
-                        <p className="capitalize text-muted-foreground text-sm">
+                        <p className="capitalize text-muted-foreground text-sm mt-2">
                           {trait.value}
                         </p>
                       </span>

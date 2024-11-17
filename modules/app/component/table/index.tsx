@@ -88,12 +88,12 @@ export function Table<T>({
           </>
         )}
       </table>
-      {/* {table.getRowModel().rows.length === 0 && isSingleNFT && (
-        <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
-      )} */}
-      {table.getRowModel().rows.length === 0 && (
+      {table.getRowModel().rows.length === 0 && isSingleNFT && (
         <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
       )}
+      {/* {table.getRowModel().rows.length === 0 && (
+        <TableEmptyState message={fallbackMessage} title={fallbackTitle} />
+      )} */}
     </div>
   );
 }

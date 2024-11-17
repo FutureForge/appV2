@@ -10,7 +10,7 @@ export default function SingleNFTPage() {
   const { contractAddress, tokenId } = router.query;
 
   return (
-    <div className="mt-20 w-full min-h-screen px-6 max-w-[1355px] mx-auto flex flex-col gap-12">
+    <div className="mt-20 w-full min-h-screen px-6 max-w-[1355px] mx-auto flex flex-col gap-12 pb-40">
       <Head>
         <title>MintMingles Marketplace - Single NFT</title>
         <meta
