@@ -176,3 +176,9 @@ body {
     background: linear-gradient(to top, #6FC9FF, #ED6A49, #A59BE6);
   }
 }
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}

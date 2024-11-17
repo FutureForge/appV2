@@ -39,7 +39,8 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
         className={cn(
           " bg-transparent outline-none placeholder:text-sm text-sm w-full placeholder:text-muted-foreground",
           className,
-          type === "number" && "hide-arrows"
+          type === "number" && "hide-arrows",
+          type === "date" && "hide-arrows appearance-none"
         )}
         ref={ref}
         onKeyDown={handleKeyDown}

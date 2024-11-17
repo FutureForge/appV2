@@ -1,4 +1,10 @@
-import { Button, DialogContent, DialogRoot, DialogTrigger, Header } from "@/modules/app";
+import {
+  Button,
+  DialogContent,
+  DialogRoot,
+  DialogTrigger,
+  Header,
+} from "@/modules/app";
 import React, { useEffect, useState } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
@@ -17,6 +23,7 @@ import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
 import { MakeOfferDialog } from "../dialogs/make-offer";
 import { DetailsSkeleton } from "../skeleton/details-skeleton";
 import { PlaceBidDialog } from "../dialogs/place-bid";
+import { ListDialog } from "../dialogs/list-dialog";
 
 export const singleNFTFilters = ["Not Listed", "Listed", "Auction", "Expired"];
 
@@ -116,11 +123,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
-const disabled = false
-const price = listingPricingData?.[0]?.pricePerToken || "N/A";
+  const disabled = false;
+  const price = listingPricingData?.[0]?.pricePerToken || "N/A";
   const extraProps = {
-    collectionFee, disabled, marketplaceFee, price
-  }
+    collectionFee,
+    disabled,
+    marketplaceFee,
+    price,
+  };
 
   console.log("====================================");
   console.log(nftData, "image");
@@ -164,7 +174,7 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                 <LinkIcon className="size-4 text-muted-foreground group-hover:text-foreground duration-300 transition-all ease-in-out" />
               </TransitionLinks>
             </div>
-            <div className="w-full relative h-[550px] gradient-box z-40 rounded-2xl">
+            <div className="w-full relative h-full gradient-box z-40 rounded-2xl">
               <MediaRenderer
                 src={image}
                 client={client}
@@ -176,7 +186,7 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
           </div>
 
           {/* details section */}
-          <div className="flex-1 flex flex-col gap-6 h-fit">
+          <div className="flex-1 flex flex-col gap-6 h-full">
             <div className="flex w-full items-center justify-between">
               <span>
                 <p className="font-medium">{name || "No Name"}</p>
@@ -349,6 +359,17 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                 </DialogRoot>
               )}
 
+              {selectedFilter === singleNFTFilters[0] && isOwner && (
+                <>
+                  <Button shape="square" className="w-1/2" variant="secondary">
+                    Auction
+                  </Button>
+                  <Button shape="square" className="w-1/2">
+                    List
+                  </Button>
+                </>
+              )}
+
               {selectedFilter === singleNFTFilters[1] && (
                 <>
                   <DialogRoot>
@@ -362,11 +383,19 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[700px]">
-                      <MakeOfferDialog
+                      {/* <MakeOfferDialog
                         src={image || ""}
                         alt={name || ""}
                         name={name || ""}
                         tokenId={tokenId}
+                      /> */}
+                      <ListDialog
+                        src={image || ""}
+                        // onClick={extraOnClick}
+                        alt={name || ""}
+                        name={name || ""}
+                        tokenId={tokenId}
+                        // props={extraProps}
                       />
                     </DialogContent>
                   </DialogRoot>
@@ -391,6 +420,12 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                   </DialogRoot>
                 </>
               )}
+              {selectedFilter === singleNFTFilters[1] && isOwner && (
+                <Button shape="square" className="w-full" variant="error">
+                  Cancel Listing
+                </Button>
+              )}
+
               {selectedFilter === singleNFTFilters[2] && (
                 <>
                   <DialogRoot>
@@ -433,8 +468,21 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
                   </DialogRoot>
                 </>
               )}
+              {selectedFilter === singleNFTFilters[2] && isOwner && (
+                <Button shape="square" className="w-full" variant="error">
+                  Cancel Auction
+                </Button>
+              )}
 
               {selectedFilter === singleNFTFilters[3] && (
+                <div className="w-full">
+                  {activeType === "listing"
+                    ? "Listing Expired"
+                    : "Auction Expired"}
+                </div>
+              )}
+
+              {selectedFilter === singleNFTFilters[3] && isOwner && (
                 <Button shape="square" variant="error" className="w-full">
                   {activeType === "listing"
                     ? "Cancel Listing"
