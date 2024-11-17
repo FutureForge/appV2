@@ -341,9 +341,21 @@ const price = listingPricingData?.[0]?.pricePerToken || "N/A";
 
             <div className="w-full flex items-center gap-3">
               {selectedFilter === singleNFTFilters[0] && (
-                <Button shape="square" className="w-full">
-                  Make Offer
-                </Button>
+                <DialogRoot>
+                  <DialogTrigger>
+                    <Button shape="square" className="w-full">
+                      Make Offer
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="w-[700px]">
+                    <MakeOfferDialog
+                      src={image || ""}
+                      alt={name || ""}
+                      name={name || ""}
+                      tokenId={tokenId}
+                    />
+                  </DialogContent>
+                </DialogRoot>
               )}
 
               {selectedFilter === singleNFTFilters[1] && (
