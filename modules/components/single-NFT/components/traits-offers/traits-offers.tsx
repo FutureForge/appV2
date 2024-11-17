@@ -38,9 +38,6 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   const auctionPricingData = nftData?.auctionData;
   const winningBid = auctionPricingData?.[0]?.winningBid;
 
-  // console.log({ nftActivities });
-  // console.log({ nftOffers });
-
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const attributes = (
@@ -52,26 +49,29 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   return (
     <>
       {isNFTDataLoading || isNFTDataPending ? (
-        <TraitsSkeleton/>
+        <TraitsSkeleton />
       ) : (
         <>
           <div className="flex w-full items-start justify-between gap-10">
             <div className="w-1/2 flex flex-col gap-4">
-              <div className="border border-border rounded-2xl p-4 flex flex-col gap-4">
-                <p>Traits</p>
-                <div className="flex  items-center w-full justify-between">
-                  {attributes.map((trait, index) => (
-                    <div key={`trait-key-${index}`} className="bg-tertiary px-4 py-2.5 rounded-lg">
-                      <span>
-                        <p className="capitalize font-medium text-sm">
+              <div className="bg-special-bg p-6 rounded-2xl mt-8">
+                <h3 className="text-xl font-semibold mb-4">Traits</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {attributes?.map(
+                    (
+                      trait: { trait_type: string; value: string },
+                      index: number
+                    ) => (
+                      <div key={index} className="bg-gray-800 p-3 rounded-lg">
+                        <p className="text-sm text-gray-400 first-letter:uppercase">
                           {trait.trait_type}
                         </p>
-                        <p className="capitalize text-muted-foreground text-sm mt-2">
+                        <p className="font-semibold first-letter:uppercase">
                           {trait.value}
                         </p>
-                      </span>
-                    </div>
-                  ))}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
 

@@ -137,8 +137,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { setListingInfo, listingInfo } = useListingInfoStore();
   const { setAuctionInfo, auctionInfo } = useAuctionInfoStore();
 
-  console.log({ listingInfo, auctionInfo });
-
   const cancelListingMutation = useCancelDirectListingMutation();
   const cancelAuctionMutation = useCancelAuctionMutation();
   const cancelOfferMutation = useCancelOfferMutation();
@@ -170,8 +168,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
 
-  console.log({ nftData });
-
   const isAuctionExpired = auctionInfo?.isAuctionExpired;
   const isOwner =
     listingInfo !== undefined
@@ -192,9 +188,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const isWinningBidder =
     userAddress?.toLowerCase() ===
     auctionInfo?.winningBid?.bidder?.toLowerCase();
-
-  console.log({ isOwner, owner });
-  console.log({ isWinningBidder, isAuctionExpired });
 
   const getListingStatus = () => {
     if (activeType === "listing")

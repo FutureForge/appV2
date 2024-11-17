@@ -39,8 +39,6 @@ export function Sliders() {
     limit: 15,
   });
 
-  console.log({ AuctionClosed });
-
   const handleViewItem = ({
     contractAddress,
     tokenId,

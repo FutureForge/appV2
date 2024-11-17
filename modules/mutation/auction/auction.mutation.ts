@@ -48,7 +48,15 @@ export function useCreateAuctionMutation() {
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.new],
+        queryKey: [
+          queryKeys.auction.new,
+          queryKeys.auction.single,
+          queryKeys.auction.all,
+          queryKeys.user.all,
+          queryKeys.user.auctions,
+          queryKeys.nft.single,
+        ],
+        refetchType: "all",
       });
     },
     onError: (error, variables, context) => {},
@@ -90,7 +98,14 @@ export function useCancelAuctionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.closed, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.auction.new,
+          queryKeys.auction.single,
+          queryKeys.auction.all,
+          queryKeys.user.all,
+          queryKeys.user.auctions,
+          queryKeys.nft.single,
+        ],
       });
     },
     onError: () => {},

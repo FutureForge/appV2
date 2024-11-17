@@ -1,5 +1,6 @@
 import { getSetApprovalForAll } from "@/modules/blockchain/global/global.blockchain";
 import { useUserChainInfo } from "@/modules/query";
+import { queryKeys } from "@/modules/query/query-keys";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendAndConfirmTransaction } from "thirdweb";
@@ -40,6 +41,7 @@ export function useApprovedForAllMutation() {
           collectionContractAddress,
           activeAccount?.address,
         ],
+        refetchType: "all",
       });
     },
     onError: () => {},
