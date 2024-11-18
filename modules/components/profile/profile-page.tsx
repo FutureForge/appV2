@@ -430,7 +430,7 @@ export function ProfilePage() {
             handleSearch={handleSearch}
             onFilterClick={handleFilterClick}
             filters={filters}
-            showRightSide
+            showRightSide={false}
           />
 
           {selectedFilter === filters[7] && (

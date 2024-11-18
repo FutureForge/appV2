@@ -3,9 +3,8 @@ import {
   DialogContent,
   DialogRoot,
   DialogTrigger,
-  Header,
 } from "@/modules/app";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
 import {
@@ -15,7 +14,7 @@ import {
 } from "@/modules/query";
 import { decimalOffChain } from "@/modules/blockchain";
 import { MediaRenderer } from "thirdweb/react";
-import { chainInfo, client } from "@/utils/configs";
+import { chainInfo, client, DEAD_ADDRESS } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import { MakeOfferDialog } from "../dialogs/make-offer";
 import { DetailsSkeleton } from "../skeleton/details-skeleton";
@@ -33,19 +32,24 @@ import {
   useListingInfoStore,
 } from "@/modules/components/now-dialog/store";
 import { Auction, Listing } from "@/utils/types/graphql";
+import {
+  useCancelAuctionMutation,
+  useCancelDirectListingMutation,
+  useCollectAuctionPayoutMutation,
+} from "@/modules/mutation";
 
 // icons
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
-import {
-  useCancelAuctionMutation,
-  useCancelDirectListingMutation,
-  useCancelOfferMutation,
-  useCollectAuctionPayoutMutation,
-} from "@/modules/mutation";
 
-export const singleNFTFilters = ["Not Listed", "Listed", "Auction", "Expired"];
+export const singleNFTFilters = [
+  "Not Listed",
+  "Listed",
+  "Auction",
+  "Expired",
+  "Pending Payout",
+];
 
 type DetailsProps = {
   contractAddress: string;
@@ -139,15 +143,12 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
   const cancelListingMutation = useCancelDirectListingMutation();
   const cancelAuctionMutation = useCancelAuctionMutation();
-  const cancelOfferMutation = useCancelOfferMutation();
   const collectAuctionPayoutMutation = useCollectAuctionPayoutMutation();
 
   const {
     data: nftData,
     isLoading: isNFTDataLoading,
     isPending: isNFTDataPending,
-    isError,
-    error,
   } = useSingleNFTQuery({
     contractAddress: contractAddress as string,
     tokenId: tokenId as string,
@@ -161,33 +162,39 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const collectionFee = nftData?.collectionFee as Fee;
   const marketplaceFee = nftData?.marketplaceFee as Fee;
   const collectionDetails = nftData?.collectionDetails;
-  const listingPricingData = nftData?.listingData?.[0];
-  const auctionPricingData = nftData?.auctionData?.[0];
+  const listingPricingData = nftData?.listingData;
+  const auctionPricingData = nftData?.auctionData;
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
 
-  const isAuctionExpired = auctionInfo?.isAuctionExpired;
+  const isAuctionExpired = auctionPricingData?.isAuctionExpired;
+  const isAuctionPendingPayout = nftData?.isAuctionPendingPayout;
+
+  const isAuctionPayoutCollector =
+    auctionPricingData?.auctionCreator?.toLowerCase() ===
+    userAddress?.toLowerCase();
+
   const isOwner =
-    listingInfo !== undefined
+    listingPricingData !== undefined
       ? userAddress?.toLowerCase() ===
-        listingInfo?.listingCreator?.toLowerCase()
-      : auctionInfo !== undefined
+        listingPricingData?.listingCreator?.toLowerCase()
+      : auctionPricingData !== undefined
       ? userAddress?.toLowerCase() ===
-        auctionInfo?.auctionCreator?.toLowerCase()
+        auctionPricingData?.auctionCreator?.toLowerCase()
       : userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
 
   const owner =
-    listingInfo !== undefined
-      ? listingInfo.listingCreator?.toLowerCase()
-      : auctionInfo !== undefined
-      ? auctionInfo.auctionCreator?.toLowerCase()
+    listingPricingData !== undefined
+      ? listingPricingData.listingCreator?.toLowerCase()
+      : auctionPricingData !== undefined
+      ? auctionPricingData.auctionCreator?.toLowerCase()
       : nft?.owner?.toLowerCase();
 
   const isWinningBidder =
     userAddress?.toLowerCase() ===
-    auctionInfo?.winningBid?.bidder?.toLowerCase();
+    auctionPricingData?.winningBid?.bidder?.toLowerCase();
 
   const getListingStatus = () => {
     if (activeType === "listing")
@@ -196,6 +203,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
       return { type: "English Auction", color: "text-blue-500" };
     if (activeType === "expired")
       return { type: "Expired", color: "text-red-500" };
+    if (activeType === "pending-payout")
+      return { type: "Pending Payout", color: "text-yellow-500" };
     return { type: "Not Listed", color: "text-gray-500" };
   };
 
@@ -207,21 +216,20 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     cancelAuctionMutation.mutate({ auctionId: auctionInfo.auctionId });
   };
 
-  const handleCancelOffer = ({ offerId }: { offerId: string }) => {
-    if (!offerId) return;
-
-    cancelOfferMutation.mutate({ offerId });
-  };
-
   const handleCollectAuctionPayout = () => {
-    collectAuctionPayoutMutation.mutate({ auctionId: auctionInfo.auctionId });
+    const auctionId = auctionPricingData?.auctionId;
+
+    if (!auctionId) return;
+
+    collectAuctionPayoutMutation.mutate({
+      auctionId,
+    });
   };
 
   const isDisabled =
     cancelListingMutation.isPending ||
     cancelAuctionMutation.isPending ||
-    collectAuctionPayoutMutation.isPending ||
-    cancelOfferMutation.isPending;
+    collectAuctionPayoutMutation.isPending;
 
   useEffect(() => {
     const filter =
@@ -231,6 +239,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
         ? singleNFTFilters[2]
         : activeType === "expired"
         ? singleNFTFilters[3]
+        : activeType === "pending-payout"
+        ? singleNFTFilters[4]
         : singleNFTFilters[0];
     setSelectedFilter(filter);
   }, [activeType, nftData]);
@@ -407,23 +417,13 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   )}
 
                   {selectedFilter === singleNFTFilters[0] && (
-                    <div className="flex items-center w-full p-4 bg-tertiary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground font-medium">
-                        This NFT is Neither Auctioned Nor Listed. You can always
-                        make an offer
+                    <div className="col-span-2 flex items-center w-full p-6 bg-tertiary/30 rounded-xl border border-border/50">
+                      <p className="text-sm text-muted-foreground">
+                        This NFT is neither auctioned nor listed. You can make
+                        an offer at any time.
                       </p>
                     </div>
                   )}
-
-                  {/* {selectedFilter === singleNFTFilters[3] && (
-                    <div className="flex items-center w-full p-4 bg-tertiary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground font-medium">
-                        {activeType === "listing"
-                          ? "Listing Expired"
-                          : "Auction Expired"}
-                      </p>
-                    </div>
-                  )} */}
                 </div>
               </div>
 
@@ -434,20 +434,20 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 <div className="p-3 flex-col flex gap-3 mt-3">
                   <FeeRow
                     label="marketplace fee"
-                    value={marketplaceFee?.percent?.toString()}
+                    value={marketplaceFee?.percent?.toString() || "0"}
                   />
                   <FeeRow
                     label="marketplace fee address"
-                    value={marketplaceFee?.address}
+                    value={marketplaceFee?.address || DEAD_ADDRESS}
                     isAddress={true}
                   />
                   <FeeRow
                     label="collection fee"
-                    value={collectionFee?.percent?.toString()}
+                    value={collectionFee?.percent?.toString() || "0"}
                   />
                   <FeeRow
                     label="collection fee address"
-                    value={collectionFee?.address}
+                    value={collectionFee?.address || DEAD_ADDRESS}
                     isAddress={true}
                   />
                 </div>
@@ -475,49 +475,51 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 </DialogRoot>
               )}
 
-              {/** list section for nft owner*/}
-              {selectedFilter === singleNFTFilters[0] && isOwner && (
-                <>
-                  <DialogRoot>
-                    <DialogTrigger>
-                      <Button
-                        shape="square"
-                        className="w-full"
-                        variant="secondary"
-                      >
-                        List NFT
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-[700px]">
-                      <ListDialog
-                        src={image!}
-                        alt={name!}
-                        name={name!}
-                        isApproved={isApproved!}
-                        tokenId={tokenId}
-                        assetContract={contractAddress}
-                      />
-                    </DialogContent>
-                  </DialogRoot>
-                  <DialogRoot>
-                    <DialogTrigger>
-                      <Button shape="square" className="w-full">
-                        Auction NFT
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-[700px]">
-                      <AuctionDialog
-                        src={image!}
-                        alt={name!}
-                        name={name!}
-                        isApproved={isApproved!}
-                        tokenId={tokenId}
-                        assetContract={contractAddress}
-                      />
-                    </DialogContent>
-                  </DialogRoot>
-                </>
-              )}
+              {/** list || auction section for nft owner*/}
+              {selectedFilter === singleNFTFilters[0] &&
+                isOwner &&
+                !isAuctionPendingPayout && (
+                  <>
+                    <DialogRoot>
+                      <DialogTrigger>
+                        <Button
+                          shape="square"
+                          className="w-full"
+                          variant="secondary"
+                        >
+                          List NFT
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="w-[700px]">
+                        <ListDialog
+                          src={image!}
+                          alt={name!}
+                          name={name!}
+                          isApproved={isApproved!}
+                          tokenId={tokenId}
+                          assetContract={contractAddress}
+                        />
+                      </DialogContent>
+                    </DialogRoot>
+                    <DialogRoot>
+                      <DialogTrigger>
+                        <Button shape="square" className="w-full">
+                          Auction NFT
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="w-[700px]">
+                        <AuctionDialog
+                          src={image!}
+                          alt={name!}
+                          name={name!}
+                          isApproved={isApproved!}
+                          tokenId={tokenId}
+                          assetContract={contractAddress}
+                        />
+                      </DialogContent>
+                    </DialogRoot>
+                  </>
+                )}
 
               {/** make offer section for listing for non-owner*/}
               {selectedFilter === singleNFTFilters[1] && !isOwner && (
@@ -589,10 +591,9 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 )}
 
               {/* auction payout for auction bidder */}
-              {selectedFilter === singleNFTFilters[3] &&
-                isWinningBidder &&
-                auctionInfo !== undefined &&
-                isAuctionExpired && (
+              {selectedFilter === singleNFTFilters[4] &&
+                isAuctionPayoutCollector &&
+                isAuctionPendingPayout && (
                   <Button
                     disabled={isDisabled}
                     shape="square"
@@ -604,26 +605,27 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 )}
 
               {/* auction expired for owner */}
-              {selectedFilter === singleNFTFilters[3] &&
+              {selectedFilter === singleNFTFilters[4] &&
                 isOwner &&
-                auctionInfo !== undefined &&
-                isAuctionExpired && (
+                !isAuctionPayoutCollector &&
+                (isAuctionPendingPayout || isAuctionExpired) && (
                   <Button disabled={true} shape="square" className="w-full">
                     Waiting for Winning Bidder to Claim
                   </Button>
                 )}
 
               {/* auction expired for non-owner */}
-              {selectedFilter === singleNFTFilters[3] &&
+              {(selectedFilter === singleNFTFilters[4] ||
+                selectedFilter === singleNFTFilters[3]) &&
                 !isOwner &&
-                !isWinningBidder &&
-                auctionInfo !== undefined &&
-                isAuctionExpired && (
+                !isAuctionPayoutCollector &&
+                !isWinningBidder && (
                   <Button disabled={true} shape="square" className="w-full">
                     Auction Expired
                   </Button>
                 )}
 
+              {/* active auction for non-owner */}
               {selectedFilter === singleNFTFilters[2] && !isOwner && (
                 <>
                   <DialogRoot>

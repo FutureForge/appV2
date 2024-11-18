@@ -7,19 +7,42 @@ import {
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
-import { getContractCustom, getIsAuctionExpired } from "@/modules/blockchain";
+import {
+  decimalOffChain,
+  getAllAuctions,
+  getContractCustom,
+  getIsAuctionExpired,
+  getTotalAuctions,
+  getWinningBid,
+} from "@/modules/blockchain";
 import ERC721ABI from "@/utils/abi/erc721.json";
 import { NFT } from "thirdweb";
-import { formatBlockchainTimestamp, tryParseJSON } from "@/utils/functions";
 import {
-  useSingleAuctionQuery,
-  useSingleCollectionWithoutNFTsQuery,
-  useSingleListingQuery,
-  useSingleOfferQuery,
-} from "..";
+  ensureSerializable,
+  formatBlockchainTimestamp,
+  tryParseJSON,
+} from "@/utils/functions";
+import { useSingleCollectionWithoutNFTsQuery } from "..";
 import { NFTActivityResponse } from "@/utils/types/global";
-import { Auction, Listing } from "@/utils/types/graphql";
+import { Auction, Listing, Offer } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
+import {
+  getAllListing,
+  getTotalListings,
+} from "@/modules/blockchain/listing/listing.blockchain";
+import {
+  getAllOffers,
+  getTotalOffers,
+} from "@/modules/blockchain/offer/offer.blockchain";
+
+export const StatusType = {
+  UNSET: 0,
+  CREATED: 1,
+  COMPLETED: 2,
+  CANCELLED: 3,
+  ACTIVE: 4,
+  EXPIRED: 5,
+};
 
 export function useSingleNFTQuery({
   contractAddress,
@@ -28,25 +51,6 @@ export function useSingleNFTQuery({
   contractAddress: string;
   tokenId: string;
 }) {
-  const { data: singleListing, isLoading: isLoadingListing } =
-    useSingleListingQuery({
-      contractAddress,
-      tokenId,
-    });
-
-  const { data: singleAuction, isLoading: isLoadingAuction } =
-    useSingleAuctionQuery({
-      contractAddress,
-      tokenId,
-    });
-
-  // include query for single auction-closed
-
-  const { data: singleOffer, isLoading: isLoadingOffer } = useSingleOfferQuery({
-    contractAddress,
-    tokenId,
-  });
-
   const { data: collectionWithoutNFTs } = useSingleCollectionWithoutNFTsQuery({
     contractAddress,
   });
@@ -55,16 +59,45 @@ export function useSingleNFTQuery({
     queryKey: [queryKeys.nft.single, tokenId],
     queryFn: async () => {
       try {
-        const [tokenTransfersResponse, collectionFee, marketplaceFee] =
-          await Promise.all([
-            axios.get<NFTActivityResponse>(
-              `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
-            ),
-            getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
-            getPlatformFeeInfoCustom({
-              contractAddress: MARKETPLACE_ADDRESS_TESTNET,
-            }).catch(() => ({})),
-          ]);
+        const [
+          tokenTransfersResponse,
+          collectionFee,
+          marketplaceFee,
+          totalListings,
+          totalAuctions,
+          totalOffers,
+          allListings,
+          allAuctions,
+        ] = await Promise.all([
+          axios.get<NFTActivityResponse>(
+            `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
+          ),
+          getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
+          getPlatformFeeInfoCustom({
+            contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+          }).catch(() => ({})),
+          getTotalListings(),
+          getTotalAuctions(),
+          getTotalOffers(),
+          getAllListing(),
+          getAllAuctions(),
+        ]);
+
+        const nftAuctionList = allAuctions.find(
+          (auction) =>
+            auction.assetContract.toLowerCase() ===
+              contractAddress.toLowerCase() &&
+            auction.tokenId === BigInt(tokenId) &&
+            auction.status === StatusType.CREATED
+        );
+
+        const nftListingList = allListings.find(
+          (listing) =>
+            listing.assetContract.toLowerCase() ===
+              contractAddress.toLowerCase() &&
+            listing.tokenId === BigInt(tokenId) &&
+            listing.status === StatusType.CREATED
+        );
 
         const nftActivity = tokenTransfersResponse.data.docs;
 
@@ -97,46 +130,74 @@ export function useSingleNFTQuery({
           updatedNFT = nft;
         }
 
-        const updatedSingleAuction = await Promise.all(
-          (singleAuction ?? []).map(async (auction: Auction) => {
-            const isExpired = await getIsAuctionExpired({
-              auctionId: BigInt(auction.auctionId),
-            });
+        let isAuctionExpired;
+        let winningBidBody;
 
-            // Inverting the result to correct the naming mismatch
-            const isAuctionExpired = !isExpired;
+        if (nftAuctionList) {
+          const isAuctionActive = await getIsAuctionExpired({
+            auctionId: nftAuctionList.auctionId,
+          });
 
-            return { ...auction, isAuctionExpired };
-          })
-        );
+          isAuctionExpired = !isAuctionActive;
 
-        const isAuctionExpired =
-          updatedSingleAuction?.some((auction) => {
-            const endTime = formatBlockchainTimestamp(auction.endTimestamp);
-            const endTimeFormatted = new Date(endTime).getTime();
-            const currentTime = new Date().getTime();
+          const winningBid = await getWinningBid({
+            auctionId: nftAuctionList.auctionId,
+          });
 
-            return endTimeFormatted < currentTime;
-          }) ?? false;
+          winningBidBody = {
+            bidder: winningBid[0],
+            currency: winningBid[1],
+            bidAmount: winningBid[2].toString(),
+          };
+        }
+
+        let nftOffers;
+
+        if (nftListingList) {
+          if (totalOffers > 0) {
+            const offers = await getAllOffers();
+            nftOffers = offers.filter(
+              (offer) =>
+                offer.assetContract.toLowerCase() ===
+                  contractAddress.toLowerCase() &&
+                offer.tokenId === BigInt(tokenId) &&
+                offer.status === StatusType.CREATED
+            );
+          }
+        }
 
         const isListingExpired =
-          singleListing?.some((listing) => {
-            const endTime = formatBlockchainTimestamp(listing.endTimestamp);
-            const endTimeFormatted = new Date(endTime).getTime();
-            const currentTime = new Date().getTime();
+          nftListingList &&
+          new Date(
+            formatBlockchainTimestamp(
+              nftListingList.endTimestamp.toString()
+            ).toString()
+          ).getTime() < new Date().getTime();
 
-            return endTimeFormatted < currentTime;
-          }) ?? false;
+        const isAuctionStatusExpired =
+          nftAuctionList &&
+          new Date(
+            formatBlockchainTimestamp(
+              nftAuctionList.endTimestamp.toString()
+            ).toString()
+          ).getTime() < new Date().getTime();
 
-        const isActiveTypeExpired = isAuctionExpired || isListingExpired;
+        const isAuctionPendingPayout =
+          Number(winningBidBody?.bidAmount.toString()) ===
+          Number(nftAuctionList?.buyoutBidAmount.toString());
 
-        const activeType = isActiveTypeExpired
-          ? "expired"
-          : singleListing?.length! > 0
-          ? "listing"
-          : singleAuction?.length! > 0
-          ? "auction"
-          : "none";
+        const isActiveTypeExpired = isAuctionStatusExpired || isListingExpired;
+
+        const activeType =
+          (nftAuctionList && isAuctionPendingPayout) || isAuctionExpired
+            ? "pending-payout"
+            : isListingExpired || isAuctionStatusExpired
+            ? "expired"
+            : nftListingList
+            ? "listing"
+            : nftAuctionList
+            ? "auction"
+            : "none";
 
         return {
           collectionFee,
@@ -144,17 +205,20 @@ export function useSingleNFTQuery({
           nftActivity,
           nft: updatedNFT,
           activeType,
+          isAuctionExpired,
+          isAuctionPendingPayout,
           isActiveTypeExpired,
-          offers: singleOffer,
+          winningBidBody,
+          offers: ensureSerializable(nftOffers) as Offer[],
           collectionDetails: collectionWithoutNFTs?.collection as Collection,
-          listingData: singleListing?.flat() as Listing[],
-          auctionData: updatedSingleAuction.flat() as Auction[],
+          listingData: ensureSerializable(nftListingList) as Listing,
+          auctionData: ensureSerializable(nftAuctionList) as Auction,
         };
       } catch (error) {
         console.log("single nft error", { error });
       }
     },
-    enabled: !isLoadingListing && !isLoadingAuction && !isLoadingOffer,
+    enabled: !!contractAddress && !!tokenId,
     refetchInterval: 5000,
   });
 }

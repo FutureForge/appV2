@@ -8,6 +8,8 @@ import {
   completedAuctionsQuery,
   filteredAllAuctionsQuery,
   filteredAuctionClosedQuery,
+  filteredAuctionPayoutClaimedQuery,
+  filteredAuctionPendingPayoutQuery,
   filteredCompletedAuctionsQuery,
   filteredNewAuctionsQuery,
   filteredUserNewBidsQuery,
@@ -244,6 +246,58 @@ export function useFilteredAuctionClosedQuery({
       return response.auctionCloseds;
     },
     enabled: !!address || !!contractAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useFilteredAuctionPendingPayoutQuery({
+  contractAddress = "",
+  tokenId = "",
+}: {
+  contractAddress?: string;
+  tokenId?: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.auction.pendingPayout],
+    queryFn: async () => {
+      const response = await request<AuctionClosedQueryResponse>(
+        indexerEndpoint,
+        filteredAuctionPendingPayoutQuery,
+        {
+          contractAddress,
+          tokenId,
+        }
+      );
+
+      return response.auctionCloseds;
+    },
+    enabled: !!tokenId || !!contractAddress,
+    refetchInterval: 5000,
+  });
+}
+
+export function useFilteredAuctionPayoutClaimedQuery({
+  contractAddress = "",
+  tokenId = "",
+}: {
+  contractAddress?: string;
+  tokenId?: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.auction.payoutClaimed],
+    queryFn: async () => {
+      const response = await request<AuctionClosedQueryResponse>(
+        indexerEndpoint,
+        filteredAuctionPayoutClaimedQuery,
+        {
+          contractAddress,
+          tokenId,
+        }
+      );
+
+      return response.auctionCloseds;
+    },
+    enabled: !!tokenId || !!contractAddress,
     refetchInterval: 5000,
   });
 }

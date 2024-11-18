@@ -36,7 +36,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   const nftActivities = nftData?.nftActivity;
   const nftOffers = nftData?.offers;
   const auctionPricingData = nftData?.auctionData;
-  const winningBid = auctionPricingData?.[0]?.winningBid;
+  const winningBid = nftData?.winningBidBody;
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};
@@ -127,26 +127,28 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
               <p>
                 {activeType === "listing"
                   ? "Offers"
-                  : activeType === "auction"
+                  : activeType === "auction" || activeType === "pending-payout"
                   ? "Winning Bid"
                   : "Offers"}
               </p>
 
-              {selectedFilter !== singleNFTFilters[2] && (
-                <OffersTable
-                  data={nftOffers as Offer[]}
-                  isLoading={isNFTDataLoading || isNFTDataPending}
-                  isOwner={isOwner}
-                  userAddress={userAddress!}
-                />
-              )}
+              {selectedFilter !== singleNFTFilters[2] &&
+                selectedFilter !== singleNFTFilters[4] && (
+                  <OffersTable
+                    data={nftOffers ?? []}
+                    isLoading={isNFTDataLoading || isNFTDataPending}
+                    isOwner={isOwner}
+                    userAddress={userAddress!}
+                  />
+                )}
 
-              {selectedFilter === singleNFTFilters[2] && (
-                <WinningBidTable
-                  data={winningBid ? [winningBid] : []}
-                  isLoading={isNFTDataLoading || isNFTDataPending}
-                />
-              )}
+              {selectedFilter === singleNFTFilters[2] ||
+                (selectedFilter === singleNFTFilters[4] && (
+                  <WinningBidTable
+                    data={winningBid ? [winningBid] : []}
+                    isLoading={isNFTDataLoading || isNFTDataPending}
+                  />
+                ))}
             </div>
           </div>
         </>

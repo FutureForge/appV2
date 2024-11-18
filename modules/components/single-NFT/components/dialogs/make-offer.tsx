@@ -9,7 +9,6 @@ import {
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import React, { useState } from "react";
 import XFI from "@/assets/xfi.svg";
-import { ExtraProps } from "@/modules/app/component/nft-card/utils/nft-card.utils";
 import { decimalOffChain } from "@/modules/blockchain";
 import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";

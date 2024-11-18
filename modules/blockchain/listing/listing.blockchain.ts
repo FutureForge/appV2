@@ -5,7 +5,7 @@ import {
   BuyFromDirectListingType,
   CreateDirectListingType,
 } from "@/utils/types/blockchain/blockchain.type";
-import { prepareContractCall, toWei } from "thirdweb";
+import { prepareContractCall, readContract, toWei } from "thirdweb";
 import {
   getCurrentBlockchainTimestamp,
   getEndBlockchainTimestamp,
@@ -133,4 +133,34 @@ export async function getBuyFromDirectListing({
   });
 
   return transaction;
+}
+
+
+export async function getTotalListings() {
+  const contract = getContractCustom({ contractAddress: MARKETPLACE_ADDRESS_TESTNET })
+  const totalListings = await readContract({
+    contract,
+    method: 'function totalListings() view returns (uint256)',
+    params: [],
+  })
+
+  if (Number(totalListings) === 0) {
+    return 0
+  } else {
+    return Number(totalListings) - 1
+  }
+}
+
+export async function getAllListing() {
+  const contract = getContractCustom({ contractAddress: MARKETPLACE_ADDRESS_TESTNET })
+  const totalListings = await getTotalListings()
+
+  const allListings = await readContract({
+    contract,
+    method:
+      'function getAllListings(uint256 _startId, uint256 _endId) view returns ((uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved)[] _allListings)',
+    params: [BigInt(0), BigInt(totalListings)],
+  })
+
+  return allListings
 }

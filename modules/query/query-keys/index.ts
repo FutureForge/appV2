@@ -16,6 +16,8 @@ export const queryKeys = {
     single: ["single-auction"] as const,
     newBids: ["new-bids"] as const,
     newBidsUser: ["new-bids-user"] as const,
+    pendingPayout: ["pending-payout"] as const,
+    payoutClaimed: ["payout-claimed"] as const,
   },
   offers: {
     all: ["offers"] as const,
