@@ -36,6 +36,11 @@ import {
 import { useState, ChangeEvent, FormEvent } from "react";
 import DatePicker from "react-datepicker";
 import { Social } from "@/utils/types/global";
+import { getNFT } from "thirdweb/extensions/erc721";
+import { getContractCustom } from "@/modules/blockchain";
+import nftFactoryAbi from "@/utils/abi/nftFactory.json";
+import nftBaseAbi from "@/utils/abi/nftbase.json";
+import { NFT } from "@/utils/types/graphql";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
 // 8
@@ -198,6 +203,20 @@ export default function Test() {
   // console.log({ approveMutation });
 
   const handleClick = async () => {
+
+    const contract = getContractCustom({
+      contractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+      abi: nftBaseAbi,
+    });
+
+    const nft = await getNFT({
+      contract,
+      tokenId: BigInt(1),
+      includeOwner: true,
+    })
+
+    console.log({ nft });
+
     // if (!isApproved) {
     //   await approveMutation.mutateAsync({
     //     collectionContractAddress: userNFTs?.[8]?.contractAddress!,
@@ -222,10 +241,10 @@ export default function Test() {
     //     endTimestamp: selectedDate,
     //   },
     // });
-    bidInAuctionMutation.mutateAsync({
-      auctionId: "4",
-      bidAmount: "5",
-    });
+    // bidInAuctionMutation.mutateAsync({
+    //   auctionId: "4",
+    //   bidAmount: "5",
+    // });
     // buyListingMutation.mutateAsync({
     //   buyFromListing: {
     //     listingId: "4",

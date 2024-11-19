@@ -23,6 +23,10 @@ export const WRAPPED_TOKEN_CONTRACT =
 
 export const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
+export const NFT_FACTORY_ADDRESS = "0x1592e9383E7a268ab32c133c41Ee797f07323140";
+
+export const NFT_BASE_ADDRESS = "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3";
+
 export const nativeCurrency = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 export const CROSSFI_API_TESTNET = "https://test.xfiscan.com/api/1.0";
