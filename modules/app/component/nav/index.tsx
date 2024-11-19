@@ -15,6 +15,7 @@ import { getFormatAddress } from "@/utils/functions";
 import { Popover } from "../popover";
 import { Button } from "../button";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
+import { Search } from "../search";
 
 
 // Icons
@@ -23,6 +24,7 @@ import Info from "@/assets/info.svg";
 import CopyIcon from '@/assets/copy.svg'
 import CheckIcon from '@/assets/check-2.svg'
 import LogoutIcon from '@/assets/logout-box-r-line.svg'
+
 
 
 const Nav_Links = [
@@ -123,10 +125,8 @@ export function Nav() {
       </div>
       <div className="flex items-center justify-between w-[48%]">
         <div className="w-1/2">
-          <TextField
-            type="search"
-            placeholder="Search for collections, NFT or Users"
-          />
+
+          <Search/>
         </div>
 
         <div className="flex items-center gap-8">
