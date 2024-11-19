@@ -25,7 +25,11 @@ type PlaceBidDialogProps = {
   tokenId: string;
 };
 
-export function PlaceBidDialog() {
+export function PlaceBidDialog({
+  setIsDialogOpen,
+}: {
+  setIsDialogOpen: (open: boolean) => void;
+}) {
   const [value, setValue] = useState("");
   const [error, setError] = useState<string>("");
   const toast = useToast();
@@ -43,16 +47,26 @@ export function PlaceBidDialog() {
     if (!auctionId || !buyoutBidAmount)
       return toast.error("Please fill in all fields");
 
-    bidInAuctionMutation.mutate({
-      auctionId,
-      bidAmount: value,
-    });
+    bidInAuctionMutation.mutate(
+      {
+        auctionId,
+        bidAmount: value,
+      },
+      {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+        },
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   const isDisabled =
-    bidInAuctionMutation.isPending || 
-    !value || 
-    !auctionId || 
+    bidInAuctionMutation.isPending ||
+    !value ||
+    !auctionId ||
     !buyoutBidAmount ||
     error !== "";
 
@@ -130,11 +144,15 @@ export function PlaceBidDialog() {
                 value={value}
                 onChange={(e) => {
                   const newValue = e.target.value;
-                  const minBid = Number(decimalOffChain(minimumBidAmount as string));
-                  const maxBid = Number(decimalOffChain(buyoutBidAmount as string));
-                  
+                  const minBid = Number(
+                    decimalOffChain(minimumBidAmount as string)
+                  );
+                  const maxBid = Number(
+                    decimalOffChain(buyoutBidAmount as string)
+                  );
+
                   setValue(newValue);
-                  
+
                   if (Number(newValue) < minBid) {
                     setError(`Bid must be at least ${minBid} XFI`);
                   } else if (Number(newValue) > maxBid) {
@@ -147,7 +165,9 @@ export function PlaceBidDialog() {
                 placeholder="Bid Amount"
                 type="number"
               />
-              {error && <span className="text-red-500 text-sm mt-1">{error}</span>}
+              {error && (
+                <span className="text-red-500 text-sm mt-1">{error}</span>
+              )}
             </form>
 
             <div className="flex w-full items-end justify-end mt-6">

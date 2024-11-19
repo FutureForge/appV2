@@ -4,11 +4,11 @@ import {
   DialogRoot,
   DialogTrigger,
 } from "@/modules/app";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
 import {
-  useCheckApprovedForAllQuery,
+  useCheckApprovalStatusQuery,
   useSingleNFTQuery,
   useUserChainInfo,
 } from "@/modules/query";
@@ -137,6 +137,8 @@ const PricingDetailItem = ({
 export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { selectedFilter, setSelectedFilter } = useFilterStore();
   const { setListingInfo, listingInfo } = useListingInfoStore();
   const { setAuctionInfo, auctionInfo } = useAuctionInfoStore();
@@ -149,13 +151,17 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     data: nftData,
     isLoading: isNFTDataLoading,
     isPending: isNFTDataPending,
+    isError,
   } = useSingleNFTQuery({
     contractAddress: contractAddress as string,
     tokenId: tokenId as string,
   });
 
-  const { data: isApproved } = useCheckApprovedForAllQuery({
+  console.log({ isError, isNFTDataLoading, isNFTDataPending });
+
+  const isApproved = useCheckApprovalStatusQuery({
     collectionContractAddress: contractAddress as string,
+    tokenId: tokenId as string,
   });
 
   const activeType = nftData?.activeType;
@@ -252,7 +258,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
   return (
     <div className="flex gap-6 pt-14">
-      {isNFTDataLoading || isNFTDataPending ? (
+      {isNFTDataLoading || isNFTDataPending || isError ? (
         <>
           <DetailsSkeleton />
         </>
@@ -458,7 +464,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
             <div className="w-full flex items-center gap-3">
               {/** make offer section for non-owner*/}
               {selectedFilter === singleNFTFilters[0] && !isOwner && (
-                <DialogRoot>
+                <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger>
                     <Button shape="square" className="w-full">
                       Make Offer
@@ -470,6 +476,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       alt={name!}
                       name={name!}
                       tokenId={tokenId}
+                      setIsDialogOpen={setIsDialogOpen}
                     />
                   </DialogContent>
                 </DialogRoot>
@@ -480,7 +487,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 isOwner &&
                 !isAuctionPendingPayout && (
                   <>
-                    <DialogRoot>
+                    <DialogRoot
+                      open={isDialogOpen}
+                      onOpenChange={setIsDialogOpen}
+                    >
                       <DialogTrigger>
                         <Button
                           shape="square"
@@ -498,10 +508,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           isApproved={isApproved!}
                           tokenId={tokenId}
                           assetContract={contractAddress}
+                          setIsDialogOpen={setIsDialogOpen}
                         />
                       </DialogContent>
                     </DialogRoot>
-                    <DialogRoot>
+                    <DialogRoot
+                      open={isDialogOpen}
+                      onOpenChange={setIsDialogOpen}
+                    >
                       <DialogTrigger>
                         <Button shape="square" className="w-full">
                           Auction NFT
@@ -515,6 +529,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           isApproved={isApproved!}
                           tokenId={tokenId}
                           assetContract={contractAddress}
+                          setIsDialogOpen={setIsDialogOpen}
                         />
                       </DialogContent>
                     </DialogRoot>
@@ -524,7 +539,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               {/** make offer section for listing for non-owner*/}
               {selectedFilter === singleNFTFilters[1] && !isOwner && (
                 <>
-                  <DialogRoot>
+                  <DialogRoot
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
                     <DialogTrigger>
                       <Button
                         variant="secondary"
@@ -540,18 +558,22 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         alt={name!}
                         name={name!}
                         tokenId={tokenId}
+                        setIsDialogOpen={setIsDialogOpen}
                       />
                     </DialogContent>
                   </DialogRoot>
 
-                  <DialogRoot>
+                  <DialogRoot
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
                     <DialogTrigger>
                       <Button shape="square" className="w-1/2">
                         Buy Now
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[564px]">
-                      <BuyNowListingDialog />
+                      <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
                     </DialogContent>
                   </DialogRoot>
                 </>
@@ -628,7 +650,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               {/* active auction for non-owner */}
               {selectedFilter === singleNFTFilters[2] && !isOwner && (
                 <>
-                  <DialogRoot>
+                  <DialogRoot
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
                     <DialogTrigger>
                       <Button
                         variant="secondary"
@@ -639,18 +664,21 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <BuyNowAuctionDialog />
+                      <BuyNowAuctionDialog setIsDialogOpen={setIsDialogOpen} />
                     </DialogContent>
                   </DialogRoot>
 
-                  <DialogRoot>
+                  <DialogRoot
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                  >
                     <DialogTrigger>
                       <Button shape="square" className="w-1/2">
                         Place Bid
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[700px]">
-                      <PlaceBidDialog />
+                      <PlaceBidDialog setIsDialogOpen={setIsDialogOpen} />
                     </DialogContent>
                   </DialogRoot>
                 </>

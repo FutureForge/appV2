@@ -22,6 +22,7 @@ type MakeOfferDialogProps = {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   name: string;
   tokenId: string;
+  setIsDialogOpen: (open: boolean) => void;
 };
 
 const notes = [
@@ -40,6 +41,7 @@ export function MakeOfferDialog({
   alt,
   name,
   tokenId,
+  setIsDialogOpen,
 }: MakeOfferDialogProps) {
   const { activeAccount } = useUserChainInfo();
   const [value, setValue] = useState("");

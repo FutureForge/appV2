@@ -10,7 +10,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import { RootLayout } from "@/modules/app/layout";
-import * as TooltipPrimitive from '@radix-ui/react-tooltip'
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;

@@ -27,6 +27,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
     data: nftData,
     isLoading: isNFTDataLoading,
     isPending: isNFTDataPending,
+    isError,
   } = useSingleNFTQuery({
     contractAddress: contractAddress as string,
     tokenId: tokenId as string,
@@ -48,7 +49,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
 
   return (
     <>
-      {isNFTDataLoading || isNFTDataPending ? (
+      {isNFTDataLoading || isNFTDataPending || isError ? (
         <TraitsSkeleton />
       ) : (
         <>

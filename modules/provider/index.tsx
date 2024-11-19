@@ -3,8 +3,9 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useToast } from "../app/hooks/useToast";
+import { useUserImageStore } from "@/utils/store/user-image.store";
 
 type QueryProviderProps = {
   children: ReactNode;
@@ -12,6 +13,11 @@ type QueryProviderProps = {
 
 export function QueryProvider({ children }: QueryProviderProps) {
   const toast = useToast();
+  const { setBackgroundImage, backgroundImage } = useUserImageStore();
+
+  useEffect(() => {
+    setBackgroundImage(backgroundImage);
+  }, []);
 
   const [queryClient] = useState(
     () =>

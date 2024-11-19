@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
-import { IoIosMenu } from "react-icons/io";
-import { IoClose } from "react-icons/io5";
-import { cn, linearGenerate } from "../../utils";
+import { cn } from "../../utils";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { useDisableScroll } from "../../hooks/useDisableScroll";
 import { chainInfo, client } from "@/utils/configs";
 import { usePathname } from "next/navigation";
-import { TextField } from "../inputs/inputs";
 import { TransitionLinks } from "./transition-links";
 import { useUserChainInfo } from "@/modules/query";
 import { getFormatAddress } from "@/utils/functions";
@@ -17,15 +14,14 @@ import { Button } from "../button";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Search } from "../search";
 
-
 // Icons
 import Logo from "@/public/logo.svg";
 import Info from "@/assets/info.svg";
-import CopyIcon from '@/assets/copy.svg'
-import CheckIcon from '@/assets/check-2.svg'
-import LogoutIcon from '@/assets/logout-box-r-line.svg'
-
-
+import CopyIcon from "@/assets/copy.svg";
+import CheckIcon from "@/assets/check-2.svg";
+import LogoutIcon from "@/assets/logout-box-r-line.svg";
+import { useApprovalSettingStore } from "@/utils/store/approval-settings.store";
+import { useUserImageStore } from "@/utils/store/user-image.store";
 
 const Nav_Links = [
   {
@@ -54,6 +50,9 @@ export function Nav() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const [copied, setCopied] = useState(false);
+
+  const { approvalSetting, setApprovalSetting } = useApprovalSettingStore();
+  const { backgroundImage } = useUserImageStore();
 
   const copyToClipboard = useCopyToClipboard()[1];
 
@@ -125,8 +124,7 @@ export function Nav() {
       </div>
       <div className="flex items-center justify-between w-[48%]">
         <div className="w-1/2">
-
-          <Search/>
+          <Search />
         </div>
 
         <div className="flex items-center gap-8">
@@ -164,7 +162,7 @@ export function Nav() {
                         <div
                           className="h-full w-full rounded-full border border-border"
                           style={{
-                            backgroundImage: linearGenerate(),
+                            backgroundImage: backgroundImage,
                           }}
                         />
                       </div>
@@ -194,7 +192,12 @@ export function Nav() {
                     </span>
                     <div className="flex items-center gap-3">
                       <Button
-                        variant="secondary"
+                        variant={
+                          approvalSetting === "unlimited"
+                            ? "primary"
+                            : "secondary"
+                        }
+                        onClick={() => setApprovalSetting("unlimited")}
                         shape="square"
                         className={cn(
                           "h-[31px] !text-xs !flex-1 uppercase bg-transparent !duration-150 font-space"
@@ -203,6 +206,10 @@ export function Nav() {
                         Unlimited
                       </Button>
                       <Button
+                        variant={
+                          approvalSetting === "1/1" ? "primary" : "secondary"
+                        }
+                        onClick={() => setApprovalSetting("1/1")}
                         shape="square"
                         className={cn(
                           "h-[31px] !text-xs !flex-1 uppercase !duration-150 font-space"
@@ -235,40 +242,16 @@ export function Nav() {
                       onClick={handleSignOut}
                       className="cursor-pointer px-2.5 h-9 text-error border border-transparent hover:bg-error/20 transition-colors duration-500 ease-in-out hover:border-error rounded-lg flex items-center gap-2"
                     >
-                      <LogoutIcon/>
+                      <LogoutIcon />
                       <span className="text-sm">Disconnect Wallet</span>
                     </div>
                   </div>
                 </Popover.Content>
               </Popover.Root>
-              {/* <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                  onClick={handleSignOut}
-                  className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-200"
-                >
-                  Sign Out
-                </button>
-              </div> */}
             </div>
           )}
         </div>
       </div>
-      {/* <div className="min-[1170px]:hidden flex items-center gap-8">
-        {isMobileNavOpen ? (
-          <IoClose
-            size={30}
-            onClick={() => setIsMobileNavOpen(false)}
-            className="text-muted-foreground"
-          />
-        ) : (
-          <IoIosMenu
-            size={30}
-            className="text-muted-foreground"
-            onClick={() => setIsMobileNavOpen(true)}
-          />
-        )}
-      </div>
-      {isMobileNavOpen && <MobileNav />} */}
     </nav>
   );
 }

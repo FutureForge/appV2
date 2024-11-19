@@ -10,7 +10,11 @@ import { useListingInfoStore, Fee } from "./store";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
 
-export function BuyNowListingDialog() {
+export function BuyNowListingDialog({
+  setIsDialogOpen,
+}: {
+  setIsDialogOpen: (open: boolean) => void;
+}) {
   const toast = useToast();
   const { activeAccount } = useUserChainInfo();
   const { listingInfo } = useListingInfoStore();
@@ -28,8 +32,6 @@ export function BuyNowListingDialog() {
     percent: 0,
   });
 
-  console.log({ listingInfo });
-
   const cta = "Buy Listing";
 
   const buyListingMutation = useBuyFromDirectListingMutation();
@@ -39,15 +41,25 @@ export function BuyNowListingDialog() {
     if (!listingId || !quantity || !pricePerToken)
       return toast.error("Please fill in all fields");
 
-    buyListingMutation.mutate({
-      buyFromListing: {
-        buyFor: activeAccount.address,
-        listingId,
-        quantity,
-        totalPrice: decimalOffChain(pricePerToken) as unknown as string,
-        nativeTokenValue: decimalOffChain(pricePerToken) as unknown as string,
+    buyListingMutation.mutate(
+      {
+        buyFromListing: {
+          buyFor: activeAccount.address,
+          listingId,
+          quantity,
+          totalPrice: decimalOffChain(pricePerToken) as unknown as string,
+          nativeTokenValue: decimalOffChain(pricePerToken) as unknown as string,
+        },
       },
-    });
+      {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+        },
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   const isDisabled = buyListingMutation.isPending;

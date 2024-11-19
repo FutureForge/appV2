@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import {
+  useApprovalMutation,
   useApprovedForAllMutation,
   useCreateAuctionMutation,
 } from "@/modules/mutation";
@@ -27,6 +28,7 @@ type AuctionDialogProps = {
   tokenId: string;
   isApproved: boolean;
   assetContract: string;
+  setIsDialogOpen: (open: boolean) => void;
 };
 
 const notes = [
@@ -43,22 +45,22 @@ export function AuctionDialog({
   tokenId,
   isApproved,
   assetContract,
+  setIsDialogOpen,
 }: AuctionDialogProps) {
   const [minimumBidAmount, setMinimumBidAmount] = useState("");
   const [buyoutBidAmount, setBuyoutBidAmount] = useState("");
   const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const [selectedDate, setSelectedDate] = useState<Date>(oneWeekFromNow);
 
-  console.log({ selectedDate });
-
   const createAuctionMutation = useCreateAuctionMutation();
-  const approveMutation = useApprovedForAllMutation();
+  const approveMutation = useApprovalMutation();
 
   const isDisabled = !isApproved
     ? false
     : !minimumBidAmount ||
       !buyoutBidAmount ||
       !selectedDate ||
+      approveMutation.isPending ||
       createAuctionMutation.isPending;
 
   const handleDateChange = (date: Date | null) => {
@@ -96,9 +98,17 @@ export function AuctionDialog({
   const handleApproveSpending = () => {
     if (isApproved) return;
 
-    approveMutation.mutate({
-      collectionContractAddress: assetContract,
-    });
+    approveMutation.mutate(
+      {
+        collectionContractAddress: assetContract,
+        tokenId,
+      },
+      {
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   const TooltipContent = () => (
@@ -135,8 +145,8 @@ export function AuctionDialog({
             <span className="flex items-center gap-2 mb-4">
               <p className="font-medium text-muted-foreground">Notes</p>
               <Tooltip content={<TooltipContent />} className="w-[350px]">
-                <button>
-                  <Info className="size-4 text-muted-foreground"/>
+                <button aria-label="View auction notes">
+                  <Info className="size-4 text-muted-foreground" />
                 </button>
               </Tooltip>
             </span>
@@ -163,7 +173,7 @@ export function AuctionDialog({
               </div>
             </div>
 
-            <div className="flex w-full mt-auto flex-col gap-4">
+            <div className="flex w-full mt-8 flex-col gap-4">
               <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">
                 <Label>Duration</Label>
                 <div className="flex items-center gap-2 w-full">
@@ -191,9 +201,9 @@ export function AuctionDialog({
               </div>
 
               <Button
-                disabled={isDisabled}
+                disabled={isApproved ? isDisabled : approveMutation.isPending}
                 onClick={
-                  !isApproved ? handleApproveSpending : handleCreateAuction
+                  isApproved ? handleCreateAuction : handleApproveSpending
                 }
                 className="w-full mt-auto"
                 shape="square"

@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import {
-  useApprovedForAllMutation,
+  useApprovalMutation,
   useCreateListingMutation,
 } from "@/modules/mutation";
 import DatePicker from "react-datepicker";
@@ -28,6 +28,7 @@ type ListDialogProps = {
   tokenId: string;
   isApproved: boolean;
   assetContract: string;
+  setIsDialogOpen: (open: boolean) => void;
 };
 
 const notes = [
@@ -44,17 +45,14 @@ export function ListDialog({
   tokenId,
   isApproved,
   assetContract,
+  setIsDialogOpen,
 }: ListDialogProps) {
-  console.log({ isApproved });
-
   const [value, setValue] = useState("");
   const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const [selectedDate, setSelectedDate] = useState<Date>(oneWeekFromNow);
 
-  console.log({ selectedDate });
-
   const createListingMutation = useCreateListingMutation();
-  const approveMutation = useApprovedForAllMutation();
+  const approveMutation = useApprovalMutation();
 
   const isDisabled = !isApproved
     ? false
@@ -81,9 +79,11 @@ export function ListDialog({
       {
         onSuccess: () => {
           setValue("");
+          setIsDialogOpen(false);
         },
         onError() {
           setValue("");
+          setIsDialogOpen(false);
         },
       }
     );
@@ -92,9 +92,17 @@ export function ListDialog({
   const handleApproveSpending = () => {
     if (isApproved) return;
 
-    approveMutation.mutate({
-      collectionContractAddress: assetContract,
-    });
+    approveMutation.mutate(
+      {
+        collectionContractAddress: assetContract,
+        tokenId,
+      },
+      {
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   const TooltipContent = () => (
@@ -131,62 +139,60 @@ export function ListDialog({
             <span className="flex items-center gap-2 mb-4">
               <p className="font-medium text-muted-foreground">Notes</p>
               <Tooltip content={<TooltipContent />} className="w-[350px]">
-                <button>
+                <button aria-label="View listing notes">
                   <Info className="size-4 text-muted-foreground" />
                 </button>
               </Tooltip>
             </span>
 
+            <div className="flex flex-col gap-2">
+              <Label>Listing Price</Label>
+              <TextField
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="Listing Price"
+                containerClass="bg-transparent"
+              />
+            </div>
+            <div className="flex w-full mt-auto flex-col gap-4">
+              <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">
+                <Label className="mb-2 block">Duration</Label>
+                <div className="flex items-center gap-2 w-full">
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={handleDateChange}
+                    placeholderText="Select date"
+                    className="w-full bg-transparent text-white border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    minDate={oneWeekFromNow}
+                    showPopperArrow={false}
+                  />
 
-              <div className="flex flex-col gap-2">
-                <Label>Listing Price</Label>
-                <TextField
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder="Listing Price"
-                  containerClass="bg-transparent"
-                />
-              </div>
-              <div className="flex w-full mt-auto flex-col gap-4">
-                <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">
-                  <Label className="mb-2 block">Duration</Label>
-                  <div className="flex items-center gap-2 w-full">
-                    <DatePicker
-                      selected={selectedDate}
-                      onChange={handleDateChange}
-                      placeholderText="Select date"
-                      className="w-full bg-transparent text-white border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                      minDate={oneWeekFromNow}
-                      showPopperArrow={false}
-                    />
-
-                    <div className="border border-border w-full rounded-lg flex justify-between p-2">
-                      <p className="font-medium text-sm text-white">
-                        {selectedDate
-                          ? selectedDate.toDateString()
-                          : "Select Date"}
-                      </p>
-                      <p className="font-medium text-sm text-white">
-                        {selectedDate
-                          ? selectedDate.toLocaleTimeString()
-                          : "Time"}
-                      </p>
-                    </div>
+                  <div className="border border-border w-full rounded-lg flex justify-between p-2">
+                    <p className="font-medium text-sm text-white">
+                      {selectedDate
+                        ? selectedDate.toDateString()
+                        : "Select Date"}
+                    </p>
+                    <p className="font-medium text-sm text-white">
+                      {selectedDate
+                        ? selectedDate.toLocaleTimeString()
+                        : "Time"}
+                    </p>
                   </div>
                 </div>
-
-                <Button
-                  disabled={isDisabled}
-                  onClick={
-                    !isApproved ? handleApproveSpending : handleCreateListing
-                  }
-                  className="w-full"
-                  shape="square"
-                >
-                  {!isApproved ? "Approve Spending" : "List NFT"}
-                </Button>
               </div>
 
+              <Button
+                disabled={isApproved ? isDisabled : approveMutation.isPending}
+                onClick={
+                  isApproved ? handleCreateListing : handleApproveSpending
+                }
+                className="w-full"
+                shape="square"
+              >
+                {!isApproved ? "Approve Spending" : "List NFT"}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogBody>

@@ -177,8 +177,12 @@ export function NFTCard(props: NFTCardProps) {
                 </motion.button>
               </DialogTrigger>
               <DialogContent className="w-[564px]">
-                {status === "listed" && <BuyNowListingDialog />}
-                {status === "auctioned" && <BuyNowAuctionDialog />}
+                {status === "listed" && (
+                  <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
+                )}
+                {status === "auctioned" && (
+                  <BuyNowAuctionDialog setIsDialogOpen={setIsDialogOpen} />
+                )}
               </DialogContent>
             </DialogRoot>
           )}

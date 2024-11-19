@@ -48,6 +48,7 @@ import {
 import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
 import { chainInfo, client } from "@/utils/configs";
 import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
+import { useUserImageStore } from "@/utils/store/user-image.store";
 
 // Icons
 import CopyIcon from "@/assets/copy.svg";
@@ -75,6 +76,8 @@ export function ProfilePage() {
   const router = useRouter();
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
+
+  const { backgroundImage } = useUserImageStore();
 
   const cancelListingMutation = useCancelDirectListingMutation();
   const cancelAuctionMutation = useCancelAuctionMutation();
@@ -394,28 +397,31 @@ export function ProfilePage() {
         <div className="bg-gradient-to-tr from-background via-background/95 to-transparent absolute inset-0 z-10" />
         <div className="z-40 flex items-end justify-between w-full">
           <div className="z-30 flex flex-col gap-6 w-[40%]">
-            <div className="flex gap-4 z-40">
-              <Image
+            <div className="flex flex-col gap-4 z-40">
+              {/* <Image
                 src={"/image-2.png"}
                 alt={"profile image"}
                 width={123}
                 height={123}
                 className="size-[123px] rounded-[22px] z-40"
+              /> */}
+              <div
+                className="size-[123px] rounded-[22px] z-40"
+                style={{
+                  background: backgroundImage,
+                }}
               />
-              <div className="z-40 flex flex-col gap-3">
-                {userAddress && (
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <h4 className="text-2xl font-medium flex gap-2 items-center">
-                      {getFormatAddress(userAddress || "")}
-                    </h4>
-
-                    <CopyIcon
-                      onClick={() => handleCopy(userAddress)}
-                      className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
-                    />
-                  </div>
-                )}
-              </div>
+              {userAddress && (
+                <div className="flex items-center gap-2 text-sm text-foreground">
+                  <h4 className="text-2xl font-medium flex gap-2 items-center">
+                    {getFormatAddress(userAddress || "")}
+                  </h4>
+                  <CopyIcon
+                    onClick={() => handleCopy(userAddress)}
+                    className="size-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors duration-300 ease-in-out"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

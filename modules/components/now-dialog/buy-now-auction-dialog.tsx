@@ -10,7 +10,11 @@ import { Fee, useAuctionInfoStore } from "./store";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
 
-export function BuyNowAuctionDialog() {
+export function BuyNowAuctionDialog({
+  setIsDialogOpen,
+}: {
+  setIsDialogOpen: (open: boolean) => void;
+}) {
   const toast = useToast();
   const { activeAccount } = useUserChainInfo();
   const { auctionInfo } = useAuctionInfoStore();
@@ -30,8 +34,6 @@ export function BuyNowAuctionDialog() {
 
   const cta = "Buy Auction";
 
-  console.log({ auctionInfo });
-
   const bidInAuctionMutation = useBidInAuctionMutation();
 
   const handleBuyAuctionNow = () => {
@@ -39,10 +41,20 @@ export function BuyNowAuctionDialog() {
     if (!auctionId || !buyoutBidAmount)
       return toast.error("Please fill in all fields");
 
-    bidInAuctionMutation.mutate({
-      auctionId,
-      bidAmount: decimalOffChain(buyoutBidAmount) as unknown as string,
-    });
+    bidInAuctionMutation.mutate(
+      {
+        auctionId,
+        bidAmount: decimalOffChain(buyoutBidAmount) as unknown as string,
+      },
+      {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+        },
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   const isDisabled = bidInAuctionMutation.isPending;

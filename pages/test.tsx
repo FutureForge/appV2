@@ -23,9 +23,11 @@ import {
   useCheckApprovedForAllQuery,
   useFilteredAllAuctionsQuery,
   useUserCollectionsQuery,
+  useCheckApprovalStatusQuery,
 } from "@/modules/query";
 import {
   useAddCollectionMutation,
+  useApprovalMutation,
   useApprovedForAllMutation,
   useBidInAuctionMutation,
   useBuyFromDirectListingMutation,
@@ -37,7 +39,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import DatePicker from "react-datepicker";
 import { Social } from "@/utils/types/global";
 import { getNFT } from "thirdweb/extensions/erc721";
-import { getContractCustom } from "@/modules/blockchain";
+import { getContractCustom, getContractEthers } from "@/modules/blockchain";
 import nftFactoryAbi from "@/utils/abi/nftFactory.json";
 import nftBaseAbi from "@/utils/abi/nftbase.json";
 import { NFT } from "@/utils/types/graphql";
@@ -178,11 +180,11 @@ export default function Test() {
     setSelectedDate(newDate);
   };
 
-  const { data: isApproved } = useCheckApprovedForAllQuery({
-    collectionContractAddress: userNFTs?.[8]?.contractAddress!,
-  });
+  // const { data: isApproved } = useCheckApprovedForAllQuery({
+  //   collectionContractAddress: userNFTs?.[8]?.contractAddress!,
+  // });
 
-  console.log({ isApproved });
+  // console.log({ isApproved });
 
   // const createListingMutation = useCreateListingMutation();
   // console.log({ createListingMutation });
@@ -202,21 +204,44 @@ export default function Test() {
   // const approveMutation = useApprovedForAllMutation();
   // console.log({ approveMutation });
 
-  const handleClick = async () => {
+  // const contract = getContractCustom({
+  //   contractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+  //   abi: nftBaseAbi,
+  // });
 
-    const contract = getContractCustom({
-      contractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
-      abi: nftBaseAbi,
+  // const etherContract = getContractEthers({
+  //   contractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+  //   abi: nftBaseAbi,
+  // });
+
+  // console.log({ etherContract });
+  // console.log({ contract });
+
+  const isApproved = useCheckApprovalStatusQuery({
+    collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+    tokenId: "1",
+  });
+  console.log({ isApproved });
+
+  const approvalMutation = useApprovalMutation();
+  console.log({ approvalMutation });
+
+  const handleClick = async () => {
+    approvalMutation.mutate({
+      collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+      tokenId: "1",
     });
 
-    const nft = await getNFT({
-      contract,
-      tokenId: BigInt(1),
-      includeOwner: true,
-    })
-
-    console.log({ nft });
-
+    // const mintFee = await etherContract.mintFee();
+    // console.log({ mintFee: mintFee.toString() });
+    // const name = await etherContract.balanceOf("0x1FFE2134c82D07227715af2A12D1406165A305BF");
+    // console.log({ name: name.toString() });
+    // const nft = await getNFT({
+    //   contract,
+    //   tokenId: BigInt(1),
+    //   includeOwner: true,
+    // });
+    // console.log({ nft });
     // if (!isApproved) {
     //   await approveMutation.mutateAsync({
     //     collectionContractAddress: userNFTs?.[8]?.contractAddress!,
