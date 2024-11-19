@@ -1,6 +1,6 @@
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { cn } from '@/utils/functions';
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { cn } from "../../utils";
 
 /* -------------------------------------------------------------------------------------------------
  * Trigger
@@ -11,10 +11,12 @@ type TriggerProps = ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>;
 
 const Trigger = forwardRef<TriggerElement, TriggerProps>((props, ref) => {
   const { asChild = true, ...triggerProps } = props;
-  return <PopoverPrimitive.Trigger asChild={asChild} {...triggerProps} ref={ref} />;
+  return (
+    <PopoverPrimitive.Trigger asChild={asChild} {...triggerProps} ref={ref} />
+  );
 });
 
-Trigger.displayName = 'PopoverTrigger';
+Trigger.displayName = "PopoverTrigger";
 
 /* -------------------------------------------------------------------------------------------------
  * Content
@@ -29,13 +31,13 @@ const Content = forwardRef<ContentElement, ContentProps>((props, ref) => {
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         className={cn(
-          'font-sans border border-new-elements-border rounded-xl bg-new-secondary text-new-foreground',
-          'origin-[--radix-popover-content-transform-origin]',
+          "font-space border border-border rounded-2xl bg-card text-foreground",
+          "origin-[--radix-popover-content-transform-origin]",
           // Animation enter
-          'data-[state=open]:data-[side=top]:animate-slide-from-top data-[state=open]:data-[side=bottom]:animate-slide-from-bottom data-[state=open]:data-[side=left]:animate-slide-from-left data-[state=open]:data-[side=right]:animate-slide-from-right',
+          "data-[state=open]:data-[side=top]:animate-slide-from-top data-[state=open]:data-[side=bottom]:animate-slide-from-bottom data-[state=open]:data-[side=left]:animate-slide-from-left data-[state=open]:data-[side=right]:animate-slide-from-right",
           // Animation out
-          'data-[state=closed]:data-[side=top]:animate-slide-to-top data-[state=closed]:data-[side=bottom]:animate-slide-to-bottom data-[state=closed]:data-[side=left]:animate-slide-to-left data-[state=closed]:data-[side=right]:animate-slide-to-right',
-          className,
+          "data-[state=closed]:data-[side=top]:animate-slide-to-top data-[state=closed]:data-[side=bottom]:animate-slide-to-bottom data-[state=closed]:data-[side=left]:animate-slide-to-left data-[state=closed]:data-[side=right]:animate-slide-to-right",
+          className
         )}
         {...contentProps}
         ref={ref}
@@ -44,13 +46,18 @@ const Content = forwardRef<ContentElement, ContentProps>((props, ref) => {
   );
 });
 
-Content.displayName = 'PopoverContent';
+Content.displayName = "PopoverContent";
 
-export const Popover = {
-  Root: PopoverPrimitive.Root,
-  Trigger,
-  Anchor: PopoverPrimitive.Anchor,
-  Content,
-  Arrow: PopoverPrimitive.Arrow,
-  Close: PopoverPrimitive.Close,
-};
+/* ----------------------------------------------------------------------------
+ * Exports
+ * --------------------------------------------------------------------------*/
+
+export const Root = PopoverPrimitive.Root;
+export const Anchor = PopoverPrimitive.Anchor;
+export const Close = PopoverPrimitive.Close;
+export const Arrow = PopoverPrimitive.Arrow;
+
+export const Popover = Object.assign(
+  {},
+  { Root, Trigger, Anchor, Content, Arrow, Close }
+);
