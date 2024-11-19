@@ -16,7 +16,7 @@ import {
   getWinningBid,
 } from "@/modules/blockchain";
 import ERC721ABI from "@/utils/abi/erc721.json";
-import { NFT } from "thirdweb";
+import { NFT as ThirdwebNFTType } from "thirdweb";
 import {
   ensureSerializable,
   formatBlockchainTimestamp,
@@ -24,7 +24,12 @@ import {
 } from "@/utils/functions";
 import { useSingleCollectionWithoutNFTsQuery } from "..";
 import { NFTActivityResponse } from "@/utils/types/global";
-import { Auction, Listing, Offer } from "@/utils/types/graphql";
+import {
+  Auction,
+  Listing,
+  NFT as CustomNFTType,
+  Offer,
+} from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
 import {
   getAllListing,
@@ -34,6 +39,9 @@ import {
   getAllOffers,
   getTotalOffers,
 } from "@/modules/blockchain/offer/offer.blockchain";
+import { indexerEndpoint } from "@/utils/graphql";
+import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
+import request from "graphql-request";
 
 export const StatusType = {
   UNSET: 0,
@@ -106,7 +114,7 @@ export function useSingleNFTQuery({
           abi: ERC721ABI,
         });
 
-        let updatedNFT: NFT | null = null;
+        let updatedNFT: ThirdwebNFTType | null = null;
 
         const nft = await getNFT({
           contract,
@@ -220,5 +228,21 @@ export function useSingleNFTQuery({
     },
     enabled: !!contractAddress && !!tokenId,
     refetchInterval: 5000,
+  });
+}
+
+export function useAllNFTQuery() {
+  return useQuery({
+    queryKey: [queryKeys.listing.single],
+    queryFn: async () => {
+      const response = await request<{ nfts: CustomNFTType[] }>(
+        indexerEndpoint,
+        allNFTsQuery
+      );
+
+      return response.nfts;
+    },
+    enabled: true,
+    refetchInterval: 600000,
   });
 }

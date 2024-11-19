@@ -33,7 +33,7 @@ export type NFT = {
   assetContract: string;
   id: string;
   metadata: NFTMetadata;
-  owner: string;
+  owner?: string;
   tokenId: string;
   tokenURI: string;
   type: string;

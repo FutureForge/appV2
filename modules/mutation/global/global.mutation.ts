@@ -145,14 +145,12 @@ export function useApprovalMutation() {
       let receipt;
 
       if (approvalSetting === ApprovalSettingEnum.UNLIMITED) {
-        console.log("inside mutation approvalForAllMutation");
         receipt = await approvalForAllMutation.mutateAsync({
           collectionContractAddress,
         });
       }
 
       if (approvalSetting === ApprovalSettingEnum.ONE_PER_ONE) {
-        console.log("inside mutation approvalTokenIdMutation");
         receipt = await approvalTokenIdMutation.mutateAsync({
           collectionContractAddress,
           tokenId,

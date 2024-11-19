@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "../../utils";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
@@ -46,9 +46,9 @@ export function Nav() {
   const { activeAccount, activeWallet } = useUserChainInfo();
   const walletAddress = activeAccount?.address;
 
+  const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const pathname = usePathname();
   const [copied, setCopied] = useState(false);
 
   const { approvalSetting, setApprovalSetting } = useApprovalSettingStore();
@@ -81,7 +81,6 @@ export function Nav() {
   }, []);
 
   const handleSignOut = async () => {
-    console.log("Signing out...");
     await activeWallet?.disconnect();
   };
 

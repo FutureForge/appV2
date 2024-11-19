@@ -5,36 +5,36 @@ import {
   ComboboxProvider,
 } from "@ariakit/react";
 import * as RadixPopover from "@radix-ui/react-popover";
-import { useRef, useState, startTransition, useMemo, ReactNode } from "react";
+import { useRef, useState, startTransition, useMemo } from "react";
 import CloseIcon from "@/assets/close.svg";
 import { matchSorter } from "match-sorter";
 import SearchIcon from "@/assets/search-lg.svg";
 import { Button } from "../button";
 import { cn } from "../../utils";
 import { ScrollArea } from "../scroll-area/scroll-area";
+import {
+  useAllCollectionsQuery,
+  useAllAuctionsQuery,
+  useAllNFTQuery,
+  useAllListingsQuery,
+} from "@/modules/query";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import { useRouter } from "next/navigation";
 
 const popular_tags = [
-  { label: "NFTS", link: "" },
-  { label: "Listed", link: "" },
-];
-const links = [
-  {
-    href: "https://x.com/ariakitjs",
-    children: "Twitter",
-    target: "_blank",
-  },
-  {
-    href: "https://www.facebook.com/ariakitjs",
-    children: "Facebook",
-    target: "_blank",
-  },
-  {
-    href: "https://www.instagram.com/ariakitjs",
-    children: "Instagram",
-    target: "_blank",
-  },
-  { href: "https://ariakit.org", children: "Ariakit.org" },
-];
+  { label: "All", type: null },
+  { label: "NFTS", type: "collection-nft" || "nft" },
+  { label: "Listed", type: "listing" },
+  { label: "Auctions", type: "auction" },
+  { label: "Collections", type: "collection" },
+] as const;
+
+type SearchType =
+  | "collection"
+  | "listing"
+  | "auction"
+  | "collection-nft"
+  | "nft";
 
 export function Search() {
   const comboboxRef = useRef<HTMLInputElement>(null);
@@ -42,25 +42,122 @@ export function Search() {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  const { data: allCollectionsQuery } = useAllCollectionsQuery({ limit: 100 });
+  const { data: listingData } = useAllListingsQuery({ limit: 100 });
+  const { data: auctionData } = useAllAuctionsQuery({ limit: 100 });
+  const { data: allNFTs } = useAllNFTQuery();
+
+  const collectionData = allCollectionsQuery?.collections;
+
+  const searchResults = useMemo(() => {
+    setIsSearching(true);
+    if (!searchValue) {
+      setIsSearching(false);
+      return [];
+    }
+
+    const results = new Map();
+
+    listingData?.forEach((listing) => {
+      if (
+        listing.nft.metadata.name
+          .toLowerCase()
+          .includes(searchValue.toLowerCase())
+      ) {
+        results.set(listing.nft.metadata.name.toLowerCase(), {
+          ...listing,
+          type: "listing" as SearchType,
+        });
+      }
+    });
+
+    auctionData?.forEach((auction) => {
+      if (
+        auction.nft.metadata.name
+          .toLowerCase()
+          .includes(searchValue.toLowerCase())
+      ) {
+        results.set(auction.nft.metadata.name.toLowerCase(), {
+          ...auction,
+          type: "auction" as SearchType,
+        });
+      }
+    });
+
+    collectionData?.forEach((collection) => {
+      if (
+        collection.collectionName
+          .toLowerCase()
+          .includes(searchValue.toLowerCase())
+      ) {
+        results.set(collection.collectionName.toLowerCase(), {
+          ...collection,
+          type: "collection" as SearchType,
+        });
+      }
+    });
+
+    allNFTs?.forEach((nft) => {
+      if (nft.metadata.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        collectionData?.forEach((collection) => {
+          if (
+            collection.collectionAddress.toLowerCase() ===
+            nft.assetContract.toLowerCase()
+          ) {
+            results.set(nft.metadata.name.toLowerCase(), {
+              ...nft,
+              type: "collection-nft" as SearchType,
+              collectionName: collection.collectionName,
+            });
+          } else {
+            results.set(nft.metadata.name.toLowerCase(), {
+              ...nft,
+              type: "nft" as SearchType,
+            });
+          }
+        });
+      }
+    });
+
+    setIsSearching(false);
+    return Array.from(results.values());
+  }, [searchValue, collectionData, listingData, auctionData, allNFTs]);
 
   const matches = useMemo(() => {
-    return matchSorter(links, searchValue, {
-      keys: ["children"],
+    return matchSorter(searchResults, searchValue, {
+      keys: [
+        "metadata.name",
+        "collectionName",
+        (item) => (item.type === "collection-nft" ? item.collectionName : null),
+      ],
       baseSort: (a, b) => (a.index < b.index ? -1 : 1),
     });
-  }, [searchValue]);
+  }, [searchValue, searchResults]);
 
-  const handleToggleTag = (tag: string) => {
-    setActiveTag((prev) => (prev === tag ? null : tag));
-  };
+  const filteredMatches = useMemo(() => {
+    if (!activeTag || activeTag === "All") return matches;
+
+    const tagType = popular_tags.find((tag) => tag.label === activeTag)?.type;
+    return matches.filter((match) => match.type === tagType);
+  }, [matches, activeTag]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
+    setIsSearching(true);
+    setShowResults(true);
   };
   const handleClearInput = () => {
     setSearchValue("");
     setOpen(false);
     setActiveTag(null);
+    setShowResults(false);
+  };
+
+  const handleToggleTag = (tag: string) => {
+    setActiveTag((prev) => (prev === tag ? null : tag));
   };
 
   return (
@@ -119,27 +216,52 @@ export function Search() {
                       })}
                     >
                       {tag.label}
-                      <CloseIcon className="text-muted-foreground size-3 cursor-pointer" />
+                      <CloseIcon
+                        className="text-muted-foreground size-3 cursor-pointer"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          setActiveTag(null);
+                        }}
+                      />
                     </Button>
                   ))}
                 </div>
               </div>
 
               <div className="p-4 flex flex-col">
-                {matches.length ? (
-                  matches.map(({ children, ...props }) => (
-                    <ComboboxItem
-                      key={children}
-                      focusOnHover
-                      hideOnClick
-                      className="combobox-item"
-                      render={<a {...props} />}
-                    >
-                      {children}
-                    </ComboboxItem>
-                  ))
-                ) : (
-                  <div className="no-results">No results found</div>
+                {showResults && searchValue && (
+                  <>
+                    {isSearching ? (
+                      <div className="flex items-center justify-center py-4 text-sm text-muted-foreground">
+                        Loading...
+                      </div>
+                    ) : filteredMatches.length ? (
+                      filteredMatches.map(({ children, ...props }, index) => {
+                        const type = props?.type as SearchType;
+                        return (
+                          <ComboboxItem
+                            key={index}
+                            focusOnHover
+                            hideOnClick
+                            className="combobox-item"
+                            render={
+                              <SearchResultItem type={type} data={props} />
+                            }
+                          />
+                        );
+                      })
+                    ) : (
+                      <div className="flex items-center justify-center py-4 text-sm text-muted-foreground">
+                        No results found
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {!showResults && !searchValue && (
+                  <div className="flex items-center justify-center py-4 text-sm text-muted-foreground">
+                    Search for collections, listings, auctions, or NFTs
+                  </div>
                 )}
               </div>
             </div>
@@ -147,5 +269,61 @@ export function Search() {
         </RadixPopover.Content>
       </ComboboxProvider>
     </RadixPopover.Root>
+  );
+}
+interface SearchResultItemProps {
+  type: SearchType;
+  data: any;
+}
+
+export function SearchResultItem({ type, data }: SearchResultItemProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (type === "collection") {
+      router.push(`/collections/${data?.collectionAddress}`);
+    } else {
+      router.push(`/nft/${data?.assetContract}/${data?.tokenId}`);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg group cursor-pointer"
+    >
+      <div className="relative">
+        {type === "collection" ? (
+          <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg group cursor-pointer">
+            <div className="relative w-10 h-10">
+              <img
+                src={data?.collectionImage}
+                alt={data?.collectionName}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            </div>
+          </div>
+        ) : (
+          <ImageHolder
+            src={data?.metadata?.image}
+            alt={data?.metadata?.name}
+            width={40}
+            height={40}
+            className="rounded-lg object-cover"
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="text-sm font-medium truncate">
+          {type === "collection" ? data?.collectionName : data?.metadata?.name}
+        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground capitalize">
+            {type.replace("-", " ")}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

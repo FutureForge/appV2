@@ -295,7 +295,7 @@ export default function CollectionPage() {
       const label = collectionLabels[key as keyof typeof collectionLabels];
       const symbol = "XFI";
 
-      const displayValue = value === undefined ? 0 : value;
+      const displayValue = value === undefined || value === Infinity ? 0 : value;
       const shouldShowSymbol = key === "floorPrice" || key === "totalVolume";
 
       return (
