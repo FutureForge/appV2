@@ -477,6 +477,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       name={name!}
                       tokenId={tokenId}
                       setIsDialogOpen={setIsDialogOpen}
+                      assetContract={contractAddress}
                     />
                   </DialogContent>
                 </DialogRoot>
@@ -559,6 +560,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         name={name!}
                         tokenId={tokenId}
                         setIsDialogOpen={setIsDialogOpen}
+                        assetContract={contractAddress}
                       />
                     </DialogContent>
                   </DialogRoot>

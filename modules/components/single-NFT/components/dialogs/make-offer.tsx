@@ -6,15 +6,14 @@ import {
   Label,
   TextField,
 } from "@/modules/app";
-import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import React, { useState } from "react";
-import XFI from "@/assets/xfi.svg";
-import { decimalOffChain } from "@/modules/blockchain";
 import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
-import { client } from "@/utils/configs";
+import { client, WRAPPED_TOKEN_CONTRACT } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import { useUserChainInfo } from "@/modules/query";
+import { useMakeListingOfferMutation } from "@/modules/mutation";
+import DatePicker from "react-datepicker";
 
 type MakeOfferDialogProps = {
   src: string;
@@ -22,6 +21,7 @@ type MakeOfferDialogProps = {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   name: string;
   tokenId: string;
+  assetContract: string;
   setIsDialogOpen: (open: boolean) => void;
 };
 
@@ -41,12 +41,48 @@ export function MakeOfferDialog({
   alt,
   name,
   tokenId,
+  assetContract,
   setIsDialogOpen,
 }: MakeOfferDialogProps) {
   const { activeAccount } = useUserChainInfo();
   const [value, setValue] = useState("");
+  const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const [selectedDate, setSelectedDate] = useState<Date>(oneWeekFromNow);
 
-  const isDisabled = !value || !activeAccount;
+  const makeOfferMutation = useMakeListingOfferMutation();
+
+  const isDisabled = !value || !selectedDate || makeOfferMutation.isPending;
+
+  const handleDateChange = (date: Date | null) => {
+    const newDate = date || oneWeekFromNow;
+    setSelectedDate(newDate);
+  };
+
+  const handleMakeOffer = () => {
+    if (!assetContract || !tokenId || !value || !selectedDate)
+      throw new Error("Provide all fields");
+
+    makeOfferMutation.mutateAsync(
+      {
+        makeOffer: {
+          assetContract,
+          tokenId,
+          totalPrice: value,
+          quantity: "1",
+          expirationTimestamp: selectedDate,
+          currency: WRAPPED_TOKEN_CONTRACT,
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+        },
+        onError: () => {
+          setIsDialogOpen(false);
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -116,8 +152,39 @@ export function MakeOfferDialog({
               />
             </form>
 
-            <div className="flex w-full items-end justify-end mt-6">
-              <Button disabled={isDisabled} className="w-full" shape="square">
+            <div className="flex w-full mt-8 flex-col gap-4">
+              <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">
+                <Label className="mb-2 block">Duration</Label>
+                <div className="flex items-center gap-2 w-full">
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={handleDateChange}
+                    placeholderText="Select date"
+                    className="w-full bg-transparent text-white border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    minDate={oneWeekFromNow}
+                    showPopperArrow={false}
+                  />
+
+                  <div className="border border-border w-full rounded-lg flex justify-between p-2">
+                    <p className="font-medium text-sm text-white">
+                      {selectedDate
+                        ? selectedDate.toDateString()
+                        : "Select Date"}
+                    </p>
+                    <p className="font-medium text-sm text-white">
+                      {selectedDate
+                        ? selectedDate.toLocaleTimeString()
+                        : "Time"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Button
+                onClick={handleMakeOffer}
+                disabled={isDisabled}
+                className="w-full"
+                shape="square"
+              >
                 {!activeAccount ? "Connect Your Wallet" : "Make Offer"}
               </Button>
             </div>

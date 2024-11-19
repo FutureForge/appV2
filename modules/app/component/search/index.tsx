@@ -27,7 +27,7 @@ const popular_tags = [
   { label: "Listed", type: "listing" },
   { label: "Auctions", type: "auction" },
   { label: "Collections", type: "collection" },
-] as const;
+] as { label: string; type: SearchType }[];
 
 type SearchType =
   | "collection"
