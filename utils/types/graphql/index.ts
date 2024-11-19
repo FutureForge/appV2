@@ -1,5 +1,5 @@
-type Attribute = {
-  traitType: string;
+export type Attribute = {
+  trait_type: string;
   value: string;
 };
 
@@ -8,7 +8,7 @@ type Property = {
   value: string;
 };
 
-type WinningBid = {
+export type WinningBid = {
   bidAmount: string;
   bidder: string;
   currency: string;

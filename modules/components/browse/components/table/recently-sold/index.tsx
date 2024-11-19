@@ -1,4 +1,3 @@
-
 import {
   getCoreRowModel,
   getSortedRowModel,
@@ -10,9 +9,8 @@ import { makeRecentlySoldListingColumn } from "./columns";
 
 import { Table } from "@/modules/app";
 import { useRouter } from "next/navigation";
-import { dehydrate,  HydrationBoundary, } from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { NewSaleListing } from "@/utils/types/graphql";
-
 
 type RecentlySoldListingTableProps = {
   isLoading: boolean;
@@ -38,10 +36,11 @@ export function RecentlySoldListingTable({
     <HydrationBoundary state={dehydrate}>
       <div suppressHydrationWarning>
         <Table
-          // onRowClick={(_row) => {
-          //   const collectionAddress = _row.collectionAddress;
-          //   router.push(`/collections/${collectionAddress}`);
-          // }}
+          onRowClick={(_row) => {
+            const collectionAddress = _row.assetContract;
+            const tokenId = _row.nft.tokenId;
+            router.push(`/nft/${collectionAddress}/${tokenId}`);
+          }}
           isLoading={isLoading}
           hasHover
           table={table}

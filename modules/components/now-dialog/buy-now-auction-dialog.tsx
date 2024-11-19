@@ -1,0 +1,116 @@
+import { Button, DialogBody, DialogHeader, DialogTitle } from "@/modules/app";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import React, { useEffect, useState } from "react";
+import XFI from "@/assets/xfi.svg";
+import { decimalOffChain } from "@/modules/blockchain";
+import { useBidInAuctionMutation } from "@/modules/mutation";
+import { useUserChainInfo } from "@/modules/query";
+import { useToast } from "@/modules/app/hooks/useToast";
+import { Fee, useAuctionInfoStore } from "./store";
+import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
+import { MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
+
+export function BuyNowAuctionDialog() {
+  const toast = useToast();
+  const { activeAccount } = useUserChainInfo();
+  const { auctionInfo } = useAuctionInfoStore();
+  const { auctionId, tokenId, nft, buyoutBidAmount, assetContract } =
+    auctionInfo;
+  const { metadata } = nft || {};
+  const { image, name } = metadata || {};
+
+  const [collectionFee, setCollectionFee] = useState<Fee>({
+    address: "",
+    percent: 0,
+  });
+  const [marketplaceFee, setMarketplaceFee] = useState<Fee>({
+    address: "",
+    percent: 0,
+  });
+
+  const cta = "Buy Auction";
+
+  console.log({ auctionInfo });
+
+  const bidInAuctionMutation = useBidInAuctionMutation();
+
+  const handleBuyAuctionNow = () => {
+    if (!activeAccount) return toast.error("Please connect your wallet");
+    if (!auctionId || !buyoutBidAmount)
+      return toast.error("Please fill in all fields");
+
+    bidInAuctionMutation.mutate({
+      auctionId,
+      bidAmount: decimalOffChain(buyoutBidAmount) as unknown as string,
+    });
+  };
+
+  const isDisabled = bidInAuctionMutation.isPending;
+
+  useEffect(() => {
+    async function fetchFees() {
+      const [collectionFee, marketplaceFee] = await Promise.all([
+        getPlatformFeeInfoCustom({ contractAddress: assetContract }).catch(
+          () => ({})
+        ),
+        getPlatformFeeInfoCustom({
+          contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+        }).catch(() => ({})),
+      ]);
+
+      setCollectionFee(collectionFee as Fee);
+      setMarketplaceFee(marketplaceFee as Fee);
+    }
+    fetchFees();
+  }, [assetContract]);
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>
+          {name} - {tokenId}
+        </DialogTitle>
+      </DialogHeader>
+      <DialogBody>
+        <div className="flex w-full gap-6">
+          <div className="relative">
+            <ImageHolder src={image} alt={name} />
+            <div className="bg-gradient-to-t from-background rounded-[10px] to-transparent absolute bottom-0 h-20 right-0 left-0 z-40" />
+          </div>
+          <div className="w-1/2 flex flex-col">
+            <div className="bg-gradient-to-r rounded-xl border border-border from-border to-transparent p-3 flex flex-col gap-2">
+              <span className="flex items-center gap-2 font-space">
+                <XFI className="size-6" />
+                <h3 className="text-2xl font-medium">
+                  {decimalOffChain(buyoutBidAmount)} XFI
+                </h3>
+              </span>
+              <p className="text-muted-foreground text-sm">Auction Price</p>
+            </div>
+
+            <div className="w-full mt-6">
+              <span className="flex items-center justify-between">
+                <p className="text-muted-foreground text-sm">Collection Fee</p>
+                <p className="text-sm font-medium">{collectionFee.percent}%</p>
+              </span>
+              <span className="flex items-center justify-between mt-3">
+                <p className="text-muted-foreground text-sm">Marketplace Fee</p>
+                <p className="text-sm font-medium">{marketplaceFee.percent}%</p>
+              </span>
+            </div>
+            <div className="flex items-end justify-end w-full mt-auto">
+              <Button
+                onClick={handleBuyAuctionNow}
+                disabled={isDisabled}
+                shape="square"
+                className="w-full"
+              >
+                {cta}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogBody>
+    </>
+  );
+}

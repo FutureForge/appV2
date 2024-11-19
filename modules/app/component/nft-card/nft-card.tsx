@@ -1,15 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { getNFTCardInfo, NFTCardProps } from "./utils/nft-card.utils";
 import { DialogContent, DialogRoot, DialogTrigger } from "../..";
 import { cn } from "../../utils";
-import { AuctionDialog, ListingDialog } from "@/modules/components/collections";
+import {
+  BuyNowAuctionDialog,
+  BuyNowListingDialog,
+} from "@/modules/components/collections";
+import {
+  useListingInfoStore,
+  useAuctionInfoStore,
+} from "@/modules/components/now-dialog/store";
+import { Auction, Listing } from "@/utils/types/graphql";
+
 // icons
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
+import { useUserChainInfo } from "@/modules/query";
 
 export function NFTCard(props: NFTCardProps) {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
@@ -19,30 +31,32 @@ export function NFTCard(props: NFTCardProps) {
     type,
     status,
     extraCTA,
-    extraOnClick,
     ctaStyles,
-    extraProps,
     extraTitle,
     extraInfo,
     actionCTA,
     actionOnClick,
     isDisabled,
   } = props;
-  const { metadata } = data.nft || {};
+  const { metadata, owner } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";
   const tokenId = data.tokenId || "";
 
-  // console.log({ data, type, status });
-
-  // console.log("====================================");
-  // console.log(data, type, "hello");
-  // console.log("====================================");
+  const { setListingInfo } = useListingInfoStore();
+  const { setAuctionInfo } = useAuctionInfoStore();
 
   const { title1, title2, info1, info2 } = getNFTCardInfo({
     type: type,
     data,
   });
+
+  useEffect(() => {
+    if (type === "listing") setListingInfo(data as Listing);
+    if (type === "auction") setAuctionInfo(data as Auction);
+  }, [type, data]);
+
+  const isOwner = owner?.toLowerCase() === userAddress?.toLowerCase();
 
   return (
     <div
@@ -125,6 +139,7 @@ export function NFTCard(props: NFTCardProps) {
             </motion.button>
           )}
 
+          {/** action cta for owner (cancel listing/auction/offer) */}
           {actionCTA && (
             <motion.button
               onClick={actionOnClick}
@@ -136,7 +151,7 @@ export function NFTCard(props: NFTCardProps) {
               transition={{ duration: 0.3 }}
               className={cn(
                 "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
-                ctaStyles,
+                ctaStyles
               )}
               disabled={isDisabled}
             >
@@ -144,7 +159,8 @@ export function NFTCard(props: NFTCardProps) {
             </motion.button>
           )}
 
-          {extraCTA && (
+          {/** buy now section for non-owner */}
+          {extraCTA && !isOwner && (
             <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger>
                 <motion.button
@@ -161,26 +177,8 @@ export function NFTCard(props: NFTCardProps) {
                 </motion.button>
               </DialogTrigger>
               <DialogContent className="w-[564px]">
-                {status === "listed" && (
-                  <ListingDialog
-                    src={image}
-                    onClick={extraOnClick}
-                    alt={name}
-                    name={name}
-                    tokenId={tokenId}
-                    props={extraProps}
-                  />
-                )}
-                {status === "auctioned" && (
-                  <AuctionDialog
-                    src={image}
-                    onClick={extraOnClick}
-                    alt={name}
-                    name={name}
-                    tokenId={tokenId}
-                    props={extraProps!}
-                  />
-                )}
+                {status === "listed" && <BuyNowListingDialog />}
+                {status === "auctioned" && <BuyNowAuctionDialog />}
               </DialogContent>
             </DialogRoot>
           )}

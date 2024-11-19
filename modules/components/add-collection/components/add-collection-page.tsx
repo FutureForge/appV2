@@ -1,3 +1,4 @@
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import {
   Button,
   FileInput,
@@ -6,12 +7,6 @@ import {
   TextArea,
   TextField,
 } from "@/modules/app";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-// icons
-import DownloadIcon from "@/assets/download.svg";
-import X from "@/assets/logo-x-twitter.svg";
-import Discord from "@/assets/discord.svg";
-import Telegram from "@/assets/telegram.svg";
 import { useAddCollectionMutation } from "@/modules/mutation";
 import { Social } from "@/utils/types/global";
 import {
@@ -20,6 +15,12 @@ import {
   useCheckCollectionExistsQuery,
 } from "@/modules/query";
 import { validateSocialLink } from "../add-collection.utils";
+
+// icons
+import DownloadIcon from "@/assets/download.svg";
+import X from "@/assets/logo-x-twitter.svg";
+import Discord from "@/assets/discord.svg";
+import Telegram from "@/assets/telegram.svg";
 
 export function AddCollectionsPage() {
   const addCollectionMutation = useAddCollectionMutation();

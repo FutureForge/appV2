@@ -32,3 +32,7 @@ export {
 export {Header} from './component/header/header'
 export {EmptyState} from './component/empty-state/empty-state'
 export {Checkbox} from './component/checkbox'
+export {Tooltip} from './component/tooltip'
+export {Popover} from './component/popover'
+export {cn, linearGenerate} from './utils/index'
+export {Search} from './component/search'

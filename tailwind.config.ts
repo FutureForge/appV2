@@ -29,7 +29,7 @@ const config: Config = {
         border: "#292A3E",
         muted: "#6b6b6b",
         tertiary: "#181825",
-        error: "#E94B4F",
+        error: "#F62B54",
         success: "#57B799",
         "table-hover": "#1C1C25",
         "new-muted": {

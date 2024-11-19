@@ -63,7 +63,7 @@ export function makeAllListingsColumn() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{getFormatAddress(getValue())} XFI</p>
+        <p>{getFormatAddress(getValue())}</p>
       </div>
     ),
   });

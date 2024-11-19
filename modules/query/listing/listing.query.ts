@@ -32,19 +32,19 @@ export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      // const updatedListings = response.allListings.filter((listing) => {
-      //   const { endTimestamp } = listing;
-      //   const endTime = formatBlockchainTimestamp(endTimestamp);
-      //   const endTimeFormatted = new Date(endTime).getTime();
-      //   const currentTime = new Date().getTime();
+      const updatedListings = response.allListings.filter((listing) => {
+        const { endTimestamp } = listing;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
 
-      //   // looking for active listings
-      //   return endTimeFormatted > currentTime;
-      // });
+        // looking for active listings
+        return endTimeFormatted > currentTime;
+      });
 
-      // return updatedListings;
+      return updatedListings;
 
-      return response.allListings;
+      // return response.allListings;
     },
     enabled: !!limit || limit === 0 || limit === 50,
     refetchInterval: 5000,
@@ -83,7 +83,7 @@ export function useFilteredAllListingsQuery({
       return updatedListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -155,7 +155,7 @@ export function useFilteredCompletedListingsQuery({
       return response.completedListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -182,7 +182,7 @@ export function useNewListingsQuery({ limit = 50 }: { limit?: number }) {
       return updatedNewListings;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -218,7 +218,7 @@ export function useFilteredNewListingsQuery({
       return updatedNewListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -234,7 +234,7 @@ export function useNewSaleListingsQuery({ limit = 50 }: { limit?: number }) {
       return response.newSaleListings;
     },
     enabled: !!limit,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }
 
@@ -259,6 +259,6 @@ export function useFilteredNewSaleListingsQuery({
       return response.newSaleListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 100000,
+    refetchInterval: 5000,
   });
 }

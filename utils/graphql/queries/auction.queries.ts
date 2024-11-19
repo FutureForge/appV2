@@ -528,6 +528,128 @@ export const filteredAuctionClosedQuery = gql`
   }
 `;
 
+//  auctionCloseds(where: {assetContract_eq: "0x1a35a38630b6f56637268f437493601dbf72e61a", AND: {tokenId_eq: "8", AND: {auctionStatus_eq: "payout-claimed"}}}) {
+
+export const filteredAuctionPayoutClaimedQuery = gql`
+  query FilteredAuctionPayoutClaimed(
+    $contractAddress: String!
+    $tokenId: BigInt!
+  ) {
+    auctionCloseds(
+      where: {
+        assetContract_eq: $contractAddress
+        AND: {
+          tokenId_eq: $tokenId
+          AND: { auctionStatus_eq: "payout-claimed" }
+        }
+      }
+    ) {
+      assetContract
+      auctionCreator
+      auctionId
+      auctionStatus
+      bidAmount
+      closer
+      currency
+      id
+      tokenId
+      transactionHash
+      winningBidder
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
+/* -------------------------------------------------------------------------------------------------
+ * auctionPendingPayoutQuery
+ * -----------------------------------------------------------------------------------------------*/
+
+export const filteredAuctionPendingPayoutQuery = gql`
+  query FilteredAuctionPendingPayout(
+    $contractAddress: String!
+    $tokenId: BigInt!
+  ) {
+    auctionCloseds(
+      where: {
+        OR: {
+          assetContract_eq: $contractAddress
+          AND: {
+            tokenId_eq: $tokenId
+            AND: { auctionStatus_eq: "pending-payout-claim" }
+          }
+        }
+      }
+    ) {
+      assetContract
+      auctionCreator
+      auctionId
+      auctionStatus
+      bidAmount
+      closer
+      currency
+      id
+      tokenId
+      transactionHash
+      winningBidder
+      nft {
+        assetContract
+        id
+        metadata {
+          animationUrl
+          attributes {
+            traitType
+            value
+          }
+          backgroundColor
+          customAnimationUrl
+          customImage
+          description
+          externalUrl
+          image
+          imageUrl
+          name
+          properties {
+            name
+            value
+          }
+          supply
+        }
+        owner
+        tokenId
+        tokenURI
+        type
+      }
+    }
+  }
+`;
+
 /* -------------------------------------------------------------------------------------------------
  * newBidsQuery
  * -----------------------------------------------------------------------------------------------*/

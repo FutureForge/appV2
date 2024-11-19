@@ -146,3 +146,55 @@ export async function getBidInAuction({
 
   return transaction;
 }
+
+export async function getAuctionByAuctionId({
+  auctionId,
+}: {
+  auctionId: string;
+}) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const data = await readContract({
+    contract,
+    method:
+      "function getAuction(uint256 _auctionId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status) _auction)",
+    params: [BigInt(auctionId)],
+  });
+
+  return data;
+}
+
+export async function getTotalAuctions() {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+  const totalAuctions = await readContract({
+    contract,
+    method: "function totalAuctions() view returns (uint256)",
+    params: [],
+  });
+
+  if (Number(totalAuctions) === 0) {
+    return 0;
+  } else {
+    return Number(totalAuctions) - 1;
+  }
+}
+
+export async function getAllAuctions() {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+  const totalAuctions = await getTotalAuctions();
+
+  const allAuctions = await readContract({
+    contract,
+    method:
+      "function getAllAuctions(uint256 _startId, uint256 _endId) view returns ((uint256 auctionId, uint256 tokenId, uint256 quantity, uint256 minimumBidAmount, uint256 buyoutBidAmount, uint64 timeBufferInSeconds, uint64 bidBufferBps, uint64 startTimestamp, uint64 endTimestamp, address auctionCreator, address assetContract, address currency, uint8 tokenType, uint8 status)[] _allAuctions)",
+    params: [BigInt(0), BigInt(totalAuctions)],
+  });
+
+  return allAuctions;
+}

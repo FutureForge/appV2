@@ -172,8 +172,7 @@ export function ProfilePage() {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   const handleCancelListing = ({ listingId }: { listingId: string }) => {
@@ -194,7 +193,10 @@ export function ProfilePage() {
     cancelOfferMutation.mutate({ offerId });
   };
 
-  const isDisabled = cancelListingMutation.isPending;
+  const isDisabled =
+    cancelListingMutation.isPending ||
+    cancelAuctionMutation.isPending ||
+    cancelOfferMutation.isPending;
 
   const getFilteredData = () => {
     switch (selectedFilter) {
@@ -428,7 +430,7 @@ export function ProfilePage() {
             handleSearch={handleSearch}
             onFilterClick={handleFilterClick}
             filters={filters}
-            showRightSide
+            showRightSide={false}
           />
 
           {selectedFilter === filters[7] && (
@@ -1134,8 +1136,7 @@ function CustomNFTCard({ data }: { data: UserNFTData }) {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   return (

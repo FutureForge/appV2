@@ -139,7 +139,12 @@ export function useAcceptOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.listing.completed, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.listing.completed,
+          queryKeys.nft.single,
+          queryKeys.offers.all,
+        ],
+        refetchType: "all",
       });
     },
     onError: () => {},
@@ -181,7 +186,12 @@ export function useCancelOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.listing.single, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.listing.completed,
+          queryKeys.nft.single,
+          queryKeys.offers.all,
+        ],
+        refetchType: "all",
       });
     },
     onError: () => {},
@@ -230,7 +240,13 @@ export function useBidInAuctionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.newBids, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.auction.newBids,
+          queryKeys.auction.all,
+          queryKeys.nft.single,
+          queryKeys.user.all,
+        ],
+        refetchType: "all",
       });
     },
     onError: () => {},
@@ -272,7 +288,13 @@ export function useCollectAuctionPayoutMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.newBids, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.auction.newBids,
+          queryKeys.auction.all,
+          queryKeys.nft.single,
+          queryKeys.user.all,
+        ],
+        refetchType: "all",
       });
     },
     onError: () => {},
@@ -314,7 +336,15 @@ export function useCollectAuctionTokensMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.auction.newBids, queryKeys.nft.single],
+        queryKey: [
+          queryKeys.auction.newBids,
+          queryKeys.auction.all,
+          queryKeys.nft.single,
+          queryKeys.user.all,
+          queryKeys.auction.newBidsUser,
+          queryKeys.auction.newBids,
+        ],
+        refetchType: "all",
       });
     },
     onError: () => {},

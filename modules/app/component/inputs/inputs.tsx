@@ -27,7 +27,7 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
   return (
     <div
       className={cn(
-        "flex gap-1 items-center h-[42px] w-full bg-[#1C1C2A] rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4",
+        "flex gap-1 items-center h-[42px] w-full bg-new-muted-bg rounded-xl border focus-within:ring-2 group-focus-visible:ring-offset-2 group-focus-visible::ring-offset-background border-[#A2ADF61A] px-4",
         containerClass
       )}
     >
@@ -39,7 +39,8 @@ const TextField = forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
         className={cn(
           " bg-transparent outline-none placeholder:text-sm text-sm w-full placeholder:text-muted-foreground",
           className,
-          type === "number" && "hide-arrows"
+          type === "number" && "hide-arrows",
+          type === "date" && "hide-arrows appearance-none"
         )}
         ref={ref}
         onKeyDown={handleKeyDown}

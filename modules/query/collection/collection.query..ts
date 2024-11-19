@@ -94,6 +94,24 @@ export function useCheckCollectionExistsQuery({
   });
 }
 
+export function useSingleCollectionWithoutNFTsQuery({
+  contractAddress,
+}: {
+  contractAddress: string;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.collection.checkCollectionExists],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendURL}/collection/${contractAddress}/without-nfts`
+      );
+
+      return response.data;
+    },
+    enabled: !!contractAddress,
+  });
+}
+
 export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
   return useQuery({
     queryKey: [queryKeys.collection.all],
