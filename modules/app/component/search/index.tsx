@@ -5,7 +5,7 @@ import {
   ComboboxProvider,
 } from "@ariakit/react";
 import * as RadixPopover from "@radix-ui/react-popover";
-import { useRef, useState, startTransition, useMemo } from "react";
+import { useRef, useState, startTransition, useMemo, ComponentPropsWithoutRef } from "react";
 import CloseIcon from "@/assets/close.svg";
 import { matchSorter } from "match-sorter";
 import SearchIcon from "@/assets/search-lg.svg";
@@ -197,13 +197,15 @@ export function Search() {
               event.preventDefault();
             }
           }}
-          className="bg-background/90 backdrop-blur-lg max-w-[--radix-popover-trigger-width] h-[351px] min-w-[--radix-popover-trigger-width] border border-border rounded-2xl z-40 overflow-hidden"
+          className="bg-background/95 filter backdrop-blur-2xl max-w-[--radix-popover-trigger-width] h-[351px] min-w-[--radix-popover-trigger-width] border border-border rounded-2xl z-40 overflow-hidden"
         >
           <ScrollArea.Root>
             <div className="flex-col flex gap-4">
-              <div className="flex flex-col gap-2 p-4 border-b border-b-border">
-                <p className="text-xs text-muted-foreground">Searching for</p>
-                <div className="flex items-center gap-1">
+              <div className="flex flex-col gap-2 p-4 border-b border-b-border relative">
+                <p className="text-xs text-muted-foreground z-30">
+                  Searching for
+                </p>
+                <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
                   {popular_tags.map((tag) => (
                     <Button
                       onClick={() => handleToggleTag(tag.label)}
@@ -225,6 +227,8 @@ export function Search() {
                       />
                     </Button>
                   ))}
+                  <div className="bg-gradient-to-l from-black via-background to-transparent w-14 h-full top-0 absolute right-1" />
+                  <div className="bg-gradient-to-r from-black via-background to-transparent w-14 h-full top-0 absolute left-0" />
                 </div>
               </div>
 
@@ -232,8 +236,8 @@ export function Search() {
                 {showResults && searchValue && (
                   <>
                     {isSearching ? (
-                      <div className="flex items-center justify-center py-4 text-sm text-muted-foreground">
-                        Loading...
+                      <div className="w-full flex items-center justify-center">
+                        <Spinner />
                       </div>
                     ) : filteredMatches.length ? (
                       filteredMatches.map(({ children, ...props }, index) => {
@@ -325,5 +329,35 @@ export function SearchResultItem({ type, data }: SearchResultItemProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+type SpinnerProps = ComponentPropsWithoutRef<"svg">;
+
+export function Spinner(props: SpinnerProps) {
+  const { className, ...svgProps } = props;
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      className={cn("text-[#C4C4C4] size-[33px] animate-spin", className)}
+      {...svgProps}
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
   );
 }
