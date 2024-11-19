@@ -32,3 +32,4 @@ export {
 export {Header} from './component/header/header'
 export {EmptyState} from './component/empty-state/empty-state'
 export {Checkbox} from './component/checkbox'
+export {Tooltip} from './component/tooltip'
