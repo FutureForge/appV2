@@ -11,6 +11,8 @@ export const buttonStyles = tv(
           "bg-border text-white border border-border hover:bg-border/50",
         tertiary: "bg-card border border-border hover:bg-card/75",
         error: "bg-error text-white hover:opacity-75",
+        outline:
+          "bg-card text-foreground px-3 rounded-[30px] border border-border gap-2",
       },
       shape: {
         square: "rounded-lg",

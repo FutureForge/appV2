@@ -54,7 +54,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
         <>
           <div className="flex w-full items-start justify-between gap-10">
             <div className="w-1/2 flex flex-col gap-4">
-              <div className="bg-special-bg p-6 rounded-2xl mt-8">
+              <div className="bg-transparent border border-border p-6 rounded-2xl">
                 <h3 className="text-xl font-semibold mb-4">Traits</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {attributes?.map(
@@ -62,7 +62,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
                       trait: { trait_type: string; value: string },
                       index: number
                     ) => (
-                      <div key={index} className="bg-gray-800 p-3 rounded-lg">
+                      <div key={index} className="bg-card p-3 rounded-lg">
                         <p className="text-sm text-gray-400 first-letter:uppercase">
                           {trait.trait_type}
                         </p>

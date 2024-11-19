@@ -2,19 +2,30 @@ import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { IoIosMenu } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import { cn } from "../../utils";
+import { cn, linearGenerate } from "../../utils";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { useDisableScroll } from "../../hooks/useDisableScroll";
 import { chainInfo, client } from "@/utils/configs";
 import { usePathname } from "next/navigation";
-
-// Icons
-import Logo from "@/public/logo.svg";
 import { TextField } from "../inputs/inputs";
 import { TransitionLinks } from "./transition-links";
 import { useUserChainInfo } from "@/modules/query";
 import { getFormatAddress } from "@/utils/functions";
+import { Popover } from "../popover";
+import { Button } from "../button";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
+import { Search } from "../search";
+
+
+// Icons
+import Logo from "@/public/logo.svg";
+import Info from "@/assets/info.svg";
+import CopyIcon from '@/assets/copy.svg'
+import CheckIcon from '@/assets/check-2.svg'
+import LogoutIcon from '@/assets/logout-box-r-line.svg'
+
+
 
 const Nav_Links = [
   {
@@ -42,6 +53,19 @@ export function Nav() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = useCopyToClipboard()[1];
+
+  const copy = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    if (copied) return;
+    if (walletAddress) {
+      copyToClipboard(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }
+  };
 
   useDisableScroll(isMobileNavOpen);
 
@@ -101,14 +125,18 @@ export function Nav() {
       </div>
       <div className="flex items-center justify-between w-[48%]">
         <div className="w-1/2">
-          <TextField
-            type="search"
-            placeholder="Search for collections, NFT or Users"
-          />
+
+          <Search/>
         </div>
 
         <div className="flex items-center gap-8">
-          <TransitionLinks href="/profile" className={cn("font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out", {'text-foreground': pathname==='/profile'})}>
+          <TransitionLinks
+            href="/profile"
+            className={cn(
+              "font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out",
+              { "text-foreground": pathname === "/profile" }
+            )}
+          >
             Profile
           </TransitionLinks>
           {!walletAddress ? (
@@ -124,17 +152,103 @@ export function Nav() {
             />
           ) : (
             <div className="relative group">
-              <div className="text-white font-medium cursor-pointer">
-                {getFormatAddress(walletAddress)}
-              </div>
-              <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Popover.Root>
+                <Popover.Trigger>
+                  <Button
+                    shape="square"
+                    variant="secondary"
+                    className="group bg-transparent max-[599px]:!h-[38px] max-[599px]:!w-[38px] !h-10 hover:border-primary data-[state=open]:z-20"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-5 w-5 rounded-full relative">
+                        <div
+                          className="h-full w-full rounded-full border border-border"
+                          style={{
+                            backgroundImage: linearGenerate(),
+                          }}
+                        />
+                      </div>
+                      <p
+                        className={cn(
+                          "font-sans !text-sm group-hover:!text-new-accent transition-all duration-300 ease-in-out text-white max-md:hidden"
+                          // {
+                          //   "hidden transition-all duration-300 ease-in-out":
+                          //     isTab && isOpen,
+                          // }
+                        )}
+                      >
+                        {getFormatAddress(walletAddress)}
+                      </p>
+                    </div>
+                  </Button>
+                </Popover.Trigger>
+                <Popover.Content
+                  align="end"
+                  sideOffset={5}
+                  className="w-[240px] p-3"
+                >
+                  <div className="flex flex-col gap-3 w-full ">
+                    <span className="flex items-center text-sm gap-2 text-white font-medium">
+                      Approval Type
+                      <Info className="size-4 text-muted-foreground" />
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="secondary"
+                        shape="square"
+                        className={cn(
+                          "h-[31px] !text-xs !flex-1 uppercase bg-transparent !duration-150 font-space"
+                        )}
+                      >
+                        Unlimited
+                      </Button>
+                      <Button
+                        shape="square"
+                        className={cn(
+                          "h-[31px] !text-xs !flex-1 uppercase !duration-150 font-space"
+                        )}
+                      >
+                        1/1
+                      </Button>
+                    </div>
+                  </div>
+                  {/* Copy */}
+                  <div className="w-full p-1.5  mt-3">
+                    <div
+                      onClick={copy}
+                      className="cursor-pointer hover:border-border h-9 hover:bg-tertiary transition-colors duration-500 ease-in-out px-2.5 border border-transparent rounded-lg text-white flex items-center gap-2"
+                    >
+                      <div>
+                        {copied ? (
+                          <CheckIcon className="size-4 text-muted-foreground" />
+                        ) : (
+                          <CopyIcon className="size-4 text-muted-foreground" />
+                        )}
+                      </div>
+
+                      <span className="text-sm">Copy Wallet Address</span>
+                    </div>
+                  </div>
+
+                  <div className="w-full p-1.5">
+                    <div
+                      onClick={handleSignOut}
+                      className="cursor-pointer px-2.5 h-9 text-error border border-transparent hover:bg-error/20 transition-colors duration-500 ease-in-out hover:border-error rounded-lg flex items-center gap-2"
+                    >
+                      <LogoutIcon/>
+                      <span className="text-sm">Disconnect Wallet</span>
+                    </div>
+                  </div>
+                </Popover.Content>
+              </Popover.Root>
+              {/* <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <button
                   onClick={handleSignOut}
                   className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-200"
                 >
                   Sign Out
                 </button>
-              </div>
+              </div> */}
             </div>
           )}
         </div>

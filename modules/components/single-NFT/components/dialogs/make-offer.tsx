@@ -56,7 +56,7 @@ export function MakeOfferDialog({
       <DialogBody>
         <div className="flex w-full gap-6">
           <div className="relative w-1/2">
-            <div className="w-full relative h-full gradient-box z-40 rounded-2xl">
+            <div className="w-full relative h-full border-2 border-border z-40 rounded-2xl">
               <MediaRenderer
                 src={src}
                 client={client}

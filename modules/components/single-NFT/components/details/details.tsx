@@ -67,7 +67,7 @@ const FeeRow = ({
 }) => (
   <div className="flex items-center justify-between">
     <p className="text-muted-foreground capitalize text-sm">{label}</p>
-    <p className="font-medium">
+    <p className="font-medium text-sm">
       {isAddress ? getFormatAddress(value) : `${value}%`}
     </p>
   </div>
@@ -198,14 +198,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
   const getListingStatus = () => {
     if (activeType === "listing")
-      return { type: "Direct Listing", color: "text-green-500" };
+      return { type: "Direct Listing", color: "text-success" };
     if (activeType === "auction")
       return { type: "English Auction", color: "text-blue-500" };
     if (activeType === "expired")
       return { type: "Expired", color: "text-red-500" };
     if (activeType === "pending-payout")
       return { type: "Pending Payout", color: "text-yellow-500" };
-    return { type: "Not Listed", color: "text-gray-500" };
+    return { type: "Not Listed", color: "text-muted-foreground" };
   };
 
   const handleCancelListing = () => {
@@ -279,12 +279,12 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 </TransitionLinks>
               </div>
             )}
-            <div className="w-full relative h-full gradient-box z-40 rounded-2xl">
+            <div className="w-full relative h-full z-40 rounded-2xl border-2 border-border overflow-hidden">
               <MediaRenderer
                 src={image}
                 client={client}
                 alt={name}
-                className="object-cover w-full absolute inset-0 size-full"
+                className="object-cover w-full h-full aspect-square"
               />
               <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
             </div>
@@ -464,7 +464,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       Make Offer
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="w-[700px]">
+                  <DialogContent className="w-[787px]">
                     <MakeOfferDialog
                       src={image!}
                       alt={name!}
