@@ -86,9 +86,9 @@ export function CreatePage() {
     !name || !description || !file || createNFTMutation.isPending;
 
   return (
-    <div className="flex items-center justify-center gap-7">
+    <div className="flex items-center max-[909px]:flex-col min-[909px]:justify-center gap-7 w-full max-[909px]:py-8">
       {/* Choose File */}
-      <div className="border-dashed border relative border-primary p-4 h-[556px] flex items-center justify-center w-[504px] rounded-3xl">
+      <div className="border-dashed border max-[909px]:h-full relative border-primary p-4 min-[1120px]:h-[34.75rem] min-[909px]:w-[24.0625rem] min-[909px]:h-[33rem] w-full flex items-center justify-center min-[1120px]:w-[31.5rem] rounded-3xl">
         <FileInput
           key={fileInputKey}
           onChange={(e) => {
@@ -103,7 +103,7 @@ export function CreatePage() {
       </div>
 
       {/* Form */}
-      <div className="w-[504px] h-[556px] bg-tertiary p-6 flex flex-col rounded-3xl">
+      <div className="min-[1120px]:w-[31.5rem] min-[1120px]:h-[34.75rem] min-[909px]:w-[27.4375rem] min-[909px]:h-[33rem] bg-tertiary p-6 flex flex-col rounded-3xl h-full w-full">
         <ScrollArea>
           <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
             <div className="w-full flex flex-col gap-5">
