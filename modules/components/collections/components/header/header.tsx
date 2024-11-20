@@ -21,7 +21,7 @@ export function CollectionsHeader({
   handleSearch 
 }: HeaderProps) {
   return (
-    <div className="w-full flex items-center justify-between">
+    <div className="w-full flex md:items-center gap-4 justify-between max-md:flex-col">
       <h4 className="font-medium tex-[28px]">Collections</h4>
       <div className="flex items-center gap-2 justify-end">
         <TextField

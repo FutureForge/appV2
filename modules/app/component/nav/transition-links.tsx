@@ -33,9 +33,13 @@ export function TransitionLinks({
     e.preventDefault();
     if (href === pathname) return;
 
+    
+    if (onClick) {
+      onClick(e);
+    }
+
     setIsTransitioning(true);
 
-    if (onClick) onClick(e);
     router.push(href);
   };
 
