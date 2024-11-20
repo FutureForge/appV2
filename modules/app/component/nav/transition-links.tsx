@@ -9,12 +9,14 @@ type TransitionLinksProps = {
   children: ReactNode;
   href: string;
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 export function TransitionLinks({
   children,
   href,
   className,
+  onClick,
   ...props
 }: TransitionLinksProps) {
   const router = useRouter();
@@ -32,6 +34,8 @@ export function TransitionLinks({
     if (href === pathname) return;
 
     setIsTransitioning(true);
+
+    if (onClick) onClick(e);
     router.push(href);
   };
 

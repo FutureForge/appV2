@@ -12,12 +12,29 @@ import { NftCardSkeleton } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { Collection } from "@/utils/types/collection/collection.type";
 
-const banners = ["/image.png", "/image-2.png"];
 export function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { width } = useWindowSize();
   const router = useRouter();
-  const length = width && width > 1720 ? 5 : 4;
+  const length = (() => {
+    if (width && width > 1720) {
+      return 5;
+    } else if (width && width <= 1720 && width > 1250) {
+      return 4;
+    } else if (width && width <= 1250 && width > 936) {
+      return 3;
+    } else if (width && width <= 936 && width > 650) {
+      return 2;
+    } else if (width && width <= 650) {
+      return 1;
+    }
+    return 4;
+  })();
+
+  const banners =
+    width && width <= 550
+      ? ["/image-2-mob.png ", "/image-2.png"]
+      : ["/image.png", "/image-2.png"];
   const {
     data: CollectionQuery,
     isLoading,
@@ -34,7 +51,7 @@ export function Hero() {
     dotsClass: "flex items-center justify-center pt-2",
     appendDots: (dots) => (
       <div className="!static !flex !items-center !justify-center ">
-        <ul className="slick-dots w-full !flex gap-12 flex-col absolute top-[15%] left-[92%]">
+        <ul className="slick-dots w-full !flex gap-12 flex-col absolute top-[15%] min-[1170px]:left-[92%] left-[80%]">
           {dots}
         </ul>
       </div>
@@ -95,8 +112,9 @@ export function Hero() {
           </>
         ) : (
           <>
-            {CollectionQuery?.collections?.slice(0, length).map(
-              (collection: Collection) => {
+            {CollectionQuery?.collections
+              ?.slice(0, length)
+              .map((collection: Collection) => {
                 const contractAddress = collection.collectionAddress;
                 const handleClick = () => {
                   router.push(`/collections/${contractAddress}`);
@@ -113,8 +131,7 @@ export function Hero() {
                     cta="Shop Collections"
                   />
                 );
-              }
-            )}
+              })}
           </>
         )}
       </div>

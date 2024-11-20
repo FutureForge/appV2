@@ -1,3 +1,4 @@
+"use client";
 import {
   Combobox,
   ComboboxItem,
@@ -5,7 +6,13 @@ import {
   ComboboxProvider,
 } from "@ariakit/react";
 import * as RadixPopover from "@radix-ui/react-popover";
-import { useRef, useState, startTransition, useMemo, ComponentPropsWithoutRef } from "react";
+import {
+  useRef,
+  useState,
+  startTransition,
+  useMemo,
+  ComponentPropsWithoutRef,
+} from "react";
 import CloseIcon from "@/assets/close.svg";
 import { matchSorter } from "match-sorter";
 import SearchIcon from "@/assets/search-lg.svg";
@@ -20,6 +27,7 @@ import {
 } from "@/modules/query";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { useRouter } from "next/navigation";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 const popular_tags = [
   { label: "All", type: null },
@@ -44,6 +52,8 @@ export function Search() {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const { width } = useWindowSize();
+  const isTab = width && width <= 1170;
 
   const { data: allCollectionsQuery } = useAllCollectionsQuery({ limit: 100 });
   const { data: listingData } = useAllListingsQuery({ limit: 100 });
@@ -168,11 +178,13 @@ export function Search() {
         setValue={(value) => startTransition(() => setSearchValue(value))}
       >
         <RadixPopover.Anchor asChild>
-          <div className="flex bg-new-muted-bg min-w-[315px] h-10 items-center gap-1 border border-border rounded-xl p-2">
+          <div className="flex bg-new-muted-bg min-[1170px]:min-w-[315px] w-[113px] min-[1170px]:w-full h-10 items-center gap-1 border border-border rounded-xl p-2">
             <SearchIcon className="size-4 text-muted-foreground" />
             <Combobox
               ref={comboboxRef}
-              placeholder="Search for collections, NFT or Users"
+              placeholder={
+                isTab ? "Search" : "Search for collections, NFT or Users"
+              }
               className="outline-none placeholder:text-xs placeholder:text-muted-foreground bg-transparent w-full"
               onChange={handleSearchChange}
               value={searchValue}
@@ -197,7 +209,7 @@ export function Search() {
               event.preventDefault();
             }
           }}
-          className="bg-background/95 filter backdrop-blur-2xl max-w-[--radix-popover-trigger-width] h-[351px] min-w-[--radix-popover-trigger-width] border border-border rounded-2xl z-40 overflow-hidden"
+          className="bg-background/95 filter backdrop-blur-2xl max-w-[--radix-popover-trigger-width] h-[351px] min-w-[315px] border border-border rounded-2xl z-40 overflow-hidden"
         >
           <ScrollArea.Root>
             <div className="flex-col flex gap-4">
@@ -294,7 +306,7 @@ export function SearchResultItem({ type, data }: SearchResultItemProps) {
   return (
     <div
       onClick={handleClick}
-      className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg group cursor-pointer"
+      className="flex items-center gap-3 p-2 hover:bg-table-hover rounded-xl group cursor-pointer"
     >
       <div className="relative">
         {type === "collection" ? (
