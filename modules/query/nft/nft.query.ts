@@ -22,7 +22,7 @@ import {
   formatBlockchainTimestamp,
   tryParseJSON,
 } from "@/utils/functions";
-import { useSingleCollectionWithoutNFTsQuery } from "..";
+import { useSingleCollectionWithoutNFTsQuery, useSingleOfferQuery } from "..";
 import { NFTActivityResponse } from "@/utils/types/global";
 import {
   Auction,
@@ -63,6 +63,11 @@ export function useSingleNFTQuery({
     contractAddress,
   });
 
+  const { data: nftOffers, isLoading: isLoadingOffers } = useSingleOfferQuery({
+    contractAddress,
+    tokenId,
+  });
+
   return useQuery({
     queryKey: [queryKeys.nft.single, tokenId],
     queryFn: async () => {
@@ -71,9 +76,6 @@ export function useSingleNFTQuery({
           tokenTransfersResponse,
           collectionFee,
           marketplaceFee,
-          totalListings,
-          totalAuctions,
-          totalOffers,
           allListings,
           allAuctions,
         ] = await Promise.all([
@@ -84,9 +86,6 @@ export function useSingleNFTQuery({
           getPlatformFeeInfoCustom({
             contractAddress: MARKETPLACE_ADDRESS_TESTNET,
           }).catch(() => ({})),
-          getTotalListings(),
-          getTotalAuctions(),
-          getTotalOffers(),
           getAllListing(),
           getAllAuctions(),
         ]);
@@ -159,21 +158,6 @@ export function useSingleNFTQuery({
           };
         }
 
-        let nftOffers;
-
-        if (nftListingList) {
-          if (totalOffers > 0) {
-            const offers = await getAllOffers();
-            nftOffers = offers.filter(
-              (offer) =>
-                offer.assetContract.toLowerCase() ===
-                  contractAddress.toLowerCase() &&
-                offer.tokenId === BigInt(tokenId) &&
-                offer.status === StatusType.CREATED
-            );
-          }
-        }
-
         const isListingExpired =
           nftListingList &&
           new Date(
@@ -217,7 +201,7 @@ export function useSingleNFTQuery({
           isAuctionPendingPayout,
           isActiveTypeExpired,
           winningBidBody,
-          offers: ensureSerializable(nftOffers) as Offer[],
+          offers: nftOffers as Offer[],
           collectionDetails: collectionWithoutNFTs?.collection as Collection,
           listingData: ensureSerializable(nftListingList) as Listing,
           auctionData: ensureSerializable(nftAuctionList) as Auction,
@@ -226,14 +210,14 @@ export function useSingleNFTQuery({
         console.log("single nft error", { error });
       }
     },
-    enabled: !!contractAddress && !!tokenId,
+    enabled: !!contractAddress && !!tokenId && !isLoadingOffers,
     refetchInterval: 5000,
   });
 }
 
 export function useAllNFTQuery() {
   return useQuery({
-    queryKey: [queryKeys.listing.single],
+    queryKey: [queryKeys.nft.single, "global-nft"],
     queryFn: async () => {
       const response = await request<{ nfts: CustomNFTType[] }>(
         indexerEndpoint,

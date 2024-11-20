@@ -6,7 +6,7 @@ import { ScrollArea } from "@/modules/app";
 import { getFormatAddress } from "@/utils/functions";
 import Link from "next/link";
 import { useSingleNFTQuery, useUserChainInfo } from "@/modules/query";
-import { Attribute, Offer, WinningBid } from "@/utils/types/graphql";
+import { Attribute } from "@/utils/types/graphql";
 import { chainInfo } from "@/utils/configs";
 import { singleNFTFilters } from "../details/details";
 import { WinningBidTable } from "../tables/winning-bid";

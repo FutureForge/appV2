@@ -31,4 +31,12 @@ export enum MessagesEnum {
   NFT_MINTED_ERROR = "Error Minting NFT",
   COLLECTION_CREATED_SUCCESS = "Collection Created Successfully",
   COLLECTION_CREATED_ERROR = "Error Creating Collection",
+  OFFER_MADE_SUCCESS = "Offer Made Successfully",
+  OFFER_MADE_ERROR = "Error Making Offer",
+  WITHDRAW_WXFI_SUCCESS = "WXFI Withdrawn Successfully",
+  WITHDRAW_WXFI_ERROR = "Error Withdrawing WXFI",
+  CONVERT_XFI_TO_WXFI_SUCCESS = "XFI Converted to WXFI Successfully",
+  CONVERT_XFI_TO_WXFI_ERROR = "Error Converting XFI to WXFI",
+  APPROVAL_FOR_WXFI_SUCCESS = "Approval for WXFI Granted Successfully",
+  APPROVAL_FOR_WXFI_ERROR = "Error Granting Approval for WXFI",
 }

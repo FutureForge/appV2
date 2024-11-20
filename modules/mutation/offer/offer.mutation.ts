@@ -1,116 +1,133 @@
+import { useToast } from "@/modules/app/hooks/useToast";
 import {
+  decimalOnChain,
   getBidInAuction,
   getCollectAuctionPayout,
   getCollectAuctionTokens,
+  getContractEthers,
 } from "@/modules/blockchain";
 import {
   getAcceptOffer,
   getCancelOffer,
+  getMakeOffer,
 } from "@/modules/blockchain/offer/offer.blockchain";
 import { useUserChainInfo } from "@/modules/query";
 import { queryKeys } from "@/modules/query/query-keys";
+import {
+  MARKETPLACE_ADDRESS_TESTNET,
+  WRAPPED_TOKEN_CONTRACT,
+} from "@/utils/configs";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
+import { MakeOfferListingType } from "@/utils/types/blockchain/blockchain.type";
+import {
+  useConvertXFIToWXFIMutation,
+  useIncreaseAllowanceMutation,
+} from "@/wxfi.mutation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BigNumber } from "ethers";
 import { sendAndConfirmTransaction } from "thirdweb";
+import WXFIAbi from "@/utils/abi/wxfi.json";
 
-// export function useMakeListingOfferMutation() {
-//   const toast = useToast();
-//   const queryClient = useQueryClient();
-//   const { activeAccount } = useUserChainInfo();
-//   const increaseAllowanceMutation = useIncreaseAllowanceMutation();
-//   const convertXFIToWXFIMutation = useConvertXFIToWXFIMutation();
+export function useMakeListingOfferMutation() {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const { activeAccount } = useUserChainInfo();
+  const increaseAllowanceMutation = useIncreaseAllowanceMutation();
+  const convertXFIToWXFIMutation = useConvertXFIToWXFIMutation();
 
-//   return useMutation({
-//     mutationFn: async ({
-//       makeOffer,
-//     }: {
-//       makeOffer: Partial<MakeOfferListingType>;
-//     }) => {
-//       if (!activeAccount) return toast.error("Please connect your wallet");
+  return useMutation({
+    mutationFn: async ({ makeOffer }: { makeOffer: MakeOfferListingType }) => {
+      if (!activeAccount) return toast.error("Please connect your wallet");
 
-//       const WXFIContract = await getContractEthers({
-//         contractAddress: CROSSFI_WRAPPED_TOKEN_CONTRACT,
-//         abi: WXFIAbi,
-//       });
+      const WXFIContract = await getContractEthers({
+        contractAddress: WRAPPED_TOKEN_CONTRACT,
+        abi: WXFIAbi,
+      });
 
-//       const makeOfferValue = decimalOnChain(makeOffer.totalPrice!);
-//       const wxfiBalanceRaw = await WXFIContract.balanceOf(
-//         activeAccount.address
-//       );
+      const makeOfferValue = decimalOnChain(makeOffer.totalPrice);
+      const wxfiBalanceRaw = await WXFIContract.balanceOf(
+        activeAccount.address
+      );
 
-//       // Step 1: Convert XFI to WXFI if needed
-//       if (BigNumber.from(wxfiBalanceRaw).lt(makeOfferValue!)) {
-//         await toast.loading("Wrapping XFI to WXFI");
-//         await convertXFIToWXFIMutation.mutateAsync({
-//           amount: makeOffer.totalPrice!,
-//         });
+      // Step 1: Convert XFI to WXFI if needed
+      if (BigNumber.from(wxfiBalanceRaw).lt(makeOfferValue!)) {
+        await toast.loading("Wrapping XFI to WXFI");
+        await convertXFIToWXFIMutation.mutateAsync({
+          amount: makeOffer.totalPrice!,
+        });
 
-//         const updatedWxfiBalance = await WXFIContract.balanceOf(
-//           activeAccount.address
-//         );
-//         if (BigNumber.from(updatedWxfiBalance).lt(makeOfferValue!)) {
-//           throw new Error("Insufficient WXFI balance after conversion");
-//         }
-//       }
+        const updatedWxfiBalance = await WXFIContract.balanceOf(
+          activeAccount.address
+        );
+        if (BigNumber.from(updatedWxfiBalance).lt(makeOfferValue!)) {
+          throw new Error("Insufficient WXFI balance after conversion");
+        }
+      }
 
-//       // Step 2: Increase allowance if needed
-//       const currentAllowance = await WXFIContract.allowance(
-//         activeAccount?.address,
-//         CROSSFI_MARKETPLACE_CONTRACT
-//       );
-//       if (BigNumber.from(currentAllowance).lt(makeOfferValue!)) {
-//         await toast.loading("Approving WXFI to spend");
-//         await increaseAllowanceMutation.mutateAsync({
-//           amount: makeOfferValue!.toString(),
-//         });
+      // Step 2: Increase allowance if needed
+      const currentAllowance = await WXFIContract.allowance(
+        activeAccount?.address,
+        MARKETPLACE_ADDRESS_TESTNET
+      );
+      if (BigNumber.from(currentAllowance).lt(makeOfferValue!)) {
+        await toast.loading("Approving WXFI to spend");
+        await increaseAllowanceMutation.mutateAsync({
+          amount: makeOfferValue!.toString(),
+        });
 
-//         const updatedAllowance = await WXFIContract.allowance(
-//           activeAccount?.address,
-//           CROSSFI_MARKETPLACE_CONTRACT
-//         );
-//         if (BigNumber.from(updatedAllowance).lt(makeOfferValue!)) {
-//           throw new Error("Insufficient allowance after approval");
-//         }
-//       }
+        const updatedAllowance = await WXFIContract.allowance(
+          activeAccount?.address,
+          MARKETPLACE_ADDRESS_TESTNET
+        );
+        if (BigNumber.from(updatedAllowance).lt(makeOfferValue!)) {
+          throw new Error("Insufficient allowance after approval");
+        }
+      }
 
-//       const transaction = await getMakeOffer({
-//         params: {
-//           assetContract: makeOffer.assetContract ?? "",
-//           tokenId: makeOffer.tokenId ?? "",
-//           quantity: makeOffer.quantity ?? "",
-//           currency: CROSSFI_WRAPPED_TOKEN_CONTRACT,
-//           totalPrice: makeOffer.totalPrice ?? "",
-//           expirationTimestamp: makeOffer.expirationTimestamp,
-//         },
-//       });
+      const transaction = await getMakeOffer({
+        params: {
+          assetContract: makeOffer.assetContract,
+          tokenId: makeOffer.tokenId,
+          quantity: makeOffer.quantity,
+          currency: makeOffer.currency,
+          totalPrice: makeOffer.totalPrice,
+          expirationTimestamp: makeOffer.expirationTimestamp,
+        },
+      });
 
-//       const transactionReceipt = await sendAndConfirmTransaction({
-//         transaction,
-//         account: activeAccount,
-//       });
+      const transactionReceipt = await sendAndConfirmTransaction({
+        transaction,
+        account: activeAccount,
+      });
 
-//       if (transactionReceipt.status === "reverted") {
-//         throw new Error("Transaction failed");
-//       }
+      if (transactionReceipt.status === "reverted") {
+        throw new Error("Transaction failed");
+      }
 
-//       return transactionReceipt;
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({
-//         queryKey: ["offer", "nft", activeAccount?.address],
-//       });
-//     },
-//     onError: () => {},
-//     meta: {
-//       successMessage: {
-//         description: "Offer made successfully",
-//       },
-//       errorMessage: {
-//         description: "Failed to make offer",
-//       },
-//     },
-//   });
-// }
+      return transactionReceipt;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          activeAccount?.address,
+          queryKeys.offers.all,
+          queryKeys.nft.single,
+          queryKeys.offers.single,
+        ],
+        refetchType: "all",
+      });
+    },
+    onError: () => {},
+    meta: {
+      successMessage: {
+        description: MessagesEnum.OFFER_MADE_SUCCESS,
+      },
+      errorMessage: {
+        description: MessagesEnum.OFFER_MADE_ERROR,
+      },
+    },
+  });
+}
 
 export function useAcceptOfferMutation() {
   const queryClient = useQueryClient();

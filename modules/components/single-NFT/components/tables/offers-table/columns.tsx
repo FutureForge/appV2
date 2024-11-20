@@ -6,6 +6,10 @@ import { Offer } from "@/utils/types/graphql";
 import { decimalOffChain } from "@/modules/blockchain";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { Button } from "@/modules/app";
+import {
+  useAcceptOfferMutation,
+  useCancelOfferMutation,
+} from "@/modules/mutation";
 
 export function makeOffersColumn({
   isOwner,
@@ -15,6 +19,16 @@ export function makeOffersColumn({
   userAddress: string;
 }) {
   const columns = createColumnHelper<Offer>();
+  const acceptOfferMutation = useAcceptOfferMutation();
+  const cancelOfferMutation = useCancelOfferMutation();
+
+  const handleAcceptOffer = (offerId: string) => {
+    acceptOfferMutation.mutateAsync({ offerId });
+  };
+
+  const handleCancelOffer = (offerId: string) => {
+    cancelOfferMutation.mutateAsync({ offerId });
+  };
 
   /* -------------------------------------------------------------------------------------------------
    * Offeror column
@@ -25,9 +39,12 @@ export function makeOffersColumn({
         <ColumnHeader column={column}>Offeror</ColumnHeader>
       </div>
     ),
-    cell: ({ row }) => {
-      const { offeror } = row.original;
-      return <div className="flex items-center gap-3 w-full ">{offeror}</div>;
+    cell: ({ getValue }) => {
+      return (
+        <div className="flex items-center gap-3 w-full ">
+          {getFormatAddress(getValue())}
+        </div>
+      );
     },
   });
 
@@ -40,12 +57,13 @@ export function makeOffersColumn({
         <ColumnHeader column={column}>Amount</ColumnHeader>
       </div>
     ),
-    cell: ({ row }) => {
-      const { totalPrice } = row.original;
-      <div className="flex gap-2">
-        <XFI className="size-4" />
-        <p>{decimalOffChain(totalPrice)} XFI</p>
-      </div>;
+    cell: ({ getValue }) => {
+      return (
+        <div className="flex gap-2">
+          <XFI className="size-4" />
+          <p>{decimalOffChain(getValue())} WXFI</p>
+        </div>
+      );
     },
   });
 
@@ -72,13 +90,21 @@ export function makeOffersColumn({
     id: "actions",
     header: () => <div className="min-w-[125px] pr-6" />,
     cell: ({ row }) => {
-      const { offeror } = row.original;
+      const { offeror, offerId } = row.original;
       const isOfferor = offeror.toLowerCase() === userAddress.toLowerCase();
 
       return (
         <div className="pr-6 flex justify-center items-center gap-2">
-          {isOwner && <Button shape="square">Accept Offer</Button>}
-          {isOfferor && <Button shape="square">Cancel Offer</Button>}
+          {isOwner && (
+            <Button onClick={() => handleAcceptOffer(offerId)} shape="square">
+              Accept Offer
+            </Button>
+          )}
+          {isOfferor && (
+            <Button onClick={() => handleCancelOffer(offerId)} shape="square">
+              Cancel Offer
+            </Button>
+          )}
         </div>
       );
     },
