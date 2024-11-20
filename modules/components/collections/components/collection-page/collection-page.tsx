@@ -76,7 +76,7 @@ export function CollectionPage() {
 
   return (
     <div
-      className="pt-12 flex flex-col gap-8 h-screen"
+      className="pt-12 flex flex-col gap-8 min-h-screen"
       suppressHydrationWarning
     >
       <CollectionsHeader
@@ -95,39 +95,41 @@ export function CollectionPage() {
               />
             </motion.div>
           ) : (
-            <motion.div className="w-full grid grid-cols-4 gap-5">
-              {isLoading || isPending || isError ? (
-                <>
-                  {Array.from({ length }).map((_, index) => (
-                    <NftCardSkeleton key={index} />
-                  ))}
-                </>
-              ) : (
-                <>
-                  {currentPageData
-                    ?.slice(0, length)
-                    .map((collection: Collection) => {
-                      const handleClick = () => {
-                        router.push(
-                          `/collections/${collection.collectionAddress}`
+            <div className="flex items-center justify-center">
+              <motion.div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                {isLoading || isPending || isError ? (
+                  <>
+                    {Array.from({ length }).map((_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </>
+                ) : (
+                  <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
+                    {currentPageData
+                      ?.slice(0, length)
+                      .map((collection: Collection) => {
+                        const handleClick = () => {
+                          router.push(
+                            `/collections/${collection.collectionAddress}`
+                          );
+                        };
+                        return (
+                          <CollectionsNFTCard
+                            key={collection._id}
+                            collectionAddress={collection.collectionAddress}
+                            collectionImage={collection.collectionImage}
+                            collectionName={collection.collectionName}
+                            floorPrice={collection.floorPrice}
+                            totalVolume={collection.totalVolume}
+                            onClick={handleClick}
+                            cta="Shop Collections"
+                          />
                         );
-                      };
-                      return (
-                        <CollectionsNFTCard
-                          key={collection._id}
-                          collectionAddress={collection.collectionAddress}
-                          collectionImage={collection.collectionImage}
-                          collectionName={collection.collectionName}
-                          floorPrice={collection.floorPrice}
-                          totalVolume={collection.totalVolume}
-                          onClick={handleClick}
-                          cta="Shop Collections"
-                        />
-                      );
-                    })}
-                </>
-              )}
-            </motion.div>
+                      })}
+                  </div>
+                )}
+              </motion.div>
+            </div>
           )}
         </motion.div>
       )}

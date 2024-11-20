@@ -13,6 +13,8 @@ import { Popover } from "../popover";
 import { Button } from "../button";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Search } from "../search";
+import { useApprovalSettingStore } from "@/utils/store/approval-settings.store";
+import { useUserImageStore } from "@/utils/store/user-image.store";
 
 // Icons
 import Logo from "@/public/logo.svg";
@@ -20,8 +22,8 @@ import Info from "@/assets/info.svg";
 import CopyIcon from "@/assets/copy.svg";
 import CheckIcon from "@/assets/check-2.svg";
 import LogoutIcon from "@/assets/logout-box-r-line.svg";
-import { useApprovalSettingStore } from "@/utils/store/approval-settings.store";
-import { useUserImageStore } from "@/utils/store/user-image.store";
+import MenuIcon from "@/assets/menu-04.svg";
+import CloseIcon from "@/assets/close.svg";
 
 const Nav_Links = [
   {
@@ -91,7 +93,7 @@ export function Nav() {
         isScrolled ? "border-b-border backdrop-blur-lg" : "border-b-transparent"
       )}
     >
-      <div className="flex items-center justify-between w-[48%]">
+      <div className="flex items-center min-[1170px]:justify-between gap-6 w-[48%]">
         <Link
           href={"/"}
           className="text-white font-medium flex-1 flex gap-1 items-center"
@@ -100,7 +102,8 @@ export function Nav() {
           <span className="hidden sm:block">MintMingles</span>
         </Link>
 
-        <ul className="min-[1170px]:flex hidden items-center justify-end gap-8 w-full">
+        <ul className="flex  items-center max-[936px]:hidden justify-end min-[1170px]:gap-8 gap-6 w-full">
+          {/* hidden min-[1170px]:*/}
           {Nav_Links.map((item) => {
             const { name, link } = item;
             const isActive = pathname === link;
@@ -121,8 +124,8 @@ export function Nav() {
           })}
         </ul>
       </div>
-      <div className="flex items-center justify-between w-[48%]">
-        <div className="w-1/2">
+      <div className="flex items-center min-[1170px]:justify-between justify-end gap-4 w-[48%]">
+        <div className="min-[1170px]:w-1/2 justify-end">
           <Search />
         </div>
 
@@ -130,7 +133,7 @@ export function Nav() {
           <TransitionLinks
             href="/profile"
             className={cn(
-              "font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out",
+              "font-medium text-muted-foreground max-[936px]:hidden hover:text-foreground transition-colors duration-300 ease-in-out",
               { "text-foreground": pathname === "/profile" }
             )}
           >
@@ -251,26 +254,60 @@ export function Nav() {
           )}
         </div>
       </div>
+
+      <div className="min-[936px]:hidden flex items-center gap-8">
+        {isMobileNavOpen ? (
+          <CloseIcon
+            onClick={() => setIsMobileNavOpen(false)}
+            className="text-muted-foreground size-6"
+          />
+        ) : (
+          <MenuIcon
+            className="text-muted-foreground"
+            onClick={() => setIsMobileNavOpen(true)}
+          />
+        )}
+      </div>
+      {isMobileNavOpen && (
+        <MobileNav onClose={() => setIsMobileNavOpen(false)} />
+      )}
     </nav>
   );
 }
 
-function MobileNav() {
+
+function MobileNav({ onClose }: { onClose: () => void }) {
+  const pathname = usePathname();
   return (
-    <div className="fixed top-[64px] left-0 w-full h-screen flex flex-col items-center bg-sec-bg text-primary-foreground z-50">
+    <div className="fixed top-[64px] left-0 w-full h-screen flex flex-col items-center bg-background text-primary-foreground z-50">
       <div className="flex flex-col items-center justify-center gap-5 mt-10">
+        <TransitionLinks
+          href="/profile"
+          className={cn(
+            "font-medium text-xl text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out",
+            { "text-foreground": pathname === "/profile" }
+          )}
+          onClick={onClose}
+        >
+          Profile
+        </TransitionLinks>
         {Nav_Links.map((item) => {
           const { name, link } = item;
+          const isActive = pathname === link;
 
           return (
             <ul key={name} className="flex">
               <li className="flex">
-                <Link
+                <TransitionLinks
                   href={link}
-                  className="hover:text-button-hover font-medium text-xl text-muted-foreground"
+                  className={cn(
+                    "hover:text-button-hover font-medium text-xl text-muted-foreground",
+                    { "text-foreground": isActive }
+                  )}
+                  onClick={onClose}
                 >
                   {name}
-                </Link>
+                </TransitionLinks>
               </li>
             </ul>
           );

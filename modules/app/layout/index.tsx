@@ -19,7 +19,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="flex-grow w-full min-h-screen max-w-[1730px] mx-auto"
+        className="flex-grow w-full min-h-screen max-w-[1730px] min-[909px]:mx-auto max-[909px]:px-4"
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);

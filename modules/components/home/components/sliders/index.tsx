@@ -17,6 +17,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
+import { useWindowSize } from "@uidotdev/usehooks";
 
 export function Sliders() {
   const router = useRouter();
@@ -255,7 +256,63 @@ export function Sliders() {
   );
 }
 
-interface DataSliderProps {
+// interface DataSliderProps {
+//   title: string;
+//   cta: string;
+//   href: string;
+//   isLoading: boolean;
+//   data: any[];
+//   renderItem: (item: any) => React.ReactNode;
+// }
+
+// export const DataSlider: React.FC<DataSliderProps> = ({
+//   title,
+//   cta,
+//   href,
+//   isLoading,
+//   data,
+//   renderItem,
+// }) => {
+//   if (data.length === 0) {
+//     return (
+//       <div className="flex gap-8 flex-col mt-12">
+//         <div className="flex items-center w-full justify-between">
+//           <h3 className="font-medium text-2xl text-white">{title}</h3>
+//         </div>
+//         <div className="flex justify-center items-center min-h-[200px]">
+//           <span className="text-white/50 text-2xl">No {title} found</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (data.length <= 3) {
+//     return (
+//       <div className="flex gap-8 flex-col mt-12">
+//         <div className="flex items-center w-full justify-between">
+//           <h3 className="font-medium text-2xl text-white">{title}</h3>
+//           <TransitionLinks
+//             href={href}
+//             className="text-white bg-border rounded-full px-3 py-2 hover:bg-border/70 transition-all duration-300 ease-in-out"
+//           >
+//             {cta}
+//           </TransitionLinks>
+//         </div>
+//         <div className="flex items-center gap-7">{data.map(renderItem)}</div>
+//       </div>
+//     );
+//   } else {
+//     return (
+//       <CustomSlider isLoading={isLoading} title={title} cta={cta} href={href}>
+//         {data.map(renderItem)}
+//       </CustomSlider>
+//     );
+//   }
+// };
+
+
+
+type DataSliderProps = {
   title: string;
   cta: string;
   href: string;
@@ -272,6 +329,9 @@ export const DataSlider: React.FC<DataSliderProps> = ({
   data,
   renderItem,
 }) => {
+  const {width} = useWindowSize();
+  const isMobile = width && width <= 550
+
   if (data.length === 0) {
     return (
       <div className="flex gap-8 flex-col mt-12">
@@ -285,7 +345,7 @@ export const DataSlider: React.FC<DataSliderProps> = ({
     );
   }
 
-  if (data.length <= 3) {
+  if (data.length <= 3 && (!isMobile || data.length <= 1)) {
     return (
       <div className="flex gap-8 flex-col mt-12">
         <div className="flex items-center w-full justify-between">
@@ -300,11 +360,11 @@ export const DataSlider: React.FC<DataSliderProps> = ({
         <div className="flex items-center gap-7">{data.map(renderItem)}</div>
       </div>
     );
-  } else {
-    return (
-      <CustomSlider isLoading={isLoading} title={title} cta={cta} href={href}>
-        {data.map(renderItem)}
-      </CustomSlider>
-    );
   }
+
+  return (
+    <CustomSlider isLoading={isLoading} title={title} cta={cta} href={href}>
+      {data.map(renderItem)}
+    </CustomSlider>
+  );
 };

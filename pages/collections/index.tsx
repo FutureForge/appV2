@@ -7,7 +7,7 @@ import React from "react";
 export default function Collection() {
   return (
     <HydrationBoundary>
-      <div suppressHydrationWarning className="mt-20 w-full min-h-screen px-6">
+      <div suppressHydrationWarning className="mt-20 w-full min-h-screen px-4">
         <Head>
           <title>MintMingles Marketplace - Browse All Collections</title>
           <meta
