@@ -2,9 +2,14 @@
     {
         "inputs": [
             {
-                "internalType": "uint128",
+                "internalType": "uint256",
+                "name": "_creationFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
                 "name": "_mintFee",
-                "type": "uint128"
+                "type": "uint256"
             }
         ],
         "stateMutability": "nonpayable",
@@ -37,12 +42,18 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "uint128",
-                "name": "fee",
-                "type": "uint128"
+                "internalType": "string",
+                "name": "feeType",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newFee",
+                "type": "uint256"
             }
         ],
-        "name": "MintFee",
+        "name": "FeeUpdated",
         "type": "event"
     },
     {
@@ -51,7 +62,7 @@
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "user",
+                "name": "creator",
                 "type": "address"
             },
             {
@@ -61,7 +72,7 @@
                 "type": "address"
             }
         ],
-        "name": "NFTContractDeployed",
+        "name": "NFTContractCreated",
         "type": "event"
     },
     {
@@ -86,76 +97,6 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "internalType": "string[]",
-                "name": "_tokenURIs",
-                "type": "string[]"
-            }
-        ],
-        "name": "batchMint",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "string",
                 "name": "_name",
                 "type": "string"
@@ -164,11 +105,6 @@
                 "internalType": "string",
                 "name": "_symbol",
                 "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_initialSupply",
-                "type": "uint256"
             }
         ],
         "name": "createNFTContract",
@@ -183,49 +119,9 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getApproved",
+        "inputs": [],
+        "name": "creationFee",
         "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            }
-        ],
-        "name": "getNFTDetails",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            },
             {
                 "internalType": "uint256",
                 "name": "",
@@ -239,7 +135,7 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "user",
+                "name": "owner",
                 "type": "address"
             }
         ],
@@ -255,97 +151,21 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "operator",
-                "type": "address"
-            }
-        ],
-        "name": "isApprovedForAll",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "mintFee",
         "outputs": [
             {
-                "internalType": "uint128",
+                "internalType": "uint256",
                 "name": "",
-                "type": "uint128"
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "_tokenURI",
-                "type": "string"
-            }
-        ],
-        "name": "mintNFT",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [],
         "name": "owner",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "ownerOf",
         "outputs": [
             {
                 "internalType": "address",
@@ -366,12 +186,12 @@
     {
         "inputs": [
             {
-                "internalType": "uint128",
-                "name": "_mintFee",
-                "type": "uint128"
+                "internalType": "uint256",
+                "name": "_fee",
+                "type": "uint256"
             }
         ],
-        "name": "setMintFee",
+        "name": "setCreationFee",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -379,27 +199,12 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "_nftContract",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "tokenId",
+                "name": "_fee",
                 "type": "uint256"
             }
         ],
-        "name": "transferFrom",
+        "name": "setMintFee",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -423,5 +228,9 @@
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+    {
+        "stateMutability": "payable",
+        "type": "receive"
     }
 ]

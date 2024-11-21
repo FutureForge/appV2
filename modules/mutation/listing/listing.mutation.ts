@@ -64,14 +64,13 @@ export function useCreateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.listing.all,
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.collection.all,
+        ],
       });
     },
     onError: () => {},
@@ -128,14 +127,7 @@ export function useUpdateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [queryKeys.user.all, queryKeys.nft.single],
       });
     },
     onError: () => {},
@@ -177,14 +169,12 @@ export function useCancelDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.listing.all,
+        ],
       });
     },
     onError: () => {},
@@ -237,14 +227,12 @@ export function useBuyFromDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.listing.all,
+        ],
       });
     },
     onError: () => {},

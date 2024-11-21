@@ -48,14 +48,15 @@ export function useCreateAuctionMutation() {
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith('auction') || 
-            queryKey.startsWith('user') || 
-            queryKey.startsWith('nft')
-          );
-        },
+        queryKey: [
+          queryKeys.auction.new,
+          queryKeys.auction.single,
+          queryKeys.auction.all,
+          queryKeys.user.all,
+          queryKeys.user.auctions,
+          queryKeys.nft.single,
+        ],
+        refetchType: "all",
       });
     },
     onError: (error, variables, context) => {},
@@ -97,14 +98,14 @@ export function useCancelAuctionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith('auction') || 
-            queryKey.startsWith('user') || 
-            queryKey.startsWith('nft')
-          );
-        },
+        queryKey: [
+          queryKeys.auction.new,
+          queryKeys.auction.single,
+          queryKeys.auction.all,
+          queryKeys.user.all,
+          queryKeys.user.auctions,
+          queryKeys.nft.single,
+        ],
       });
     },
     onError: () => {},

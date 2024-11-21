@@ -513,14 +513,11 @@ export function useUserNFTActivitiesQuery() {
 type UserNFTContract = {
   name: string;
   symbol: string;
-  totalSupply: string;
-  initialSupply: string;
   contractAddress: string;
 };
 
 export function useUserNFTContractQuery() {
   const { activeAccount } = useUserChainInfo();
-  const testAddress = "0x898d06461F1431b6302CeE28d48D723703Ee4697";
   const userAddress = activeAccount?.address;
 
   const NFTFactoryContract = getContractEthers({
@@ -547,14 +544,10 @@ export function useUserNFTContractQuery() {
 
                   const name = await getContract.name();
                   const symbol = await getContract.symbol();
-                  const totalSupply = await getContract.totalSupply();
-                  const initialSupply = await getContract.initialSupply();
 
                   const contractInfo = {
                     name,
                     symbol,
-                    totalSupply: totalSupply.toString(),
-                    initialSupply: initialSupply.toString(),
                     contractAddress: contract.toLowerCase(),
                   };
 
@@ -562,19 +555,13 @@ export function useUserNFTContractQuery() {
                 }
               )
             )
-          : [
-              {
-                name: "",
-                symbol: "",
-                totalSupply: "0",
-                initialSupply: "0",
-                contractAddress: "",
-              },
-            ];
+          : [];
 
       return deployedContractsUpdated;
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

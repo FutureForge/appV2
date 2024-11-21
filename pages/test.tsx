@@ -39,10 +39,16 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import DatePicker from "react-datepicker";
 import { Social } from "@/utils/types/global";
 import { getNFT } from "thirdweb/extensions/erc721";
-import { getContractCustom, getContractEthers } from "@/modules/blockchain";
+import {
+  getContractCustom,
+  getContractEthers,
+  waitForTransaction,
+} from "@/modules/blockchain";
 import nftFactoryAbi from "@/utils/abi/nftFactory.json";
 import nftBaseAbi from "@/utils/abi/nftBase.json";
 import { NFT } from "@/utils/types/graphql";
+import { NFT_FACTORY_ADDRESS } from "@/utils/configs";
+import { ethers } from "ethers";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
 // 8
@@ -74,8 +80,8 @@ export default function Test() {
 
   // const listingCreator = allListings?.[0]?.listingCreator;
 
-  const { data: userNFTs } = useUserNFTsQuery();
-  console.log({ userNFTs });
+  // const { data: userNFTs } = useUserNFTsQuery();
+  // console.log({ userNFTs });
 
   // const { data: singleNFT } = useSingleNFTQuery({
   //   contractAddress: "0x55babee194af5c59a5f17f9dea47be4a37dfb36d",
@@ -226,7 +232,34 @@ export default function Test() {
   // const approvalMutation = useApprovalMutation();
   // console.log({ approvalMutation });
 
+  const NFTFactory = getContractEthers({
+    contractAddress: NFT_FACTORY_ADDRESS,
+    abi: nftFactoryAbi,
+  });
+
+  console.log({ NFTFactory });
+
   const handleClick = async () => {
+    const creationFee = await NFTFactory.creationFee();
+    console.log({ creationFee: creationFee.toString() });
+
+    const transaction = await NFTFactory.populateTransaction.createNFTContract(
+      "Test",
+      "TEST",
+      {
+        value: ethers.utils.parseEther(creationFee.toString()),
+      }
+    );
+    console.log({ transaction });
+
+    // @ts-ignore
+    const tx = await activeAccount.sendTransaction(transaction);
+    const receipt = await waitForTransaction(tx.transactionHash);
+
+    console.log({ receipt });
+
+    // return receipt;
+
     // approvalMutation.mutate({
     //   collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
     //   tokenId: "1",

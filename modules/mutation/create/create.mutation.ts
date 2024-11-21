@@ -1,16 +1,12 @@
 import { upload } from "thirdweb/storage";
 import { useToast } from "@/modules/app/hooks/useToast";
+import { getContractEthers, waitForTransaction } from "@/modules/blockchain";
 import {
-  getContractCustom,
-  getContractEthers,
-  waitForTransaction,
-} from "@/modules/blockchain";
-import { useMintFeeQuery, useUserChainInfo } from "@/modules/query";
-import {
-  client,
-  MARKETPLACE_ADDRESS_TESTNET,
-  NFT_FACTORY_ADDRESS,
-} from "@/utils/configs";
+  useCreationFeeQuery,
+  useMintFeeQuery,
+  useUserChainInfo,
+} from "@/modules/query";
+import { client, NFT_FACTORY_ADDRESS } from "@/utils/configs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { useRouter } from "next/navigation";
@@ -18,7 +14,6 @@ import { queryKeys } from "@/modules/query/query-keys";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
 import nftBaseABI from "@/utils/abi/nftBase.json";
-import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 
 type CreateNFTMetadata = {
   contractAddress: string;
@@ -40,6 +35,8 @@ export function useCreateNFTMutation() {
   const queryClient = useQueryClient();
   const { activeAccount } = useUserChainInfo();
 
+  const { data: mintFee } = useMintFeeQuery();
+
   return useMutation({
     mutationFn: async (createNFTData: CreateNFTMetadata) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
@@ -49,80 +46,65 @@ export function useCreateNFTMutation() {
         abi: nftBaseABI,
       });
 
-      const NFTFactoryContract = getContractEthers({
-        contractAddress: NFT_FACTORY_ADDRESS,
-        abi: nftFactoryABI,
+      if (!NFTBaseContract) throw new Error("No file");
+
+      // upload file to ipfs
+      const uri = await upload({
+        client,
+        files: [createNFTData.file],
+        uploadWithoutDirectory: true,
       });
 
-      console.log({ NFTFactoryContract });
+      if (uri) {
+        // create metadata and upload to ipfs
+        const metadata = {
+          name: createNFTData.name,
+          description: createNFTData.description,
+          image: uri,
+          attributes: createNFTData.attributes,
+        };
 
-      // // upload file to ipfs
-      // const uri = await upload({
-      //   client,
-      //   files: [createNFTData.file],
-      //   uploadWithoutDirectory: true,
-      // });
+        const metadataURI = await upload({
+          client,
+          files: [
+            {
+              name: `${createNFTData.name}-${Math.random()}.json`,
+              data: JSON.stringify(metadata),
+            },
+          ],
+          uploadWithoutDirectory: true,
+        });
 
-      // if (uri) {
-      //   // create metadata and upload to ipfs
-      //   const metadata = {
-      //     name: createNFTData.name,
-      //     description: createNFTData.description,
-      //     image: uri,
-      //     attributes: createNFTData.attributes,
-      //   };
+        if (!metadataURI) throw new Error("No metadata URI");
 
-      //   const metadataURI = await upload({
-      //     client,
-      //     files: [
-      //       {
-      //         name: `${createNFTData.name}-${Math.random()}.json`,
-      //         data: JSON.stringify(metadata),
-      //       },
-      //     ],
-      //     uploadWithoutDirectory: true,
-      //   });
+        const userAddress = activeAccount.address;
 
-      //   if (!metadataURI) throw new Error("No metadata URI");
+        const transaction = await NFTBaseContract.populateTransaction.safeMint(
+          userAddress,
+          metadataURI,
+          {
+            value: ethers.utils.parseEther(mintFee),
+          }
+        );
 
-      //   console.log({ metadataURI });
+        // @ts-ignore
+        const tx = await activeAccount.sendTransaction(transaction);
+        const receipt = await waitForTransaction(tx.transactionHash);
 
-      const metadataURI =
-        "ipfs://QmciqcbPJqsj211nH9pZDr57w1zqqc7oUFQ8oEmeNY1WcV";
+        if (receipt.status === "reverted") {
+          throw new Error("Transaction failed");
+        }
 
-      console.log({ createNFTData });
-      const contractAddress = createNFTData.contractAddress.toLowerCase();
-      const userAddress = activeAccount.address;
+        const userBalance = await NFTBaseContract.balanceOf(userAddress);
+        console.log({ userBalance });
+        const tokenId = Number(userBalance.toString()) - 1;
 
-      // const transaction = await NFTFactoryContract.populateTransaction.mintNFT(
-      //   contractAddress,
-      //   userAddress,
-      //   metadataURI,
-      // );
+        // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);
 
-      // console.log({transaction})
-
-     // // @ts-ignore
-      // const tx = await activeAccount.sendTransaction(transaction);
-      // const receipt = await waitForTransaction(tx.transactionHash);
-
-      // if (receipt.status === "reverted") {
-      //   throw new Error("Transaction failed");
-      // }
-
-      // const totalSupply = await NFTBaseContract.totalSupply();
-      // const tokenId = totalSupply.toString() - 1;
-
-      // console.log({ tokenId });
-      // console.log({ totalSupply });
-
-      // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);
-
-      // return receipt;
-      return null;
-      // } else {
-      //   throw new Error("No URI");
-      // }
+        return { receipt, tokenId };
+      } else {
+        throw new Error("No URI");
+      }
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
@@ -142,10 +124,11 @@ export function useCreateNFTMutation() {
 }
 
 export function useCreateNFTContractMutation() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const { activeAccount } = useUserChainInfo();
 
-  const { data: mintFee } = useMintFeeQuery();
+  const { data: creationFee } = useCreationFeeQuery();
 
   const NFTFactoryContract = getContractEthers({
     contractAddress: NFT_FACTORY_ADDRESS,
@@ -153,22 +136,15 @@ export function useCreateNFTContractMutation() {
   });
 
   return useMutation({
-    mutationFn: async ({
-      name,
-      symbol,
-      initialSupply,
-    }: {
-      name: string;
-      symbol: string;
-      initialSupply: string;
-    }) => {
+    mutationFn: async ({ name, symbol }: { name: string; symbol: string }) => {
+      if (!activeAccount) return toast.error("Please connect your wallet");
+
       const transaction =
         await NFTFactoryContract.populateTransaction.createNFTContract(
           name,
           symbol,
-          initialSupply,
           {
-            value: ethers.utils.parseEther(mintFee),
+            value: ethers.utils.parseEther(creationFee),
           }
         );
 

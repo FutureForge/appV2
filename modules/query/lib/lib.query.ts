@@ -90,3 +90,19 @@ export function useMintFeeQuery() {
     },
   });
 }
+
+export function useCreationFeeQuery() {
+  const NFTFactoryContract = getContractEthers({
+    contractAddress: NFT_FACTORY_ADDRESS,
+    abi: nftFactoryABI,
+  });
+
+  return useQuery({
+    queryKey: ["creation-fee"],
+    queryFn: async () => {
+      const creationFee = await NFTFactoryContract.creationFee();
+      return creationFee.toString();
+    },
+  });
+}
+

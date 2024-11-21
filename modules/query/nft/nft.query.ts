@@ -74,6 +74,7 @@ export function useSingleNFTQuery({
       try {
         const [
           tokenTransfersResponse,
+          // tokenInventoryResponse,
           collectionFee,
           marketplaceFee,
           allListings,
@@ -82,6 +83,9 @@ export function useSingleNFTQuery({
           axios.get<NFTActivityResponse>(
             `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
           ),
+          // axios.get(
+          //   `https://test.xfiscan.com/api/1.0/token-inventory/${contractAddress}/${tokenId}`
+          // ),
           getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
           getPlatformFeeInfoCustom({
             contractAddress: MARKETPLACE_ADDRESS_TESTNET,

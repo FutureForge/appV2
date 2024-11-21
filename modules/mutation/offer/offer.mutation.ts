@@ -108,15 +108,12 @@ export function useMakeListingOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+        ],
       });
     },
     onError: () => {},
@@ -158,15 +155,12 @@ export function useAcceptOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+        ],
       });
     },
     onError: () => {},
@@ -208,15 +202,12 @@ export function useCancelOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("listing") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+        ],
       });
     },
     onError: () => {},
@@ -265,15 +256,14 @@ export function useBidInAuctionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("auction") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.newBids,
+          queryKeys.auction.filteredAll,
+        ],
       });
     },
     onError: () => {},
@@ -315,15 +305,13 @@ export function useCollectAuctionPayoutMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("auction") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.filteredAll,
+        ],
       });
     },
     onError: () => {},
@@ -365,15 +353,13 @@ export function useCollectAuctionTokensMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0] as string;
-          return (
-            queryKey.startsWith("offer") ||
-            queryKey.startsWith("auction") ||
-            queryKey.startsWith("user") ||
-            queryKey.startsWith("nft")
-          );
-        },
+        queryKey: [
+          queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.filteredAll,
+        ],
       });
     },
     onError: () => {},
