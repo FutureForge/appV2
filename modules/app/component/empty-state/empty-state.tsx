@@ -10,7 +10,7 @@ export function EmptyState({ message, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "w-full !p-4 items-center flex-col gap-10 justify-center flex h-[80vh]",
+        "w-full !p-4 items-center flex-col gap-10 justify-center flex h-[80vh] max-md:h-[50vh]",
         className
       )}
     >

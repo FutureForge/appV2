@@ -41,12 +41,28 @@ export function CustomSlider({
     cssEase: "linear",
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1200,
         settings: {
           slidesToShow: 3,
           slidesToScroll: 1,
           infinite: true,
           dots: true,
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2.5,
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 1000,
+        settings: {
+          slidesToShow: 2.1,
+          slidesToScroll: 1,
         },
       },
       {
@@ -93,7 +109,7 @@ export function CustomSlider({
         </TransitionLinks>
       </div>
       {isLoading ? (
-        <div className="grid grid-cols-4 w-full">
+        <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
           {Array.from({ length: 4 }, (_, index) => (
             <NftCardSkeleton key={index} />
           ))}

@@ -52,7 +52,7 @@ export default function SingleCollectionSkeleton() {
 
       {/* Contents */}
       <div className="mt-6">
-        <div className="z-40 flex items-center justify-between flex-wrap gap-2">
+        <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full z-40">
           {Array.from({ length: 5 }).map((_, index) => (
             <NftCardSkeleton key={index} />
           ))}

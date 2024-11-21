@@ -380,7 +380,7 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="mt-20 w-full min-h-screen px-6 pb-20">
+    <div className="mt-20 w-full min-h-screen pb-20">
       <Head>
         <title>Mint Mingle - Profile</title>
         <meta name="description" content={`View your profile on Mint Mingle`} />
@@ -413,7 +413,7 @@ export function ProfilePage() {
               />
               {userAddress && (
                 <div className="flex items-center gap-2 text-sm text-foreground">
-                  <h4 className="text-2xl font-medium flex gap-2 items-center">
+                  <h4 className="text-2xl max-md:text-lg font-medium flex gap-2 items-center">
                     {getFormatAddress(userAddress || "")}
                   </h4>
                   <CopyIcon
@@ -428,7 +428,7 @@ export function ProfilePage() {
       </div>
 
       <div className="pt-12 flex flex-col gap-8 min-h-screen w-full">
-        <div className="flex items-center w-full justify-between">
+        <div className="flex items-center w-full justify-between gap-6 flex-col">
           <Header
             isActive={isActive}
             setIsActive={setIsActive}
@@ -438,41 +438,42 @@ export function ProfilePage() {
             filters={filters}
             showRightSide={false}
           />
-
-          {selectedFilter === filters[7] && (
-            <div className="flex items-center gap-4 whitespace-nowrap">
-              {options.map((option) => (
-                <div
-                  key={option}
-                  className="flex items-center gap-2"
-                  onClick={() => setSelectedOption(option)}
-                >
-                  <Checkbox
-                    checked={selectedOption === option}
-                    onCheckedChange={() => setSelectedOption(option)}
-                  />
-                  <label
-                    className={
-                      selectedOption === option
-                        ? "text-primary"
-                        : "text-muted-foreground"
-                    }
+          <div className="w-full items-center flex justify-end flex-wrap">
+            {selectedFilter === filters[7] && (
+              <div className="flex items-center flex-wrap gap-4 whitespace-nowrap">
+                {options.map((option) => (
+                  <div
+                    key={option}
+                    className="flex items-center gap-2"
+                    onClick={() => setSelectedOption(option)}
                   >
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          )}
+                    <Checkbox
+                      checked={selectedOption === option}
+                      onCheckedChange={() => setSelectedOption(option)}
+                    />
+                    <label
+                      className={
+                        selectedOption === option
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                      }
+                    >
+                      {option}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {userAddress ? (
           <div className="flex flex-wrap items-center gap-6 w-full">
             {/* User NFTS */}
             {selectedFilter === filters[0] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserNFTsLoading || isUserNFTsPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -506,9 +507,9 @@ export function ProfilePage() {
 
             {/* Listed NFTS */}
             {selectedFilter === filters[1] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserListingsLoading || isUserListingsPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -561,9 +562,9 @@ export function ProfilePage() {
 
             {/* Auctioned NFTS */}
             {selectedFilter === filters[2] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserAuctionsLoading || isUserAuctionsPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -619,9 +620,9 @@ export function ProfilePage() {
 
             {/* Offers NFTS */}
             {selectedFilter === filters[3] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserOffersLoading || isUserOffersPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -675,9 +676,9 @@ export function ProfilePage() {
 
             {/* Offers Received NFTS */}
             {selectedFilter === filters[4] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserOffersReceivedLoading || isUserOffersReceivedPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -730,9 +731,9 @@ export function ProfilePage() {
 
             {/* Bids NFTS */}
             {selectedFilter === filters[5] && (
-              <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserBidsLoading || isUserBidsPending ? (
-                  <div className="grid grid-cols-4 w-full">
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -801,7 +802,8 @@ export function ProfilePage() {
                               <p className="text-sm font-medium">{date}</p>
                             </div>
 
-                            <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 gap-8">
+                            <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                              {/* <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5"> */}
                               {transfers.map((transfer, index) => {
                                 const image = transfer.nft?.metadata.image;
                                 const name = transfer.nft?.metadata.name;
@@ -891,10 +893,10 @@ export function ProfilePage() {
               <>
                 {/** Expired Listings */}
                 {selectedOption === options[0] && (
-                  <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                     {isUserExpiredListingsLoading ||
                     isUserExpiredListingsPending ? (
-                      <div className="grid grid-cols-4 w-full">
+                      <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                         {Array.from({ length: 4 }, (_, index) => (
                           <NftCardSkeleton key={index} />
                         ))}
@@ -949,10 +951,10 @@ export function ProfilePage() {
 
                 {/** Expired Auctions */}
                 {selectedOption === options[1] && (
-                  <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                     {isUserExpiredAuctionsLoading ||
                     isUserExpiredAuctionsPending ? (
-                      <div className="grid grid-cols-4 w-full">
+                      <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                         {Array.from({ length: 4 }, (_, index) => (
                           <NftCardSkeleton key={index} />
                         ))}
@@ -1007,10 +1009,10 @@ export function ProfilePage() {
 
                 {/** Expired Offers */}
                 {selectedOption === options[2] && (
-                  <div className="grid grid-cols-4 min-[1520px]:grid-cols-5 w-full gap-8">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                     {isUserExpiredOffersLoading ||
                     isUserExpiredOffersPending ? (
-                      <div className="grid grid-cols-4 w-full">
+                      <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
                         {Array.from({ length: 4 }, (_, index) => (
                           <NftCardSkeleton key={index} />
                         ))}
@@ -1067,7 +1069,7 @@ export function ProfilePage() {
 
             {/* User Collections */}
             {selectedFilter === filters[8] && (
-              <div className="flex items-center gap-8 flex-wrap w-full">
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {userCollections &&
                 paginatedCollectionsData &&
                 paginatedCollectionsData.length > 0 ? (
