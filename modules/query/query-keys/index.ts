@@ -7,6 +7,7 @@ export const queryKeys = {
     single: ["single-listing"] as const,
     newFiltered: ["new-listing-filtered"] as const,
     newSaleFiltered: ["newSale-listing-filtered"] as const,
+    filteredAll: ["filtered-all-listings"] as const,
   },
   auction: {
     all: ["auction"] as const,
@@ -18,6 +19,9 @@ export const queryKeys = {
     newBidsUser: ["new-bids-user"] as const,
     pendingPayout: ["pending-payout"] as const,
     payoutClaimed: ["payout-claimed"] as const,
+    filteredAll: ["filtered-all-auctions"] as const,
+    filteredNew: ["filtered-new-auctions"] as const,
+    filteredClosed: ["filtered-closed-auctions"] as const,
   },
   offers: {
     all: ["offers"] as const,
@@ -25,12 +29,14 @@ export const queryKeys = {
     accepted: ["accepted-offers"] as const,
     new: ["new-offer"] as const,
     single: ["single-offer"] as const,
+    filteredAll: ["filtered-all-offers"] as const,
   },
   collection: {
     all: ["collection"] as const,
     single: ["single-collection"] as const,
     checkCollectionExists: ["check-collection-exists"] as const,
     checkContractIsACollection: ["check-contract-is-a-collection"] as const,
+    filteredAll: ["filtered-all-collection"] as const,
   },
   nft: {
     single: ["single-nft"] as const,

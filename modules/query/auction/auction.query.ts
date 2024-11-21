@@ -64,7 +64,7 @@ export function useFilteredAllAuctionsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.all],
+    queryKey: [queryKeys.auction.filteredAll],
     queryFn: async () => {
       const response = await request<AllAuctionsQueryResponse>(
         indexerEndpoint,
@@ -190,7 +190,7 @@ export function useFilteredNewAuctionsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.new],
+    queryKey: [queryKeys.auction.filteredNew],
     queryFn: async () => {
       const response = await request<NewAuctionsQueryResponse>(
         indexerEndpoint,
@@ -232,7 +232,7 @@ export function useFilteredAuctionClosedQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.auction.closed],
+    queryKey: [queryKeys.auction.filteredClosed],
     queryFn: async () => {
       const response = await request<AuctionClosedQueryResponse>(
         indexerEndpoint,

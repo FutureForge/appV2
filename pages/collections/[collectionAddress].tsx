@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-
 import { useRef, useState, useEffect } from "react";
+
 import { useSingleCollectionQuery, useUserChainInfo } from "@/modules/query";
 import { useInView } from "react-intersection-observer";
 import {
@@ -32,13 +32,7 @@ import {
 import { chainInfo } from "@/utils/configs";
 import { useRouter } from "next/router";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
-import {
-  useBidInAuctionMutation,
-  useBuyFromDirectListingMutation,
-  useUpdateCollectionMutation,
-} from "@/modules/mutation";
-import { useToast } from "@/modules/app/hooks/useToast";
-import { decimalOffChain } from "@/modules/blockchain";
+import { useUpdateCollectionMutation } from "@/modules/mutation";
 import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 import { validateSocialLink } from "@/modules/components/add-collection/add-collection.utils";
 import { Social } from "@/utils/types/global";
@@ -51,10 +45,6 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
-import {
-  useAuctionInfoStore,
-  useListingInfoStore,
-} from "@/modules/components/now-dialog/store";
 
 type FilterType =
   | "Items"
@@ -71,16 +61,6 @@ const filters: FilterType[] = [
   "Collection Settings",
 ];
 
-// const formatTimestamp = (timestamp: string): string => {
-//   const date = new Date(timestamp);
-//   return date.toLocaleDateString("en-US", {
-//     weekday: "short",
-//     month: "short",
-//     day: "2-digit",
-//     year: "numeric",
-//   });
-// };
-
 const defaultCollectionSocials = [
   { icon: <X className="size-[14px]" />, link: "" },
   { icon: <Discord className="size-[14px]" />, link: "" },
@@ -91,7 +71,6 @@ export const ITEMS_PER_PAGE = 4;
 
 export default function CollectionPage() {
   const { activeAccount } = useUserChainInfo();
-  const toast = useToast();
   const router = useRouter();
   const { collectionAddress } = router.query;
   const [filter, setFilter] = useState<FilterType>("Items");
@@ -102,17 +81,8 @@ export default function CollectionPage() {
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
     rootMargin: "100px",
+    delay: 100,
   });
-
-  useEffect(() => {
-    if (inView) {
-      setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
-    }
-  }, [inView]);
-
-  useEffect(() => {
-    setDisplayCount(ITEMS_PER_PAGE);
-  }, [filter, searchQuery, selectedFilter]);
 
   const {
     data: singleCollection,
@@ -134,7 +104,7 @@ export default function CollectionPage() {
     singleCollection?.collectionListings?.allListings;
   const collectionAllOffers = singleCollection?.collectionOffers?.allOffers;
   const collectionListingSales =
-    singleCollection?.collectionListings?.completedListings;
+    singleCollection?.collectionListings?.newSaleListings;
   const collectionAuctionSales =
     singleCollection?.collectionAuctions?.auctionClosed;
 
@@ -157,7 +127,7 @@ export default function CollectionPage() {
   const collectionSales = [
     ...(collectionListingSales?.map((sale) => ({
       ...sale,
-      saleType: "completed-listing",
+      saleType: "new-sale-listing",
       nftStatus: "listed",
     })) || []),
     ...(collectionAuctionSales?.map((sale) => ({
@@ -170,7 +140,8 @@ export default function CollectionPage() {
   const collectionLabels = {
     floorPrice: "Floor Price",
     holderCount: "Holders",
-    listedNFTs: "Listed",
+    // listedNFTs: "Listed",
+    totalNFTs: "Collection Size",
     percentageOfAuctioned: "Auction %",
     percentageOfListed: "Listed %",
     totalVolume: "Total Volume",
@@ -180,7 +151,8 @@ export default function CollectionPage() {
     "floorPrice",
     "totalVolume",
     "holderCount",
-    "listedNFTs",
+    // "listedNFTs",
+    "totalNFTs",
     "percentageOfAuctioned",
     "percentageOfListed",
   ];
@@ -287,19 +259,43 @@ export default function CollectionPage() {
     router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
+  useEffect(() => {
+    if (inView) {
+      const timeoutId = setTimeout(() => {
+        setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    inView,
+    filter,
+    displayCount,
+    filteredCollectionNFTs,
+    filteredCollectionOffers,
+    filteredCollectionSales,
+    filteredCollectionTokenTransfers,
+  ]);
+
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+  }, [filter, searchQuery, selectedFilter]);
+
   const renderCollectionDetails = () => {
-    if (!collectionDetails) return (
-      <div className="flex justify-end w-full">
-        <p>No collection details available</p>
-      </div>
-    );
+    if (!collectionDetails)
+      return (
+        <div className="flex justify-end w-full">
+          <p>No collection details available</p>
+        </div>
+      );
 
     return displayOrder.map((key) => {
       const value = collectionDetails[key as keyof typeof collectionDetails];
       const label = collectionLabels[key as keyof typeof collectionLabels];
       const symbol = "XFI";
 
-      const displayValue = value === undefined || value === Infinity ? 0 : value;
+      const displayValue =
+        value === undefined || value === Infinity ? 0 : value;
       const shouldShowSymbol = key === "floorPrice" || key === "totalVolume";
 
       return (
