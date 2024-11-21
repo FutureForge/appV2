@@ -203,7 +203,7 @@ export function AddCollectionsPage() {
           </div>
         </div>
         <div className="w-[504px] max-[1450px]:h-[482px] max-[1095px]:w-full bg-tertiary p-6 flex flex-col rounded-3xl">
-          <ScrollArea>
+          <ScrollArea.Root>
             <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
               <div className="w-full flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
@@ -290,7 +290,7 @@ export function AddCollectionsPage() {
                 </div>
               </div>
             </div>
-          </ScrollArea>
+          </ScrollArea.Root>
           <div className="mt-4 flex items-center justify-end gap-3">
             <Button
               type="submit"

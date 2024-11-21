@@ -135,7 +135,7 @@ export const Body = forwardRef<BodyElement, BodyProps>((props, ref) => {
   const { className, ...bodyProps } = props;
   return (
     <div className="flex flex-1 overflow-auto" ref={ref}>
-      <ScrollArea
+      <ScrollArea.Root
         className={cn("p-4", className)}
         rootClassName="h-auto"
         {...bodyProps}

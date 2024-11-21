@@ -86,7 +86,7 @@ export function CreatePage() {
     !name || !description || !file || createNFTMutation.isPending;
 
   return (
-    <div className="flex items-center max-[909px]:flex-col min-[909px]:justify-center gap-7 w-full max-[909px]:py-8">
+    <div className="flex items-center max-[909px]:flex-col min-[909px]:justify-center gap-7 w-full max-[909px]:py-8 max-[909px]:px-4">
       {/* Choose File */}
       <div className="border-dashed border max-[909px]:h-full relative border-primary p-4 min-[1120px]:h-[34.75rem] min-[909px]:w-[24.0625rem] min-[909px]:h-[33rem] w-full flex items-center justify-center min-[1120px]:w-[31.5rem] rounded-3xl">
         <FileInput
@@ -104,7 +104,7 @@ export function CreatePage() {
 
       {/* Form */}
       <div className="min-[1120px]:w-[31.5rem] min-[1120px]:h-[34.75rem] min-[909px]:w-[27.4375rem] min-[909px]:h-[33rem] bg-tertiary p-6 flex flex-col rounded-3xl h-full w-full">
-        <ScrollArea>
+        <ScrollArea.Root>
           <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
             <div className="w-full flex flex-col gap-5">
               <div className="flex flex-col gap-4">
@@ -196,7 +196,7 @@ export function CreatePage() {
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </ScrollArea.Root>
         <div className="mt-4 flex items-center justify-end gap-3">
           <Button
             onClick={handleCreateNFT}
