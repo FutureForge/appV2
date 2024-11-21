@@ -84,7 +84,7 @@ export function useFilteredAllListingsQuery({
 
       return updatedListings;
     },
-    enabled: !!contractAddress,
+    enabled: !!contractAddress || !!address,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
