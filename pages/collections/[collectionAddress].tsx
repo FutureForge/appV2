@@ -288,7 +288,11 @@ export default function CollectionPage() {
   };
 
   const renderCollectionDetails = () => {
-    if (!collectionDetails) return <p>No collection details available</p>;
+    if (!collectionDetails) return (
+      <div className="flex justify-end w-full">
+        <p>No collection details available</p>
+      </div>
+    );
 
     return displayOrder.map((key) => {
       const value = collectionDetails[key as keyof typeof collectionDetails];

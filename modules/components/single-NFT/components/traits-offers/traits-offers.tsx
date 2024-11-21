@@ -87,7 +87,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
                     <ChevronDownIcon className="AccordionChevron" aria-hidden />
                   </Accordion.Trigger>
                   <Accordion.Content className="rounded-2xl h-[250px] p-4 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
-                    <ScrollArea>
+                    <ScrollArea.Root>
                       <div className="flex flex-col gap-2">
                         {nftActivities?.map((transfer, index) => (
                           <div
@@ -118,7 +118,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
                           </div>
                         ))}
                       </div>
-                    </ScrollArea>
+                    </ScrollArea.Root>
                   </Accordion.Content>
                 </Accordion.Item>
               </Accordion.Root>
