@@ -19,7 +19,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="flex-grow w-full min-h-screen max-w-[1730px] mx-auto"
+        className="flex-grow w-full min-h-screen max-w-[1730px] min-[909px]:mx-auto"
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);
@@ -29,7 +29,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
         {children}
         <Toast />
       </div>
-      {pathname !== "/create" && pathname !== "/add_collections" && <Footer />}
+      {/* {pathname !== "/create" && pathname !== "/add_collections" && <Footer />} */}
     </div>
   );
 };

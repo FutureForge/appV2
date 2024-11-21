@@ -4,7 +4,7 @@ import React from "react";
 
 export default function Browse() {
   return (
-    <div className="mt-20 w-full min-h-screen px-6">
+    <div className="mt-20 w-full min-h-screen px-4">
       <Head>
         <title>
           MintMingles Marketplace - Browse All Listings and Auctions

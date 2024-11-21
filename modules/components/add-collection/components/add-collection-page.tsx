@@ -167,19 +167,21 @@ export function AddCollectionsPage() {
     Object.values(socialErrors).some((error) => error !== "");
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6  max-[1095px]:py-12 max-[1095px]:px-4 ">
       <div className="flex flex-col gap-2">
-        <h4 className="font-medium text-[28px]">Add Collections</h4>
-        <p className="text-muted-foreground">
+        <h4 className="font-medium md:text-xl text-lg min-[1170px]:text-[28px]">
+          Add Collections
+        </h4>
+        <p className="text-muted-foreground max-md:text-sm">
           Make sure you’re the owner of the collection
         </p>
       </div>
       <form
         onSubmit={handleSubmit}
-        className="flex items-center justify-center gap-7"
+        className="flex items-center justify-center gap-7 max-[1095px]:flex-col max-[1095px]:w-full"
       >
-        <div className="flex flex-col gap-4">
-          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
+        <div className="flex flex-col gap-4 max-[1095px]:w-full">
+          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
               id="image"
               name="image"
@@ -189,7 +191,7 @@ export function AddCollectionsPage() {
             />
             <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
-          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center w-[504px] rounded-3xl">
+          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
               id="backgroundImage"
               name="backgroundImage"
@@ -200,8 +202,8 @@ export function AddCollectionsPage() {
             <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
         </div>
-        <div className="w-[504px] max-[1450px]:h-[482px] bg-tertiary p-6 flex flex-col rounded-3xl">
-          <ScrollArea>
+        <div className="w-[504px] max-[1450px]:h-[482px] max-[1095px]:w-full bg-tertiary p-6 flex flex-col rounded-3xl">
+          <ScrollArea.Root>
             <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
               <div className="w-full flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
@@ -288,7 +290,7 @@ export function AddCollectionsPage() {
                 </div>
               </div>
             </div>
-          </ScrollArea>
+          </ScrollArea.Root>
           <div className="mt-4 flex items-center justify-end gap-3">
             <Button
               type="submit"

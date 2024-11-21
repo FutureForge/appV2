@@ -1,10 +1,19 @@
-import { Card, SwitchView, TextField, ToggleGroup } from "@/modules/app";
+import {
+  Card,
+  IconButton,
+  Select,
+  SwitchView,
+  TextField,
+  ToggleGroup,
+} from "@/modules/app";
 import React, { useState } from "react";
+import { cn } from "@/modules/app/utils";
+import { ScrollArea } from "../scroll-area/scroll-area";
 
 // icons
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
-import { cn } from "@/modules/app/utils";
+import FilterIcon from "@/assets/filter-lines.svg";
 
 type HeaderProps = {
   title?: string;
@@ -36,35 +45,76 @@ export function Header({
   const [duration, setDuration] = useState<string>("1H");
 
   return (
-    <div className="w-full flex items-center justify-between">
+    <div className="w-full flex md:items-center gap-4 justify-between max-md:flex-col">
       <div className="w-full flex justify-between items-center">
-        <Card className="bg-transparent w-full border border-new-muted-text p-1 rounded-xl h-10">
-          <ToggleGroup.Root
-            type="single"
-            value={selectedFilter ? selectedFilter : filter}
-            onValueChange={(value) => {
-              if (value) setFilter(value);
-              onFilterClick && onFilterClick(value);
+        <Card className="bg-transparent w-fit border overflow-x-auto border-new-muted-text p-1 rounded-xl h-10">
+          <ScrollArea.Root
+            onScroll={(event) => {
+              const target = event.target as HTMLElement;
+              const scrollLeft = target.scrollLeft;
+              const scrollWidth = target.scrollWidth;
+              const clientWidth = target.clientWidth;
+              if (scrollLeft === 0) {
+                target.style.setProperty("--right-black", "0%");
+              } else if (scrollLeft + clientWidth === scrollWidth) {
+                //
+              } else {
+                target.style.setProperty("--right-black", "8%");
+              }
             }}
-            className={cn({ "justify-between": !showRightSide })}
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent 0%, black var(--right-black, 0%), black 95%, transparent 100%)",
+            }}
           >
-            {filters.map((value) => (
-              <ToggleGroup.Item
-                key={value}
-                variant="select"
-                value={value}
-                disabled={!!selectedFilter}
-                className={cn(
-                  "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
-                  "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",
-                  { "min-w-[142px] justify-center": !showRightSide }
-                )}
-              >
-                {value}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup.Root>
+            <ToggleGroup.Root
+              type="single"
+              value={selectedFilter ? selectedFilter : filter}
+              onValueChange={(value) => {
+                if (value) setFilter(value);
+                onFilterClick && onFilterClick(value);
+              }}
+              className={cn({ "justify-between": !showRightSide })}
+            >
+              {filters.map((value) => (
+                <ToggleGroup.Item
+                  key={value}
+                  variant="select"
+                  value={value}
+                  disabled={!!selectedFilter}
+                  className={cn(
+                    "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
+                    "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",
+                    { "min-w-[142px] justify-center": !showRightSide }
+                  )}
+                >
+                  {value}
+                </ToggleGroup.Item>
+              ))}
+            </ToggleGroup.Root>
+          </ScrollArea.Root>
         </Card>
+
+        {/* <Select.Root
+          value={selectedFilter ? selectedFilter : filter}
+          onValueChange={(value) => {
+            if (value) setFilter(value);
+            onFilterClick && onFilterClick(value);
+          }}
+        >
+          <Select.Trigger>
+            <IconButton size="xl" variant="ghost" className="">
+              <FilterIcon className="size-4 text-muted-foreground" />
+            </IconButton>
+          </Select.Trigger>
+          <Select.Content align="end" className="w-fit">
+            {filters.map((item) => (
+              <Select.Item key={item} value={item}>
+                {item}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root> */}
       </div>
 
       {showRightSide && (

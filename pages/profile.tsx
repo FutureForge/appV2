@@ -5,7 +5,7 @@ import React from "react";
 export default function Profile() {
   return (
     <HydrationBoundary>
-      <div suppressHydrationWarning className="mt-20 w-full min-h-screen px-6">
+      <div suppressHydrationWarning className="mt-20 w-full min-h-screen px-4">
         <ProfilePage />
       </div>
     </HydrationBoundary>

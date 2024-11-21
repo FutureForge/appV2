@@ -257,7 +257,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   }, [listingPricingData, auctionPricingData]);
 
   return (
-    <div className="flex gap-6 pt-14">
+    <div className="flex gap-6 pt-14 max-[910px]:flex-col">
       {isNFTDataLoading || isNFTDataPending || isError ? (
         <>
           <DetailsSkeleton />
@@ -265,7 +265,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
       ) : (
         <>
           {/* image section */}
-          <div className="w-[40%] flex flex-col gap-6">
+          <div className="w-[40%] max-[910px]:w-full flex flex-col gap-6">
             {collectionDetails && (
               <div className="w-full bg-tertiary p-4 rounded-xl flex items-center justify-between">
                 <span>
@@ -297,7 +297,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
           </div>
 
           {/* details section */}
-          <div className="flex-1 flex flex-col gap-6 h-full">
+          <div className="flex-1 max-[1200px]:w-[55%] max-[910px]:w-full flex flex-col gap-6 h-full">
             {/** name section */}
             <div className="flex w-full items-center justify-between">
               <span>
@@ -329,7 +329,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               <p>{description || "No Description"}</p>
               <Line />
 
-              <div className="bg-card rounded-xl p-4 flex items-center justify-between">
+              <div className="bg-card rounded-xl p-4 flex items-center justify-between max-lg:grid grid-cols-2 gap-y-2">
                 {[
                   {
                     label: "Contract Address",
@@ -356,8 +356,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
             </div>
 
             {/** pricing section */}
-            <div className="bg-gradient-to-r w-full from-border via-black/70 to-transparent p-3 rounded-2xl flex items-center justify-between gap-6 border border-border">
-              <div className="w-1/2 flex flex-col gap-6 p-3">
+            <div className="bg-gradient-to-r w-full from-border via-black/70 to-transparent p-3 rounded-2xl flex items-center max-lg:flex-col justify-between gap-6 border border-border">
+              <div className="w-1/2 max-lg:w-full flex flex-col gap-6 p-3">
                 <p className="font-medium">Pricing Details</p>
                 <div className="grid grid-cols-2 gap-5">
                   {selectedFilter !== singleNFTFilters[0] && (
@@ -433,7 +433,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 </div>
               </div>
 
-              <div className="border border-border rounded-xl w-1/2">
+              <div className="border border-border rounded-xl w-1/2 max-lg:w-full">
                 <div className="border-b border-b-border p-3">
                   <p>Market Details</p>
                 </div>
@@ -487,7 +487,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               {selectedFilter === singleNFTFilters[0] &&
                 isOwner &&
                 !isAuctionPendingPayout && (
-                  <>
+                  <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                     <DialogRoot
                       open={isDialogOpen}
                       onOpenChange={setIsDialogOpen}
@@ -534,12 +534,12 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         />
                       </DialogContent>
                     </DialogRoot>
-                  </>
+                  </div>
                 )}
 
               {/** make offer section for listing for non-owner*/}
               {selectedFilter === singleNFTFilters[1] && !isOwner && (
-                <>
+                <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                   <DialogRoot
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
@@ -578,7 +578,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
                     </DialogContent>
                   </DialogRoot>
-                </>
+                </div>
               )}
 
               {/* cancel listing/auction section for owner */}
@@ -651,7 +651,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
 
               {/* active auction for non-owner */}
               {selectedFilter === singleNFTFilters[2] && !isOwner && (
-                <>
+                <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                   <DialogRoot
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
@@ -683,7 +683,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       <PlaceBidDialog setIsDialogOpen={setIsDialogOpen} />
                     </DialogContent>
                   </DialogRoot>
-                </>
+                </div>
               )}
             </div>
           </div>
