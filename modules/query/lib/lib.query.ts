@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUserChainInfo } from "..";
 import { getCheckApprovedForAll, getCheckApprovedPerTokenId } from "@/modules/blockchain/global/global.blockchain";
+import { getContractEthers } from "@/modules/blockchain";
+import { NFT_FACTORY_ADDRESS } from "@/utils/configs";
+import nftFactoryABI from "@/utils/abi/nftFactory.json";
 
 export function useCheckApprovedForAllQuery({
   collectionContractAddress,
@@ -71,4 +74,19 @@ export function useCheckApprovalStatusQuery({
   const isApproved = Boolean(isApprovedForAll) || Boolean(isApprovedForTokenId);
 
   return isApproved;
+}
+
+export function useMintFeeQuery() {
+  const NFTFactoryContract = getContractEthers({
+    contractAddress: NFT_FACTORY_ADDRESS,
+    abi: nftFactoryABI,
+  });
+
+  return useQuery({
+    queryKey: ["mint-fee"],
+    queryFn: async () => {
+      const mintFee = await NFTFactoryContract.mintFee();
+      return mintFee.toString();
+    },
+  });
 }

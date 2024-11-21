@@ -41,7 +41,7 @@ import { Social } from "@/utils/types/global";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { getContractCustom, getContractEthers } from "@/modules/blockchain";
 import nftFactoryAbi from "@/utils/abi/nftFactory.json";
-import nftBaseAbi from "@/utils/abi/nftbase.json";
+import nftBaseAbi from "@/utils/abi/nftBase.json";
 import { NFT } from "@/utils/types/graphql";
 
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
@@ -192,8 +192,8 @@ export default function Test() {
   // const createAuctionMutation = useCreateAuctionMutation();
   // console.log({ createAuctionMutation });
 
-  const bidInAuctionMutation = useBidInAuctionMutation();
-  console.log({ bidInAuctionMutation });
+  // const bidInAuctionMutation = useBidInAuctionMutation();
+  // console.log({ bidInAuctionMutation });
 
   // const buyListingMutation = useBuyFromDirectListingMutation();
   // console.log({ buyListingMutation });
@@ -217,21 +217,20 @@ export default function Test() {
   // console.log({ etherContract });
   // console.log({ contract });
 
-  const isApproved = useCheckApprovalStatusQuery({
-    collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
-    tokenId: "1",
-  });
-  console.log({ isApproved });
+  // const isApproved = useCheckApprovalStatusQuery({
+  //   collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+  //   tokenId: "1",
+  // });
+  // console.log({ isApproved });
 
-  const approvalMutation = useApprovalMutation();
-  console.log({ approvalMutation });
+  // const approvalMutation = useApprovalMutation();
+  // console.log({ approvalMutation });
 
   const handleClick = async () => {
-    approvalMutation.mutate({
-      collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
-      tokenId: "1",
-    });
-
+    // approvalMutation.mutate({
+    //   collectionContractAddress: "0x56532a3Df2a4F3c420Ec327C9a0667be36121DC3",
+    //   tokenId: "1",
+    // });
     // const mintFee = await etherContract.mintFee();
     // console.log({ mintFee: mintFee.toString() });
     // const name = await etherContract.balanceOf("0x1FFE2134c82D07227715af2A12D1406165A305BF");

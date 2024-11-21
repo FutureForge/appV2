@@ -185,7 +185,9 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
       };
     },
     enabled: !!limit && !!page,
-    refetchInterval: 60000,
+    // refetchInterval: 60000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -432,6 +434,8 @@ export function useSingleCollectionQuery({
     //     !!isLoadingNewOffers ||
     //     !!isLoadingAllOffers ||
     //     !!isLoadingAcceptedOffers),
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

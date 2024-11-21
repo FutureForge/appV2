@@ -47,5 +47,6 @@ export const queryKeys = {
     expiredOffers: ["user-expired-offers"] as const,
     createNFT: ["user-create-nft"] as const,
     nftActivities: ["user-nft-activities"] as const,
+    nftContracts: ["user-nft-contracts"] as const,
   },
 };

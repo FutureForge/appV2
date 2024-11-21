@@ -108,13 +108,15 @@ export function useMakeListingOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          activeAccount?.address,
-          queryKeys.offers.all,
-          queryKeys.nft.single,
-          queryKeys.offers.single,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -156,12 +158,15 @@ export function useAcceptOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.listing.completed,
-          queryKeys.nft.single,
-          queryKeys.offers.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -203,12 +208,15 @@ export function useCancelOfferMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.listing.completed,
-          queryKeys.nft.single,
-          queryKeys.offers.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -257,13 +265,15 @@ export function useBidInAuctionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
-          queryKeys.user.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("auction") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -305,13 +315,15 @@ export function useCollectAuctionPayoutMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
-          queryKeys.user.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("auction") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -353,15 +365,15 @@ export function useCollectAuctionTokensMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
-          queryKeys.user.all,
-          queryKeys.auction.newBidsUser,
-          queryKeys.auction.newBids,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("offer") ||
+            queryKey.startsWith("auction") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},

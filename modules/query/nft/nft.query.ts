@@ -212,6 +212,8 @@ export function useSingleNFTQuery({
     },
     enabled: !!contractAddress && !!tokenId && !isLoadingOffers,
     refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 

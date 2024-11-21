@@ -64,14 +64,14 @@ export function useCreateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.listing.new,
-          queryKeys.listing.newFiltered,
-          queryKeys.listing.single,
-          queryKeys.nft.single,
-          queryKeys.user.all,
-        ],
-        refetchType: "active",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -128,13 +128,14 @@ export function useUpdateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.nft.single,
-          queryKeys.user.all,
-          queryKeys.listing.new,
-          queryKeys.listing.newFiltered,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -176,13 +177,14 @@ export function useCancelDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.nft.single,
-          queryKeys.user.expiredListings,
-          queryKeys.listing.new,
-          queryKeys.user.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},
@@ -235,12 +237,14 @@ export function useBuyFromDirectListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.listing.completed,
-          queryKeys.nft.single,
-          queryKeys.user.all,
-        ],
-        refetchType: "all",
+        predicate: (query) => {
+          const queryKey = query.queryKey[0] as string;
+          return (
+            queryKey.startsWith("listing") ||
+            queryKey.startsWith("user") ||
+            queryKey.startsWith("nft")
+          );
+        },
       });
     },
     onError: () => {},

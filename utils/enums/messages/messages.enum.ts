@@ -39,4 +39,6 @@ export enum MessagesEnum {
   CONVERT_XFI_TO_WXFI_ERROR = "Error Converting XFI to WXFI",
   APPROVAL_FOR_WXFI_SUCCESS = "Approval for WXFI Granted Successfully",
   APPROVAL_FOR_WXFI_ERROR = "Error Granting Approval for WXFI",
+  NFT_CONTRACT_CREATED_SUCCESS = "NFT Contract Created Successfully",
+  NFT_CONTRACT_CREATED_ERROR = "Error Creating NFT Contract",
 }

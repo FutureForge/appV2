@@ -10,6 +10,12 @@ import {
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useCreateNFTMutation } from "@/modules/mutation";
 import DownloadIcon from "@/assets/download.svg";
+import CreateNFTContract from "./create-nft-contract";
+import {
+  useMintFeeQuery,
+  useUserChainInfo,
+  useUserNFTContractQuery,
+} from "@/modules/query";
 
 type Trait = {
   trait_type: string;
@@ -19,6 +25,7 @@ type Trait = {
 export function CreatePage() {
   const toast = useToast();
   const createNFTMutation = useCreateNFTMutation();
+  const { activeAccount } = useUserChainInfo();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -26,8 +33,13 @@ export function CreatePage() {
   const [showTraitInputs, setShowTraitInputs] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(() => Date.now().toString());
+  const [selectedContract, setSelectedContract] = useState<string>("");
 
-  console.log({ file });
+  const { data: userNFTContract } = useUserNFTContractQuery();
+  console.log({ userNFTContract });
+
+  const { data: mintFee } = useMintFeeQuery();
+  console.log({ mintFee });
 
   const handleAddTrait = () => {
     setShowTraitInputs(true);
@@ -58,14 +70,18 @@ export function CreatePage() {
     setFile(null);
     setTraits([]);
     setFileInputKey(Date.now().toString());
+    setSelectedContract("");
   };
 
   const handleCreateNFT = async () => {
-    // if (!name || !description || !file)
+    // if (!name || !description || !file || !selectedContract)
     //   return toast.error("Please fill out all fields");
+
+    // console.log({ selectedContract, name, description, file, traits });
 
     createNFTMutation.mutate(
       {
+        contractAddress: selectedContract,
         name,
         description,
         file: file!,
@@ -83,7 +99,12 @@ export function CreatePage() {
   };
 
   const isDisabled =
-    !name || !description || !file || createNFTMutation.isPending;
+    !name ||
+    !description ||
+    !file ||
+    createNFTMutation.isPending ||
+    !selectedContract ||
+    !activeAccount;
 
   return (
     <div className="flex items-center justify-center gap-7">
@@ -106,6 +127,24 @@ export function CreatePage() {
       <div className="w-[504px] h-[556px] bg-tertiary p-6 flex flex-col rounded-3xl">
         <ScrollArea>
           <div className="lg:overflow-y-auto flex-grow px-1 scrollbar-none">
+            <CreateNFTContract />
+
+            <Label htmlFor="contract-select">Select Contract</Label>
+            <select 
+              id="contract-select" 
+              aria-label="Select Contract"
+              value={selectedContract}
+              onChange={(e) => setSelectedContract(e.target.value)}
+              className="w-full p-2 rounded bg-border text-white"
+            >
+              <option value="">Select Contract</option>
+              {userNFTContract?.map((contract) => (
+                <option key={contract.contractAddress} value={contract.contractAddress}>
+                  {contract.name}
+                </option>
+              ))}
+            </select>
+
             <div className="w-full flex flex-col gap-5">
               <div className="flex flex-col gap-4">
                 <Label htmlFor="name">Token Name</Label>
@@ -200,11 +239,11 @@ export function CreatePage() {
         <div className="mt-4 flex items-center justify-end gap-3">
           <Button
             onClick={handleCreateNFT}
-            disabled={isDisabled}
+            // disabled={isDisabled}
             shape="square"
             className="w-full"
           >
-            Create NFT
+            {!activeAccount ? "Connect Wallet to Create" : "Create NFT"}
           </Button>
         </div>
       </div>

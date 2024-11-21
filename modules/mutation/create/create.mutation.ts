@@ -1,16 +1,27 @@
 import { upload } from "thirdweb/storage";
 import { useToast } from "@/modules/app/hooks/useToast";
-import { getContractEthers, waitForTransaction } from "@/modules/blockchain";
-import { useUserChainInfo } from "@/modules/query";
-import { client, MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
+import {
+  getContractCustom,
+  getContractEthers,
+  waitForTransaction,
+} from "@/modules/blockchain";
+import { useMintFeeQuery, useUserChainInfo } from "@/modules/query";
+import {
+  client,
+  MARKETPLACE_ADDRESS_TESTNET,
+  NFT_FACTORY_ADDRESS,
+} from "@/utils/configs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ethers } from "ethers";
 import { useRouter } from "next/navigation";
-import MinterABI from "@/utils/abi/erc721.json";
 import { queryKeys } from "@/modules/query/query-keys";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
+import nftFactoryABI from "@/utils/abi/nftFactory.json";
+import nftBaseABI from "@/utils/abi/nftBase.json";
+import { prepareContractCall, sendAndConfirmTransaction } from "thirdweb";
 
 type CreateNFTMetadata = {
+  contractAddress: string;
   name: string;
   description: string;
   file: File;
@@ -31,81 +42,87 @@ export function useCreateNFTMutation() {
 
   return useMutation({
     mutationFn: async (createNFTData: CreateNFTMetadata) => {
-      //   if (!activeAccount) return toast.error("Please connect your wallet");
+      if (!activeAccount) return toast.error("Please connect your wallet");
 
-      //   const minterContract = await getContractEthers({
-      //     contractAddress: MARKETPLACE_ADDRESS_TESTNET,
-      //     abi: MinterABI,
-      //   });
-
-      console.log({ createNFTData });
-
-      const uri = await upload({
-        client,
-        files: [createNFTData.file],
-        uploadWithoutDirectory: true,
-        // metadata: {
-        //   name: createNFTData.name, metadata?: Record<string, string>; 
-        //   description: createNFTData.description, {uri: 'ipfs://QmeWaoYTdtAETwfgJQm41cPi2KewxoeeNWfAEXDPcvHpV9'}  QmWoUSpWQnQJFnGyiQvohobaR589pPMZz3UYVyahhTV16Z
-        // },
+      const NFTBaseContract = getContractEthers({
+        contractAddress: createNFTData.contractAddress,
+        abi: nftBaseABI,
       });
 
-      console.log({ uri });
+      const NFTFactoryContract = getContractEthers({
+        contractAddress: NFT_FACTORY_ADDRESS,
+        abi: nftFactoryABI,
+      });
+
+      console.log({ NFTFactoryContract });
+
+      // // upload file to ipfs
+      // const uri = await upload({
+      //   client,
+      //   files: [createNFTData.file],
+      //   uploadWithoutDirectory: true,
+      // });
+
+      // if (uri) {
+      //   // create metadata and upload to ipfs
+      //   const metadata = {
+      //     name: createNFTData.name,
+      //     description: createNFTData.description,
+      //     image: uri,
+      //     attributes: createNFTData.attributes,
+      //   };
+
+      //   const metadataURI = await upload({
+      //     client,
+      //     files: [
+      //       {
+      //         name: `${createNFTData.name}-${Math.random()}.json`,
+      //         data: JSON.stringify(metadata),
+      //       },
+      //     ],
+      //     uploadWithoutDirectory: true,
+      //   });
+
+      //   if (!metadataURI) throw new Error("No metadata URI");
+
+      //   console.log({ metadataURI });
+
+      const metadataURI =
+        "ipfs://QmciqcbPJqsj211nH9pZDr57w1zqqc7oUFQ8oEmeNY1WcV";
+
       console.log({ createNFTData });
+      const contractAddress = createNFTData.contractAddress.toLowerCase();
+      const userAddress = activeAccount.address;
 
-      if (uri) {
-        // const tokenURI = JSON.stringify({
-        //   name: createNFTData.name,
-        //   description: createNFTData.description,
-        //   image: uri,
-        //   attributes: createNFTData.attributes,
-        // });
+      // const transaction = await NFTFactoryContract.populateTransaction.mintNFT(
+      //   contractAddress,
+      //   userAddress,
+      //   metadataURI,
+      // );
 
-        const metadata = {
-          name: createNFTData.name,
-          description: createNFTData.description,
-          image: uri,
-          attributes: createNFTData.attributes,
-        };
+      // console.log({transaction})
 
-        const metadataURI = await upload({
-          client,
-          files: [
-            {
-              name: `${createNFTData.name}-${Math.random()}.json`,
-              data: JSON.stringify(metadata),
-            },
-          ],
-          uploadWithoutDirectory: true,
-        });
+     // // @ts-ignore
+      // const tx = await activeAccount.sendTransaction(transaction);
+      // const receipt = await waitForTransaction(tx.transactionHash);
 
-        console.log({ metadataURI });
+      // if (receipt.status === "reverted") {
+      //   throw new Error("Transaction failed");
+      // }
 
-        // const transaction = await minterContract.populateTransaction.mint(
-        //   tokenURI,
-        //   {
-        //     value: ethers.utils.parseEther("1"), // update this to the mint price directly from the contract
-        //   }
-        // );
+      // const totalSupply = await NFTBaseContract.totalSupply();
+      // const tokenId = totalSupply.toString() - 1;
 
-        // // @ts-ignore
-        // const tx = await activeAccount.sendTransaction(transaction);
-        // const receipt = await waitForTransaction(tx.transactionHash);
+      // console.log({ tokenId });
+      // console.log({ totalSupply });
 
-        // if (receipt.status === "reverted") {
-        //   throw new Error("Transaction failed");
-        // }
+      // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);
 
-        // const totalSupply = await minterContract.totalSupply();
-        // const tokenId = totalSupply.toString() - 1;
-
-        // await router.push(`/nft/${CROSSFI_MINTER_ADDRESS}/CFC-721/${tokenId}`);
-
-        // return receipt;
-        return uri;
-      } else {
-        throw new Error("No URI");
-      }
+      // return receipt;
+      return null;
+      // } else {
+      //   throw new Error("No URI");
+      // }
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
@@ -119,6 +136,59 @@ export function useCreateNFTMutation() {
       },
       errorMessage: {
         description: MessagesEnum.NFT_MINTED_ERROR,
+      },
+    },
+  });
+}
+
+export function useCreateNFTContractMutation() {
+  const queryClient = useQueryClient();
+  const { activeAccount } = useUserChainInfo();
+
+  const { data: mintFee } = useMintFeeQuery();
+
+  const NFTFactoryContract = getContractEthers({
+    contractAddress: NFT_FACTORY_ADDRESS,
+    abi: nftFactoryABI,
+  });
+
+  return useMutation({
+    mutationFn: async ({
+      name,
+      symbol,
+      initialSupply,
+    }: {
+      name: string;
+      symbol: string;
+      initialSupply: string;
+    }) => {
+      const transaction =
+        await NFTFactoryContract.populateTransaction.createNFTContract(
+          name,
+          symbol,
+          initialSupply,
+          {
+            value: ethers.utils.parseEther(mintFee),
+          }
+        );
+
+      // @ts-ignore
+      const tx = await activeAccount.sendTransaction(transaction);
+      const receipt = await waitForTransaction(tx.transactionHash);
+
+      return receipt;
+    },
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.user.nftContracts],
+      });
+    },
+    meta: {
+      successMessage: {
+        description: MessagesEnum.NFT_CONTRACT_CREATED_SUCCESS,
+      },
+      errorMessage: {
+        description: MessagesEnum.NFT_CONTRACT_CREATED_ERROR,
       },
     },
   });
