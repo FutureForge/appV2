@@ -220,7 +220,7 @@ export function useUserOffersReceivedQuery() {
 
   // First filter offers received by the user
   const userOffersReceived = allOffers?.filter((offer) => {
-    const offerOwner = offer.nft.owner.toLowerCase();
+    const offerOwner = offer.nft?.owner?.toLowerCase();
     return offerOwner === userAddress?.toLowerCase();
   });
 

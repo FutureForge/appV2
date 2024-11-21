@@ -262,20 +262,39 @@ export function useSingleCollectionQuery({
     }, 0);
   }, [newSaleListings]);
 
+  const totalAuctionVolume = useMemo(() => {
+    return auctionClosed?.reduce((acc, auction) => {
+      const price = parseFloat(decimalOffChain(auction.bidAmount) || "0");
+      return acc + price;
+    }, 0);
+  }, [auctionClosed]);
+
+  const totalVolume = (totalListingVolume ?? 0) + (totalAuctionVolume ?? 0);
+
   const formattedTotalVolume = useMemo(
-    () => to3DP(totalListingVolume || 0),
-    [totalListingVolume]
+    () => to3DP(totalVolume || 0),
+    [totalVolume]
   );
 
   const floorPrice = useMemo(() => {
     let floor = Infinity;
+    
+    // Check listing prices
     for (const listing of allListings || []) {
       const price = decimalOffChain(listing.pricePerToken) || "0";
       const listingPrice = parseFloat(price);
       floor = Math.min(floor, listingPrice);
     }
-    return floor;
-  }, [allListings]);
+    
+    // Check closed auction prices
+    for (const auction of auctionClosed || []) {
+      const price = decimalOffChain(auction.bidAmount) || "0";
+      const auctionPrice = parseFloat(price);
+      floor = Math.min(floor, auctionPrice);
+    }
+    
+    return floor === Infinity ? 0 : floor;
+  }, [allListings, auctionClosed]);
 
   return useQuery({
     queryKey: [queryKeys.collection.single, contractAddress],
@@ -318,6 +337,7 @@ export function useSingleCollectionQuery({
         totalVolume: formattedTotalVolume,
         totalSupply,
         floorPrice,
+        totalNFTs: nftLength,
       };
 
       const updatedTokenTransfers = await Promise.all(
@@ -372,19 +392,6 @@ export function useSingleCollectionQuery({
         })
       );
 
-      const updatedAuctionClosed = await Promise.all(
-        (auctionClosed ?? []).map(async (auction) => {
-          const isExpired = await getIsAuctionExpired({
-            auctionId: BigInt(auction.auctionId),
-          });
-
-          // Inverting the result to correct the naming mismatch
-          const isAuctionExpired = !isExpired;
-
-          return { ...auction, isAuctionExpired };
-        })
-      );
-
       return {
         collection,
         collectionNFTs: nfts,
@@ -398,7 +405,7 @@ export function useSingleCollectionQuery({
           acceptedOffers: acceptedOffers || [],
         },
         collectionAuctions: {
-          auctionClosed: updatedAuctionClosed || [],
+          auctionClosed: auctionClosed || [],
           newAuctions: updatedNewAuctions || [],
           allAuctions: updatedAllAuctions || [],
         },

@@ -59,7 +59,7 @@ export function useFilteredAllListingsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.listing.all],
+    queryKey: [queryKeys.listing.filteredAll],
     queryFn: async () => {
       const response = await request<AllListingsQueryResponse>(
         indexerEndpoint,
@@ -82,7 +82,7 @@ export function useFilteredAllListingsQuery({
 
       return updatedListings;
     },
-    enabled: !!address || !!contractAddress,
+    enabled: !!contractAddress,
     refetchInterval: 5000,
   });
 }
