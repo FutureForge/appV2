@@ -27,6 +27,7 @@ type HeaderProps = {
   showRightSide?: boolean;
   renderDurationToggle?: boolean;
   selectedFilter?: string;
+  disabled?: boolean;
 };
 
 export function Header({
@@ -40,6 +41,7 @@ export function Header({
   showRightSide = true,
   renderDurationToggle = false,
   selectedFilter,
+  disabled = false,
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
@@ -81,7 +83,7 @@ export function Header({
                   key={value}
                   variant="select"
                   value={value}
-                  disabled={!!selectedFilter}
+                  disabled={!!selectedFilter || disabled}
                   className={cn(
                     "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
                     "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",

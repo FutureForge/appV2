@@ -38,18 +38,18 @@ export function useAllAuctionsQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      // const updatedAuctions = response.allAuctions.filter((auction) => {
-      //   const { endTimestamp } = auction;
-      //   const endTime = formatBlockchainTimestamp(endTimestamp);
-      //   const endTimeFormatted = new Date(endTime).getTime();
-      //   const currentTime = new Date().getTime();
+      const updatedAuctions = response.allAuctions.filter((auction) => {
+        const { endTimestamp } = auction;
+        const endTime = formatBlockchainTimestamp(endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
 
-      //   return endTimeFormatted > currentTime;
-      // });
+        return endTimeFormatted > currentTime;
+      });
 
-      // return updatedAuctions;
+      return updatedAuctions;
 
-      return response.allAuctions;
+      // return response.allAuctions;
     },
     enabled: !!limit,
     // refetchInterval: 60 * 60 * 1000,

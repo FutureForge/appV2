@@ -437,6 +437,7 @@ export function ProfilePage() {
             onFilterClick={handleFilterClick}
             filters={filters}
             showRightSide={false}
+            disabled={!userAddress}
           />
           <div className="w-full items-center flex justify-end flex-wrap">
             {selectedFilter === filters[7] && (
@@ -496,11 +497,13 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0 ? "No NFTs found" : "No NFTs"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0 ? "No NFTs found" : "No NFTs"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -551,11 +554,15 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0 ? "No NFTs found" : "No NFT Listed"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Listed"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -607,13 +614,15 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0
-                        ? "No NFTs found"
-                        : "No NFT Auctioned"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Auctioned"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -665,11 +674,15 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0 ? "No NFTs found" : "No NFT Offers"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Offers"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -718,13 +731,15 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0
-                        ? "No NFTs found"
-                        : "No NFT Offers Received"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Offers Received"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -768,11 +783,13 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0 ? "No NFTs found" : "No Bids"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0 ? "No NFTs found" : "No Bids"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -877,13 +894,15 @@ export function ProfilePage() {
                     )}
                   </div>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0
-                        ? "No NFTs found"
-                        : "No NFT Activities"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Activities"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -938,13 +957,15 @@ export function ProfilePage() {
                         )}
                       </>
                     ) : (
-                      <EmptyState
-                        message={
-                          searchQuery.length > 0
-                            ? "No NFTs found"
-                            : "No Expired Listings"
-                        }
-                      />
+                      <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                        <EmptyState
+                          message={
+                            searchQuery.length > 0
+                              ? "No NFTs found"
+                              : "No Expired Listings"
+                          }
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -996,13 +1017,15 @@ export function ProfilePage() {
                         )}
                       </>
                     ) : (
-                      <EmptyState
-                        message={
-                          searchQuery.length > 0
-                            ? "No NFTs found"
-                            : "No Expired Auctions"
-                        }
-                      />
+                      <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                        <EmptyState
+                          message={
+                            searchQuery.length > 0
+                              ? "No NFTs found"
+                              : "No Expired Auctions"
+                          }
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -1054,13 +1077,15 @@ export function ProfilePage() {
                         )}
                       </>
                     ) : (
-                      <EmptyState
-                        message={
-                          searchQuery.length > 0
-                            ? "No NFTs found"
-                            : "No Expired Offers"
-                        }
-                      />
+                      <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                        <EmptyState
+                          message={
+                            searchQuery.length > 0
+                              ? "No NFTs found"
+                              : "No Expired Offers"
+                          }
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -1099,13 +1124,15 @@ export function ProfilePage() {
                     )}
                   </>
                 ) : (
-                  <EmptyState
-                    message={
-                      searchQuery.length > 0
-                        ? "No NFTs found"
-                        : "No NFT Offers Received"
-                    }
-                  />
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No Collections found"
+                          : "No Collection Created"
+                      }
+                    />
+                  </div>
                 )}
               </div>
             )}

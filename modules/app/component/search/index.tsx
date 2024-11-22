@@ -31,7 +31,7 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 const popular_tags = [
   { label: "All", type: null },
-  { label: "NFTS", type: "collection-nft"},
+  { label: "NFTS", type: "collection-nft" },
   { label: "NFTS", type: "nft" },
   { label: "Listed", type: "listing" },
   { label: "Auctions", type: "auction" },
@@ -160,6 +160,7 @@ export function Search() {
     setIsSearching(true);
     setShowResults(true);
   };
+
   const handleClearInput = () => {
     setSearchValue("");
     setOpen(false);
@@ -262,7 +263,11 @@ export function Search() {
                             hideOnClick
                             className="combobox-item"
                             render={
-                              <SearchResultItem type={type} data={props} />
+                              <SearchResultItem
+                                type={type}
+                                data={props}
+                                setOpen={setOpen}
+                              />
                             }
                           />
                         );
@@ -291,12 +296,18 @@ export function Search() {
 interface SearchResultItemProps {
   type: SearchType;
   data: any;
+  setOpen: (open: boolean) => void;
 }
 
-export function SearchResultItem({ type, data }: SearchResultItemProps) {
+export function SearchResultItem({
+  type,
+  data,
+  setOpen,
+}: SearchResultItemProps) {
   const router = useRouter();
 
   const handleClick = () => {
+    setOpen(false);
     if (type === "collection") {
       router.push(`/collections/${data?.collectionAddress}`);
     } else {
