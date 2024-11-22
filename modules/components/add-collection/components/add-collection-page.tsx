@@ -35,9 +35,9 @@ export function AddCollectionsPage() {
     description: "",
     contractAddress: "",
     collectionSocials: [
-      { socialName: "twitter", socialLink: "" },
-      { socialName: "discord", socialLink: "" },
-      { socialName: "telegram", socialLink: "" },
+      { socialName: "twitter", socialLink: "https://x.com/" },
+      { socialName: "discord", socialLink: "https://discord.gg/" },
+      { socialName: "telegram", socialLink: "https://t.me/" },
     ],
   });
 
@@ -123,9 +123,9 @@ export function AddCollectionsPage() {
               name: "",
               description: "",
               collectionSocials: [
-                { socialName: "twitter", socialLink: "" },
-                { socialName: "discord", socialLink: "" },
-                { socialName: "telegram", socialLink: "" },
+                { socialName: "twitter", socialLink: "https://x.com/" },
+                { socialName: "discord", socialLink: "https://discord.gg/" },
+                { socialName: "telegram", socialLink: "https://t.me/" },
               ],
             });
             setImage(null);
@@ -139,9 +139,9 @@ export function AddCollectionsPage() {
               name: "",
               description: "",
               collectionSocials: [
-                { socialName: "twitter", socialLink: "" },
-                { socialName: "discord", socialLink: "" },
-                { socialName: "telegram", socialLink: "" },
+                { socialName: "twitter", socialLink: "https://x.com/" },
+                { socialName: "discord", socialLink: "https://discord.gg/" },
+                { socialName: "telegram", socialLink: "https://t.me/" },
               ],
             });
             setImage(null);
@@ -184,22 +184,6 @@ export function AddCollectionsPage() {
     !image ||
     !backgroundImage ||
     Object.values(socialErrors).some((error) => error !== "");
-
-  // console.log({ isDisabled });
-  // console.log({ image });
-  // console.log({ backgroundImage });
-  // console.log("name", !formData.name);
-  // console.log("description", !formData.description);
-  // console.log("contractAddress", !formData.contractAddress);
-  // console.log("NFTContract", formData.contractAddress && !NFTContract);
-  // console.log(
-  //   "collectionExists",
-  //   formData.contractAddress && collectionExists === true
-  // );
-  // console.log(
-  //   "addCollectionMutation.isPending",
-  //   addCollectionMutation.isPending
-  // );
 
   return (
     <div className="flex flex-col gap-6 max-[1095px]:py-12 max-[1095px]:px-4 max-sm:h-screen max-sm:mt-[15vh]">
