@@ -6,6 +6,8 @@ import {
 import { ReactNode, useEffect, useState } from "react";
 import { useToast } from "../app/hooks/useToast";
 import { useUserImageStore } from "@/utils/store/user-image.store";
+import { useUserChainInfo } from "../query";
+import { chainInfo } from "@/utils/configs";
 
 type QueryProviderProps = {
   children: ReactNode;
@@ -13,11 +15,33 @@ type QueryProviderProps = {
 
 export function QueryProvider({ children }: QueryProviderProps) {
   const toast = useToast();
+  const [isChainSupported, setIsChainSupported] = useState(false);
+
+  const { activeWallet } = useUserChainInfo();
   const { setBackgroundImage, backgroundImage } = useUserImageStore();
 
   useEffect(() => {
     setBackgroundImage(backgroundImage);
   }, []);
+
+  useEffect(() => {
+    const checkChain = async () => {
+      if (activeWallet) {
+        const chain = await activeWallet.getChain();
+        setIsChainSupported(chain?.id === chainInfo.id);
+      } else {
+        setIsChainSupported(false);
+      }
+    };
+
+    checkChain();
+
+    const unsubscribe = activeWallet?.subscribe("chainChanged", checkChain);
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [activeWallet]);
 
   const [queryClient] = useState(
     () =>
@@ -25,6 +49,10 @@ export function QueryProvider({ children }: QueryProviderProps) {
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
           onMutate: (_variables, mutation) => {
+            if (!isChainSupported) {
+              throw new Error("Please switch to the correct network");
+            }
+
             toast.loading("Transaction In Process...", {
               id: mutation?.mutationId,
               duration: Infinity,

@@ -138,7 +138,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isListingDialogOpen, setIsListingDialogOpen] = useState(false);
+  const [isAuctionDialogOpen, setIsAuctionDialogOpen] = useState(false);
+  const [isMakeOfferDialogOpen, setIsMakeOfferDialogOpen] = useState(false);
+  const [isBuyNowListingDialogOpen, setIsBuyNowListingDialogOpen] =
+    useState(false);
+  const [isBuyNowAuctionDialogOpen, setIsBuyNowAuctionDialogOpen] =
+    useState(false);
+  const [isPlaceBidDialogOpen, setIsPlaceBidDialogOpen] = useState(false);
+
   const { selectedFilter, setSelectedFilter } = useFilterStore();
   const { setListingInfo, listingInfo } = useListingInfoStore();
   const { setAuctionInfo, auctionInfo } = useAuctionInfoStore();
@@ -462,7 +470,10 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
             <div className="w-full flex items-center gap-3">
               {/** make offer section for non-owner*/}
               {selectedFilter === singleNFTFilters[0] && !isOwner && (
-                <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogRoot
+                  open={isMakeOfferDialogOpen}
+                  onOpenChange={setIsMakeOfferDialogOpen}
+                >
                   <DialogTrigger>
                     <Button shape="square" className="w-full">
                       Make Offer
@@ -474,7 +485,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       alt={name!}
                       name={name!}
                       tokenId={tokenId}
-                      setIsDialogOpen={setIsDialogOpen}
+                      setIsDialogOpen={setIsMakeOfferDialogOpen}
                       assetContract={contractAddress}
                     />
                   </DialogContent>
@@ -487,8 +498,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 !isAuctionPendingPayout && (
                   <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                     <DialogRoot
-                      open={isDialogOpen}
-                      onOpenChange={setIsDialogOpen}
+                      open={isListingDialogOpen}
+                      onOpenChange={setIsListingDialogOpen}
                     >
                       <DialogTrigger>
                         <Button
@@ -507,13 +518,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           isApproved={isApproved!}
                           tokenId={tokenId}
                           assetContract={contractAddress}
-                          setIsDialogOpen={setIsDialogOpen}
+                          setIsDialogOpen={setIsListingDialogOpen}
                         />
                       </DialogContent>
                     </DialogRoot>
+
                     <DialogRoot
-                      open={isDialogOpen}
-                      onOpenChange={setIsDialogOpen}
+                      open={isAuctionDialogOpen}
+                      onOpenChange={setIsAuctionDialogOpen}
                     >
                       <DialogTrigger>
                         <Button shape="square" className="w-full">
@@ -528,7 +540,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           isApproved={isApproved!}
                           tokenId={tokenId}
                           assetContract={contractAddress}
-                          setIsDialogOpen={setIsDialogOpen}
+                          setIsDialogOpen={setIsAuctionDialogOpen}
                         />
                       </DialogContent>
                     </DialogRoot>
@@ -539,8 +551,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               {selectedFilter === singleNFTFilters[1] && !isOwner && (
                 <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                   <DialogRoot
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    open={isMakeOfferDialogOpen}
+                    onOpenChange={setIsMakeOfferDialogOpen}
                   >
                     <DialogTrigger>
                       <Button
@@ -557,15 +569,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                         alt={name!}
                         name={name!}
                         tokenId={tokenId}
-                        setIsDialogOpen={setIsDialogOpen}
+                        setIsDialogOpen={setIsMakeOfferDialogOpen}
                         assetContract={contractAddress}
                       />
                     </DialogContent>
                   </DialogRoot>
 
                   <DialogRoot
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    open={isBuyNowListingDialogOpen}
+                    onOpenChange={setIsBuyNowListingDialogOpen}
                   >
                     <DialogTrigger>
                       <Button shape="square" className="w-1/2">
@@ -573,7 +585,9 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[564px]">
-                      <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
+                      <BuyNowListingDialog
+                        setIsDialogOpen={setIsBuyNowListingDialogOpen}
+                      />
                     </DialogContent>
                   </DialogRoot>
                 </div>
@@ -651,8 +665,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               {selectedFilter === singleNFTFilters[2] && !isOwner && (
                 <div className="w-full flex items-center justify-between max-[500px]:flex-col gap-4">
                   <DialogRoot
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    open={isBuyNowAuctionDialogOpen}
+                    onOpenChange={setIsBuyNowAuctionDialogOpen}
                   >
                     <DialogTrigger>
                       <Button
@@ -664,13 +678,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <BuyNowAuctionDialog setIsDialogOpen={setIsDialogOpen} />
+                      <BuyNowAuctionDialog
+                        setIsDialogOpen={setIsBuyNowAuctionDialogOpen}
+                      />
                     </DialogContent>
                   </DialogRoot>
 
                   <DialogRoot
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
+                    open={isPlaceBidDialogOpen}
+                    onOpenChange={setIsPlaceBidDialogOpen}
                   >
                     <DialogTrigger>
                       <Button shape="square" className="w-1/2">
@@ -678,7 +694,9 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="w-[700px]">
-                      <PlaceBidDialog setIsDialogOpen={setIsDialogOpen} />
+                      <PlaceBidDialog
+                        setIsDialogOpen={setIsPlaceBidDialogOpen}
+                      />
                     </DialogContent>
                   </DialogRoot>
                 </div>

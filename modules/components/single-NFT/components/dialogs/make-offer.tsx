@@ -149,6 +149,7 @@ export function MakeOfferDialog({
                 onChange={(e) => setValue(e.target.value)}
                 containerClass="bg-transparent rounded-lg"
                 placeholder="Amount"
+                type="number"
               />
             </form>
 

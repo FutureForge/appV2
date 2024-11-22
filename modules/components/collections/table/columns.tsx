@@ -4,7 +4,7 @@ import { ColumnHeader } from "@/modules/app/component/table/header";
 import { Collection } from "@/utils/types/collection/collection.type";
 import XFI from "@/assets/xfi.svg";
 
-export function makeYourPositionsColumn() {
+export function makeCollectionColumns() {
   const columns = createColumnHelper<Collection>();
 
   /* -------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ export function makeYourPositionsColumn() {
             <div className="flex flex-col gap-1.5">
               <div className="text-sm">
                 <span>
-                  {collectionName} {getValue()}
+                  {collectionName}
                 </span>
               </div>
             </div>

@@ -152,6 +152,7 @@ export function ListDialog({
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="Listing Price"
                 containerClass="bg-transparent"
+                type="number"
               />
             </div>
             <div className="flex w-full mt-auto flex-col gap-4">

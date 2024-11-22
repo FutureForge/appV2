@@ -159,6 +159,7 @@ export function AuctionDialog({
                   onChange={(e) => setMinimumBidAmount(e.target.value)}
                   placeholder="Minimum Bid Amount"
                   containerClass="bg-transparent"
+                  type="number"
                 />
               </div>
 
@@ -169,6 +170,7 @@ export function AuctionDialog({
                   onChange={(e) => setBuyoutBidAmount(e.target.value)}
                   placeholder="Buyout Bid Amount"
                   containerClass="bg-transparent"
+                  type="number"
                 />
               </div>
             </div>

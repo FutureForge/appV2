@@ -47,6 +47,7 @@ const Nav_Links = [
 export function Nav() {
   const { activeAccount, activeWallet } = useUserChainInfo();
   const walletAddress = activeAccount?.address;
+  const [isChainSupported, setIsChainSupported] = useState(false);
 
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -85,6 +86,26 @@ export function Nav() {
   const handleSignOut = async () => {
     await activeWallet?.disconnect();
   };
+
+  useEffect(() => {
+    const checkChain = async () => {
+      if (activeWallet) {
+        const chain = await activeWallet.getChain();
+        setIsChainSupported(chain?.id === chainInfo.id);
+      } else {
+        setIsChainSupported(false);
+      }
+    };
+
+    checkChain();
+    
+    // Optional: Listen for chain changes if your wallet provider supports it
+    const unsubscribe = activeWallet?.subscribe('chainChanged', checkChain);
+    
+    return () => {
+      unsubscribe?.();
+    };
+  }, [activeWallet]);
 
   return (
     <nav
@@ -139,7 +160,7 @@ export function Nav() {
           >
             Profile
           </TransitionLinks>
-          {!walletAddress ? (
+          {!walletAddress || !isChainSupported ? (
             <ConnectButton
               client={client}
               chain={chainInfo}
@@ -274,7 +295,6 @@ export function Nav() {
     </nav>
   );
 }
-
 
 function MobileNav({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();

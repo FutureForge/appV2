@@ -8,6 +8,7 @@ import { useInView } from "react-intersection-observer";
 import {
   Button,
   Card,
+  EmptyState,
   IconButton,
   Label,
   NFTCard,
@@ -45,7 +46,7 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
-import LinkIcon2 from '@/assets/link-01.svg'
+import LinkIcon2 from "@/assets/link-01.svg";
 
 type FilterType =
   | "Items"
@@ -209,7 +210,9 @@ export default function CollectionPage() {
       const nameNoSpace = sale?.nft?.metadata?.name
         .toLowerCase()
         .replace(/\s+/g, "");
-      const tokenIdNoSpace = sale?.nft?.tokenId?.toLowerCase().replace(/\s+/g, "");
+      const tokenIdNoSpace = sale?.nft?.tokenId
+        ?.toLowerCase()
+        .replace(/\s+/g, "");
       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
       return combinedField.includes(searchTerm);
@@ -529,10 +532,14 @@ export default function CollectionPage() {
                     )}
                   </>
                 ) : (
-                  <div className="w-full items-center justify-center flex h-52">
-                    {searchQuery.length > 0
-                      ? "No items found"
-                      : "No items in this collection"}
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No items found"
+                          : "No items in this collection"
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -565,10 +572,14 @@ export default function CollectionPage() {
                     )}
                   </>
                 ) : (
-                  <div className="w-full items-center justify-center flex h-52">
-                    {searchQuery.length > 0
-                      ? "No offers found"
-                      : "No offers in this collection"}
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No offers found"
+                          : "No offers in this collection"
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -604,10 +615,14 @@ export default function CollectionPage() {
                     )}
                   </>
                 ) : (
-                  <div className="w-full items-center justify-center flex h-52">
-                    {searchQuery.length > 0
-                      ? "No sales found"
-                      : "No sales in this collection"}
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No sales found"
+                          : "No sales in this collection"
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -713,10 +728,14 @@ export default function CollectionPage() {
                 </div>
               </div>
             ) : (
-              <div className="w-full items-center justify-center flex h-52">
-                {searchQuery.length > 0
-                  ? "No items found"
-                  : "No activity in this collection"}
+              <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                <EmptyState
+                  message={
+                    searchQuery.length > 0
+                      ? "No item found"
+                      : "No activity in this collection"
+                  }
+                />
               </div>
             ))}
         </>
@@ -728,7 +747,6 @@ export default function CollectionPage() {
         singleCollection?.collection && (
           <CollectionSettings collection={singleCollection.collection} />
         )}
-        
     </div>
   );
 }
@@ -1003,7 +1021,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
 
         <div className="flex w-full flex-col gap-6 max-sm:mt-6 max-sm:items-start items-end mt-auto">
           <span className="max-sm:text-xs text-sm flex items-center gap-2">
-            <LinkIcon2 className="size-5 max-sm:size-3"/>
+            <LinkIcon2 className="size-5 max-sm:size-3" />
             Social Links
           </span>
           <div className="flex items-start justify-start gap-4 max-sm:flex-col max-sm:w-full">

@@ -6,7 +6,7 @@ import {
   getFilteredRowModel,
   getExpandedRowModel,
 } from "@tanstack/react-table";
-import { makeYourPositionsColumn } from "./columns";
+import { makeCollectionColumns } from "./columns";
 
 import { Table } from "@/modules/app";
 import { Collection } from "@/utils/types/collection/collection.type";
@@ -26,7 +26,7 @@ export function CollectionTable({
   const router = useRouter();
 
   const table = useReactTable<Collection>({
-    columns: makeYourPositionsColumn(),
+    columns: makeCollectionColumns(),
     data: collectionData ?? [],
     getExpandedRowModel: getExpandedRowModel(),
     getCoreRowModel: getCoreRowModel(),

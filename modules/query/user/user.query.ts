@@ -4,6 +4,7 @@ import { queryKeys } from "../query-keys";
 import axios from "axios";
 import {
   backendURL,
+  chainInfo,
   CROSSFI_API_TESTNET,
   NFT_FACTORY_ADDRESS,
 } from "@/utils/configs";
@@ -51,7 +52,10 @@ export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
   const activeWallet = useActiveWallet();
 
-  return { activeAccount, activeWallet };
+  const chain = activeWallet?.getChain();
+  const isChainSupported = chain?.id === chainInfo.id;
+
+  return { activeAccount, activeWallet, isChainSupported };
 }
 
 export function useUserNFTsQuery() {
