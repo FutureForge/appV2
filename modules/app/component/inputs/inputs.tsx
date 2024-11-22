@@ -118,9 +118,9 @@ Label.displayName = LABEL_NAME;
 
 const FileInput = forwardRef<
   HTMLInputElement,
-  FileInputProps & { key?: string; title?: string; subTitle?: string; icon:ReactElement }
+  FileInputProps & { key?: string; title?: string; subTitle?: string; icon:ReactElement, containerClass?:string }
 >((props, ref) => {
-  const { onChange, title, subTitle, icon, ...otherProps } = props;
+  const { onChange, title, subTitle, icon, containerClass, ...otherProps } = props;
   const [fileName, setFileName] = useState<string | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -218,7 +218,7 @@ const FileInput = forwardRef<
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className="flex w-full h-full items-center relative text-center bg-gradient-to-t from-transparent to-[#292A3E] justify-center cursor-pointer rounded-2xl"
+        className={cn("flex w-full h-full items-center relative text-center bg-gradient-to-t from-transparent to-[#292A3E] justify-center cursor-pointer rounded-2xl", containerClass)}
       >
         <input
           ref={fileInputRef}

@@ -165,9 +165,14 @@ export function AddCollectionsPage() {
     (formData.contractAddress && !NFTContract) ||
     (formData.contractAddress && collectionExists) ||
     Object.values(socialErrors).some((error) => error !== "");
-
+  const handleFileChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      console.log("File selected:", file.name); // Log the file name
+    }
+  };
   return (
-    <div className="flex flex-col gap-6  max-[1095px]:py-12 max-[1095px]:px-4 ">
+    <div className="flex flex-col gap-6 max-[1095px]:py-12 max-[1095px]:px-4 max-sm:h-screen max-sm:mt-[15vh]">
       <div className="flex flex-col gap-2">
         <h4 className="font-medium md:text-xl text-lg min-[1170px]:text-[28px]">
           Add Collections
@@ -180,24 +185,26 @@ export function AddCollectionsPage() {
         onSubmit={handleSubmit}
         className="flex items-center justify-center gap-7 max-[1095px]:flex-col max-[1095px]:w-full"
       >
-        <div className="flex flex-col gap-4 max-[1095px]:w-full">
-          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
+        <div className="flex flex-col gap-4 max-[1095px]:w-full max-[1095px]:flex-row max-sm:flex-col h-full">
+          <div className="border-dashed border relative border-primary p-4 h-[255px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
               id="image"
               name="image"
-              onChange={handleFileChange}
+              onChange={handleFileChanges}
               subTitle="Upload Image"
               icon={<DownloadIcon className="size-10" />}
+              containerClass="z-20"
             />
             <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
-          <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
+          <div className="border-dashed border relative border-primary  p-4 h-[255px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
               id="backgroundImage"
               name="backgroundImage"
               onChange={handleFileChange}
               subTitle="Upload Background"
               icon={<DownloadIcon className="size-10" />}
+              containerClass="z-20"
             />
             <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
