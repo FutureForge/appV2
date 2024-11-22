@@ -223,7 +223,7 @@ export function AddCollectionsPage() {
                       Not a Valid CFC-721 token
                     </p>
                   )}
-                  {formData.contractAddress && collectionExists && (
+                  {formData.contractAddress && collectionExists === true && (
                     <p className="text-error text-sm font-medium">
                       Collection already in Marketplace
                     </p>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   useAllAuctionsQuery,
   useAllListingsQuery,
@@ -7,10 +7,8 @@ import {
   useNewBidsQuery,
   useNewListingsQuery,
   useNewSaleListingsQuery,
-  useUserChainInfo,
 } from "@/modules/query";
 import { EmptyState, Header, NFTCard } from "@/modules/app";
-import { useRouter } from "next/navigation";
 import { cn } from "@/modules/app/utils";
 import Caret from "@/assets/arrow-left-s-line.svg";
 import {
@@ -28,11 +26,6 @@ import { RecentlySoldListingTable } from "../table/recently-sold";
 import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
-import {
-  useBidInAuctionMutation,
-  useBuyFromDirectListingMutation,
-} from "@/modules/mutation";
-import { useToast } from "@/modules/app/hooks/useToast";
 
 const filters = [
   "All Listings",
@@ -44,15 +37,7 @@ const filters = [
   "Recent Bids",
 ];
 
-// TODO: run the get platform fee and collection fee queries
-
 export function BrowsePage() {
-  const bidInAuctionMutation = useBidInAuctionMutation();
-  const buyListingMutation = useBuyFromDirectListingMutation();
-
-  const { activeAccount } = useUserChainInfo();
-  const toast = useToast();
-  const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,8 +59,6 @@ export function BrowsePage() {
   } = useAllAuctionsQuery({
     limit: fetchLimit,
   });
-
-  console.log("AllAuctions", AllAuctions);
 
   // const recentlyListed = AllListings?.slice(-5);
   const {
