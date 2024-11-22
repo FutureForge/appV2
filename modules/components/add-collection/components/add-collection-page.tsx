@@ -170,9 +170,11 @@ export function AddCollectionsPage() {
     !formData.name ||
     !formData.description ||
     !formData.contractAddress ||
-    !addCollectionMutation.isPending ||
+    addCollectionMutation.isPending ||
     (formData.contractAddress && !NFTContract) ||
     (formData.contractAddress && collectionExists === true) ||
+    !image ||
+    !backgroundImage ||
     Object.values(socialErrors).some((error) => error !== "");
 
   return (
@@ -198,7 +200,6 @@ export function AddCollectionsPage() {
               subTitle="Upload Image"
               icon={<DownloadIcon className="size-10" />}
             />
-            <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
           <div className="border-dashed border relative border-primary p-4 max-[1450px]:h-[230px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
@@ -208,7 +209,6 @@ export function AddCollectionsPage() {
               subTitle="Upload Background"
               icon={<DownloadIcon className="size-10" />}
             />
-            <div className="bg-gradient-to-t from-black/50 to-transparent w-full absolute -bottom-2 left-0 right-0 h-40" />
           </div>
         </div>
         <div className="w-[504px] max-[1450px]:h-[482px] max-[1095px]:w-full bg-tertiary p-6 flex flex-col rounded-3xl">
