@@ -45,6 +45,7 @@ import Discord from "@/assets/discord.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
 import LinkIcon from "@/assets/link-external-02.svg";
 import CopyIcon from "@/assets/copy.svg";
+import LinkIcon2 from '@/assets/link-01.svg'
 
 type FilterType =
   | "Items"
@@ -205,10 +206,10 @@ export default function CollectionPage() {
   const filteredCollectionSales =
     collectionSales?.filter((sale) => {
       const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-      const nameNoSpace = sale.nft.metadata.name
+      const nameNoSpace = sale?.nft?.metadata?.name
         .toLowerCase()
         .replace(/\s+/g, "");
-      const tokenIdNoSpace = sale.nft.tokenId.toLowerCase().replace(/\s+/g, "");
+      const tokenIdNoSpace = sale?.nft?.tokenId?.toLowerCase().replace(/\s+/g, "");
       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
       return combinedField.includes(searchTerm);
@@ -315,7 +316,7 @@ export default function CollectionPage() {
   };
 
   return (
-    <div className="mt-20 w-full min-h-screen px-6">
+    <div className="mt-20 w-full min-h-screen px-4">
       <Head>
         <title>
           MintMingles Marketplace - {collection?.collectionName || "Collection"}
@@ -341,8 +342,8 @@ export default function CollectionPage() {
               className="w-full h-full object-cover rounded-3xl"
             />
             <div className="bg-gradient-to-tr from-background via-background/95 to-transparent absolute inset-0 z-10" />
-            <div className="z-40 flex items-end justify-between w-full">
-              <div className="z-30 flex flex-col gap-6 w-[40%]">
+            <div className="z-40 flex min-[870px]:items-end justify-between max-[970px]:flex-col gap-6 w-full">
+              <div className="z-30 flex flex-col gap-6 w-[40%] max-[970px]:w-full items-start">
                 <div className="flex flex-col gap-4 z-40">
                   <Image
                     src={collection?.collectionImage || ""}
@@ -392,16 +393,19 @@ export default function CollectionPage() {
                   </p>
                 </div>
               </div>
-              <div className="z-40 flex items-center justify-between flex-1">
+              <div className="z-40 flex items-center justify-between flex-1 max-[970px]:hidden">
                 {renderCollectionDetails()}
               </div>
             </div>
           </div>
 
           {/* filter */}
-          <div className="mt-7">
-            <div className="w-full flex justify-between items-center">
-              <Card className="bg-transparent border border-new-muted-text p-1 rounded-xl h-10">
+          <div className="mt-7 flex flex-col gap-6">
+            <div className="min-[970px]:hidden max-[970px]:w-full flex items-center justify-between max-[630px]:grid grid-cols-2">
+              {renderCollectionDetails()}
+            </div>
+            <div className="w-full flex justify-between max-md:flex-col gap-4 md:items-center">
+              <Card className="bg-transparent border border-new-muted-text p-1 rounded-xl h-10 w-fit">
                 <ToggleGroup.Root
                   type="single"
                   value={filter}
@@ -425,7 +429,7 @@ export default function CollectionPage() {
                 </ToggleGroup.Root>
               </Card>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 justify-end">
                 {filter !== filters[4] && (
                   <TextField
                     type="search"
@@ -466,7 +470,7 @@ export default function CollectionPage() {
           {/* Render Items Content */}
           {filter === filters[0] && (
             <div className="mt-6">
-              <div className="flex items-center gap-8 flex-wrap">
+              <div className="w-full grid min-[1250px]:grid-cols-4 min-[1550px]:grid-cols-5 min-[970px]:grid-cols-3 max-[970px]:flex flex-wrap grid-cols-1 place-content-center gap-5">
                 {paginatedCollectionNFTs &&
                 paginatedCollectionNFTs.length > 0 ? (
                   <>
@@ -538,7 +542,7 @@ export default function CollectionPage() {
           {/* Render Offers Content */}
           {filter === filters[1] && (
             <div className="mt-6">
-              <div className="flex items-center gap-8 flex-wrap">
+              <div className="w-full grid min-[1250px]:grid-cols-4 min-[1550px]:grid-cols-5 min-[970px]:grid-cols-3 max-[970px]:flex flex-wrap grid-cols-1 place-content-center gap-5">
                 {paginatedCollectionOffers &&
                 paginatedCollectionOffers.length > 0 ? (
                   <>
@@ -574,7 +578,7 @@ export default function CollectionPage() {
           {/* Render Sales Content */}
           {filter === filters[2] && (
             <div className="mt-6">
-              <div className="flex items-center gap-8 flex-wrap">
+              <div className="w-full grid min-[1250px]:grid-cols-4 min-[1550px]:grid-cols-5 min-[970px]:grid-cols-3 max-[970px]:flex flex-wrap grid-cols-1 place-content-center gap-5">
                 {paginatedCollectionSales &&
                 paginatedCollectionSales.length > 0 ? (
                   <>
@@ -724,6 +728,7 @@ export default function CollectionPage() {
         singleCollection?.collection && (
           <CollectionSettings collection={singleCollection.collection} />
         )}
+        
     </div>
   );
 }
@@ -884,10 +889,10 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
   };
 
   return (
-    <div className="flex items-start w-full gap-8 mt-8">
-      <div className="flex items-center gap-4 flex-1">
+    <div className="flex items-start w-full max-sm:flex-col gap-8 mt-8 h-full">
+      <div className="flex items-center max-[1246px]:flex-col gap-4 flex-1 max-sm:flex-row max-sm:w-full">
         {/* Collection Image */}
-        <div className="relative w-[392px] h-[447px]">
+        <div className="relative w-[392px] h-[447px] max-[1246px]:h-[282px] max-[1246px]:w-full max-sm:w-full max-sm:h-[180px]">
           <div className="absolute inset-0 bg-black/60 z-10" />
           <Image
             src={
@@ -917,7 +922,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
         </div>
 
         {/* Collection Background Image */}
-        <div className="relative w-[392px] h-[447px]">
+        <div className="relative w-[392px] h-[447px] max-[1246px]:h-[282px] max-[1246px]:w-full max-sm:w-full max-sm:h-[180px]">
           <div className="absolute inset-0 bg-black/60 z-10" />
           <Image
             src={
@@ -947,7 +952,7 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
         </div>
       </div>
 
-      <div className="w-[50%] flex flex-col h-[447px]">
+      <div className="w-[50%] max-sm:w-full max-sm:pb-10 flex flex-col h-[447px] max-[1246px]:h-[578px] max-sm:h-full">
         <div className="flex items-center gap-5 w-full">
           <div className="flex flex-col gap-3 w-full">
             <Label htmlFor="name">Collection Name</Label>
@@ -996,10 +1001,14 @@ function CollectionSettings({ collection }: CollectionSettingsProps) {
           />
         </div>
 
-        <div className="flex w-full flex-col gap-6 items-end mt-auto">
-          <div className="flex items-start justify-start gap-4">
+        <div className="flex w-full flex-col gap-6 max-sm:mt-6 max-sm:items-start items-end mt-auto">
+          <span className="max-sm:text-xs text-sm flex items-center gap-2">
+            <LinkIcon2 className="size-5 max-sm:size-3"/>
+            Social Links
+          </span>
+          <div className="flex items-start justify-start gap-4 max-sm:flex-col max-sm:w-full">
             {formData.collectionSocials.map((social, index) => (
-              <div key={index} className="flex flex-col gap-1">
+              <div key={index} className="flex flex-col gap-1 w-full">
                 <TextField
                   value={social.socialLink}
                   icon={
