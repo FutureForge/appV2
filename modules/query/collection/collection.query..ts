@@ -237,7 +237,6 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
       );
 
       for (const collection of response.data.collections) {
-        console.log("inside for loop");
         try {
           const [collectionDetailsResponse] = await Promise.all([
             axios.get(

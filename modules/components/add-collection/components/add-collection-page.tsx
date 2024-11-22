@@ -47,8 +47,6 @@ export function AddCollectionsPage() {
   const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
   const [nftName, setNFTName] = useState("");
 
-  console.log({ NFTContract });
-
   const { data: collectionInfo } = useCheckIfItsACollectionQuery({
     contractAddress: formData.contractAddress,
   });
@@ -174,7 +172,7 @@ export function AddCollectionsPage() {
     !formData.contractAddress ||
     !addCollectionMutation.isPending ||
     (formData.contractAddress && !NFTContract) ||
-    (formData.contractAddress && collectionExists) ||
+    (formData.contractAddress && collectionExists === true) ||
     Object.values(socialErrors).some((error) => error !== "");
 
   return (
