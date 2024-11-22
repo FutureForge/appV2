@@ -43,8 +43,10 @@ export function useAllOffersQuery({ limit = 50 }: { limit?: number }) {
 
       return updatedOffers;
     },
-    enabled: !!limit,
-    refetchInterval: 5000,
+    enabled: !!limit, 
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -79,8 +81,9 @@ export function useFilteredAllOffersQuery({
       return updatedOffers;
     },
     enabled: !!address || !!contractAddress,
-
-    refetchInterval: 100000,
+    // refetchInterval: 100000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -115,7 +118,9 @@ export function useSingleOfferQuery({
       return updatedOffers;
     },
     enabled: !!contractAddress || !!tokenId,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -131,7 +136,9 @@ export function useAcceptedOffersQuery({ limit = 50 }: { limit?: number }) {
       return response.acceptedOffers;
     },
     enabled: !!limit,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -156,7 +163,9 @@ export function useFilteredAcceptedOffersQuery({
       return response.acceptedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -195,7 +204,9 @@ export function useFilteredCompletedOffersQuery({
       return response.completedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -220,7 +231,9 @@ export function useNewOffersQuery({ limit = 50 }: { limit?: number }) {
       return updatedOffers;
     },
     enabled: !!limit,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -255,6 +268,8 @@ export function useFilteredNewOffersQuery({
       return updatedOffers;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

@@ -109,12 +109,11 @@ export function useMakeListingOfferMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          activeAccount?.address,
-          queryKeys.offers.all,
+          queryKeys.user.all,
           queryKeys.nft.single,
-          queryKeys.offers.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -157,11 +156,11 @@ export function useAcceptOfferMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.listing.completed,
+          queryKeys.user.all,
           queryKeys.nft.single,
+          queryKeys.user.listings,
           queryKeys.offers.all,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -204,11 +203,11 @@ export function useCancelOfferMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.listing.completed,
+          queryKeys.user.all,
           queryKeys.nft.single,
+          queryKeys.user.listings,
           queryKeys.offers.all,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -258,12 +257,13 @@ export function useBidInAuctionMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
           queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.newBids,
+          queryKeys.auction.filteredAll,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -306,12 +306,12 @@ export function useCollectAuctionPayoutMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
           queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.filteredAll,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -354,14 +354,12 @@ export function useCollectAuctionTokensMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.auction.newBids,
-          queryKeys.auction.all,
-          queryKeys.nft.single,
           queryKeys.user.all,
-          queryKeys.auction.newBidsUser,
-          queryKeys.auction.newBids,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.offers.all,
+          queryKeys.auction.filteredAll,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},

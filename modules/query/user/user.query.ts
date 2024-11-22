@@ -2,7 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useActiveAccount, useActiveWallet } from "thirdweb/react";
 import { queryKeys } from "../query-keys";
 import axios from "axios";
-import { backendURL, CROSSFI_API_TESTNET } from "@/utils/configs";
+import {
+  backendURL,
+  CROSSFI_API_TESTNET,
+  NFT_FACTORY_ADDRESS,
+} from "@/utils/configs";
 import { NFTActivityResponse, UserNFTResponse } from "@/utils/types/global";
 import {
   useAllOffersQuery,
@@ -11,7 +15,11 @@ import {
   useFilteredAllOffersQuery,
   useFilteredUserNewBidsQuery,
 } from "..";
-import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
+import {
+  decimalOffChain,
+  getContractCustom,
+  getContractEthers,
+} from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
   formatBlockchainTimestamp,
@@ -36,6 +44,8 @@ import request from "graphql-request";
 import { indexerEndpoint } from "@/utils/graphql";
 import { filteredAllAuctionsQuery } from "@/utils/graphql/queries/auction.queries";
 import { filteredAllOffersQuery } from "@/utils/graphql/queries/offers.queries";
+import nftFactoryABI from "@/utils/abi/nftFactory.json";
+import nftBaseABI from "@/utils/abi/nftBase.json";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -124,7 +134,9 @@ export function useUserNFTsQuery() {
       return userNFTsNotListed;
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -145,7 +157,9 @@ export function useUserOffersQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -166,7 +180,9 @@ export function useUserAuctionsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -187,7 +203,9 @@ export function useUserListingsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -208,7 +226,9 @@ export function useUserBidsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -252,7 +272,9 @@ export function useUserOffersReceivedQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -288,7 +310,9 @@ export function useUserExpiredListingsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -323,7 +347,9 @@ export function useUserExpiredAuctionsQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -359,7 +385,9 @@ export function useUserExpiredOffersQuery() {
       };
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -428,7 +456,9 @@ export function useUserCollectionsQuery() {
       return collections;
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -474,6 +504,64 @@ export function useUserNFTActivitiesQuery() {
       return updatedTokenTransfers;
     },
     enabled: !!userAddress,
-    refetchInterval: 5000,
+    //  refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+}
+
+type UserNFTContract = {
+  name: string;
+  symbol: string;
+  contractAddress: string;
+};
+
+export function useUserNFTContractQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const NFTFactoryContract = getContractEthers({
+    contractAddress: NFT_FACTORY_ADDRESS,
+    abi: nftFactoryABI,
+  });
+
+  return useQuery({
+    queryKey: [queryKeys.user.nftContracts],
+    queryFn: async () => {
+      const userDeployedContracts = await NFTFactoryContract.getUserNFT(
+        userAddress
+      );
+
+      const deployedContractsUpdated =
+        userDeployedContracts.length > 0
+          ? await Promise.all(
+              userDeployedContracts.map(
+                async (contract: string): Promise<UserNFTContract> => {
+                  const getContract = getContractEthers({
+                    contractAddress: contract,
+                    abi: nftBaseABI,
+                  });
+
+                  const name = await getContract.name();
+                  const symbol = await getContract.symbol();
+
+                  const contractInfo = {
+                    name,
+                    symbol,
+                    contractAddress: contract.toLowerCase(),
+                  };
+
+                  return contractInfo;
+                }
+              )
+            )
+          : [];
+
+      return deployedContractsUpdated;
+    },
+    enabled: !!userAddress,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

@@ -2,33 +2,39 @@
     {
         "inputs": [
             {
-                "internalType": "uint128",
+                "internalType": "uint256",
+                "name": "_creationFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
                 "name": "_mintFee",
-                "type": "uint128"
+                "type": "uint256"
             }
         ],
         "stateMutability": "nonpayable",
         "type": "constructor"
     },
     {
-        "inputs": [],
-        "name": "FailedDeployment",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableInvalidOwner",
         "type": "error"
     },
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "balance",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "needed",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
             }
         ],
-        "name": "InsufficientBalance",
+        "name": "OwnableUnauthorizedAccount",
         "type": "error"
     },
     {
@@ -36,12 +42,18 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "uint128",
-                "name": "fee",
-                "type": "uint128"
+                "internalType": "string",
+                "name": "feeType",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newFee",
+                "type": "uint256"
             }
         ],
-        "name": "MintFee",
+        "name": "FeeUpdated",
         "type": "event"
     },
     {
@@ -50,7 +62,7 @@
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "user",
+                "name": "creator",
                 "type": "address"
             },
             {
@@ -60,32 +72,27 @@
                 "type": "address"
             }
         ],
-        "name": "NFTContractDeployed",
+        "name": "NFTContractCreated",
         "type": "event"
     },
     {
+        "anonymous": false,
         "inputs": [
             {
+                "indexed": true,
                 "internalType": "address",
-                "name": "",
+                "name": "previousOwner",
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "UserNFTs",
-        "outputs": [
-            {
+                "indexed": true,
                 "internalType": "address",
-                "name": "",
+                "name": "newOwner",
                 "type": "address"
             }
         ],
-        "stateMutability": "view",
-        "type": "function"
+        "name": "OwnershipTransferred",
+        "type": "event"
     },
     {
         "inputs": [
@@ -98,11 +105,6 @@
                 "internalType": "string",
                 "name": "_symbol",
                 "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_initialSupply",
-                "type": "uint256"
             }
         ],
         "name": "createNFTContract",
@@ -113,12 +115,57 @@
                 "type": "address"
             }
         ],
-        "stateMutability": "nonpayable",
+        "stateMutability": "payable",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "implementationAddress",
+        "name": "creationFee",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "getUserNFT",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "mintFee",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
         "outputs": [
             {
                 "internalType": "address",
@@ -131,28 +178,59 @@
     },
     {
         "inputs": [],
-        "name": "mintFee",
-        "outputs": [
-            {
-                "internalType": "uint128",
-                "name": "",
-                "type": "uint128"
-            }
-        ],
-        "stateMutability": "view",
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [
             {
-                "internalType": "uint128",
-                "name": "_mintFee",
-                "type": "uint128"
+                "internalType": "uint256",
+                "name": "_fee",
+                "type": "uint256"
+            }
+        ],
+        "name": "setCreationFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_fee",
+                "type": "uint256"
             }
         ],
         "name": "setMintFee",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "withdrawFees",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "stateMutability": "payable",
+        "type": "receive"
     }
 ]

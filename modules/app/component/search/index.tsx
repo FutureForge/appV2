@@ -31,7 +31,8 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 const popular_tags = [
   { label: "All", type: null },
-  { label: "NFTS", type: "collection-nft" || "nft" },
+  { label: "NFTS", type: "collection-nft"},
+  { label: "NFTS", type: "nft" },
   { label: "Listed", type: "listing" },
   { label: "Auctions", type: "auction" },
   { label: "Collections", type: "collection" },

@@ -65,13 +65,12 @@ export function useCreateListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.listing.new,
-          queryKeys.listing.newFiltered,
-          queryKeys.listing.single,
-          queryKeys.nft.single,
+          queryKeys.listing.all,
           queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.collection.all,
         ],
-        refetchType: "active",
       });
     },
     onError: () => {},
@@ -128,13 +127,7 @@ export function useUpdateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [
-          queryKeys.nft.single,
-          queryKeys.user.all,
-          queryKeys.listing.new,
-          queryKeys.listing.newFiltered,
-        ],
-        refetchType: "all",
+        queryKey: [queryKeys.user.all, queryKeys.nft.single],
       });
     },
     onError: () => {},
@@ -177,12 +170,11 @@ export function useCancelDirectListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.nft.single,
-          queryKeys.user.expiredListings,
-          queryKeys.listing.new,
           queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.listing.all,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -236,11 +228,11 @@ export function useBuyFromDirectListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.listing.completed,
-          queryKeys.nft.single,
           queryKeys.user.all,
+          queryKeys.nft.single,
+          queryKeys.user.listings,
+          queryKeys.listing.all,
         ],
-        refetchType: "all",
       });
     },
     onError: () => {},

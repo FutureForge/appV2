@@ -47,7 +47,9 @@ export function useAllListingsQuery({ limit = 50 }: { limit?: number }) {
       // return response.allListings;
     },
     enabled: !!limit || limit === 0 || limit === 50,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -82,8 +84,10 @@ export function useFilteredAllListingsQuery({
 
       return updatedListings;
     },
-    enabled: !!contractAddress,
-    refetchInterval: 5000,
+    enabled: !!contractAddress || !!address,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -116,7 +120,9 @@ export function useSingleListingQuery({
       return updatedListings;
     },
     enabled: !!contractAddress || !!tokenId,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -155,7 +161,9 @@ export function useFilteredCompletedListingsQuery({
       return response.completedListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -182,7 +190,9 @@ export function useNewListingsQuery({ limit = 50 }: { limit?: number }) {
       return updatedNewListings;
     },
     enabled: !!limit,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -218,7 +228,9 @@ export function useFilteredNewListingsQuery({
       return updatedNewListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -234,7 +246,9 @@ export function useNewSaleListingsQuery({ limit = 50 }: { limit?: number }) {
       return response.newSaleListings;
     },
     enabled: !!limit,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
 
@@ -259,6 +273,8 @@ export function useFilteredNewSaleListingsQuery({
       return response.newSaleListings;
     },
     enabled: !!address || !!contractAddress,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }
