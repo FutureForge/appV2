@@ -73,10 +73,6 @@ export const crossFiMainnet = defineChain({
   // blockExplorers: [{ name: "Explorer", url: "https://xfiscan.com/" }],
 });
 
-export const chainInfo =
-  process.env.NODE_ENV === "development" ? crossFiTestnet : crossFiMainnet;
+export const chainInfo = crossFiTestnet;
 
-export const providerUrl =
-  process.env.NODE_ENV === "development"
-    ? testnetProviderUrl
-    : mainnetProviderUrlMap;
+export const providerUrl = testnetProviderUrl;
