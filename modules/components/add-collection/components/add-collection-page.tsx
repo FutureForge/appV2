@@ -42,7 +42,11 @@ export function AddCollectionsPage() {
   });
 
   const [image, setImage] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(() => Date.now().toString());
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
+  const [backgroundFileInputKey, setBackgroundFileInputKey] = useState(() =>
+    Date.now().toString()
+  );
   const [NFTContract, setNFTContract] = useState<boolean>();
   const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
   const [nftName, setNFTName] = useState("");
@@ -126,6 +130,8 @@ export function AddCollectionsPage() {
             });
             setImage(null);
             setBackgroundImage(null);
+            setFileInputKey(Date.now().toString());
+            setBackgroundFileInputKey(Date.now().toString());
           },
           onError: () => {
             setFormData({
@@ -140,6 +146,8 @@ export function AddCollectionsPage() {
             });
             setImage(null);
             setBackgroundImage(null);
+            setFileInputKey(Date.now().toString());
+            setBackgroundFileInputKey(Date.now().toString());
           },
         }
       );
@@ -176,12 +184,23 @@ export function AddCollectionsPage() {
     !image ||
     !backgroundImage ||
     Object.values(socialErrors).some((error) => error !== "");
-  const handleFileChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      console.log("File selected:", file.name); // Log the file name
-    }
-  };
+
+  // console.log({ isDisabled });
+  // console.log({ image });
+  // console.log({ backgroundImage });
+  // console.log("name", !formData.name);
+  // console.log("description", !formData.description);
+  // console.log("contractAddress", !formData.contractAddress);
+  // console.log("NFTContract", formData.contractAddress && !NFTContract);
+  // console.log(
+  //   "collectionExists",
+  //   formData.contractAddress && collectionExists === true
+  // );
+  // console.log(
+  //   "addCollectionMutation.isPending",
+  //   addCollectionMutation.isPending
+  // );
+
   return (
     <div className="flex flex-col gap-6 max-[1095px]:py-12 max-[1095px]:px-4 max-sm:h-screen max-sm:mt-[15vh]">
       <div className="flex flex-col gap-2">
@@ -199,9 +218,10 @@ export function AddCollectionsPage() {
         <div className="flex flex-col gap-4 max-[1095px]:w-full max-[1095px]:flex-row max-sm:flex-col h-full">
           <div className="border-dashed border relative border-primary p-4 h-[255px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
+              key={fileInputKey}
               id="image"
               name="image"
-              onChange={handleFileChanges}
+              onChange={handleFileChange}
               subTitle="Upload Image"
               icon={<DownloadIcon className="size-10" />}
               containerClass="z-20"
@@ -209,6 +229,7 @@ export function AddCollectionsPage() {
           </div>
           <div className="border-dashed border relative border-primary  p-4 h-[255px] flex items-center justify-center min-[1095px]:w-[504px] w-full rounded-3xl">
             <FileInput
+              key={backgroundFileInputKey}
               id="backgroundImage"
               name="backgroundImage"
               onChange={handleFileChange}
