@@ -22,6 +22,11 @@ import X from "@/assets/logo-x-twitter.svg";
 import Discord from "@/assets/discord.svg";
 import Telegram from "@/assets/telegram.svg";
 
+const isValidContractAddress = (address: string): boolean => {
+  const hexRegex = /^0x[0-9a-fA-F]{40}$/;
+  return hexRegex.test(address);
+};
+
 export function AddCollectionsPage() {
   const addCollectionMutation = useAddCollectionMutation();
 
@@ -41,6 +46,8 @@ export function AddCollectionsPage() {
   const [NFTContract, setNFTContract] = useState<boolean>();
   const [socialErrors, setSocialErrors] = useState<Record<number, string>>({});
   const [nftName, setNFTName] = useState("");
+
+  console.log({ NFTContract });
 
   const { data: collectionInfo } = useCheckIfItsACollectionQuery({
     contractAddress: formData.contractAddress,
@@ -143,14 +150,18 @@ export function AddCollectionsPage() {
     }
   };
 
+  // useEffect(() => {
+  //   const checkIfNFT721Contract = async () => {
+  //     if (formData.contractAddress) {
+  //       const result = await isNFTContract(formData.contractAddress);
+  //       setNFTContract(result);
+  //     }
+  //   };
+  //   checkIfNFT721Contract();
+  // }, [formData.contractAddress, isNFTContract]);
+
   useEffect(() => {
-    const checkIfNFT721Contract = async () => {
-      if (formData.contractAddress) {
-        const result = await isNFTContract(formData.contractAddress);
-        setNFTContract(result);
-      }
-    };
-    checkIfNFT721Contract();
+    setNFTContract(isValidContractAddress(formData.contractAddress));
   }, [formData.contractAddress]);
 
   useEffect(() => {
