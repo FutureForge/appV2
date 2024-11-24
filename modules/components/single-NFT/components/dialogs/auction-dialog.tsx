@@ -12,7 +12,6 @@ import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import {
   useApprovalMutation,
-  useApprovedForAllMutation,
   useCreateAuctionMutation,
 } from "@/modules/mutation";
 import DatePicker from "react-datepicker";
@@ -20,6 +19,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import Check from "@/assets/Checkbox [1.0].svg";
 import Info from "@/assets/info.svg";
+import XFI from "@/assets/xfi.svg";
 
 type AuctionDialogProps = {
   src: string;
@@ -154,24 +154,36 @@ export function AuctionDialog({
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <Label>Minimum Bid Amount</Label>
-                <TextField
-                  value={minimumBidAmount}
-                  onChange={(e) => setMinimumBidAmount(e.target.value)}
-                  placeholder="Minimum Bid Amount"
-                  containerClass="bg-transparent"
-                  type="number"
-                />
+                <div className="relative">
+                  <TextField
+                    value={minimumBidAmount}
+                    onChange={(e) => setMinimumBidAmount(e.target.value)}
+                    placeholder="Minimum Bid Amount"
+                    containerClass="bg-transparent"
+                    type="number"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <XFI className="size-4" />
+                    <span className="text-gray-400">XFI</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <Label>Buyout Bid Amount</Label>
-                <TextField
-                  value={buyoutBidAmount}
-                  onChange={(e) => setBuyoutBidAmount(e.target.value)}
-                  placeholder="Buyout Bid Amount"
-                  containerClass="bg-transparent"
-                  type="number"
-                />
+                <div className="relative">
+                  <TextField
+                    value={buyoutBidAmount}
+                    onChange={(e) => setBuyoutBidAmount(e.target.value)}
+                    placeholder="Buyout Bid Amount"
+                    containerClass="bg-transparent"
+                    type="number"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <XFI className="size-4" />
+                    <span className="text-gray-400">XFI</span>
+                  </div>
+                </div>
               </div>
             </div>
 

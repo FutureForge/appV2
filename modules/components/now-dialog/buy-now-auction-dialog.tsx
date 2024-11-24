@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import XFI from "@/assets/xfi.svg";
 import { decimalOffChain } from "@/modules/blockchain";
 import { useBidInAuctionMutation } from "@/modules/mutation";
-import { useUserChainInfo } from "@/modules/query";
+import { getUserNativeBalance, useUserChainInfo } from "@/modules/query";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { Fee, useAuctionInfoStore } from "./store";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
@@ -35,6 +35,7 @@ export function BuyNowAuctionDialog({
   const cta = "Buy Auction";
 
   const bidInAuctionMutation = useBidInAuctionMutation();
+  const { balanceData } = getUserNativeBalance();
 
   const handleBuyAuctionNow = () => {
     if (!activeAccount) return toast.error("Please connect your wallet");
@@ -101,6 +102,13 @@ export function BuyNowAuctionDialog({
             </div>
 
             <div className="w-full mt-6">
+              <span className="flex items-center justify-between">
+                <p className="text-muted-foreground text-sm">XFI Balance</p>
+                <XFI className="size-6" />
+                <p className="text-sm font-medium">
+                  {Number(balanceData?.displayValue).toFixed(2)} XFI
+                </p>
+              </span>
               <span className="flex items-center justify-between">
                 <p className="text-muted-foreground text-sm">Collection Fee</p>
                 <p className="text-sm font-medium">{collectionFee.percent}%</p>

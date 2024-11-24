@@ -11,9 +11,11 @@ import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client, WRAPPED_TOKEN_CONTRACT } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
-import { useUserChainInfo } from "@/modules/query";
+import { getUserWrappedTokenBalance, useUserChainInfo } from "@/modules/query";
 import { useMakeListingOfferMutation } from "@/modules/mutation";
 import DatePicker from "react-datepicker";
+
+import XFI from "@/assets/xfi.svg";
 
 type MakeOfferDialogProps = {
   src: string;
@@ -34,8 +36,6 @@ const notes = [
   ["You can also", "swap for WXFI", "manually."],
 ];
 
-// TODO: add the logic to make an offer
-
 export function MakeOfferDialog({
   src,
   alt,
@@ -51,7 +51,10 @@ export function MakeOfferDialog({
 
   const makeOfferMutation = useMakeListingOfferMutation();
 
-  const isDisabled = !value || !selectedDate || makeOfferMutation.isPending;
+  const isDisabled =
+    !value || !selectedDate || makeOfferMutation.isPending || !activeAccount;
+
+  const { wrappedBalance } = getUserWrappedTokenBalance();
 
   const handleDateChange = (date: Date | null) => {
     const newDate = date || oneWeekFromNow;
@@ -144,13 +147,21 @@ export function MakeOfferDialog({
 
             <form className="flex flex-col mt-6 gap-2">
               <Label>Offer Amount</Label>
-              <TextField
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                containerClass="bg-transparent rounded-lg"
-                placeholder="Amount"
-                type="number"
-              />
+              <div className="relative">
+                <TextField
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  containerClass="bg-transparent rounded-lg"
+                  placeholder={`Balance ${Number(
+                    wrappedBalance?.displayValue
+                  ).toFixed(2)} ${wrappedBalance?.symbol}`}
+                  type="number"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <XFI className="size-4" />
+                  <span className="text-gray-400">WXFI</span>
+                </div>
+              </div>
             </form>
 
             <div className="flex w-full mt-8 flex-col gap-4">

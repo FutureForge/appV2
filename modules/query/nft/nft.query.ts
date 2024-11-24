@@ -8,11 +8,9 @@ import {
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
-  decimalOffChain,
   getAllAuctions,
   getContractCustom,
   getIsAuctionExpired,
-  getTotalAuctions,
   getWinningBid,
 } from "@/modules/blockchain";
 import ERC721ABI from "@/utils/abi/erc721.json";
@@ -31,14 +29,7 @@ import {
   Offer,
 } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
-import {
-  getAllListing,
-  getTotalListings,
-} from "@/modules/blockchain/listing/listing.blockchain";
-import {
-  getAllOffers,
-  getTotalOffers,
-} from "@/modules/blockchain/offer/offer.blockchain";
+import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
 import { indexerEndpoint } from "@/utils/graphql";
 import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
 import request from "graphql-request";
@@ -141,6 +132,16 @@ export function useSingleNFTQuery({
           updatedNFT = nft;
         }
 
+        const updatedNFTAuctionList = {
+          ...nftAuctionList,
+          nft,
+        };
+
+        const updatedNFTListingList = {
+          ...nftListingList,
+          nft,
+        };
+
         let isAuctionExpired;
         let winningBidBody;
 
@@ -207,8 +208,8 @@ export function useSingleNFTQuery({
           winningBidBody,
           offers: nftOffers as Offer[],
           collectionDetails: collectionWithoutNFTs?.collection as Collection,
-          listingData: ensureSerializable(nftListingList) as Listing,
-          auctionData: ensureSerializable(nftAuctionList) as Auction,
+          listingData: ensureSerializable(updatedNFTListingList) as Listing,
+          auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };
       } catch (error) {
         console.log("single nft error", { error });

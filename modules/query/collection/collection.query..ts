@@ -370,7 +370,7 @@ export function useSingleCollectionQuery({
   // })();
 
   return useQuery({
-    queryKey: [queryKeys.collection.single, contractAddress],
+    queryKey: [queryKeys.collection.single],
     queryFn: async () => {
       const { floorPrice, formattedTotalVolume } =
         await getTotalVolumeAndFloorPrice({

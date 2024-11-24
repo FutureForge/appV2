@@ -188,21 +188,19 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     auctionPricingData?.auctionCreator?.toLowerCase() ===
     userAddress?.toLowerCase();
 
-  const isOwner =
-    listingPricingData !== undefined
-      ? userAddress?.toLowerCase() ===
-        listingPricingData?.listingCreator?.toLowerCase()
-      : auctionPricingData !== undefined
-      ? userAddress?.toLowerCase() ===
-        auctionPricingData?.auctionCreator?.toLowerCase()
-      : userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
+  const isOwner = listingPricingData?.listingCreator
+    ? userAddress?.toLowerCase() ===
+      listingPricingData?.listingCreator?.toLowerCase()
+    : auctionPricingData?.auctionCreator
+    ? userAddress?.toLowerCase() ===
+      auctionPricingData?.auctionCreator?.toLowerCase()
+    : userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
 
-  const owner =
-    listingPricingData !== undefined
-      ? listingPricingData.listingCreator?.toLowerCase()
-      : auctionPricingData !== undefined
-      ? auctionPricingData.auctionCreator?.toLowerCase()
-      : nft?.owner?.toLowerCase();
+  const owner = listingPricingData?.listingCreator
+    ? listingPricingData.listingCreator.toLowerCase()
+    : auctionPricingData?.auctionCreator
+    ? auctionPricingData.auctionCreator.toLowerCase()
+    : nft?.owner?.toLowerCase() || undefined;
 
   const isWinningBidder =
     userAddress?.toLowerCase() ===

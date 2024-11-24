@@ -17,9 +17,9 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import Calendar from "@/assets/calendar.svg";
 import Check from "@/assets/Checkbox [1.0].svg";
 import Info from "@/assets/info.svg";
+import XFI from "@/assets/xfi.svg";
 
 type ListDialogProps = {
   src: string;
@@ -147,13 +147,19 @@ export function ListDialog({
 
             <div className="flex flex-col gap-2">
               <Label>Listing Price</Label>
-              <TextField
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="Listing Price"
-                containerClass="bg-transparent"
-                type="number"
-              />
+              <div className="relative">
+                <TextField
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder="Listing Price"
+                  containerClass="bg-transparent"
+                  type="number"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <XFI className="size-4" />
+                  <span className="text-gray-400">XFI</span>
+                </div>
+              </div>
             </div>
             <div className="flex w-full mt-auto flex-col gap-4">
               <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">

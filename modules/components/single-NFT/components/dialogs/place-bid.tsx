@@ -11,28 +11,25 @@ import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
-import { useUserChainInfo } from "@/modules/query";
+import { getUserNativeBalance, useUserChainInfo } from "@/modules/query";
 import { useAuctionInfoStore } from "@/modules/components/now-dialog/store";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useBidInAuctionMutation } from "@/modules/mutation";
 import { decimalOffChain } from "@/modules/blockchain";
 
-type PlaceBidDialogProps = {
-  src: string;
-  alt: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  name: string;
-  tokenId: string;
-};
+import XFI from "@/assets/xfi.svg";
 
 export function PlaceBidDialog({
   setIsDialogOpen,
 }: {
   setIsDialogOpen: (open: boolean) => void;
 }) {
+  const toast = useToast();
+
   const [value, setValue] = useState("");
   const [error, setError] = useState<string>("");
-  const toast = useToast();
+
+  const { balanceData } = getUserNativeBalance();
   const { activeAccount } = useUserChainInfo();
   const { auctionInfo } = useAuctionInfoStore();
   const { auctionId, tokenId, nft, buyoutBidAmount, minimumBidAmount } =
@@ -140,31 +137,37 @@ export function PlaceBidDialog({
 
             <form className="flex flex-col mt-6 gap-2">
               <Label>Bid Amount</Label>
-              <TextField
-                value={value}
-                onChange={(e) => {
-                  const newValue = e.target.value;
-                  const minBid = Number(
-                    decimalOffChain(minimumBidAmount as string)
-                  );
-                  const maxBid = Number(
-                    decimalOffChain(buyoutBidAmount as string)
-                  );
+              <div className="relative">
+                <TextField
+                  value={value}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    const minBid = Number(
+                      decimalOffChain(minimumBidAmount as string)
+                    );
+                    const maxBid = Number(
+                      decimalOffChain(buyoutBidAmount as string)
+                    );
 
-                  setValue(newValue);
+                    setValue(newValue);
 
-                  if (Number(newValue) < minBid) {
-                    setError(`Bid must be at least ${minBid} XFI`);
-                  } else if (Number(newValue) > maxBid) {
-                    setError(`Bid cannot exceed ${maxBid} XFI`);
-                  } else {
-                    setError("");
-                  }
-                }}
-                containerClass="bg-transparent rounded-lg"
-                placeholder="Bid Amount"
-                type="number"
-              />
+                    if (Number(newValue) < minBid) {
+                      setError(`Bid must be at least ${minBid} XFI`);
+                    } else if (Number(newValue) > maxBid) {
+                      setError(`Bid cannot exceed ${maxBid} XFI`);
+                    } else {
+                      setError("");
+                    }
+                  }}
+                  containerClass="bg-transparent rounded-lg pr-20"
+                  placeholder={`Balance ${Number(balanceData?.displayValue).toFixed(2)} ${balanceData?.symbol}`}
+                  type="number"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <XFI className="size-4" />
+                  <span className="text-gray-400">XFI</span>
+                </div>
+              </div>
               {error && (
                 <span className="text-red-500 text-sm mt-1">{error}</span>
               )}

@@ -3,7 +3,7 @@ import { ImageHolder } from "@/modules/components/home/components/collections-nf
 import React, { useEffect, useState } from "react";
 import XFI from "@/assets/xfi.svg";
 import { decimalOffChain } from "@/modules/blockchain";
-import { useUserChainInfo } from "@/modules/query";
+import { getUserNativeBalance, useUserChainInfo } from "@/modules/query";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useBuyFromDirectListingMutation } from "@/modules/mutation";
 import { useListingInfoStore, Fee } from "./store";
@@ -35,6 +35,7 @@ export function BuyNowListingDialog({
   const cta = "Buy Listing";
 
   const buyListingMutation = useBuyFromDirectListingMutation();
+  const { balanceData } = getUserNativeBalance();
 
   const handleBuyListingNow = () => {
     if (!activeAccount) return toast.error("Please connect your wallet");
@@ -106,6 +107,13 @@ export function BuyNowListingDialog({
             </div>
 
             <div className="w-full mt-6">
+              <span className="flex items-center justify-between">
+                <p className="text-muted-foreground text-sm">XFI Balance</p>
+                <XFI className="size-6" />
+                <p className="text-sm font-medium">
+                  {Number(balanceData?.displayValue).toFixed(2)} XFI
+                </p>
+              </span>
               <span className="flex items-center justify-between">
                 <p className="text-muted-foreground text-sm">Collection Fee</p>
                 <p className="text-sm font-medium">{collectionFee.percent}%</p>

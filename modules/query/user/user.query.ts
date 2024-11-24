@@ -1,12 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { useActiveAccount, useActiveWallet } from "thirdweb/react";
+import {
+  useActiveAccount,
+  useActiveWallet,
+  useWalletBalance,
+} from "thirdweb/react";
 import { queryKeys } from "../query-keys";
 import axios from "axios";
 import {
   backendURL,
   chainInfo,
+  client,
   CROSSFI_API_TESTNET,
   NFT_FACTORY_ADDRESS,
+  WRAPPED_TOKEN_CONTRACT,
 } from "@/utils/configs";
 import { NFTActivityResponse, UserNFTResponse } from "@/utils/types/global";
 import {
@@ -56,6 +62,41 @@ export function useUserChainInfo() {
   const isChainSupported = chain?.id === chainInfo.id;
 
   return { activeAccount, activeWallet, isChainSupported };
+}
+
+export function getUserNativeBalance() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const {
+    data: balanceData,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  } = useWalletBalance({
+    chain: chainInfo,
+    address: userAddress,
+    client,
+  });
+
+  return { balanceData, isBalanceLoading, isBalanceError };
+}
+
+export function getUserWrappedTokenBalance() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const {
+    data: wrappedBalance,
+    isLoading: isWrappedBalanceLoading,
+    isError: isWrappedBalanceError,
+  } = useWalletBalance({
+    chain: chainInfo,
+    address: userAddress,
+    client,
+    tokenAddress: WRAPPED_TOKEN_CONTRACT,
+  });
+
+  return { wrappedBalance, isWrappedBalanceLoading, isWrappedBalanceError };
 }
 
 export function useUserNFTsQuery() {
