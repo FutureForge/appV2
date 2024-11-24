@@ -3,7 +3,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, useMemo } from "react";
 import { useToast } from "../app/hooks/useToast";
 import { useUserImageStore } from "@/utils/store/user-image.store";
 import { useUserChainInfo } from "../query";
@@ -43,7 +43,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
     };
   }, [activeWallet]);
 
-  const [queryClient] = useState(
+  const queryClient = useMemo(
     () =>
       new QueryClient({
         defaultOptions: { queries: { retry: 0 } },
@@ -99,7 +99,8 @@ export function QueryProvider({ children }: QueryProviderProps) {
             );
           },
         }),
-      })
+      }),
+    [isChainSupported]
   );
 
   return (
