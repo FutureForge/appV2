@@ -126,7 +126,7 @@ const FileInput = forwardRef<
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const MAX_FILE_SIZE_MB = 50;
+  const MAX_FILE_SIZE_MB = 10;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,11 +180,11 @@ const FileInput = forwardRef<
       "image/webp",
       "image/avif",
       "image/svg+xml",
-      "video/mp4",
+      // "video/mp4",
     ];
     if (!validTypes.includes(file.type)) {
       setError(
-        "Invalid file type. Please upload a JPG, PNG, GIF, SVG, or MP4 file."
+        "Invalid file type. Please upload a JPG, PNG, GIF, or SVG, file."
       );
       return false;
     }
