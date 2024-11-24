@@ -400,6 +400,10 @@ export function useSingleCollectionQuery({
       const { collection, nftLength, nfts } = collectionResponse.data;
       const tokenTransfers = collectionTransfersResponse.data.docs;
 
+      const updatedNFTs = nfts.filter((nft) => {
+        return nft.owner !== undefined && nft.owner !== null;
+      });
+
       const totalSupply = collectionDetailsResponse.data.totalSupply;
       const listedNFTs = allListings?.length;
       const auctionedNFTs = allAuctions?.length;
@@ -472,7 +476,7 @@ export function useSingleCollectionQuery({
 
       return {
         collection,
-        collectionNFTs: nfts,
+        collectionNFTs: updatedNFTs,
         tokenTransfers: updatedTokenTransfers,
         marketplaceFee,
         collectionDetails,
