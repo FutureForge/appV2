@@ -85,19 +85,19 @@ export function PlaceBidDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex w-full gap-6">
-          <div className="relative w-1/2">
+        <div className="flex w-full gap-6 min-[440px]:h-[389px] h-full max-[440px]:flex-col">
+          <div className="relative h-full">
             <div className="w-full relative h-full border-2 border-border z-40 rounded-2xl">
               <MediaRenderer
                 src={image!}
                 client={client}
                 alt={name!}
-                className="object-cover w-full absolute inset-0 size-full"
+                className="object-cover w-full absolute inset-0 size-full rounded-2xl"
               />
               <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
             </div>
           </div>
-          <div className="w-1/2 flex flex-col h-full">
+          <div className="w-1/2 flex flex-col max-[440px]:w-full h-full">
             <div className="bg-gradient-to-r from-border to-transparent p-4 rounded-2xl border border-border flex flex-col gap-6">
               <p className="font-medium">Note:</p>
               <div className="flex flex-col gap-4">
@@ -160,7 +160,9 @@ export function PlaceBidDialog({
                     }
                   }}
                   containerClass="bg-transparent rounded-lg pr-20"
-                  placeholder={`Balance ${Number(balanceData?.displayValue).toFixed(2)} ${balanceData?.symbol}`}
+                  placeholder={`Balance ${Number(
+                    balanceData?.displayValue
+                  ).toFixed(2)} ${balanceData?.symbol}`}
                   type="number"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">

@@ -8,7 +8,8 @@ import { useToast } from "@/modules/app/hooks/useToast";
 import { useBuyFromDirectListingMutation } from "@/modules/mutation";
 import { useListingInfoStore, Fee } from "./store";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
-import { MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
+import { client, MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
+import { MediaRenderer } from "thirdweb/react";
 
 export function BuyNowListingDialog({
   setIsDialogOpen,
@@ -90,12 +91,19 @@ export function BuyNowListingDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex w-full gap-6">
+        <div className="flex w-full gap-6 min-[440px]:h-[389px] h-full max-[440px]:flex-col">
           <div className="relative">
-            <ImageHolder src={image} alt={name} />
-            <div className="bg-gradient-to-t from-background rounded-[10px] to-transparent absolute bottom-0 h-20 right-0 left-0 z-40" />
+            <div className="w-full relative h-full z-40 rounded-2xl border-2 border-border overflow-hidden">
+              <MediaRenderer
+                src={image}
+                client={client}
+                alt={name}
+                className="object-cover w-full h-full aspect-square rounded-2xl"
+              />
+              <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
+            </div>
           </div>
-          <div className="w-1/2 flex flex-col">
+          <div className="w-1/2 flex flex-col max-[440px]:w-full h-full">
             <div className="bg-gradient-to-r rounded-xl border border-border from-border to-transparent p-3 flex flex-col gap-2">
               <span className="flex items-center gap-2 font-space">
                 <XFI className="size-6" />
@@ -109,10 +117,12 @@ export function BuyNowListingDialog({
             <div className="w-full mt-6">
               <span className="flex items-center justify-between">
                 <p className="text-muted-foreground text-sm">XFI Balance</p>
-                <XFI className="size-6" />
-                <p className="text-sm font-medium">
-                  {Number(balanceData?.displayValue).toFixed(2)} XFI
-                </p>
+                <span className="flex items-center gap-2">
+                  <XFI className="size-6" />
+                  <p className="text-sm font-medium">
+                    {Number(balanceData?.displayValue).toFixed(2)} XFI
+                  </p>
+                </span>
               </span>
               <span className="flex items-center justify-between">
                 <p className="text-muted-foreground text-sm">Collection Fee</p>
