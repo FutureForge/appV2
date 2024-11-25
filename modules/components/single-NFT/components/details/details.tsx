@@ -508,7 +508,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           List NFT
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="w-[700px]">
+                      <DialogContent className="min-[441px]:w-[700px]">
                         <ListDialog
                           src={image!}
                           alt={name!}
@@ -530,7 +530,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                           Auction NFT
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="w-[700px]">
+                      <DialogContent className="min-[441px]:w-[700px]">
                         <AuctionDialog
                           src={image!}
                           alt={name!}
@@ -556,12 +556,12 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       <Button
                         variant="secondary"
                         shape="square"
-                        className="w-1/2"
+                        className="w-1/2 max-[500px]:w-full"
                       >
                         Make Offer
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="w-[700px]">
+                    <DialogContent className="min-[441px]:w-[700px]">
                       <MakeOfferDialog
                         src={image!}
                         alt={name!}
@@ -578,11 +578,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                     onOpenChange={setIsBuyNowListingDialogOpen}
                   >
                     <DialogTrigger>
-                      <Button shape="square" className="w-1/2">
+                      <Button
+                        shape="square"
+                        className="w-1/2 max-[500px]:w-full"
+                      >
                         Buy Now
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="w-[564px]">
+                    <DialogContent className="min-[441px]:w-[564px]">
                       <BuyNowListingDialog
                         setIsDialogOpen={setIsBuyNowListingDialogOpen}
                       />
@@ -670,7 +673,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       <Button
                         variant="secondary"
                         shape="square"
-                        className="w-1/2"
+                        className="w-1/2 max-[500px]:w-full"
                       >
                         Buy Auction
                       </Button>
@@ -687,11 +690,14 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                     onOpenChange={setIsPlaceBidDialogOpen}
                   >
                     <DialogTrigger>
-                      <Button shape="square" className="w-1/2">
+                      <Button
+                        shape="square"
+                        className="w-1/2 max-[500px]:w-full"
+                      >
                         Place Bid
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="w-[700px]">
+                    <DialogContent className="min-[441px]:w-[700px]">
                       <PlaceBidDialog
                         setIsDialogOpen={setIsPlaceBidDialogOpen}
                       />

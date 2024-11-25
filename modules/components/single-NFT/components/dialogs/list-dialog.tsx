@@ -125,17 +125,20 @@ export function ListDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex gap-6 items-stretch">
-          <div className="gradient-box w-[50%] rounded-2xl overflow-hidden">
-            <MediaRenderer
-              src={src}
-              client={client}
-              alt={alt}
-              className="w-full h-full object-cover aspect-square"
-            />
+        <div className="flex w-full gap-6 min-[440px]:h-[389px] h-full max-[440px]:flex-col">
+          <div className="relative">
+            <div className="w-full relative h-full z-40 rounded-2xl border-2 border-border overflow-hidden">
+              <MediaRenderer
+                src={src}
+                client={client}
+                alt={name}
+                className="object-cover w-full h-full aspect-square rounded-2xl"
+              />
+              <div className="w-full h-[257px] absolute bottom-0 left-0 right-0 bg-gradient-to-t rounded-2xl via-black/80 from-background to-transparent" />
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col h-[380px]">
+          <div className="w-1/2 flex flex-col max-[440px]:w-full h-full">
             <span className="flex items-center gap-2 mb-4">
               <p className="font-medium text-muted-foreground">Notes</p>
               <Tooltip content={<TooltipContent />} className="w-[350px]">

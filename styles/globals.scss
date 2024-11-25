@@ -20,10 +20,16 @@ body {
   background: #030312;
   color: white;
   min-height: 100vh;
+    overflow-y: scroll;
 }
-
+.antialiased{
+  overflow-y: scroll !important;
+}
 * {
-  /* outline: 1px solid red; */
+  scrollbar-width: thin;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
 }
 
 @layer utilities {

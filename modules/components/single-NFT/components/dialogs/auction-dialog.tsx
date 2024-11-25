@@ -131,8 +131,8 @@ export function AuctionDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex gap-6 items-stretch">
-          <div className="gradient-box w-[50%] rounded-2xl overflow-hidden">
+        <div className="flex gap-6 items-stretch max-[440px]:flex-col h-full">
+          <div className="gradient-box w-[50%] max-[440px]:w-full rounded-2xl overflow-hidden">
             <MediaRenderer
               src={src}
               client={client}
