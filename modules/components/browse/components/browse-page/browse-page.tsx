@@ -26,6 +26,7 @@ import { RecentlySoldListingTable } from "../table/recently-sold";
 import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
+import { Pagination } from "@/modules/app/component/pagination";
 
 const filters = [
   "All Listings",
@@ -317,11 +318,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -370,11 +370,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -423,11 +422,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -474,11 +472,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -527,11 +524,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -578,11 +574,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
@@ -629,11 +624,10 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <PaginationControls
+                <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
-                  pageNumbers={pageNumbers}
                 />
               </>
             ) : (
