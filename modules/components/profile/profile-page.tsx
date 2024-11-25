@@ -581,7 +581,6 @@ export function ProfilePage() {
                   paginatedData.length > 0 ? (
                   <>
                     {paginatedData?.map((auction, index) => {
-                      console.log({ auction });
                       const data = auction as Auction;
                       return (
                         <NFTCard
@@ -641,7 +640,6 @@ export function ProfilePage() {
                   paginatedData.length > 0 ? (
                   <>
                     {paginatedData?.map((offer, index) => {
-                      console.log({ offer });
                       const data = offer as Offer;
                       return (
                         <NFTCard
@@ -701,7 +699,6 @@ export function ProfilePage() {
                   paginatedData.length > 0 ? (
                   <>
                     {paginatedData?.map((offer, index) => {
-                      console.log({ offer });
                       const data = offer as Offer;
                       return (
                         <NFTCard

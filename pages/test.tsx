@@ -53,6 +53,18 @@ import { ethers } from "ethers";
 // "0x1a35a38630b6f56637268f437493601dbf72e61a"
 // 8
 
+export const getServerSideProps = async () => {
+  if (process.env.VERCEL_ENV === "production") {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
+
 export default function Test() {
   // const { data } = useSingleCollectionQuery({
   //   contractAddress: "0x1A35a38630b6F56637268F437493601dbF72E61A",

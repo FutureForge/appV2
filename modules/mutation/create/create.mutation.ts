@@ -96,7 +96,6 @@ export function useCreateNFTMutation() {
         }
 
         const userBalance = await NFTBaseContract.balanceOf(userAddress);
-        console.log({ userBalance });
         const tokenId = Number(userBalance.toString()) - 1;
 
         // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);

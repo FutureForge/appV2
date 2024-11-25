@@ -496,13 +496,6 @@ export default function CollectionPage() {
                       const type = isListed ? "listing" : "auction";
                       const data = isListed ? isListed : isAuctioned;
 
-                      // if (status === "listed") {
-                      //   setListingInfo(data as Listing);
-                      // } else {
-                      //   console.log("auctioned", data);
-                      //   setAuctionInfo(data as Auction);
-                      // }
-
                       return status !== "" && data ? (
                         <NFTCard
                           key={index}

@@ -27,6 +27,7 @@ import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
 import { Pagination } from "@/modules/app/component/pagination";
+import { useRouter } from "next/navigation";
 
 const filters = [
   "All Listings",
@@ -39,6 +40,7 @@ const filters = [
 ];
 
 export function BrowsePage() {
+  const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -268,8 +270,7 @@ export function BrowsePage() {
     contractAddress: string;
     tokenId: string;
   }) => {
-    // router.push(`/item/${contractAddress}/${tokenId}`);
-    console.log("view item", { contractAddress, tokenId });
+    router.push(`/nft/${contractAddress}/${tokenId}`);
   };
 
   return (
