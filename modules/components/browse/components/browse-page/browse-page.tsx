@@ -46,7 +46,7 @@ export function BrowsePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedFilter, setSelectedFilter] = useState(filters[0]);
 
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
   const fetchLimit = 50;
 
   const {
@@ -319,11 +319,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -348,7 +350,7 @@ export function BrowsePage() {
                     data={currentPageData as Auction[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((auction, index) => {
                         return (
@@ -371,11 +373,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -400,7 +404,7 @@ export function BrowsePage() {
                     data={currentPageData as Listing[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((listing, index) => {
                         return (
@@ -423,11 +427,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -452,7 +458,7 @@ export function BrowsePage() {
                     data={currentPageData as NewSaleListing[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((listing, index) => {
                         return (
@@ -473,11 +479,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -502,7 +510,7 @@ export function BrowsePage() {
                     data={currentPageData as Auction[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((auction, index) => {
                         return (
@@ -525,11 +533,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -554,7 +564,7 @@ export function BrowsePage() {
                     data={currentPageData as AuctionClosed[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((auction, index) => {
                         return (
@@ -575,11 +585,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState
@@ -604,7 +616,7 @@ export function BrowsePage() {
                     data={currentPageData as NewBid[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
+                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
                     <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
                       {currentPageData?.map((bid, index) => {
                         return (
@@ -625,11 +637,13 @@ export function BrowsePage() {
                     </div>
                   </div>
                 )}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             ) : (
               <EmptyState

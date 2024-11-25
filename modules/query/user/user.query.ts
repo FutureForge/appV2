@@ -108,7 +108,7 @@ export function useUserNFTsQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.nfts],
+    queryKey: [queryKeys.user.nfts, userAddress],
     queryFn: async () => {
       const response = await axios.get<UserNFTResponse>(
         `${CROSSFI_API_TESTNET}/token-holders?address=${userAddress}&tokenType=CFC-721&page=1&limit=1000&sort=-balance`
@@ -194,7 +194,7 @@ export function useUserOffersQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.offers],
+    queryKey: [queryKeys.user.offers, userAddress],
     queryFn: async () => {
       return {
         userOffers,
@@ -217,7 +217,7 @@ export function useUserAuctionsQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.auctions],
+    queryKey: [queryKeys.user.auctions, userAddress],
     queryFn: async () => {
       return {
         userAuctions,
@@ -240,7 +240,7 @@ export function useUserListingsQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.listings],
+    queryKey: [queryKeys.user.listings, userAddress],
     queryFn: async () => {
       return {
         userListings,
@@ -263,7 +263,7 @@ export function useUserBidsQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.listings],
+    queryKey: [queryKeys.user.listings, userAddress],
     queryFn: async () => {
       return {
         userBids,
@@ -290,7 +290,7 @@ export function useUserOffersReceivedQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.offersReceived],
+    queryKey: [queryKeys.user.offersReceived, userAddress],
     queryFn: async () => {
       // Group offers by tokenId and assetContract
       const groupedOffers = userOffersReceived?.reduce((acc, offer) => {
@@ -328,7 +328,7 @@ export function useUserExpiredListingsQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.expiredListings],
+    queryKey: [queryKeys.user.expiredListings, userAddress],
     queryFn: async () => {
       const response = await request<AllListingsQueryResponse>(
         indexerEndpoint,
@@ -366,7 +366,7 @@ export function useUserExpiredAuctionsQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.expiredAuctions],
+    queryKey: [queryKeys.user.expiredAuctions, userAddress],
     queryFn: async () => {
       const response = await request<AllAuctionsQueryResponse>(
         indexerEndpoint,
@@ -403,7 +403,7 @@ export function useUserExpiredOffersQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.expiredAuctions],
+    queryKey: [queryKeys.user.expiredAuctions, userAddress],
     queryFn: async () => {
       const response = await request<AllOffersQueryResponse>(
         indexerEndpoint,
@@ -441,7 +441,7 @@ export function useUserCollectionsQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.all],
+    queryKey: [queryKeys.user.all, userAddress],
     queryFn: async () => {
       const response = await axios.get(
         `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
@@ -512,7 +512,7 @@ export function useUserNFTActivitiesQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.nftActivities],
+    queryKey: [queryKeys.user.nftActivities, userAddress],
     queryFn: async () => {
       const response = await axios.get<NFTActivityResponse>(
         `${CROSSFI_API_TESTNET}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
@@ -571,7 +571,7 @@ export function useUserNFTContractQuery() {
   });
 
   return useQuery({
-    queryKey: [queryKeys.user.nftContracts],
+    queryKey: [queryKeys.user.nftContracts, userAddress],
     queryFn: async () => {
       const userDeployedContracts = await NFTFactoryContract.getUserNFT(
         userAddress

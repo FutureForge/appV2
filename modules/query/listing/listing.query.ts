@@ -61,7 +61,7 @@ export function useFilteredAllListingsQuery({
   address?: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.listing.filteredAll],
+    queryKey: [queryKeys.listing.filteredAll, contractAddress, address],
     queryFn: async () => {
       const response = await request<AllListingsQueryResponse>(
         indexerEndpoint,

@@ -335,42 +335,8 @@ export function useSingleCollectionQuery({
       contractAddress,
     });
 
-  // const totalListingVolume = newSaleListings?.reduce((acc, listing) => {
-  //   const price = parseFloat(decimalOffChain(listing.totalPricePaid) || "0");
-  //   return acc + price;
-  // }, 0);
-
-  // const totalAuctionVolume = auctionClosed?.reduce((acc, auction) => {
-  //   const price = parseFloat(decimalOffChain(auction.bidAmount) || "0");
-  //   return acc + price;
-  // }, 0);
-
-  // const totalVolume = (totalListingVolume ?? 0) + (totalAuctionVolume ?? 0);
-
-  // const formattedTotalVolume = to3DP(totalVolume || 0);
-
-  // const floorPrice = (() => {
-  //   let floor = Infinity;
-
-  //   // Check listing prices
-  //   for (const listing of allListings || []) {
-  //     const price = decimalOffChain(listing.pricePerToken) || "0";
-  //     const listingPrice = parseFloat(price);
-  //     floor = Math.min(floor, listingPrice);
-  //   }
-
-  //   // Check closed auction prices
-  //   for (const auction of allAuctions || []) {
-  //     const price = decimalOffChain(auction.minimumBidAmount) || "0";
-  //     const auctionPrice = parseFloat(price);
-  //     floor = Math.min(floor, auctionPrice);
-  //   }
-
-  //   return floor === Infinity ? 0 : floor;
-  // })();
-
   return useQuery({
-    queryKey: [queryKeys.collection.single],
+    queryKey: [queryKeys.collection.single, contractAddress],
     queryFn: async () => {
       const { floorPrice, formattedTotalVolume } =
         await getTotalVolumeAndFloorPrice({
@@ -521,7 +487,7 @@ export function useSingleCollectionQuery({
     //     !!isLoadingNewOffers ||
     //     !!isLoadingAllOffers ||
     //     !!isLoadingAcceptedOffers),
-    // refetchInterval: 5000,
+    refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
   });

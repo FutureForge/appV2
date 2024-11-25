@@ -441,7 +441,7 @@ export function ProfilePage() {
           />
           <div className="w-full items-center flex justify-end flex-wrap">
             {selectedFilter === filters[7] && (
-              <div className="flex items-center flex-wrap gap-4 whitespace-nowrap">
+              <div className="flex items-center flex-wrap gap-4 whitespace-nowrap text-sm">
                 {options.map((option) => (
                   <div
                     key={option}

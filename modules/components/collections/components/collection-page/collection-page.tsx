@@ -17,7 +17,7 @@ export function CollectionPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [mounted, setMounted] = useState(false);
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
   const fetchLimit = 50;
   const currentBatch = Math.ceil((currentPage * itemsPerPage) / fetchLimit);
 

@@ -134,6 +134,92 @@ const PricingDetailItem = ({
   );
 };
 
+const getPricingDetails = (
+  activeType: string,
+  listingInfo: Listing,
+  auctionInfo: Auction
+) => {
+  const details = [
+    {
+      id: "mainPrice",
+      icon: <XFI className="size-[18px]" />,
+      value: (() => {
+        switch (activeType) {
+          case "listing":
+            return decimalOffChain(listingInfo?.pricePerToken);
+          case "auction":
+            return decimalOffChain(auctionInfo?.minimumBidAmount);
+          case "expired":
+            return listingInfo
+              ? decimalOffChain(listingInfo?.pricePerToken)
+              : decimalOffChain(auctionInfo?.minimumBidAmount);
+          case "pending-payout":
+            return decimalOffChain(auctionInfo?.minimumBidAmount);
+          default:
+            return "0";
+        }
+      })(),
+      label:
+        activeType === "listing" ||
+        (activeType === "expired" && listingInfo !== null)
+          ? "Listing Price"
+          : "Minimum Bid Amount",
+      show: true,
+    },
+    {
+      id: "buyoutPrice",
+      icon: <XFI className="size-[18px]" />,
+      value: (() => {
+        switch (activeType) {
+          case "auction":
+            return decimalOffChain(auctionInfo?.buyoutBidAmount);
+          case "expired":
+            return auctionInfo
+              ? decimalOffChain(auctionInfo?.buyoutBidAmount)
+              : "0";
+          case "pending-payout":
+            return decimalOffChain(auctionInfo?.buyoutBidAmount);
+          default:
+            return "0";
+        }
+      })(),
+      label: "Buyout Price",
+      show:
+        activeType === "auction" ||
+        activeType === "pending-payout" ||
+        (activeType === "expired" && auctionInfo),
+    },
+    {
+      id: "startTime",
+      icon: null,
+      value: formatBlockchainTimestamp(
+        listingInfo?.startTimestamp || auctionInfo?.startTimestamp
+      ),
+      label:
+        activeType === "listing" ||
+        (activeType === "expired" && listingInfo !== null)
+          ? "Available From"
+          : "Starts From",
+      show: true,
+    },
+    {
+      id: "endTime",
+      icon: null,
+      value: formatBlockchainTimestamp(
+        listingInfo?.endTimestamp || auctionInfo?.endTimestamp
+      ),
+      label:
+        activeType === "listing" ||
+        (activeType === "expired" && listingInfo !== null)
+          ? "Expires On"
+          : "Ends On",
+      show: true,
+    },
+  ];
+
+  return details;
+};
+
 export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
@@ -366,63 +452,16 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 <div className="grid grid-cols-2 gap-5">
                   {selectedFilter !== singleNFTFilters[0] && (
                     <>
-                      {/* Price Details */}
-                      <PricingDetailItem
-                        value={
-                          activeType === "listing"
-                            ? decimalOffChain(listingInfo?.pricePerToken)!
-                            : decimalOffChain(auctionInfo?.minimumBidAmount)!
-                        }
-                        label={
-                          activeType === "listing"
-                            ? "Listing Price"
-                            : "Minimum Bid Amount"
-                        }
-                      />
-
-                      {/* Buyout Price (Auction only) */}
-                      {activeType === "auction" && (
-                        <PricingDetailItem
-                          value={decimalOffChain(auctionInfo?.buyoutBidAmount)!}
-                          label="Buyout Price"
-                        />
-                      )}
-
-                      {/* Start Time */}
-                      <PricingDetailItem
-                        icon={null}
-                        value={
-                          activeType === "listing"
-                            ? formatBlockchainTimestamp(
-                                listingInfo?.startTimestamp
-                              )
-                            : formatBlockchainTimestamp(
-                                auctionInfo?.startTimestamp
-                              )
-                        }
-                        label={
-                          activeType === "listing"
-                            ? "Available From"
-                            : "Starts From"
-                        }
-                      />
-
-                      {/* End Time */}
-                      <PricingDetailItem
-                        icon={null}
-                        value={
-                          activeType === "listing"
-                            ? formatBlockchainTimestamp(
-                                listingInfo?.endTimestamp
-                              )
-                            : formatBlockchainTimestamp(
-                                auctionInfo?.endTimestamp
-                              )
-                        }
-                        label={
-                          activeType === "listing" ? "Expires On" : "Ends On"
-                        }
-                      />
+                      {getPricingDetails(activeType!, listingInfo, auctionInfo)
+                        .filter((detail) => detail.show)
+                        .map((detail) => (
+                          <PricingDetailItem
+                            key={detail.id}
+                            icon={detail.icon}
+                            value={detail.value!}
+                            label={detail.label}
+                          />
+                        ))}
                     </>
                   )}
 
@@ -617,13 +656,46 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   </Button>
                 )}
 
-              {/* listing expired for non-owner */}
+              {/* cancel listing/auction section for owner EXPIRED  */}
+              {selectedFilter === singleNFTFilters[3] && isOwner && (
+                <Button
+                  disabled={isDisabled}
+                  shape="square"
+                  className="w-full"
+                  variant="error"
+                  onClick={() => {
+                    if (listingInfo !== null) {
+                      handleCancelListing();
+                    }
+
+                    if (auctionInfo !== null) {
+                      handleCancelAuction();
+                    }
+                  }}
+                >
+                  Cancel Expired {listingInfo !== null ? "Listing" : "Auction"}
+                </Button>
+              )}
+
+              {/* Listing expired for non-owner */}
               {selectedFilter === singleNFTFilters[3] &&
                 !isOwner &&
-                listingInfo !== undefined &&
-                nftData?.isActiveTypeExpired && (
+                listingInfo !== null &&
+                auctionInfo === null && (
                   <Button disabled={true} shape="square" className="w-full">
                     Listing Expired
+                  </Button>
+                )}
+
+              {/* Auction expired for non-owner */}
+              {(selectedFilter === singleNFTFilters[4] ||
+                selectedFilter === singleNFTFilters[3]) &&
+                !isOwner &&
+                !isAuctionPayoutCollector &&
+                !isWinningBidder &&
+                auctionInfo !== null && (
+                  <Button disabled={true} shape="square" className="w-full">
+                    Auction Expired
                   </Button>
                 )}
 
@@ -648,17 +720,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                 (isAuctionPendingPayout || isAuctionExpired) && (
                   <Button disabled={true} shape="square" className="w-full">
                     Waiting for Winning Bidder to Claim
-                  </Button>
-                )}
-
-              {/* auction expired for non-owner */}
-              {(selectedFilter === singleNFTFilters[4] ||
-                selectedFilter === singleNFTFilters[3]) &&
-                !isOwner &&
-                !isAuctionPayoutCollector &&
-                !isWinningBidder && (
-                  <Button disabled={true} shape="square" className="w-full">
-                    Auction Expired
                   </Button>
                 )}
 

@@ -50,7 +50,10 @@ export function useSingleNFTQuery({
   contractAddress: string;
   tokenId: string;
 }) {
-  const { data: collectionWithoutNFTs } = useSingleCollectionWithoutNFTsQuery({
+  const {
+    data: collectionWithoutNFTs,
+    isLoading: isLoadingCollectionWithoutNFTs,
+  } = useSingleCollectionWithoutNFTsQuery({
     contractAddress,
   });
 
@@ -132,15 +135,22 @@ export function useSingleNFTQuery({
           updatedNFT = nft;
         }
 
-        const updatedNFTAuctionList = {
-          ...nftAuctionList,
-          nft,
-        };
+        let updatedNFTAuctionList = null;
+        let updatedNFTListingList = null;
 
-        const updatedNFTListingList = {
-          ...nftListingList,
-          nft,
-        };
+        if (nftAuctionList) {
+          updatedNFTAuctionList = {
+            ...nftAuctionList,
+            nft,
+          };
+        }
+
+        if (nftListingList) {
+          updatedNFTListingList = {
+            ...nftListingList,
+            nft,
+          };
+        }
 
         let isAuctionExpired;
         let winningBidBody;
@@ -215,7 +225,11 @@ export function useSingleNFTQuery({
         console.log("single nft error", { error });
       }
     },
-    enabled: !!contractAddress && !!tokenId && !isLoadingOffers,
+    enabled:
+      !!contractAddress &&
+      !!tokenId &&
+      !isLoadingOffers &&
+      !isLoadingCollectionWithoutNFTs,
     refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
