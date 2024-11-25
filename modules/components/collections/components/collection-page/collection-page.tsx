@@ -10,8 +10,7 @@ import { Collection } from "@/utils/types/collection/collection.type";
 import { useRouter } from "next/navigation";
 import { CollectionsNFTCard } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { motion } from "framer-motion";
-import Caret from "@/assets/arrow-left-s-line.svg";
-import { cn } from "@/modules/app/utils";
+import { Pagination } from "@/modules/app/component/pagination";
 
 export function CollectionPage() {
   const [isActive, setIsActive] = useState(false);
@@ -59,7 +58,6 @@ export function CollectionPage() {
   const totalCount =
     filteredCollections?.length || CollectionQuery?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const handlePageChange = (pageNum: number) => {
     setCurrentPage(pageNum);
@@ -133,62 +131,11 @@ export function CollectionPage() {
           )}
         </motion.div>
       )}
-      {/* Add pagination controls */}
-      <div className="flex items-center justify-between w-full">
-        <button
-          title="previous-page"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className={cn(
-            "w-8 h-[30px] rounded-lg text-sm flex items-center justify-center bg-transparent hover:bg-tertiary",
-            {
-              "cursor-not-allowed hover:bg-transparent": currentPage === 1,
-            }
-          )}
-        >
-          <Caret />
-        </button>
-        <div className="flex justify-center gap-4 mt-4 mb-8">
-          {pageNumbers.map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => handlePageChange(pageNum)}
-              className={`w-8 h-[30px] rounded-lg text-sm  transition duration-300 ease-in-out ${
-                currentPage === pageNum
-                  ? "bg-primary text-white"
-                  : "bg-transparent border border-border text-muted-foreground hover:bg-tertiary"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
-          {totalPages > 5 && currentPage < totalPages - 2 && (
-            <>
-              <span className="text-muted-foreground">...</span>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                className="w-8 h-[30px] rounded-lg bg-transparent border border-border text-muted-foreground hover:bg-tertiary transition duration-300 ease-in-out"
-              >
-                {totalPages}
-              </button>
-            </>
-          )}
-        </div>
-        <button
-          title="next-page"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className={cn(
-            "w-8 h-[30px] rounded-lg text-sm flex items-center justify-center bg-transparent hover:bg-tertiary",
-            {
-              "cursor-not-allowed hover:bg-transparent":
-                currentPage === totalPages,
-            }
-          )}
-        >
-          <Caret className="rotate-180" />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }
