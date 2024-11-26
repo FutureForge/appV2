@@ -296,27 +296,25 @@ export function BrowsePage() {
                     data={currentPageData as Listing[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((listing, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={listing}
-                            type="listing"
-                            cta="View Item"
-                            extraCTA="Buy Now"
-                            status="listed"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: listing.assetContract,
-                                tokenId: listing.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((listing, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="listing"
+                          cta="View Item"
+                          extraCTA="Buy Now"
+                          status="listed"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -350,27 +348,25 @@ export function BrowsePage() {
                     data={currentPageData as Auction[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((auction, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={auction}
-                            type="auction"
-                            cta="View Item"
-                            extraCTA="Buy Auction"
-                            status="auctioned"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: auction.assetContract,
-                                tokenId: auction.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((auction, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="auction"
+                          cta="View Item"
+                          extraCTA="Buy Auction"
+                          status="auctioned"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -404,27 +400,25 @@ export function BrowsePage() {
                     data={currentPageData as Listing[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((listing, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={listing}
-                            type="new-listing"
-                            cta="View Item"
-                            extraCTA="Buy Now"
-                            status="listed"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: listing.assetContract,
-                                tokenId: listing.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((listing, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="new-listing"
+                          cta="View Item"
+                          extraCTA="Buy Now"
+                          status="listed"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -458,25 +452,23 @@ export function BrowsePage() {
                     data={currentPageData as NewSaleListing[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((listing, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={listing}
-                            type="new-sale-listing"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: listing.assetContract,
-                                tokenId: listing.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((listing, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={listing}
+                          type="new-sale-listing"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: listing.assetContract,
+                              tokenId: listing.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -510,27 +502,25 @@ export function BrowsePage() {
                     data={currentPageData as Auction[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((auction, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={auction}
-                            type="new-auction"
-                            cta="View Item"
-                            extraCTA="Buy Auction"
-                            status="auctioned"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: auction.assetContract,
-                                tokenId: auction.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((auction, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="new-auction"
+                          cta="View Item"
+                          extraCTA="Buy Auction"
+                          status="auctioned"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -564,25 +554,23 @@ export function BrowsePage() {
                     data={currentPageData as AuctionClosed[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((auction, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={auction}
-                            type="new-sold-auction"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: auction.assetContract,
-                                tokenId: auction.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((auction, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={auction}
+                          type="new-sold-auction"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auction.assetContract,
+                              tokenId: auction.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
@@ -616,25 +604,23 @@ export function BrowsePage() {
                     data={currentPageData as NewBid[]}
                   />
                 ) : (
-                  <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5 mb-8">
-                    <div className="flex max-sm:items-center max-sm:flex-col gap-6 max-sm:justify-center">
-                      {currentPageData?.map((bid, index) => {
-                        return (
-                          <NFTCard
-                            key={index}
-                            data={bid}
-                            type="bids"
-                            cta="View Item"
-                            onClick={() => {
-                              handleViewItem({
-                                contractAddress: bid.assetContract,
-                                tokenId: bid.nft.tokenId,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((bid, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={bid}
+                          type="bids"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: bid.assetContract,
+                              tokenId: bid.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
                 <div className="mt-8">
