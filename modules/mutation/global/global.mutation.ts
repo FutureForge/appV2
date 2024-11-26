@@ -2,12 +2,7 @@ import {
   getSetApprovalForAll,
   getSetApprovalForTokenId,
 } from "@/modules/blockchain/global/global.blockchain";
-import {
-  useCheckApprovedForAllQuery,
-  useCheckApprovedForTokenIdQuery,
-  useUserChainInfo,
-} from "@/modules/query";
-import { queryKeys } from "@/modules/query/query-keys";
+import { useUserChainInfo } from "@/modules/query";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import {
   ApprovalSettingEnum,
@@ -48,7 +43,7 @@ export function useApprovedForAllMutation() {
     onSuccess: (_, { collectionContractAddress }) => {
       queryClient.invalidateQueries({
         queryKey: [
-          "approval",
+          "approval-all",
           collectionContractAddress,
           activeAccount?.address,
         ],
@@ -57,6 +52,7 @@ export function useApprovedForAllMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.APPROVAL_SUCCESS,
       },
@@ -102,7 +98,7 @@ export function useApprovedForTokenIdMutation() {
     onSuccess: (_, { collectionContractAddress }) => {
       queryClient.invalidateQueries({
         queryKey: [
-          "approval",
+          "approval-token-id",
           collectionContractAddress,
           activeAccount?.address,
         ],
@@ -111,6 +107,7 @@ export function useApprovedForTokenIdMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.APPROVAL_SUCCESS,
       },
@@ -171,6 +168,7 @@ export function useApprovalMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.APPROVAL_SUCCESS,
       },

@@ -53,10 +53,14 @@ export function QueryProvider({ children }: QueryProviderProps) {
               throw new Error("Please switch to the correct network");
             }
 
-            toast.loading("Transaction In Process...", {
-              id: mutation?.mutationId,
-              duration: Infinity,
-            });
+            const showLoading = mutation?.meta?.showLoading;
+
+            if (showLoading) {
+              toast.loading("Transaction In Process...", {
+                id: mutation?.mutationId,
+                duration: Infinity,
+              });
+            }
           },
           onSuccess: (_data, _variables, _context, mutation) => {
             // console.log('query provider success', _data, _variables, _context, mutation)

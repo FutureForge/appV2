@@ -44,6 +44,7 @@ export function useIncreaseAllowanceMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.APPROVAL_SUCCESS,
       },
@@ -95,6 +96,7 @@ export function useConvertXFIToWXFIMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.CONVERT_XFI_TO_WXFI_SUCCESS,
       },

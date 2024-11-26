@@ -9,6 +9,7 @@ import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
 import {
   useCheckApprovalStatusQuery,
+  useCheckApprovedForTokenIdQuery,
   useSingleNFTQuery,
   useUserChainInfo,
 } from "@/modules/query";

@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUserChainInfo } from "..";
-import { getCheckApprovedForAll, getCheckApprovedPerTokenId } from "@/modules/blockchain/global/global.blockchain";
+import {
+  getCheckApprovedForAll,
+  getCheckApprovedPerTokenId,
+} from "@/modules/blockchain/global/global.blockchain";
 import { getContractEthers } from "@/modules/blockchain";
 import { NFT_FACTORY_ADDRESS } from "@/utils/configs";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
@@ -13,7 +16,11 @@ export function useCheckApprovedForAllQuery({
   const { activeAccount } = useUserChainInfo();
 
   return useQuery({
-    queryKey: ["approval", collectionContractAddress, activeAccount?.address],
+    queryKey: [
+      "approval-all",
+      collectionContractAddress,
+      activeAccount?.address,
+    ],
     queryFn: async () => {
       if (!activeAccount?.address) return false;
 
@@ -25,7 +32,7 @@ export function useCheckApprovedForAllQuery({
       return isApproved;
     },
     enabled: !!activeAccount && !!collectionContractAddress,
-    refetchInterval: 60000,
+    refetchInterval: 5000,
   });
 }
 
@@ -39,7 +46,11 @@ export function useCheckApprovedForTokenIdQuery({
   const { activeAccount } = useUserChainInfo();
 
   return useQuery({
-    queryKey: ["approval", collectionContractAddress, activeAccount?.address],
+    queryKey: [
+      "approval-token-id",
+      collectionContractAddress,
+      activeAccount?.address,
+    ],
     queryFn: async () => {
       if (!activeAccount?.address) return false;
 
@@ -51,7 +62,7 @@ export function useCheckApprovedForTokenIdQuery({
       return isApproved;
     },
     enabled: !!activeAccount && !!collectionContractAddress && !!tokenId,
-    refetchInterval: 60000,
+    refetchInterval: 5000,
   });
 }
 
@@ -105,4 +116,3 @@ export function useCreationFeeQuery() {
     },
   });
 }
-
