@@ -32,7 +32,7 @@ type IconProps = ComponentPropsWithoutRef<typeof RadixSelect.Icon>;
 export const Icon = forwardRef<IconElement, IconProps>((props, ref) => {
   return (
     <RadixSelect.Icon {...props} ref={ref}>
-      <ChevronDownIcon className="rotate-90"/>
+      <ChevronDownIcon className="rotate-[270deg]"/>
     </RadixSelect.Icon>
   );
 });

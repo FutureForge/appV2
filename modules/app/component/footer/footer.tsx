@@ -63,10 +63,10 @@ export function Footer() {
   };
   return (
     <div className="w-full py-20 flex items-center justify-between px-6">
-      <div className="w-full mx-auto flex items-start justify-between">
-        <div className="flex flex-col gap-6">
+      <div className="w-full mx-auto flex items-start justify-between max-md:flex-col gap-12 ">
+        <div className="flex flex-col gap-6 max-md:w-full">
           <h4 className="font-medium text-2xl">Stay in the loop</h4>
-          <div className="bg-tertiary flex rounded-xl focus-within:border-border focus-within:border py-3 px-4 w-[400px]">
+          <div className="bg-tertiary flex rounded-xl focus-within:border-border focus-within:border py-3 px-4 w-full md:w-[400px]">
             <input
               onChange={handleChange}
               value={email}

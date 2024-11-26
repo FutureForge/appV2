@@ -29,7 +29,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
         {children}
         <Toast />
       </div>
-      {/* {pathname !== "/create" && pathname !== "/add_collections" && <Footer />} */}
+      {pathname !== "/create" && pathname !== "/add_collections" && <Footer />}
     </div>
   );
 };
