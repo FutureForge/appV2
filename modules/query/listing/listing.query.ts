@@ -72,15 +72,16 @@ export function useFilteredAllListingsQuery({
         }
       );
 
-      const updatedListings = response.allListings.filter((listing) => {
-        const { endTimestamp } = listing;
-        const endTime = formatBlockchainTimestamp(endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+      const updatedListings =
+        response.allListings.filter((listing) => {
+          const { endTimestamp } = listing;
+          const endTime = formatBlockchainTimestamp(endTimestamp);
+          const endTimeFormatted = new Date(endTime).getTime();
+          const currentTime = new Date().getTime();
 
-        // looking for active listings
-        return endTimeFormatted > currentTime;
-      });
+          // looking for active listings
+          return endTimeFormatted > currentTime;
+        }) || [];
 
       return updatedListings;
     },

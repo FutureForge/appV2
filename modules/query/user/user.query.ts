@@ -103,9 +103,15 @@ export function useUserNFTsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: userListedNFTs } = useFilteredAllListingsQuery({
-    address: userAddress?.toLowerCase() || "",
-  });
+  const { data: userListedNFTs, isLoading: isUserListingsLoading } =
+    useFilteredAllListingsQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
+
+  const { data: userListedAuctions, isLoading: isUserAuctionsLoading } =
+    useFilteredAllAuctionsQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
 
   return useQuery({
     queryKey: [queryKeys.user.nfts, userAddress],
@@ -176,9 +182,19 @@ export function useUserNFTsQuery() {
         );
       });
 
-      return userNFTsNotListed;
+      const userNFTsNotAuctioned = userNFTsNotListed?.filter(
+        (nft: any) =>
+          !userListedAuctions?.some(
+            (auction: Auction) =>
+              auction.assetContract.toLowerCase() ===
+                nft.contractAddress.toLowerCase() &&
+              auction.tokenId.toString() === nft.tokenId
+          )
+      );
+
+      return userNFTsNotAuctioned;
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isUserListingsLoading && !isUserAuctionsLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -189,9 +205,10 @@ export function useUserOffersQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: userOffers } = useFilteredAllOffersQuery({
-    address: userAddress?.toLowerCase() || "",
-  });
+  const { data: userOffers, isLoading: isUserOffersLoading } =
+    useFilteredAllOffersQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
 
   return useQuery({
     queryKey: [queryKeys.user.offers, userAddress],
@@ -201,7 +218,7 @@ export function useUserOffersQuery() {
         offerLength: userOffers?.length,
       };
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isUserOffersLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -212,9 +229,10 @@ export function useUserAuctionsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: userAuctions } = useFilteredAllAuctionsQuery({
-    address: userAddress?.toLowerCase() || "",
-  });
+  const { data: userAuctions, isLoading: isUserAuctionsLoading } =
+    useFilteredAllAuctionsQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
 
   return useQuery({
     queryKey: [queryKeys.user.auctions, userAddress],
@@ -224,7 +242,7 @@ export function useUserAuctionsQuery() {
         auctionLength: userAuctions?.length,
       };
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isUserAuctionsLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -235,9 +253,11 @@ export function useUserListingsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: userListings } = useFilteredAllListingsQuery({
-    address: userAddress?.toLowerCase() || "",
-  });
+  const { data: userListings, isLoading: isUserListingsLoading } =
+    useFilteredAllListingsQuery({
+      address: userAddress?.toLowerCase() || "",
+      // address: "0x0026ccfcb61acb9f8da5f60028efc708c0f64c1f",
+    });
 
   return useQuery({
     queryKey: [queryKeys.user.listings, userAddress],
@@ -247,7 +267,7 @@ export function useUserListingsQuery() {
         userListingsLength: userListings?.length,
       };
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isUserListingsLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -258,19 +278,20 @@ export function useUserBidsQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: userBids } = useFilteredUserNewBidsQuery({
-    address: userAddress?.toLowerCase() || "",
-  });
+  const { data: userBids, isLoading: isUserBidsLoading } =
+    useFilteredUserNewBidsQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
 
   return useQuery({
-    queryKey: [queryKeys.user.listings, userAddress],
+    queryKey: [queryKeys.user.bids, userAddress],
     queryFn: async () => {
       return {
         userBids,
         userBidsLength: userBids?.length,
       };
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isUserBidsLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -281,7 +302,9 @@ export function useUserOffersReceivedQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const { data: allOffers } = useAllOffersQuery({});
+  const { data: allOffers, isLoading: isAllOffersLoading } = useAllOffersQuery(
+    {}
+  );
 
   // First filter offers received by the user
   const userOffersReceived = allOffers?.filter((offer) => {
@@ -316,7 +339,7 @@ export function useUserOffersReceivedQuery() {
         userOffersReceivedLength: highestOffers?.length,
       };
     },
-    enabled: !!userAddress,
+    enabled: !!userAddress && !isAllOffersLoading,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,

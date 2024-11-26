@@ -63,7 +63,7 @@ export function useSingleNFTQuery({
   });
 
   return useQuery({
-    queryKey: [queryKeys.nft.single, tokenId],
+    queryKey: [queryKeys.nft.single, tokenId, contractAddress],
     queryFn: async () => {
       try {
         const [
