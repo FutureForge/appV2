@@ -348,15 +348,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   }, [listingPricingData, auctionPricingData]);
 
   return (
-    <div className="flex gap-6 pt-14 max-[910px]:flex-col">
+    <div className="flex gap-6 pt-14 max-[910px]:flex-col items-stretch">
       {isNFTDataLoading || isNFTDataPending || isError ? (
         <>
           <DetailsSkeleton />
         </>
       ) : (
-        <>
+        <div className="flex items-stretch h-full gap-6">
           {/* image section */}
-          <div className="w-[40%] max-[910px]:w-full flex flex-col gap-6">
+          <div className="w-[40%] max-[910px]:w-full flex flex-col gap-6 h-full">
             {collectionDetails && (
               <div className="w-full bg-tertiary p-4 rounded-xl flex items-center justify-between">
                 <span>
@@ -388,7 +388,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
           </div>
 
           {/* details section */}
-          <div className="flex-1 max-[1200px]:w-[55%] max-[910px]:w-full flex flex-col gap-6 h-full">
+          <div className="flex-1 max-[1200px]:w-[55%] max-[910px]:w-full flex flex-col gap-6 min-h-full">
             {/** name section */}
             <div className="flex w-full items-center justify-between">
               <span>
@@ -505,7 +505,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
             </div>
 
             {/** actions section */}
-            <div className="w-full flex items-center gap-3">
+            <div className="w-full flex items-center gap-3 mt-auto">
               {/** make offer section for non-owner*/}
               {selectedFilter === singleNFTFilters[0] && !isOwner && (
                 <DialogRoot
@@ -769,7 +769,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

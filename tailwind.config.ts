@@ -31,6 +31,7 @@ const config: Config = {
         tertiary: "#181825",
         error: "#F62B54",
         success: "#57B799",
+        'pry-text': "#5041F0",
         "table-hover": "#1C1C25",
         "new-muted": {
           bg: "#1C1C2A",
