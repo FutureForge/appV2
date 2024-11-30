@@ -39,6 +39,7 @@ export function CustomSlider({
     slidesToShow: 4,
     slidesToScroll: 1,
     cssEase: "linear",
+    draggable: true,
     responsive: [
       {
         breakpoint: 1200,

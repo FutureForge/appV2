@@ -95,9 +95,9 @@ export function MakeOfferDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex gap-6 items-stretch max-[440px]:flex-col h-[76vh] max-[440px]:h-full">
+        <div className="flex gap-6 items-stretch max-[440px]:flex-col max-h-[76vh] h-full max-[440px]:h-full">
           <div className="relative h-full w-1/2 max-[440px]:w-full">
-            <div className="w-full relative h-full border-2 border-border z-40 rounded-2xl">
+            <div className="w-full relative h-[500px] border-2 border-border z-40 rounded-2xl">
               <MediaRenderer
                 src={src}
                 client={client}
