@@ -19,11 +19,13 @@ import {
   useUserNFTsQuery,
   useUserOffersQuery,
   useUserOffersReceivedQuery,
+  useUserPendingPayoutQuery,
 } from "@/modules/query";
 import {
   useCancelAuctionMutation,
   useCancelDirectListingMutation,
   useCancelOfferMutation,
+  useCollectAuctionPayoutMutation,
 } from "@/modules/mutation";
 import {
   Checkbox,
@@ -64,6 +66,7 @@ const filters = [
   "NFT Activities",
   "Expired",
   "Collections",
+  "Pending Payout",
 ];
 
 const options = [
@@ -82,6 +85,7 @@ export function ProfilePage() {
   const cancelListingMutation = useCancelDirectListingMutation();
   const cancelAuctionMutation = useCancelAuctionMutation();
   const cancelOfferMutation = useCancelOfferMutation();
+  const collectAuctionPayoutMutation = useCollectAuctionPayoutMutation();
 
   const [mounted, setMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -113,6 +117,11 @@ export function ProfilePage() {
     isLoading: isUserAuctionsLoading,
     isPending: isUserAuctionsPending,
   } = useUserAuctionsQuery();
+  const {
+    data: userPendingPayout,
+    isLoading: isUserPendingPayoutLoading,
+    isPending: isUserPendingPayoutPending,
+  } = useUserPendingPayoutQuery();
   const {
     data: userOffers,
     isLoading: isUserOffersLoading,
@@ -190,6 +199,14 @@ export function ProfilePage() {
     cancelAuctionMutation.mutate({ auctionId });
   };
 
+  const handleCollectAuctionPayout = ({ auctionId }: { auctionId: string }) => {
+    if (!auctionId) return;
+
+    collectAuctionPayoutMutation.mutate({
+      auctionId,
+    });
+  };
+
   const handleCancelOffer = ({ offerId }: { offerId: string }) => {
     if (!offerId) return;
 
@@ -200,6 +217,20 @@ export function ProfilePage() {
     cancelListingMutation.isPending ||
     cancelAuctionMutation.isPending ||
     cancelOfferMutation.isPending;
+
+  const isLoading =
+    isUserNFTsLoading ||
+    isUserListingsLoading ||
+    isUserAuctionsLoading ||
+    isUserOffersLoading ||
+    isUserOffersReceivedLoading ||
+    isUserBidsLoading ||
+    isUserExpiredListingsLoading ||
+    isUserExpiredAuctionsLoading ||
+    isUserExpiredOffersLoading ||
+    isUserCollectionsLoading ||
+    isUserPendingPayoutLoading ||
+    isUserNFTActivitiesLoading;
 
   const getFilteredData = () => {
     switch (selectedFilter) {
@@ -332,6 +363,27 @@ export function ProfilePage() {
         });
         return filteredBids;
 
+      case filters[9]:
+        const filteredPendingPayout =
+          userPendingPayout?.userPendingPayout?.filter((auction) => {
+            const searchTerm = searchQuery
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "");
+
+            const nameNoSpace = auction?.nft?.metadata?.name
+              .toLowerCase()
+              .replace(/\s+/g, "");
+            const tokenIdNoSpace = auction.tokenId
+              .toString()
+              .toLowerCase()
+              .replace(/\s+/g, "");
+            const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+            return combinedField.includes(searchTerm);
+          });
+        return filteredPendingPayout;
+
       default:
         return [];
     }
@@ -437,7 +489,7 @@ export function ProfilePage() {
             onFilterClick={handleFilterClick}
             filters={filters}
             showRightSide={false}
-            disabled={!userAddress}
+            disabled={!userAddress || isLoading}
           />
           <div className="w-full items-center flex justify-end flex-wrap">
             {selectedFilter === filters[7] && (
@@ -619,6 +671,65 @@ export function ProfilePage() {
                         searchQuery.length > 0
                           ? "No NFTs found"
                           : "No NFT Auctioned"
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Pending Payout NFTS */}
+            {selectedFilter === filters[9] && (
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
+                {isUserPendingPayoutLoading || isUserPendingPayoutPending ? (
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
+                  <>
+                    {paginatedData?.map((auction, index) => {
+                      const data = auction as Auction;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-auction"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          actionCTA="Collect Payout"
+                          actionOnClick={() => {
+                            handleCollectAuctionPayout({
+                              auctionId: data.auctionId,
+                            });
+                          }}
+                          isDisabled={isDisabled}
+                        />
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Pending Payout"
                       }
                     />
                   </div>

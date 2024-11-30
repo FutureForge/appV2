@@ -113,6 +113,8 @@ export function useMakeListingOfferMutation() {
           queryKeys.nft.single,
           queryKeys.user.listings,
           queryKeys.offers.all,
+          queryKeys.offers.new,
+          queryKeys.offers.single,
         ],
       });
     },
@@ -160,6 +162,8 @@ export function useAcceptOfferMutation() {
           queryKeys.nft.single,
           queryKeys.user.listings,
           queryKeys.offers.all,
+          queryKeys.offers.new,
+          queryKeys.offers.single,
         ],
       });
     },
@@ -207,6 +211,8 @@ export function useCancelOfferMutation() {
           queryKeys.nft.single,
           queryKeys.user.listings,
           queryKeys.offers.all,
+          queryKeys.offers.new,
+          queryKeys.offers.single,
         ],
       });
     },
@@ -311,6 +317,7 @@ export function useCollectAuctionPayoutMutation() {
           queryKeys.user.listings,
           queryKeys.offers.all,
           queryKeys.auction.filteredAll,
+          queryKeys.user.pendingPayout,
         ],
       });
     },

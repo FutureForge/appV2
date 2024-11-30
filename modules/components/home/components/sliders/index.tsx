@@ -310,8 +310,6 @@ export function Sliders() {
 //   }
 // };
 
-
-
 type DataSliderProps = {
   title: string;
   cta: string;
@@ -319,7 +317,7 @@ type DataSliderProps = {
   isLoading: boolean;
   data: any[];
   renderItem: (item: any) => React.ReactNode;
-}
+};
 
 export const DataSlider: React.FC<DataSliderProps> = ({
   title,
@@ -329,8 +327,8 @@ export const DataSlider: React.FC<DataSliderProps> = ({
   data,
   renderItem,
 }) => {
-  const {width} = useWindowSize();
-  const isMobile = width && width <= 550
+  const { width } = useWindowSize();
+  const isMobile = width && width <= 550;
 
   if (data.length === 0) {
     return (
@@ -368,8 +366,6 @@ export const DataSlider: React.FC<DataSliderProps> = ({
     </CustomSlider>
   );
 };
-
-
 
 // type DataSliderProps = {
 //   title: string;

@@ -1,4 +1,5 @@
 "use client";
+
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
@@ -21,7 +22,7 @@ export function makeRecentlySoldAuctionColumns() {
       </div>
     ),
     cell: ({ row, getValue }) => {
-      const { name, image } = row.original.nft.metadata;
+      const { name, image } = row.original.nft?.metadata || {};
 
       return (
         <div className="flex items-center gap-3 w-full">

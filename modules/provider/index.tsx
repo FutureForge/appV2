@@ -17,7 +17,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
   const toast = useToast();
   const [isChainSupported, setIsChainSupported] = useState(false);
 
-  const { activeWallet } = useUserChainInfo();
+  const { activeAccount, activeWallet } = useUserChainInfo();
   const { setBackgroundImage, backgroundImage } = useUserImageStore();
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
 
             const showLoading = mutation?.meta?.showLoading;
 
-            if (showLoading) {
+            if (showLoading || showLoading === undefined) {
               toast.loading("Transaction In Process...", {
                 id: mutation?.mutationId,
                 duration: Infinity,
@@ -104,7 +104,7 @@ export function QueryProvider({ children }: QueryProviderProps) {
           },
         }),
       }),
-    [isChainSupported]
+    [isChainSupported, activeWallet, activeAccount]
   );
 
   return (

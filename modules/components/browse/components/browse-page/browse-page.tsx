@@ -100,7 +100,7 @@ export function BrowsePage() {
   };
 
   const handleFilterClick = (filter: string) => {
-    setSelectedFilter(filter);
+    if (filter) setSelectedFilter(filter);
   };
 
   const getFilteredData = () => {
@@ -112,12 +112,12 @@ export function BrowsePage() {
               .toLowerCase()
               .trim()
               .replace(/\s+/g, "");
-            const nameNoSpace = listing.nft.metadata.name
-              .toLowerCase()
-              .replace(/\s+/g, "");
-            const tokenIdNoSpace = listing.nft.tokenId
-              .toLowerCase()
-              .replace(/\s+/g, "");
+            const nameNoSpace = listing?.nft?.metadata?.name
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
+            const tokenIdNoSpace = listing?.nft?.tokenId
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
             const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
             return combinedField.includes(searchTerm);
@@ -132,12 +132,12 @@ export function BrowsePage() {
               .toLowerCase()
               .trim()
               .replace(/\s+/g, "");
-            const nameNoSpace = auction.nft.metadata.name
-              .toLowerCase()
-              .replace(/\s+/g, "");
+            const nameNoSpace = auction?.nft?.metadata?.name
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
             const tokenIdNoSpace = auction.nft.tokenId
-              .toLowerCase()
-              .replace(/\s+/g, "");
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
             const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
             return combinedField.includes(searchTerm);
@@ -152,12 +152,12 @@ export function BrowsePage() {
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = listing.nft.metadata.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
+          const nameNoSpace = listing?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const tokenIdNoSpace = listing.nft.tokenId
-            .toLowerCase()
-            .replace(/\s+/g, "");
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
           return combinedField.includes(searchTerm);
@@ -172,12 +172,12 @@ export function BrowsePage() {
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = listing.nft.metadata.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
+          const nameNoSpace = listing?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const tokenIdNoSpace = listing.nft.tokenId
-            .toLowerCase()
-            .replace(/\s+/g, "");
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
           return combinedField.includes(searchTerm);
@@ -192,12 +192,12 @@ export function BrowsePage() {
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = auction.nft.metadata.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
-          const tokenIdNoSpace = auction.nft.tokenId
-            .toLowerCase()
-            .replace(/\s+/g, "");
+          const nameNoSpace = auction?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const tokenIdNoSpace = auction?.nft?.tokenId
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
           return combinedField.includes(searchTerm);
@@ -212,11 +212,11 @@ export function BrowsePage() {
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = auction.nft.metadata.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
-          const tokenIdNoSpace = auction.nft.tokenId
-            .toLowerCase()
+          const nameNoSpace = auction?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const tokenIdNoSpace = auction?.nft?.tokenId
+            ?.toLowerCase()
             .replace(/\s+/g, "");
           const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
@@ -232,12 +232,12 @@ export function BrowsePage() {
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = bid.nft.metadata.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
+          const nameNoSpace = bid?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const tokenIdNoSpace = bid.nft.tokenId
-            .toLowerCase()
-            .replace(/\s+/g, "");
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
           const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
           return combinedField.includes(searchTerm);

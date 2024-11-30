@@ -3,7 +3,11 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRef, useState, useEffect } from "react";
 
-import { useSingleCollectionQuery, useUserChainInfo } from "@/modules/query";
+import {
+  useSingleCollectionInfoQuery,
+  useSingleCollectionQuery,
+  useUserChainInfo,
+} from "@/modules/query";
 import { useInView } from "react-intersection-observer";
 import {
   Button,
@@ -70,14 +74,18 @@ const defaultCollectionSocials = [
 ];
 
 export const ITEMS_PER_PAGE = 4;
+const INITIAL_FETCH_LIMIT = 20;
+const FETCH_MORE_INCREMENT = 20;
 
 export default function CollectionPage() {
-  const { activeAccount } = useUserChainInfo();
   const router = useRouter();
   const { collectionAddress } = router.query;
+
+  const { activeAccount } = useUserChainInfo();
   const [filter, setFilter] = useState<FilterType>("Items");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [queryLimit, setQueryLimit] = useState(INITIAL_FETCH_LIMIT);
 
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const { ref: loadMoreRef, inView } = useInView({
@@ -95,11 +103,30 @@ export default function CollectionPage() {
     contractAddress: collectionAddress as string,
   });
 
-  const collection = singleCollection?.collection;
-  const collectionSocials = singleCollection?.collection?.collectionSocials;
-  const collectionDetails = singleCollection?.collectionDetails;
+  const {
+    data: singleCollectionInfo,
+    isPending: isPendingCollectionInfo,
+    isLoading: isLoadingCollectionInfo,
+  } = useSingleCollectionInfoQuery({
+    contractAddress: collectionAddress as string,
+  });
+
+  // console.log({ singleCollectionInfo });
+
+
+  const collection = singleCollectionInfo?.collection;
+  const collectionSocials = collection?.collectionSocials;
+  const collectionNFTs = singleCollectionInfo?.collectionNFTs;
+
+  // const collection = singleCollection?.collection;
+  // const collectionSocials = singleCollection?.collection?.collectionSocials;
+  const defaultCollectionDetails = singleCollection?.collectionDetails;
+  const collectionDetails = {
+    ...defaultCollectionDetails,
+    totalNFTs: singleCollectionInfo?.totalNFTs,
+  };
   const collectionTokenTransfers = singleCollection?.tokenTransfers;
-  const collectionNFTs = singleCollection?.collectionNFTs;
+  // const collectionNFTs = singleCollection?.collectionNFTs;
   const collectionAllAuctions =
     singleCollection?.collectionAuctions?.allAuctions;
   const collectionAllListings =
@@ -163,8 +190,10 @@ export default function CollectionPage() {
     collectionNFTs?.filter((nft) => {
       // First apply search filter
       const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-      const nameNoSpace = nft.metadata.name.toLowerCase().replace(/\s+/g, "");
-      const tokenIdNoSpace = nft.tokenId.toLowerCase().replace(/\s+/g, "");
+      const nameNoSpace = nft?.metadata?.name
+        ?.toLowerCase()
+        .replace(/\s+/g, "");
+      const tokenIdNoSpace = nft?.tokenId?.toLowerCase().replace(/\s+/g, "");
       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
       const matchesSearch = combinedField.includes(searchTerm);
 
@@ -285,6 +314,28 @@ export default function CollectionPage() {
     setDisplayCount(ITEMS_PER_PAGE);
   }, [filter, searchQuery, selectedFilter]);
 
+  // useEffect(() => {
+  //   if (inView && !isPendingCollectionInfo && !isLoadingCollectionInfo) {
+  //     const timeoutId = setTimeout(() => {
+  //       if (singleCollectionInfo?.collectionNFTs?.length === queryLimit) {
+  //         setQueryLimit((prev) => prev + FETCH_MORE_INCREMENT);
+  //       }
+  //     }, 300);
+
+  //     return () => clearTimeout(timeoutId);
+  //   }
+  // }, [
+  //   inView,
+  //   isPendingCollectionInfo,
+  //   isLoadingCollectionInfo,
+  //   queryLimit,
+  //   singleCollectionInfo?.collectionNFTs?.length,
+  // ]);
+
+  // useEffect(() => {
+  //   setQueryLimit(INITIAL_FETCH_LIMIT);
+  // }, [filter, searchQuery, selectedFilter]);
+
   const renderCollectionDetails = () => {
     if (!collectionDetails)
       return (
@@ -331,7 +382,10 @@ export default function CollectionPage() {
           } on Mint Mingle Marketplace`}
         />
       </Head>
-      {isPending || isLoading ? (
+      {isPending ||
+      isLoading ||
+      isPendingCollectionInfo ||
+      isLoadingCollectionInfo ? (
         <SingleCollectionSkeleton />
       ) : (
         <>
@@ -735,11 +789,9 @@ export default function CollectionPage() {
       )}
 
       {/* Render Collection Settings Content */}
-      {isCollectionOwner &&
-        filter === filters[4] &&
-        singleCollection?.collection && (
-          <CollectionSettings collection={singleCollection.collection} />
-        )}
+      {isCollectionOwner && filter === filters[4] && collection && (
+        <CollectionSettings collection={collection} />
+      )}
     </div>
   );
 }
