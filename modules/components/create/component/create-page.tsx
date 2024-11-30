@@ -8,6 +8,7 @@ import {
   TextField,
   Dialog,
   Select,
+  ClientOnly,
 } from "@/modules/app";
 import { useToast } from "@/modules/app/hooks/useToast";
 import { useCreateNFTMutation } from "@/modules/mutation";
@@ -21,12 +22,23 @@ import {
 import { chainInfo } from "@/utils/configs";
 import CreateNFTContract from "./create-nft-contract";
 import { useWindowSize } from "@uidotdev/usehooks";
+import { SuccessDialog } from "./success-dialog";
+import Discord from "@/assets/discord.svg";
+import X from "@/assets/logo-x-twitter.svg";
+import Telegram from "@/assets/telegram.svg";
+import Github from "@/assets/github.svg";
 
 type Trait = {
   trait_type: string;
   value: string;
 };
 
+const shareLinks = [
+  { icon: <Discord />, link: "https://discord.com" },
+  { icon: <X />, link: "https://twitter.com" },
+  { icon: <Telegram />, link: "https://telegram.org" },
+  { icon: <Github />, link: "https://github.com" },
+];
 export function CreatePage() {
   const toast = useToast();
   const createNFTMutation = useCreateNFTMutation();
@@ -314,7 +326,21 @@ export function CreatePage() {
               </Button>
             </div>
           </div>
-
+          {/* Success Modal */}
+          <ClientOnly>
+            <Dialog.Root
+              onOpenChange={setShowSuccessModal}
+              open={showSuccessModal}
+            >
+              <Dialog.Content className="min-[440px]:w-[420px] max-[440px]:h-[60vh]">
+                <SuccessDialog
+                  src={file ? URL.createObjectURL(file) : ""}
+                  name={name}
+                  Links={shareLinks}
+                />
+              </Dialog.Content>
+            </Dialog.Root>
+          </ClientOnly>
           {/* Add Success Modal */}
           {/* <Dialog.Root open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <Dialog.Content className="flex flex-col items-center text-center p-6">
