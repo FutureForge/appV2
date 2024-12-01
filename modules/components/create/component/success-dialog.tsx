@@ -10,20 +10,24 @@ type SuccessDialogProps = {
   src: string;
   name: string;
   Links?: { icon: React.ReactNode; link: string }[];
+  onClick?: () => void;
 };
 
-export function SuccessDialog({ src, name, Links }: SuccessDialogProps) {
+export function SuccessDialog({
+  src,
+  name,
+  Links,
+  onClick,
+}: SuccessDialogProps) {
   const [showConfetti, setShowConfetti] = useState(false);
-   const { width =800, height=800} = useWindowSize() ?? {};
+  const { width = 800, height = 800 } = useWindowSize() ?? {};
 
   useEffect(() => {
     setShowConfetti(true);
-
-    // Stop confetti after 5 seconds
     const timer = setTimeout(() => setShowConfetti(false), 5000);
-
     return () => clearTimeout(timer);
   }, []);
+
   return (
     <>
       {showConfetti && (
@@ -51,9 +55,9 @@ export function SuccessDialog({ src, name, Links }: SuccessDialogProps) {
 
           {Links && (
             <div className="flex flex-col gap-2 items-center">
-              <p className="text-muted-foreground">Share to</p>
+              {/* <p className="text-muted-foreground">Share to</p> */}
               <div className="flex items-center justify-center gap-4">
-                {Links?.map(({ icon, link }, index) => (
+                {/* {Links?.map(({ icon, link }, index) => (
                   <Link
                     href={link}
                     key={`social-links-key-${index}`}
@@ -63,7 +67,11 @@ export function SuccessDialog({ src, name, Links }: SuccessDialogProps) {
                       {icon}
                     </div>
                   </Link>
-                ))}
+                ))} */}
+
+                <button aria-label={"nft-page"} onClick={onClick}>
+                  <p className="text-muted-foreground">View NFT</p>
+                </button>
               </div>
             </div>
           )}
