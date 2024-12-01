@@ -221,8 +221,6 @@ export function useNewOffersQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      console.log({ response });
-
       const updatedOffers = response.newOffers.filter((offer) => {
         const { expirationTimestamp } = offer;
         const endTime = formatBlockchainTimestamp(expirationTimestamp);

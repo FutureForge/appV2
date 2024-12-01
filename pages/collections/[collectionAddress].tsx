@@ -111,22 +111,16 @@ export default function CollectionPage() {
     contractAddress: collectionAddress as string,
   });
 
-  // console.log({ singleCollectionInfo });
-
-
   const collection = singleCollectionInfo?.collection;
   const collectionSocials = collection?.collectionSocials;
   const collectionNFTs = singleCollectionInfo?.collectionNFTs;
 
-  // const collection = singleCollection?.collection;
-  // const collectionSocials = singleCollection?.collection?.collectionSocials;
   const defaultCollectionDetails = singleCollection?.collectionDetails;
   const collectionDetails = {
     ...defaultCollectionDetails,
     totalNFTs: singleCollectionInfo?.totalNFTs,
   };
   const collectionTokenTransfers = singleCollection?.tokenTransfers;
-  // const collectionNFTs = singleCollection?.collectionNFTs;
   const collectionAllAuctions =
     singleCollection?.collectionAuctions?.allAuctions;
   const collectionAllListings =
