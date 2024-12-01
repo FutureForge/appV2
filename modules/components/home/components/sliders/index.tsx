@@ -83,7 +83,7 @@ export function Sliders() {
         isLoading={isNewListingsLoading}
         title="Recently Listed"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_listings"
         data={NewListings || []}
         renderItem={(listing: Listing) => {
           return (
@@ -106,9 +106,9 @@ export function Sliders() {
       {/* Recently Auctioned */}
       <DataSlider
         isLoading={isAuctionListingLoading}
-        title="Recently Auctioned Listing"
+        title="Recently Auctioned NFTs"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_auctions"
         data={AuctionListing || []}
         renderItem={(auction: Auction) => {
           return (
@@ -133,7 +133,7 @@ export function Sliders() {
         isLoading={isNewBidsLoading}
         title="Recent Bids"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_bids"
         data={NewBids || []}
         renderItem={(bid: NewBid) => {
           return (
@@ -158,7 +158,7 @@ export function Sliders() {
         isLoading={isNewSalesLoading}
         title="Recently Sold Listing"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_sales"
         data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
           return (
@@ -183,7 +183,7 @@ export function Sliders() {
         isLoading={isAuctionClosedLoading}
         title="Recently Sold Auction"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_sold_auctions"
         data={AuctionClosed || []}
         renderItem={(auction: Auction) => {
           return (
@@ -208,7 +208,7 @@ export function Sliders() {
         isLoading={isAuctionClosedLoading}
         title="Recent Offers"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=recent_offers"
         data={RecentOffers || []}
         renderItem={(offer: Offer) => {
           return (
@@ -229,11 +229,11 @@ export function Sliders() {
       />
 
       {/* Accepted Offers */}
-      <DataSlider
+      {/* <DataSlider
         isLoading={isAcceptedOffersLoading}
         title="Accepted Offers"
         cta="View More"
-        href="/browse"
+        href="/browse?filter=accepted_offers"
         data={AcceptedOffers || []}
         renderItem={(offer: Offer) => {
           return (
@@ -251,7 +251,7 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
     </div>
   );
 }

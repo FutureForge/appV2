@@ -6,7 +6,7 @@ import {
   TextField,
   ToggleGroup,
 } from "@/modules/app";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { cn } from "@/modules/app/utils";
 import { ScrollArea } from "../scroll-area/scroll-area";
 
@@ -14,6 +14,7 @@ import { ScrollArea } from "../scroll-area/scroll-area";
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
+import { useSearchParams } from "next/navigation";
 
 type HeaderProps = {
   title?: string;
@@ -45,6 +46,23 @@ export function Header({
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
+
+  const searchParams = useSearchParams();
+  const currentFilter = searchParams.get("filter") || "";
+
+  useEffect(() => {
+    if (currentFilter) {
+      const matchingFilter = filters.find(
+        (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
+      );
+      console.log({ matchingFilter });
+      if (matchingFilter) {
+        setFilter(matchingFilter);
+      }
+    } else {
+      setFilter(filters[0]);
+    }
+  }, [currentFilter]);
 
   return (
     <div className="w-full flex md:items-center gap-4 justify-between max-md:flex-col">
