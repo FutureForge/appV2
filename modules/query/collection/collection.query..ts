@@ -524,3 +524,21 @@ export function useSingleCollectionQuery({
     // gcTime: Infinity,
   });
 }
+
+export function usePromotedCollectionsQuery() {
+  return useQuery({
+    queryKey: [queryKeys.collection.promoted],
+    queryFn: async () => {
+      const response = await axios.get<CollectionsQueryResponse>(
+        `${backendURL}/collection/promoted/collections`
+      );
+
+      const promotedCollections = response.data.collections;
+
+      return promotedCollections;
+    },
+    // refetchInterval: 60000,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+}

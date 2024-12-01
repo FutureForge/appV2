@@ -37,6 +37,7 @@ export const queryKeys = {
     checkCollectionExists: ["check-collection-exists"] as const,
     checkContractIsACollection: ["check-contract-is-a-collection"] as const,
     filteredAll: ["filtered-all-collection"] as const,
+    promoted: ["promoted-collections"] as const,
   },
   nft: {
     single: ["single-nft"] as const,

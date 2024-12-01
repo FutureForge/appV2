@@ -3,11 +3,8 @@ import Image from "next/image";
 import { useState } from "react";
 import Slider, { Settings } from "react-slick";
 import { useWindowSize } from "@uidotdev/usehooks";
-import { useAllCollectionsQuery } from "@/modules/query";
-import {
-  CollectionNFTCardProps,
-  CollectionsNFTCard,
-} from "../collections-nft-card/collections-nft-card";
+import { usePromotedCollectionsQuery } from "@/modules/query";
+import { CollectionsNFTCard } from "../collections-nft-card/collections-nft-card";
 import { NftCardSkeleton } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { Collection } from "@/utils/types/collection/collection.type";
@@ -31,15 +28,13 @@ export function Hero() {
     return 4;
   })();
 
-  const banners =
-    width && width <= 550
-      ? ["/image-2-mob.png ", "/image-2.png"]
-      : ["/image.png", "/image-2.png"];
   const {
-    data: CollectionQuery,
+    data: promotedCollections,
     isLoading,
     isError,
-  } = useAllCollectionsQuery({});
+  } = usePromotedCollectionsQuery();
+
+  console.log({ promotedCollections });
 
   const settings: Settings = {
     dots: true,
@@ -67,7 +62,7 @@ export function Hero() {
       >
         <div className="flex w-full h-full relative rounded-full">
           <Image
-            src={banners[i]}
+            src={promotedCollections?.[i]?.promotionBackgroundImage!}
             alt={`Thumbnail ${i + 1}`}
             layout="fill"
             objectFit="cover"
@@ -88,10 +83,10 @@ export function Hero() {
     <div className="h-screen w-full relative overflow-x-hidden">
       {/* Banner */}
       <Slider {...settings}>
-        {banners.map((banner, index) => (
+        {promotedCollections?.map((collection, index) => (
           <div key={index} className="relative h-[90vh] w-full overflow-hidden">
             <Image
-              src={banner}
+              src={collection.promotionBackgroundImage}
               alt="banner"
               layout="fill"
               objectFit="cover"
@@ -112,9 +107,8 @@ export function Hero() {
           </>
         ) : (
           <>
-            {CollectionQuery?.collections
-              ?.slice(0, length)
-              .map((collection: Collection) => {
+            {promotedCollections &&
+              promotedCollections.map((collection: Collection) => {
                 const contractAddress = collection.collectionAddress;
                 const handleClick = () => {
                   router.push(`/collections/${contractAddress}`);

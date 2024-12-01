@@ -83,7 +83,7 @@ export function Sliders() {
         isLoading={isNewListingsLoading}
         title="Recently Listed"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={NewListings || []}
         renderItem={(listing: Listing) => {
           return (
@@ -108,7 +108,7 @@ export function Sliders() {
         isLoading={isAuctionListingLoading}
         title="Recently Auctioned Listing"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={AuctionListing || []}
         renderItem={(auction: Auction) => {
           return (
@@ -133,7 +133,7 @@ export function Sliders() {
         isLoading={isNewBidsLoading}
         title="Recent Bids"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={NewBids || []}
         renderItem={(bid: NewBid) => {
           return (
@@ -158,7 +158,7 @@ export function Sliders() {
         isLoading={isNewSalesLoading}
         title="Recently Sold Listing"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={NewSalesListing || []}
         renderItem={(sale: Listing) => {
           return (
@@ -183,7 +183,7 @@ export function Sliders() {
         isLoading={isAuctionClosedLoading}
         title="Recently Sold Auction"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={AuctionClosed || []}
         renderItem={(auction: Auction) => {
           return (
@@ -208,7 +208,7 @@ export function Sliders() {
         isLoading={isAuctionClosedLoading}
         title="Recent Offers"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={RecentOffers || []}
         renderItem={(offer: Offer) => {
           return (
@@ -233,7 +233,7 @@ export function Sliders() {
         isLoading={isAcceptedOffersLoading}
         title="Accepted Offers"
         cta="View More"
-        href="/collections"
+        href="/browse"
         data={AcceptedOffers || []}
         renderItem={(offer: Offer) => {
           return (
@@ -255,60 +255,6 @@ export function Sliders() {
     </div>
   );
 }
-
-// interface DataSliderProps {
-//   title: string;
-//   cta: string;
-//   href: string;
-//   isLoading: boolean;
-//   data: any[];
-//   renderItem: (item: any) => React.ReactNode;
-// }
-
-// export const DataSlider: React.FC<DataSliderProps> = ({
-//   title,
-//   cta,
-//   href,
-//   isLoading,
-//   data,
-//   renderItem,
-// }) => {
-//   if (data.length === 0) {
-//     return (
-//       <div className="flex gap-8 flex-col mt-12">
-//         <div className="flex items-center w-full justify-between">
-//           <h3 className="font-medium text-2xl text-white">{title}</h3>
-//         </div>
-//         <div className="flex justify-center items-center min-h-[200px]">
-//           <span className="text-white/50 text-2xl">No {title} found</span>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (data.length <= 3) {
-//     return (
-//       <div className="flex gap-8 flex-col mt-12">
-//         <div className="flex items-center w-full justify-between">
-//           <h3 className="font-medium text-2xl text-white">{title}</h3>
-//           <TransitionLinks
-//             href={href}
-//             className="text-white bg-border rounded-full px-3 py-2 hover:bg-border/70 transition-all duration-300 ease-in-out"
-//           >
-//             {cta}
-//           </TransitionLinks>
-//         </div>
-//         <div className="flex items-center gap-7">{data.map(renderItem)}</div>
-//       </div>
-//     );
-//   } else {
-//     return (
-//       <CustomSlider isLoading={isLoading} title={title} cta={cta} href={href}>
-//         {data.map(renderItem)}
-//       </CustomSlider>
-//     );
-//   }
-// };
 
 type DataSliderProps = {
   title: string;
@@ -366,60 +312,3 @@ export const DataSlider: React.FC<DataSliderProps> = ({
     </CustomSlider>
   );
 };
-
-// type DataSliderProps = {
-//   title: string;
-//   cta: string;
-//   href: string;
-//   isLoading: boolean;
-//   data: any[];
-//   renderItem: (item: any) => React.ReactNode;
-// }
-
-// export const DataSlider: React.FC<DataSliderProps> = ({
-//   title,
-//   cta,
-//   href,
-//   isLoading,
-//   data,
-//   renderItem,
-// }) => {
-//   const {width} = useWindowSize();
-//   const isMobile = width && width <= 550
-
-//   if (data.length === 0) {
-//     return (
-//       <div className="flex gap-8 flex-col mt-12">
-//         <div className="flex items-center w-full justify-between">
-//           <h3 className="font-medium text-2xl text-white">{title}</h3>
-//         </div>
-//         <div className="flex justify-center items-center min-h-[200px]">
-//           <span className="text-white/50 text-2xl">No {title} found</span>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (data.length <= 3 && (!isMobile || data.length <= 1)) {
-//     return (
-//       <div className="flex gap-8 flex-col mt-12">
-//         <div className="flex items-center w-full justify-between">
-//           <h3 className="font-medium text-2xl text-white">{title}</h3>
-//           <TransitionLinks
-//             href={href}
-//             className="text-white bg-border rounded-full px-3 py-2 hover:bg-border/70 transition-all duration-300 ease-in-out"
-//           >
-//             {cta}
-//           </TransitionLinks>
-//         </div>
-//         <div className="flex items-center gap-7">{data.map(renderItem)}</div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <CustomSlider isLoading={isLoading} title={title} cta={cta} href={href}>
-//       {data.map(renderItem)}
-//     </CustomSlider>
-//   );
-// };
