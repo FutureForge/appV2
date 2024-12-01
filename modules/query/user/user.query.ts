@@ -26,6 +26,7 @@ import {
   decimalOffChain,
   getContractCustom,
   getContractEthers,
+  getIsAuctionExpired,
 } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
@@ -171,6 +172,8 @@ export function useUserNFTsQuery() {
 
       const flatNFTs = updatedNFTs.flat();
 
+      console.log({ flatNFTs });
+
       const userNFTsNotListed = flatNFTs?.filter((nft: any) => {
         const nftTokenId = nft.tokenId;
 
@@ -192,12 +195,22 @@ export function useUserNFTsQuery() {
           )
       );
 
+      const updatedUserNFTs = userNFTsNotAuctioned?.filter((nft: any) => {
+        const endTime = formatBlockchainTimestamp(nft.endTimestamp);
+        const endTimeFormatted = new Date(endTime).getTime();
+        const currentTime = new Date().getTime();
+
+        return endTimeFormatted < currentTime;
+      });
+
+      console.log({ userNFTsNotAuctioned, updatedUserNFTs });
+
       return userNFTsNotAuctioned;
     },
     enabled: !!userAddress && !isUserListingsLoading && !isUserAuctionsLoading,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    refetchInterval: 5000,
+    // staleTime: Infinity,
+    // gcTime: Infinity,
   });
 }
 
@@ -237,9 +250,71 @@ export function useUserAuctionsQuery() {
   return useQuery({
     queryKey: [queryKeys.user.auctions, userAddress],
     queryFn: async () => {
+      const updatedAuctions = await Promise.all(
+        (userAuctions ?? []).map(async (auction) => {
+          const isAuctionActive = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          const isAuctionExpired = !isAuctionActive;
+
+          return {
+            ...auction,
+            isAuctionExpired,
+          };
+        })
+      );
+
+      const activeAuctions = updatedAuctions.filter(
+        (auction) => auction.isAuctionExpired === false
+      );
+
       return {
-        userAuctions,
-        auctionLength: userAuctions?.length,
+        userAuctions: activeAuctions,
+        auctionLength: activeAuctions.length,
+      };
+    },
+    enabled: !!userAddress && !isUserAuctionsLoading,
+    refetchInterval: 5000,
+    // staleTime: Infinity,
+    // gcTime: Infinity,
+  });
+}
+
+export function useUserPendingPayoutQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const { data: userAuctions, isLoading: isUserAuctionsLoading } =
+    useFilteredAllAuctionsQuery({
+      address: userAddress?.toLowerCase() || "",
+    });
+
+  return useQuery({
+    queryKey: [queryKeys.user.pendingPayout, userAddress],
+    queryFn: async () => {
+      const updatedAuctions = await Promise.all(
+        (userAuctions ?? []).map(async (auction) => {
+          const isAuctionActive = await getIsAuctionExpired({
+            auctionId: BigInt(auction.auctionId),
+          });
+
+          const isAuctionExpired = !isAuctionActive;
+
+          return {
+            ...auction,
+            isAuctionExpired,
+          };
+        })
+      );
+
+      const expiredAuctions = updatedAuctions.filter(
+        (auction) => auction.isAuctionExpired
+      );
+
+      return {
+        userPendingPayout: expiredAuctions,
+        userPendingPayoutLength: expiredAuctions.length,
       };
     },
     enabled: !!userAddress && !isUserAuctionsLoading,

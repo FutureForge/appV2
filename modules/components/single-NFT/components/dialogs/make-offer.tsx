@@ -6,7 +6,7 @@ import {
   Label,
   TextField,
 } from "@/modules/app";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client, WRAPPED_TOKEN_CONTRACT } from "@/utils/configs";
@@ -46,15 +46,21 @@ export function MakeOfferDialog({
 }: MakeOfferDialogProps) {
   const { activeAccount } = useUserChainInfo();
   const [value, setValue] = useState("");
+  const [error, setError] = useState("");
   const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const [selectedDate, setSelectedDate] = useState<Date>(oneWeekFromNow);
 
   const makeOfferMutation = useMakeListingOfferMutation();
 
-  const isDisabled =
-    !value || !selectedDate || makeOfferMutation.isPending || !activeAccount;
+  const isDisabled: boolean =
+    !value ||
+    !selectedDate ||
+    makeOfferMutation.isPending ||
+    !activeAccount ||
+    Boolean(error);
 
-  const { wrappedBalance } = getUserWrappedTokenBalance();
+  const { wrappedBalance, isWrappedBalanceLoading } =
+    getUserWrappedTokenBalance();
 
   const handleDateChange = (date: Date | null) => {
     const newDate = date || oneWeekFromNow;
@@ -86,6 +92,19 @@ export function MakeOfferDialog({
       }
     );
   };
+
+  const balance = isWrappedBalanceLoading
+    ? "0"
+    : Number(wrappedBalance?.displayValue).toFixed(2) || 0;
+  const symbol = wrappedBalance?.symbol || "WXFI";
+
+  useEffect(() => {
+    if (Number(value) > Number(balance)) {
+      setError("Insufficient balance");
+    } else {
+      setError("");
+    }
+  }, [value, balance]);
 
   return (
     <>
@@ -152,16 +171,22 @@ export function MakeOfferDialog({
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   containerClass="bg-transparent rounded-lg"
-                  placeholder={`Balance ${Number(
-                    wrappedBalance?.displayValue
-                  ).toFixed(2)} ${wrappedBalance?.symbol}`}
+                  placeholder={`Balance ${balance} ${symbol}`}
                   type="number"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setValue(balance.toString())}
+                    className="text-primary text-sm hover:text-primary/80 transition-colors mr-2"
+                  >
+                    MAX
+                  </button>
                   <XFI className="size-4" />
                   <span className="text-gray-400">WXFI</span>
                 </div>
               </div>
+              {error && <p className="text-red-500 text-sm">{error}</p>}
             </form>
 
             <div className="flex w-full mt-8 flex-col gap-4">

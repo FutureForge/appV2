@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
   backendURL,
@@ -269,6 +269,38 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
   });
 }
 
+export function useSingleCollectionInfoQuery({
+  contractAddress,
+  page = 1,
+  limit = 20,
+}: {
+  contractAddress: string;
+  page?: number;
+  limit?: number;
+}) {
+  return useQuery({
+    queryKey: [queryKeys.collection.single, contractAddress, "info"],
+    queryFn: async () => {
+      const response = await axios.get<SingleCollection>(
+        `${backendURL}/collection/${contractAddress}`
+      );
+
+      const { collection, nftLength, nfts } = response.data;
+
+      const updatedNFTs = nfts.filter((nft) => {
+        return nft.owner !== undefined && nft.owner !== null;
+      });
+
+      return {
+        collection,
+        collectionNFTs: updatedNFTs,
+        totalNFTs: nftLength,
+      };
+    },
+    enabled: !!contractAddress,
+  });
+}
+
 export function useSingleCollectionQuery({
   contractAddress,
 }: {
@@ -344,15 +376,15 @@ export function useSingleCollectionQuery({
         });
 
       const [
-        collectionResponse,
+        // collectionResponse,
         collectionTransfersResponse,
         collectionDetailsResponse,
         collectionFee,
         marketplaceFee,
       ] = await Promise.all([
-        axios.get<SingleCollection>(
-          `${backendURL}/collection/${contractAddress}`
-        ),
+        // axios.get<SingleCollection>(
+        //   `${backendURL}/collection/${contractAddress}`
+        // ),
         axios.get<NFTActivityResponse>(
           `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
         ),
@@ -363,12 +395,12 @@ export function useSingleCollectionQuery({
         }).catch(() => ({})),
       ]);
 
-      const { collection, nftLength, nfts } = collectionResponse.data;
+      // const { collection, nftLength, nfts } = collectionResponse.data;
       const tokenTransfers = collectionTransfersResponse.data.docs;
 
-      const updatedNFTs = nfts.filter((nft) => {
-        return nft.owner !== undefined && nft.owner !== null;
-      });
+      // const updatedNFTs = nfts.filter((nft) => {
+      //   return nft.owner !== undefined && nft.owner !== null;
+      // });
 
       const totalSupply = collectionDetailsResponse.data.totalSupply;
       const listedNFTs = allListings?.length;
@@ -385,7 +417,7 @@ export function useSingleCollectionQuery({
         totalVolume: formattedTotalVolume,
         totalSupply,
         floorPrice,
-        totalNFTs: nftLength,
+        // totalNFTs: nftLength,
       };
 
       const updatedTokenTransfers = await Promise.all(
@@ -441,8 +473,8 @@ export function useSingleCollectionQuery({
       );
 
       return {
-        collection,
-        collectionNFTs: updatedNFTs,
+        // collection,
+        // collectionNFTs: updatedNFTs,
         tokenTransfers: updatedTokenTransfers,
         marketplaceFee,
         collectionDetails,
@@ -487,8 +519,8 @@ export function useSingleCollectionQuery({
     //     !!isLoadingNewOffers ||
     //     !!isLoadingAllOffers ||
     //     !!isLoadingAcceptedOffers),
-    refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    // refetchInterval: 5000,
+    // staleTime: Infinity,
+    // gcTime: Infinity,
   });
 }

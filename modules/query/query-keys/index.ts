@@ -56,5 +56,6 @@ export const queryKeys = {
     nftActivities: ["user-nft-activities"] as const,
     nftContracts: ["user-nft-contracts"] as const,
     bids: ["user-bids"] as const,
+    pendingPayout: ["user-pending-payout"] as const,
   },
 };

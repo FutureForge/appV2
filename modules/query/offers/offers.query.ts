@@ -105,6 +105,7 @@ export function useSingleOfferQuery({
           tokenId,
         }
       );
+
       const updatedOffers = response.allOffers.filter((offer) => {
         const { expirationTimestamp } = offer;
         const endTime = formatBlockchainTimestamp(expirationTimestamp);
@@ -118,9 +119,9 @@ export function useSingleOfferQuery({
       return updatedOffers;
     },
     enabled: !!contractAddress || !!tokenId,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    refetchInterval: 5000,
+    // staleTime: Infinity,
+    // gcTime: Infinity,
   });
 }
 
