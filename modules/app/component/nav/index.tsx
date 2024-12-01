@@ -17,7 +17,8 @@ import { useApprovalSettingStore } from "@/utils/store/approval-settings.store";
 import { useUserImageStore } from "@/utils/store/user-image.store";
 
 // Icons
-import Logo from "@/public/logo.svg";
+import Logo from "@/assets/M.svg";
+import Mingles from '@/assets/MINGLE WM.svg'
 import Info from "@/assets/info.svg";
 import CopyIcon from "@/assets/copy.svg";
 import CheckIcon from "@/assets/check-2.svg";
@@ -119,8 +120,10 @@ export function Nav() {
           href={"/"}
           className="text-white font-medium flex-1 flex gap-1 items-center"
         >
-          <Logo />
-          <span className="hidden sm:block">MintMingles</span>
+          <Logo className="w-8" />
+          <span className="hidden sm:block">
+            <Mingles className="w-24" />
+          </span>
         </Link>
 
         <ul className="flex  items-center max-[936px]:hidden justify-end min-[1170px]:gap-8 gap-6 w-full">
