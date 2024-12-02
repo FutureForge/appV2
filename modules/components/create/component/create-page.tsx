@@ -27,6 +27,7 @@ import Discord from "@/assets/discord.svg";
 import X from "@/assets/logo-x-twitter.svg";
 import Telegram from "@/assets/telegram.svg";
 import Github from "@/assets/github.svg";
+import { useRouter } from "next/navigation";
 
 type Trait = {
   trait_type: string;
@@ -39,8 +40,10 @@ const shareLinks = [
   { icon: <Telegram />, link: "https://telegram.org" },
   { icon: <Github />, link: "https://github.com" },
 ];
+
 export function CreatePage() {
   const toast = useToast();
+  const router = useRouter();
   const createNFTMutation = useCreateNFTMutation();
   const { activeAccount } = useUserChainInfo();
 
@@ -52,7 +55,7 @@ export function CreatePage() {
   const [file, setFile] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(() => Date.now().toString());
   const [selectedContract, setSelectedContract] = useState<string>("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(true);
   const [tokenId, setTokenId] = useState<number | null>(null);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -142,6 +145,7 @@ export function CreatePage() {
       setViewType("deploy");
     }
   };
+
   return (
     <>
       {viewType === "create" && (
@@ -337,6 +341,10 @@ export function CreatePage() {
                   src={file ? URL.createObjectURL(file) : ""}
                   name={name}
                   Links={shareLinks}
+                  onClick={() => {
+                    setFile(null);
+                    router.push(`/nft/${selectedContract}/${tokenId}`);
+                  }}
                 />
               </Dialog.Content>
             </Dialog.Root>

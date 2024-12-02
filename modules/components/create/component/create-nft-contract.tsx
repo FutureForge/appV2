@@ -12,6 +12,7 @@ type CreateNFTContractProps = {
   isDrawerOpen: boolean;
   setIsDrawerOpen: (open: boolean) => void;
 };
+
 export default function CreateNFTContract({
   onGoToCreate,
   isDrawerOpen,

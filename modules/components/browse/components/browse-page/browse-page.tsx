@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAllAuctionsQuery,
   useAllListingsQuery,
@@ -27,7 +27,7 @@ import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
 import { Pagination } from "@/modules/app/component/pagination";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const filters = [
   "All Listings",
@@ -39,12 +39,17 @@ const filters = [
   "Recent Bids",
 ];
 
+// TODO: Add offers filter
+
 export function BrowsePage() {
   const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedFilter, setSelectedFilter] = useState(filters[0]);
+  const [selectedFilter, setSelectedFilter] = useState("");
+
+  const searchParams = useSearchParams();
+  const currentFilter = searchParams.get("filter") || "";
 
   const itemsPerPage = 5;
   const fetchLimit = 50;
@@ -100,7 +105,12 @@ export function BrowsePage() {
   };
 
   const handleFilterClick = (filter: string) => {
-    if (filter) setSelectedFilter(filter);
+    // if (filter) setSelectedFilter(filter);
+    if (filter) {
+      setSelectedFilter(filter);
+      const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
+      router.push(`/browse?filter=${queryFilter}`);
+    }
   };
 
   const getFilteredData = () => {
@@ -272,6 +282,19 @@ export function BrowsePage() {
   }) => {
     router.push(`/nft/${contractAddress}/${tokenId}`);
   };
+
+  useEffect(() => {
+    if (currentFilter) {
+      const matchingFilter = filters.find(
+        (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
+      );
+      if (matchingFilter) {
+        setSelectedFilter(matchingFilter);
+      }
+    } else {
+      setSelectedFilter(filters[0]);
+    }
+  }, [currentFilter]);
 
   return (
     <div className="pt-[17px]">
