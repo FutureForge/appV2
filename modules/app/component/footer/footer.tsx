@@ -33,24 +33,24 @@ const Footer_Data = {
     links: [
       {
         name: "X/Twitter",
-        link: "",
+        link: "https://x.com/mintmingles",
         external: true,
       },
-      {
-        name: "Instagram",
-        link: "",
-        external: true,
-      },
-      {
-        name: "Discord",
-        link: "",
-        external: true,
-      },
-      {
-        name: "Farcaster",
-        link: "",
-        external: true,
-      },
+      // {
+      //   name: "Instagram",
+      //   link: "",
+      //   external: true,
+      // },
+      // {
+      //   name: "Discord",
+      //   link: "",
+      //   external: true,
+      // },
+      // {
+      //   name: "Farcaster",
+      //   link: "",
+      //   external: true,
+      // },
     ],
   },
 };
@@ -64,7 +64,7 @@ export function Footer() {
   return (
     <div className="w-full py-20 flex items-center justify-between px-6 mt-28">
       <div className="w-full mx-auto flex items-start justify-between max-md:flex-col gap-12 ">
-        <div className="flex flex-col gap-6 max-md:w-full">
+        {/* <div className="flex flex-col gap-6 max-md:w-full">
           <h4 className="font-medium text-2xl">Stay in the loop</h4>
           <div className="bg-tertiary flex rounded-xl focus-within:border-border focus-within:border py-3 px-4 w-full md:w-[400px]">
             <input
@@ -82,7 +82,7 @@ export function Footer() {
               <ArrowLeft />
             </button>
           </div>
-        </div>
+        </div> */}
 
         <FooterLinks
           title={Footer_Data.marketplace.title}
@@ -102,6 +102,7 @@ type FooterLinksProps = {
   title: string;
   links: { name: string; link: string; external?: boolean }[];
 };
+
 function FooterLinks({ title, links }: FooterLinksProps) {
   const pathname = usePathname();
   return (
@@ -115,6 +116,7 @@ function FooterLinks({ title, links }: FooterLinksProps) {
             <li key={item.name}>
               <Component
                 href={item.link}
+                target={item.external ? "_blank" : "_self"}
                 className={cn(
                   "text-muted-foreground hover:text-foreground duration-300 ease-in-out transition font-medium",
                   { "text-foreground": isActive }
