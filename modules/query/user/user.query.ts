@@ -172,8 +172,6 @@ export function useUserNFTsQuery() {
 
       const flatNFTs = updatedNFTs.flat();
 
-      console.log({ flatNFTs });
-
       const userNFTsNotListed = flatNFTs?.filter((nft: any) => {
         const nftTokenId = nft.tokenId;
 
@@ -195,15 +193,13 @@ export function useUserNFTsQuery() {
           )
       );
 
-      const updatedUserNFTs = userNFTsNotAuctioned?.filter((nft: any) => {
-        const endTime = formatBlockchainTimestamp(nft.endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+      // const updatedUserNFTs = userNFTsNotAuctioned?.filter((nft: any) => {
+      //   const endTime = formatBlockchainTimestamp(nft.endTimestamp);
+      //   const endTimeFormatted = new Date(endTime).getTime();
+      //   const currentTime = new Date().getTime();
 
-        return endTimeFormatted < currentTime;
-      });
-
-      console.log({ userNFTsNotAuctioned, updatedUserNFTs });
+      //   return endTimeFormatted < currentTime;
+      // });
 
       return userNFTsNotAuctioned;
     },

@@ -55,7 +55,6 @@ export function Header({
       const matchingFilter = filters.find(
         (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
       );
-      console.log({ matchingFilter });
       if (matchingFilter) {
         setFilter(matchingFilter);
       }
