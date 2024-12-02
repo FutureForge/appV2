@@ -18,13 +18,14 @@ import { useUserImageStore } from "@/utils/store/user-image.store";
 
 // Icons
 import Logo from "@/assets/M.svg";
-import Mingles from '@/assets/MINGLE WM.svg'
+import Mingles from "@/assets/MINGLE WM.svg";
 import Info from "@/assets/info.svg";
 import CopyIcon from "@/assets/copy.svg";
 import CheckIcon from "@/assets/check-2.svg";
 import LogoutIcon from "@/assets/logout-box-r-line.svg";
 import MenuIcon from "@/assets/menu-04.svg";
 import CloseIcon from "@/assets/close.svg";
+import { useToast } from "../../hooks/useToast";
 
 const Nav_Links = [
   {
@@ -49,6 +50,7 @@ export function Nav() {
   const { activeAccount, activeWallet } = useUserChainInfo();
   const walletAddress = activeAccount?.address;
   const [isChainSupported, setIsChainSupported] = useState(false);
+  const toast = useToast();
 
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -66,6 +68,7 @@ export function Nav() {
     if (walletAddress) {
       copyToClipboard(walletAddress);
       setCopied(true);
+      toast.success("Wallet address copied successfully");
       setTimeout(() => setCopied(false), 3000);
     }
   };
@@ -99,10 +102,10 @@ export function Nav() {
     };
 
     checkChain();
-    
+
     // Optional: Listen for chain changes if your wallet provider supports it
-    const unsubscribe = activeWallet?.subscribe('chainChanged', checkChain);
-    
+    const unsubscribe = activeWallet?.subscribe("chainChanged", checkChain);
+
     return () => {
       unsubscribe?.();
     };
@@ -246,7 +249,7 @@ export function Nav() {
                     </div>
                   </div>
                   {/* Copy */}
-                  <div className="w-full p-1.5  mt-3">
+                  <div className="w-full mt-3">
                     <div
                       onClick={copy}
                       className="cursor-pointer hover:border-border h-9 hover:bg-tertiary transition-colors duration-500 ease-in-out px-2.5 border border-transparent rounded-lg text-white flex items-center gap-2"
@@ -263,7 +266,7 @@ export function Nav() {
                     </div>
                   </div>
 
-                  <div className="w-full p-1.5">
+                  <div className="w-full">
                     <div
                       onClick={handleSignOut}
                       className="cursor-pointer px-2.5 h-9 text-error border border-transparent hover:bg-error/20 transition-colors duration-500 ease-in-out hover:border-error rounded-lg flex items-center gap-2"
