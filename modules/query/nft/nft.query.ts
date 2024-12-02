@@ -221,9 +221,7 @@ export function useSingleNFTQuery({
           listingData: ensureSerializable(updatedNFTListingList) as Listing,
           auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };
-      } catch (error) {
-        console.log("single nft error", { error });
-      }
+      } catch (error) {}
     },
     enabled:
       !!contractAddress &&

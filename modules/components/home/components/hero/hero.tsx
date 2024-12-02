@@ -34,8 +34,6 @@ export function Hero() {
     isError,
   } = usePromotedCollectionsQuery();
 
-  console.log({ promotedCollections });
-
   const settings: Settings = {
     dots: true,
     infinite: true,
