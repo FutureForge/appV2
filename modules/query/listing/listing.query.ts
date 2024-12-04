@@ -92,40 +92,40 @@ export function useFilteredAllListingsQuery({
   });
 }
 
-export function useSingleListingQuery({
-  contractAddress,
-  tokenId,
-}: {
-  contractAddress: string;
-  tokenId: string;
-}) {
-  return useQuery({
-    queryKey: [queryKeys.listing.single],
-    queryFn: async () => {
-      const response = await request<SingleListingQueryResponse>(
-        indexerEndpoint,
-        singleListingQuery,
-        { contractAddress, tokenId }
-      );
+// export function useSingleListingQuery({
+//   contractAddress,
+//   tokenId,
+// }: {
+//   contractAddress: string;
+//   tokenId: string;
+// }) {
+//   return useQuery({
+//     queryKey: [queryKeys.listing.single],
+//     queryFn: async () => {
+//       const response = await request<SingleListingQueryResponse>(
+//         indexerEndpoint,
+//         singleListingQuery,
+//         { contractAddress, tokenId }
+//       );
 
-      const updatedListings = response.allListings.map((listing) => {
-        const { endTimestamp } = listing;
-        const endTime = formatBlockchainTimestamp(endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+//       const updatedListings = response.allListings.map((listing) => {
+//         const { endTimestamp } = listing;
+//         const endTime = formatBlockchainTimestamp(endTimestamp);
+//         const endTimeFormatted = new Date(endTime).getTime();
+//         const currentTime = new Date().getTime();
 
-        // looking for active listings
-        return { ...listing, expired: endTimeFormatted < currentTime };
-      });
+//         // looking for active listings
+//         return { ...listing, expired: endTimeFormatted < currentTime };
+//       });
 
-      return updatedListings;
-    },
-    enabled: !!contractAddress || !!tokenId,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
-}
+//       return updatedListings;
+//     },
+//     enabled: !!contractAddress || !!tokenId,
+//     // refetchInterval: 5000,
+//     staleTime: Infinity,
+//     gcTime: Infinity,
+//   });
+// }
 
 // export function useCompletedListingsQuery() {
 //   return useQuery({
@@ -178,14 +178,14 @@ export function useNewListingsQuery({ limit = 50 }: { limit?: number }) {
         { limit }
       );
 
-      const updatedNewListings = response.newListings.map((listing) => {
+      const updatedNewListings = response.newListings.filter((listing) => {
         const { endTimestamp } = listing;
         const endTime = formatBlockchainTimestamp(endTimestamp);
         const endTimeFormatted = new Date(endTime).getTime();
         const currentTime = new Date().getTime();
 
         // looking for active listings
-        return { ...listing, expired: endTimeFormatted < currentTime };
+        return endTimeFormatted > currentTime;
       });
 
       return updatedNewListings;
@@ -216,14 +216,14 @@ export function useFilteredNewListingsQuery({
         }
       );
 
-      const updatedNewListings = response.newListings.map((listing) => {
+      const updatedNewListings = response.newListings.filter((listing) => {
         const { endTimestamp } = listing;
         const endTime = formatBlockchainTimestamp(endTimestamp);
         const endTimeFormatted = new Date(endTime).getTime();
         const currentTime = new Date().getTime();
 
         // looking for active listings
-        return { ...listing, expired: endTimeFormatted < currentTime };
+        return endTimeFormatted > currentTime;
       });
 
       return updatedNewListings;
