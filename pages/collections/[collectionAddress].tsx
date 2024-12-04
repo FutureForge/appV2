@@ -13,6 +13,7 @@ import {
   Button,
   Card,
   EmptyState,
+  ErrorComponent,
   IconButton,
   Label,
   NFTCard,
@@ -329,6 +330,10 @@ export default function CollectionPage() {
   // useEffect(() => {
   //   setQueryLimit(INITIAL_FETCH_LIMIT);
   // }, [filter, searchQuery, selectedFilter]);
+
+  if (isError) {
+    return <ErrorComponent />;
+  }
 
   const renderCollectionDetails = () => {
     if (!collectionDetails)

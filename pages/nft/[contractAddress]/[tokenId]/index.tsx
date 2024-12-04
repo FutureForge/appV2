@@ -1,9 +1,6 @@
 import Head from "next/head";
-import React, { useState, useEffect, act } from "react";
 import { useRouter } from "next/router";
-
 import { Details, TraitsOffers } from "@/modules/components/single-NFT";
-import { useSingleNFTQuery } from "@/modules/query";
 
 export default function SingleNFTPage() {
   const router = useRouter();

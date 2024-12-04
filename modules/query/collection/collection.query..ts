@@ -271,12 +271,8 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
 
 export function useSingleCollectionInfoQuery({
   contractAddress,
-  page = 1,
-  limit = 20,
 }: {
   contractAddress: string;
-  page?: number;
-  limit?: number;
 }) {
   return useQuery({
     queryKey: [queryKeys.collection.single, contractAddress, "info"],
@@ -298,6 +294,8 @@ export function useSingleCollectionInfoQuery({
       };
     },
     enabled: !!contractAddress,
+    staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
+    gcTime: 1000 * 60 * 30, // Keep unused data in cache for 30 minutes
   });
 }
 
@@ -520,8 +518,8 @@ export function useSingleCollectionQuery({
     //     !!isLoadingAllOffers ||
     //     !!isLoadingAcceptedOffers),
     // refetchInterval: 5000,
-    // staleTime: Infinity,
-    // gcTime: Infinity,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
