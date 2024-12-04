@@ -1,45 +1,51 @@
 import React, { useEffect, useState } from "react";
 import {
+  useAcceptedOffersQuery,
   useAllAuctionsQuery,
   useAllListingsQuery,
+  useAllOffersQuery,
   useAuctionClosedQuery,
   useNewAuctionsQuery,
   useNewBidsQuery,
   useNewListingsQuery,
   useNewSaleListingsQuery,
 } from "@/modules/query";
-import { EmptyState, Header, NFTCard } from "@/modules/app";
+import { EmptyState, ErrorComponent, Header, NFTCard } from "@/modules/app";
 import { cn } from "@/modules/app/utils";
 import Caret from "@/assets/arrow-left-s-line.svg";
 import {
+  AcceptedOffer,
   Auction,
   AuctionClosed,
   Listing,
   NewBid,
   NewSaleListing,
+  Offer,
 } from "@/utils/types/graphql";
 import { motion } from "framer-motion";
 import { AllListingTable } from "../table/all-listing";
 import { AllAuctionTable } from "../table/all-auction";
+import { AllOffersTable } from "../table/all-offers";
 import { RecentlyListedTable } from "../table/recently-listed";
 import { RecentlySoldListingTable } from "../table/recently-sold";
 import { RecentlyAuctionedTable } from "../table/recently-auctioned";
 import { RecentlySoldAuctionTable } from "../table/recently-sold-auction";
 import { RecentBidsTable } from "../table/recent-bids";
 import { Pagination } from "@/modules/app/component/pagination";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AcceptedOfferTable } from "../table/accepted-offers";
 
 const filters = [
   "All Listings",
   "All Auctions",
+  "All Offers",
   "Recent Listings",
   "Recent Sales",
   "Recent Auctions",
   "Recent Sold Auctions",
   "Recent Bids",
+  "Accepted Offers",
 ];
-
-// TODO: Add offers filter
 
 export function BrowsePage() {
   const router = useRouter();
@@ -99,6 +105,29 @@ export function BrowsePage() {
     isError: isNewBidsError,
   } = useNewBidsQuery({ limit: fetchLimit });
 
+  const {
+    data: AllOffers,
+    isLoading: isAllOffersLoading,
+    isError: isAllOffersError,
+  } = useAllOffersQuery({ limit: fetchLimit });
+
+  const {
+    data: AcceptedOffers,
+    isLoading: isAcceptedOfferLoading,
+    isError: isAcceptedOfferError,
+  } = useAcceptedOffersQuery({ limit: fetchLimit });
+
+  const isError =
+    isAllListingsError ||
+    isAllOffersError ||
+    isNewAuctionedError ||
+    isAuctionClosedError ||
+    isNewSaleListingsError ||
+    isAcceptedOfferError ||
+    isNewListingsError ||
+    isAllAuctionsError ||
+    isNewBidsError;
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
@@ -156,6 +185,26 @@ export function BrowsePage() {
         return filteredAllAuctions as Auction[];
 
       case filters[2]:
+        const filteredAllOffers = AllOffers?.filter((auction) => {
+          const searchTerm = searchQuery
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "");
+
+          const nameNoSpace = auction?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const tokenIdNoSpace = auction?.nft?.tokenId
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+          return combinedField.includes(searchTerm);
+        });
+
+        return filteredAllOffers as Offer[];
+
+      case filters[3]:
         const filteredNewListings = NewListings?.filter((listing) => {
           const searchTerm = searchQuery
             .toLowerCase()
@@ -175,7 +224,7 @@ export function BrowsePage() {
 
         return filteredNewListings as Listing[];
 
-      case filters[3]:
+      case filters[4]:
         const filteredNewSaleListings = NewSaleListings?.filter((listing) => {
           const searchTerm = searchQuery
             .toLowerCase()
@@ -195,7 +244,7 @@ export function BrowsePage() {
 
         return filteredNewSaleListings as NewSaleListing[];
 
-      case filters[4]:
+      case filters[5]:
         const filteredNewAuctioned = NewAuctioned?.filter((auction) => {
           const searchTerm = searchQuery
             .toLowerCase()
@@ -215,7 +264,7 @@ export function BrowsePage() {
 
         return filteredNewAuctioned as Auction[];
 
-      case filters[5]:
+      case filters[6]:
         const filteredNewSoldAuction = AuctionClosed?.filter((auction) => {
           const searchTerm = searchQuery
             .toLowerCase()
@@ -235,7 +284,7 @@ export function BrowsePage() {
 
         return filteredNewSoldAuction as AuctionClosed[];
 
-      case filters[6]:
+      case filters[7]:
         const filteredNewBids = NewBids?.filter((bid) => {
           const searchTerm = searchQuery
             .toLowerCase()
@@ -254,6 +303,27 @@ export function BrowsePage() {
         });
 
         return filteredNewBids as NewBid[];
+
+      case filters[8]:
+        const filteredAcceptedOffers = AcceptedOffers?.filter((auction) => {
+          const searchTerm = searchQuery
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, "");
+
+          const nameNoSpace = auction?.nft?.metadata?.name
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const tokenIdNoSpace = auction?.nft?.tokenId
+            ?.toLowerCase()
+            ?.replace(/\s+/g, "");
+          const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+          return combinedField.includes(searchTerm);
+        });
+
+        return filteredAcceptedOffers as AcceptedOffer[];
+
       default:
         return null;
     }
@@ -295,6 +365,10 @@ export function BrowsePage() {
       setSelectedFilter(filters[0]);
     }
   }, [currentFilter]);
+
+  if (isError) {
+    return <ErrorComponent />;
+  }
 
   return (
     <div className="pt-[17px]">
@@ -412,8 +486,58 @@ export function BrowsePage() {
           </>
         )}
 
-        {/* Recent Listings */}
+        {/* All Offers */}
         {selectedFilter === filters[2] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AllOffersTable
+                    isLoading={isAllOffersLoading}
+                    data={currentPageData as Offer[]}
+                  />
+                ) : (
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((offers, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={offers}
+                          type="offers"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: offers.assetContract,
+                              tokenId: offers.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No offers found"
+                }
+              />
+            )}
+          </>
+        )}
+
+        {/* Recent Listings */}
+        {selectedFilter === filters[3] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
               <>
@@ -465,7 +589,7 @@ export function BrowsePage() {
         )}
 
         {/* Recently Sold Listings */}
-        {selectedFilter === filters[3] && (
+        {selectedFilter === filters[4] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
               <>
@@ -515,7 +639,7 @@ export function BrowsePage() {
         )}
 
         {/* Recent Auctions */}
-        {selectedFilter === filters[4] && (
+        {selectedFilter === filters[5] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
               <>
@@ -567,7 +691,7 @@ export function BrowsePage() {
         )}
 
         {/* Recent Sold Auctions */}
-        {selectedFilter === filters[5] && (
+        {selectedFilter === filters[6] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
               <>
@@ -617,7 +741,7 @@ export function BrowsePage() {
         )}
 
         {/* Recent Bids */}
-        {selectedFilter === filters[6] && (
+        {selectedFilter === filters[7] && (
           <>
             {currentPageData && currentPageData.length > 0 ? (
               <>
@@ -660,6 +784,56 @@ export function BrowsePage() {
                   searchQuery.length > 0
                     ? "No item found according to your search"
                     : "No recently bid items found"
+                }
+              />
+            )}
+          </>
+        )}
+
+        {/* Accepted Offers */}
+        {selectedFilter === filters[8] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AcceptedOfferTable
+                    isLoading={isAcceptedOfferLoading}
+                    data={currentPageData as AcceptedOffer[]}
+                  />
+                ) : (
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((acceptedOffer, index) => {
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={acceptedOffer}
+                          type="new-accepted-offers"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: acceptedOffer.assetContract,
+                              tokenId: acceptedOffer.nft.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No item found according to your search"
+                    : "No accepted offers found"
                 }
               />
             )}

@@ -30,6 +30,7 @@ import {
 import {
   Checkbox,
   EmptyState,
+  ErrorComponent,
   Header,
   NFTCard,
   NftCardSkeleton,
@@ -106,61 +107,73 @@ export function ProfilePage() {
     data: userNFTs,
     isLoading: isUserNFTsLoading,
     isPending: isUserNFTsPending,
+    isError: isUserNFTsError,
   } = useUserNFTsQuery();
   const {
     data: userListings,
     isLoading: isUserListingsLoading,
     isPending: isUserListingsPending,
+    isError: isUserListingsError,
   } = useUserListingsQuery();
   const {
     data: userAuctions,
     isLoading: isUserAuctionsLoading,
     isPending: isUserAuctionsPending,
+    isError: isUserAuctionsError,
   } = useUserAuctionsQuery();
   const {
     data: userPendingPayout,
     isLoading: isUserPendingPayoutLoading,
     isPending: isUserPendingPayoutPending,
+    isError: isUserPendingPayoutError,
   } = useUserPendingPayoutQuery();
   const {
     data: userOffers,
     isLoading: isUserOffersLoading,
     isPending: isUserOffersPending,
+    isError: isUserOffersError,
   } = useUserOffersQuery();
   const {
     data: userOffersReceived,
     isLoading: isUserOffersReceivedLoading,
     isPending: isUserOffersReceivedPending,
+    isError: isUserOffersReceivedError,
   } = useUserOffersReceivedQuery();
   const {
     data: userBids,
     isLoading: isUserBidsLoading,
     isPending: isUserBidsPending,
+    isError: isUserBidsError,
   } = useUserBidsQuery();
   const {
     data: userExpiredListings,
     isLoading: isUserExpiredListingsLoading,
     isPending: isUserExpiredListingsPending,
+    isError: isUserExpiredListingsError,
   } = useUserExpiredListingsQuery();
   const {
     data: userExpiredAuctions,
     isLoading: isUserExpiredAuctionsLoading,
     isPending: isUserExpiredAuctionsPending,
+    isError: isUserExpiredAuctionsError,
   } = useUserExpiredAuctionsQuery();
   const {
     data: userExpiredOffers,
     isLoading: isUserExpiredOffersLoading,
     isPending: isUserExpiredOffersPending,
+    isError: isUserExpiredOffersError,
   } = useUserExpiredOffersQuery();
   const {
     data: userCollections,
     isLoading: isUserCollectionsLoading,
     isPending: isUserCollectionsPending,
+    isError: isUserCollectionsError,
   } = useUserCollectionsQuery();
   const {
     data: userNFTActivities,
     isLoading: isUserNFTActivitiesLoading,
     isPending: isUserNFTActivitiesPending,
+    isError: isUserNFTActivitiesError,
   } = useUserNFTActivitiesQuery();
 
   const copyToClipboard = useCopyToClipboard()[1];
@@ -231,6 +244,20 @@ export function ProfilePage() {
     isUserCollectionsLoading ||
     isUserPendingPayoutLoading ||
     isUserNFTActivitiesLoading;
+
+  const isError =
+    isUserAuctionsError ||
+    isUserBidsError ||
+    isUserOffersReceivedError ||
+    isUserExpiredListingsError ||
+    isUserExpiredAuctionsError ||
+    isUserExpiredOffersError ||
+    isUserCollectionsError ||
+    isUserNFTActivitiesError ||
+    isUserOffersError ||
+    isUserNFTsError ||
+    isUserListingsError ||
+    isUserPendingPayoutError;
 
   const getFilteredData = () => {
     switch (selectedFilter) {
@@ -429,6 +456,10 @@ export function ProfilePage() {
 
   if (!mounted) {
     return null;
+  }
+
+  if (isError) {
+    return <ErrorComponent />;
   }
 
   return (

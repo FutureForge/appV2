@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { CollectionsHeader } from "../header/header";
-import { NftCardSkeleton } from "@/modules/app";
+import { ErrorComponent, NftCardSkeleton } from "@/modules/app";
 import { CollectionTable } from "../../table";
 import { useAllCollectionsQuery } from "@/modules/query";
 import { useWindowSize } from "@uidotdev/usehooks";
@@ -70,6 +70,10 @@ export function CollectionPage() {
 
   if (!mounted) {
     return null;
+  }
+
+  if (isError) {
+    return <ErrorComponent />;
   }
 
   return (

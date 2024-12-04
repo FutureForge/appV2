@@ -22,8 +22,10 @@ import { useUserChainInfo } from "@/modules/query";
 export function NFTCard(props: NFTCardProps) {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
+
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const {
     onClick,
     cta,
@@ -38,6 +40,7 @@ export function NFTCard(props: NFTCardProps) {
     actionOnClick,
     isDisabled,
   } = props;
+
   const { metadata, owner } = data.nft || {};
   const image = metadata?.image || "";
   const name = metadata?.name || "";

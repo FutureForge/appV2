@@ -1,6 +1,5 @@
-import { CustomSlider, NFTCard } from "@/modules/app";
+import { CustomSlider, ErrorComponent, NFTCard } from "@/modules/app";
 import {
-  useAcceptedOffersQuery,
   useAllCollectionsQuery,
   useAuctionClosedQuery,
   useNewAuctionsQuery,
@@ -24,21 +23,51 @@ export function Sliders() {
   const { data: CollectionQuery, isLoading: isCollectionLoading } =
     useAllCollectionsQuery({});
 
-  const { data: NewListings, isLoading: isNewListingsLoading } =
-    useNewListingsQuery({ limit: 15 });
-  const { data: NewSalesListing, isLoading: isNewSalesLoading } =
-    useNewSaleListingsQuery({ limit: 15 });
-  const { data: AuctionListing, isLoading: isAuctionListingLoading } =
-    useNewAuctionsQuery({ limit: 15 });
-  const { data: AuctionClosed, isLoading: isAuctionClosedLoading } =
-    useAuctionClosedQuery({ limit: 15 });
-  const { data: RecentOffers, isLoading: isRecentOffersLoading } =
-    useNewOffersQuery({ limit: 15 });
-  const { data: AcceptedOffers, isLoading: isAcceptedOffersLoading } =
-    useAcceptedOffersQuery({ limit: 15 });
-  const { data: NewBids, isLoading: isNewBidsLoading } = useNewBidsQuery({
+  const {
+    data: NewListings,
+    isLoading: isNewListingsLoading,
+    isError: isNewListingError,
+  } = useNewListingsQuery({ limit: 15 });
+
+  const {
+    data: NewSalesListing,
+    isLoading: isNewSalesLoading,
+    isError: isNewSalesError,
+  } = useNewSaleListingsQuery({ limit: 15 });
+
+  const {
+    data: NewAuction,
+    isLoading: isNewAuctionLoading,
+    isError: isNewAuctionError,
+  } = useNewAuctionsQuery({ limit: 15 });
+
+  const {
+    data: AuctionClosed,
+    isLoading: isAuctionClosedLoading,
+    isError: isAuctionClosedError,
+  } = useAuctionClosedQuery({ limit: 15 });
+
+  const {
+    data: RecentOffers,
+    isLoading: isRecentOffersLoading,
+    isError: isRecentOffersError,
+  } = useNewOffersQuery({ limit: 15 });
+
+  const {
+    data: NewBids,
+    isLoading: isNewBidsLoading,
+    isError: isNewBidsError,
+  } = useNewBidsQuery({
     limit: 15,
   });
+
+  const isError =
+    isNewBidsError ||
+    isNewListingError ||
+    isNewSalesError ||
+    isNewAuctionError ||
+    isAuctionClosedError ||
+    isRecentOffersError;
 
   const handleViewItem = ({
     contractAddress,
@@ -49,6 +78,10 @@ export function Sliders() {
   }) => {
     router.push(`/nft/${contractAddress}/${tokenId}`);
   };
+
+  if (isError) {
+    return <ErrorComponent />;
+  }
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col">
@@ -105,11 +138,11 @@ export function Sliders() {
 
       {/* Recently Auctioned */}
       <DataSlider
-        isLoading={isAuctionListingLoading}
+        isLoading={isNewAuctionLoading}
         title="Recently Auctioned NFTs"
         cta="View More"
         href="/browse?filter=recent_auctions"
-        data={AuctionListing || []}
+        data={NewAuction || []}
         renderItem={(auction: Auction) => {
           return (
             <NFTCard
@@ -205,7 +238,7 @@ export function Sliders() {
 
       {/* Recent Offers */}
       <DataSlider
-        isLoading={isAuctionClosedLoading}
+        isLoading={isRecentOffersLoading}
         title="Recent Offers"
         cta="View More"
         href="/browse?filter=recent_offers"
