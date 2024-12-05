@@ -19,14 +19,14 @@ import {
 } from "@/utils/configs";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import { MakeOfferListingType } from "@/utils/types/blockchain/blockchain.type";
-import {
-  useConvertXFIToWXFIMutation,
-  useIncreaseAllowanceMutation,
-} from "@/wxfi.mutation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BigNumber } from "ethers";
 import { sendAndConfirmTransaction } from "thirdweb";
 import WXFIAbi from "@/utils/abi/wxfi.json";
+import {
+  useConvertXFIToWXFIMutation,
+  useIncreaseAllowanceMutation,
+} from "../wxfi/wxfi.mutation";
 
 export function useMakeListingOfferMutation() {
   const toast = useToast();

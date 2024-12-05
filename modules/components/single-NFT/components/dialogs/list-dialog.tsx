@@ -158,7 +158,6 @@ export function ListDialog({
                   placeholder="Listing Price"
                   containerClass="bg-transparent"
                   type="number"
-                  disabled={isDisabled}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                   <XFI className="size-4" />
@@ -177,7 +176,6 @@ export function ListDialog({
                     className="w-full bg-transparent text-white border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     minDate={oneWeekFromNow}
                     showPopperArrow={false}
-                    disabled={isDisabled}
                   />
 
                   <div className="border border-border w-full rounded-lg flex justify-between p-2">

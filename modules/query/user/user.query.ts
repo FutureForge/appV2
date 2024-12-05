@@ -73,11 +73,17 @@ export function getUserNativeBalance() {
     data: balanceData,
     isLoading: isBalanceLoading,
     isError: isBalanceError,
-  } = useWalletBalance({
-    chain: chainInfo,
-    address: userAddress,
-    client,
-  });
+  } = useWalletBalance(
+    {
+      chain: chainInfo,
+      address: userAddress,
+      client,
+    },
+    {
+      enabled: !!userAddress,
+      refetchInterval: 5000,
+    }
+  );
 
   return { balanceData, isBalanceLoading, isBalanceError };
 }
@@ -90,12 +96,18 @@ export function getUserWrappedTokenBalance() {
     data: wrappedBalance,
     isLoading: isWrappedBalanceLoading,
     isError: isWrappedBalanceError,
-  } = useWalletBalance({
-    chain: chainInfo,
-    address: userAddress,
-    client,
-    tokenAddress: WRAPPED_TOKEN_CONTRACT,
-  });
+  } = useWalletBalance(
+    {
+      chain: chainInfo,
+      address: userAddress,
+      client,
+      tokenAddress: WRAPPED_TOKEN_CONTRACT,
+    },
+    {
+      enabled: !!userAddress,
+      refetchInterval: 5000,
+    }
+  );
 
   return { wrappedBalance, isWrappedBalanceLoading, isWrappedBalanceError };
 }

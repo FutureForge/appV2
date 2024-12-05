@@ -176,14 +176,12 @@ export function MakeOfferDialog({
                     balance === "NaN" ? "0" : balance
                   } ${symbol}`}
                   type="number"
-                  disabled={isDisabled}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setValue(balance.toString())}
                     className="text-primary text-sm hover:text-primary/80 transition-colors mr-2"
-                    disabled={isDisabled}
                   >
                     MAX
                   </button>
@@ -205,7 +203,6 @@ export function MakeOfferDialog({
                     className="w-full bg-transparent text-white border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     minDate={oneWeekFromNow}
                     showPopperArrow={false}
-                    disabled={isDisabled}
                   />
 
                   <div className="border border-border w-full rounded-lg flex justify-between p-2">

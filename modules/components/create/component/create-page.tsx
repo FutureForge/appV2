@@ -99,20 +99,22 @@ export function CreatePage() {
     // setSelectedContract("");
   };
 
-  const handleCreateNFT = async () => {
+  const handleCreateNFT = () => {
     if (!name || !description || !file || !selectedContract)
       return toast.error("Please fill out all fields");
 
-    createNFTMutation.mutate(
+    createNFTMutation.mutateAsync(
       {
-        contractAddress: selectedContract,
-        name,
-        description,
-        file: file!,
-        attributes: traits,
+        createNFTData: {
+          contractAddress: selectedContract,
+          name,
+          description,
+          file: file!,
+          attributes: traits,
+        },
       },
       {
-        onSuccess: (data) => {
+        onSuccess(data, variables, context) {
           const tokenId =
             typeof data === "object" && "tokenId" in data ? data.tokenId : null;
           const receipt =
@@ -124,6 +126,9 @@ export function CreatePage() {
         },
         onError: () => {
           resetForm();
+          setSelectedContract("");
+          setFile(null);
+          setName("");
         },
       }
     );

@@ -6,8 +6,12 @@ import {
 } from "@/utils/configs";
 import WXFIAbi from "@/utils/abi/wxfi.json";
 import { useUserChainInfo } from "@/modules/query";
-import { decimalOnChain, getContractEthers, waitForTransaction } from "./modules/blockchain";
-import { MessagesEnum } from "./utils/enums/messages/messages.enum";
+import {
+  decimalOnChain,
+  getContractEthers,
+  waitForTransaction,
+} from "../../blockchain";
+import { MessagesEnum } from "../../../utils/enums/messages/messages.enum";
 
 export function useIncreaseAllowanceMutation() {
   const toast = useToast();
@@ -147,6 +151,7 @@ export function useWithdrawWXFIMutation() {
     },
     onError: () => {},
     meta: {
+      showLoading: false,
       successMessage: {
         description: MessagesEnum.WITHDRAW_WXFI_SUCCESS,
       },

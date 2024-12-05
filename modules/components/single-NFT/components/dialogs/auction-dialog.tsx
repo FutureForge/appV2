@@ -162,7 +162,6 @@ export function AuctionDialog({
                     placeholder="Minimum Bid Amount"
                     containerClass="bg-transparent"
                     type="number"
-                    disabled={isDisabled}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <XFI className="size-4" />
@@ -180,7 +179,6 @@ export function AuctionDialog({
                     placeholder="Buyout Bid Amount"
                     containerClass="bg-transparent"
                     type="number"
-                    disabled={isDisabled}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <XFI className="size-4" />
@@ -201,7 +199,6 @@ export function AuctionDialog({
                     className="w-full text-foreground placeholder:text-muted-foreground bg-transparent border border-border rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     minDate={oneWeekFromNow}
                     showPopperArrow={false}
-                    disabled={isDisabled}
                   />
                   <div className="border border-border w-full rounded-lg flex justify-between p-2">
                     <p className="font-medium text-sm text-muted-foreground">

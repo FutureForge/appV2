@@ -55,7 +55,11 @@ export function QueryProvider({ children }: QueryProviderProps) {
 
             const showLoading = mutation?.meta?.showLoading;
 
-            if (showLoading || showLoading === undefined) {
+            if (
+              showLoading ||
+              showLoading === undefined ||
+              showLoading === null
+            ) {
               toast.loading("Transaction In Process...", {
                 id: mutation?.mutationId,
                 duration: Infinity,

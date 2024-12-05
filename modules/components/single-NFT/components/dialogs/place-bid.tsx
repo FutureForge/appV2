@@ -174,7 +174,6 @@ export function PlaceBidDialog({
                     balanceData?.displayValue
                   ).toFixed(2)} ${balanceData?.symbol}`}
                   type="number"
-                  disabled={isDisabled}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                   <XFI className="size-4" />
