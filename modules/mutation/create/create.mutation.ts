@@ -30,7 +30,7 @@ type CreateNFTMetadata = {
 
 export function useCreateNFTMutation() {
   const queryClient = useQueryClient();
-  const { activeAccount, activeWallet, isChainSupported } = useUserChainInfo();
+  const { activeAccount, isChainSupported } = useUserChainInfo();
 
   const toast = useToast();
   const router = useRouter();
@@ -44,6 +44,7 @@ export function useCreateNFTMutation() {
       createNFTData: CreateNFTMetadata;
     }) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
+      if (!isChainSupported) return toast.error("Unsupported chain");
 
       const NFTBaseContract = getContractEthers({
         contractAddress: createNFTData.contractAddress,
@@ -117,7 +118,13 @@ export function useCreateNFTMutation() {
       });
     },
     onError: (error, variables, context) => {},
+    onMutate: (variables) => {
+      if (!isChainSupported) {
+        throw new Error("Please switch to the correct network");
+      }
+    },
     meta: {
+      checkOnMutate: false,
       successMessage: {
         description: MessagesEnum.NFT_MINTED_SUCCESS,
       },
@@ -131,7 +138,7 @@ export function useCreateNFTMutation() {
 export function useCreateNFTContractMutation() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { activeAccount } = useUserChainInfo();
+  const { activeAccount, isChainSupported } = useUserChainInfo();
 
   const { data: creationFee } = useCreationFeeQuery();
 
@@ -143,6 +150,7 @@ export function useCreateNFTContractMutation() {
   return useMutation({
     mutationFn: async ({ name, symbol }: { name: string; symbol: string }) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
+      if (!isChainSupported) return toast.error("Unsupported chain");
 
       const transaction =
         await NFTFactoryContract.populateTransaction.createNFTContract(

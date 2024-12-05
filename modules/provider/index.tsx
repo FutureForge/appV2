@@ -24,24 +24,24 @@ export function QueryProvider({ children }: QueryProviderProps) {
     setBackgroundImage(backgroundImage);
   }, []);
 
-  useEffect(() => {
-    const checkChain = async () => {
-      if (activeWallet) {
-        const chain = await activeWallet.getChain();
-        setIsChainSupported(chain?.id === chainInfo.id);
-      } else {
-        setIsChainSupported(false);
-      }
-    };
+  // useEffect(() => {
+  //   const checkChain = async () => {
+  //     if (activeWallet) {
+  //       const chain = await activeWallet.getChain();
+  //       setIsChainSupported(chain?.id === chainInfo.id);
+  //     } else {
+  //       setIsChainSupported(false);
+  //     }
+  //   };
 
-    checkChain();
+  //   checkChain();
 
-    const unsubscribe = activeWallet?.subscribe("chainChanged", checkChain);
+  //   const unsubscribe = activeWallet?.subscribe("chainChanged", checkChain);
 
-    return () => {
-      unsubscribe?.();
-    };
-  }, [activeWallet]);
+  //   return () => {
+  //     unsubscribe?.();
+  //   };
+  // }, [activeWallet]);
 
   const queryClient = useMemo(
     () =>
@@ -49,9 +49,17 @@ export function QueryProvider({ children }: QueryProviderProps) {
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
           onMutate: (_variables, mutation) => {
-            // if (!isChainSupported) {
-            //   throw new Error("Please switch to the correct network");
-            // }
+            const checkOnMutate = mutation?.meta?.checkOnMutate;
+
+            if (
+              checkOnMutate ||
+              checkOnMutate === null ||
+              checkOnMutate === undefined
+            ) {
+              if (!isChainSupported) {
+                throw new Error("Please switch to the correct network");
+              }
+            }
 
             const showLoading = mutation?.meta?.showLoading;
 
