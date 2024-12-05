@@ -49,9 +49,9 @@ export function QueryProvider({ children }: QueryProviderProps) {
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
           onMutate: (_variables, mutation) => {
-            if (!isChainSupported) {
-              throw new Error("Please switch to the correct network");
-            }
+            // if (!isChainSupported) {
+            //   throw new Error("Please switch to the correct network");
+            // }
 
             const showLoading = mutation?.meta?.showLoading;
 
