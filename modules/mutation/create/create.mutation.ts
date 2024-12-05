@@ -48,62 +48,64 @@ export function useCreateNFTMutation() {
 
       if (!NFTBaseContract) throw new Error("No file");
 
+      return { receipt: { transactionHash: "12345" }, tokenId: 1 };
+
       // upload file to ipfs
-      const uri = await upload({
-        client,
-        files: [createNFTData.file],
-        uploadWithoutDirectory: true,
-      });
+      // const uri = await upload({
+      //   client,
+      //   files: [createNFTData.file],
+      //   uploadWithoutDirectory: true,
+      // });
 
-      if (uri) {
-        // create metadata and upload to ipfs
-        const metadata = {
-          name: createNFTData.name,
-          description: createNFTData.description,
-          image: uri,
-          attributes: createNFTData.attributes,
-        };
+      // if (uri) {
+      //   // create metadata and upload to ipfs
+      //   const metadata = {
+      //     name: createNFTData.name,
+      //     description: createNFTData.description,
+      //     image: uri,
+      //     attributes: createNFTData.attributes,
+      //   };
 
-        const metadataURI = await upload({
-          client,
-          files: [
-            {
-              name: `${createNFTData.name}-${Math.random()}.json`,
-              data: JSON.stringify(metadata),
-            },
-          ],
-          uploadWithoutDirectory: true,
-        });
+      //   const metadataURI = await upload({
+      //     client,
+      //     files: [
+      //       {
+      //         name: `${createNFTData.name}-${Math.random()}.json`,
+      //         data: JSON.stringify(metadata),
+      //       },
+      //     ],
+      //     uploadWithoutDirectory: true,
+      //   });
 
-        if (!metadataURI) throw new Error("No metadata URI");
+      //   if (!metadataURI) throw new Error("No metadata URI");
 
-        const userAddress = activeAccount.address;
+      //   const userAddress = activeAccount.address;
 
-        const transaction = await NFTBaseContract.populateTransaction.safeMint(
-          userAddress,
-          metadataURI,
-          {
-            value: ethers.utils.parseEther(mintFee),
-          }
-        );
+      //   const transaction = await NFTBaseContract.populateTransaction.safeMint(
+      //     userAddress,
+      //     metadataURI,
+      //     {
+      //       value: ethers.utils.parseEther(mintFee),
+      //     }
+      //   );
 
-        // @ts-ignore
-        const tx = await activeAccount.sendTransaction(transaction);
-        const receipt = await waitForTransaction(tx.transactionHash);
+      //   // @ts-ignore
+      //   const tx = await activeAccount.sendTransaction(transaction);
+      //   const receipt = await waitForTransaction(tx.transactionHash);
 
-        if (receipt.status === "reverted") {
-          throw new Error("Transaction failed");
-        }
+      //   if (receipt.status === "reverted") {
+      //     throw new Error("Transaction failed");
+      //   }
 
-        const userBalance = await NFTBaseContract.balanceOf(userAddress);
-        const tokenId = Number(userBalance.toString()) - 1;
+      //   const userBalance = await NFTBaseContract.balanceOf(userAddress);
+      //   const tokenId = Number(userBalance.toString()) - 1;
 
-        // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);
+      //   // await router.push(`/nft/${createNFTData.contractAddress}/${tokenId}`);
 
-        return { receipt, tokenId };
-      } else {
-        throw new Error("No URI");
-      }
+      //   return { receipt, tokenId };
+      // } else {
+      //   throw new Error("No URI");
+      // }
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({

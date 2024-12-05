@@ -348,7 +348,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     setAuctionInfo(auctionPricingData as Auction);
   }, [listingPricingData, auctionPricingData]);
 
-  if (isError) {
+  if (isError && !nft?.metadata.image && !isNFTDataLoading) {
     return <ErrorComponent />;
   }
 

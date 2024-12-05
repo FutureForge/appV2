@@ -659,14 +659,14 @@ export function useUserNFTContractQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
-  const NFTFactoryContract = getContractEthers({
-    contractAddress: NFT_FACTORY_ADDRESS,
-    abi: nftFactoryABI,
-  });
-
   return useQuery({
     queryKey: [queryKeys.user.nftContracts, userAddress],
     queryFn: async () => {
+      const NFTFactoryContract = getContractEthers({
+        contractAddress: NFT_FACTORY_ADDRESS,
+        abi: nftFactoryABI,
+      });
+
       const userDeployedContracts = await NFTFactoryContract.getUserNFT(
         userAddress
       );
