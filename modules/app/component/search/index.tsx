@@ -12,6 +12,7 @@ import {
   startTransition,
   useMemo,
   ComponentPropsWithoutRef,
+  useEffect,
 } from "react";
 import CloseIcon from "@/assets/close.svg";
 import { matchSorter } from "match-sorter";
@@ -31,7 +32,7 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 const popular_tags = [
   { label: "All", type: null },
-  { label: "NFTS", type: "collection-nft" },
+  { label: "Collection NFTS", type: "collection-nft" },
   { label: "NFTS", type: "nft" },
   { label: "Listed", type: "listing" },
   { label: "Auctions", type: "auction" },
@@ -173,7 +174,17 @@ export function Search() {
   };
 
   return (
-    <RadixPopover.Root open={open} onOpenChange={setOpen}>
+    <RadixPopover.Root 
+      open={open} 
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          setSearchValue('');
+          setActiveTag(null);
+          setShowResults(false);
+        }
+      }}
+    >
       <ComboboxProvider
         open={open}
         setOpen={setOpen}
@@ -267,6 +278,7 @@ export function Search() {
                                 type={type}
                                 data={props}
                                 setOpen={setOpen}
+                                setSearchValue={setSearchValue}
                               />
                             }
                           />
@@ -297,14 +309,17 @@ interface SearchResultItemProps {
   type: SearchType;
   data: any;
   setOpen: (open: boolean) => void;
+  setSearchValue: (searchValue: string) => void;
 }
 
 export function SearchResultItem({
   type,
   data,
   setOpen,
+  setSearchValue,
 }: SearchResultItemProps) {
   const router = useRouter();
+  console.log({data})
 
   const handleClick = () => {
     setOpen(false);
@@ -313,6 +328,7 @@ export function SearchResultItem({
     } else {
       router.push(`/nft/${data?.assetContract}/${data?.tokenId}`);
     }
+    setSearchValue("");
   };
 
   return (
