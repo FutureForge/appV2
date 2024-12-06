@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Nav } from "../component/nav";
 import { Footer } from "../component/footer/footer";
 import { usePathname } from "next/navigation";
+import { cn } from "../utils";
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -19,7 +20,7 @@ export const RootLayout = ({ children, scrollToTop }: RootLayoutProps) => {
       {/* max-w-[1440px] mx-auto */}
       <Nav />
       <div
-        className="flex-grow w-full min-h-screen max-w-[1730px] min-[909px]:mx-auto"
+        className={cn("flex-grow w-full min-h-screen min-[909px]:mx-auto", {'max-w-[1730px]':pathname !== '/'})}
         ref={(node) => {
           if (node && scrollToTop) {
             node.scroll(0, 0);

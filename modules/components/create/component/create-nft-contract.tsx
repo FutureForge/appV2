@@ -83,7 +83,7 @@ export default function CreateNFTContract({
           setIsDrawerOpen={setIsDrawerOpen}
         />
       ) : (
-        <div className="px-4 flex items-center justify-center w-full max-h-[500px] h-full">
+        <div className="px-4 flex items-center justify-center w-full h-[480px]">
           <div className="min-[600px]:w-[530px] w-full flex flex-col bg-tertiary rounded-3xl p-6 h-full">
             <div className="flex items-center gap-4 mb-6">
               <button

@@ -555,9 +555,9 @@ export function ProfilePage() {
           <div className="flex flex-wrap items-center gap-6 w-full">
             {/* User NFTS */}
             {selectedFilter === filters[0] && (
-              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
+              <div className="w-full">
                 {isUserNFTsLoading || isUserNFTsPending ? (
-                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
+                  <div className="grid min-[1250px]:grid-cols-4 gap-y-5 w-full md:grid-cols-2 lg:grid-cols-3 grid-cols-1">
                     {Array.from({ length: 4 }, (_, index) => (
                       <NftCardSkeleton key={index} />
                     ))}
@@ -565,7 +565,7 @@ export function ProfilePage() {
                 ) : filteredData &&
                   paginatedData &&
                   paginatedData.length > 0 ? (
-                  <>
+                  <div className="w-full grid min-[1250px]:grid-cols-4 min-[1680px]:grid-cols-5 min-[675px]:grid-cols-2 min-[960px]:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                     {paginatedData?.map((nft) => {
                       // @ts-ignore
                       const data = nft as UserNFTData;
@@ -578,7 +578,7 @@ export function ProfilePage() {
                         style={{ gridColumn: "1 / -1" }}
                       />
                     )}
-                  </>
+                  </div>
                 ) : (
                   <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
                     <EmptyState
