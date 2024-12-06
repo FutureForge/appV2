@@ -930,7 +930,7 @@ export function ProfilePage() {
                   <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
                     <EmptyState
                       message={
-                        searchQuery.length > 0 ? "No NFTs found" : "No Bids"
+                        searchQuery.length > 0 ? "No NFTs found" : "No Bids Placed"
                       }
                     />
                   </div>

@@ -319,7 +319,6 @@ export function SearchResultItem({
   setSearchValue,
 }: SearchResultItemProps) {
   const router = useRouter();
-  console.log({data})
 
   const handleClick = () => {
     setOpen(false);

@@ -153,7 +153,11 @@ export function Header({
           </Tooltip>
           <Select.Content align="end" className="w-fit border border-border">
             {remainingFilters.map((item) => (
-              <Select.Item key={item} value={item}>
+              <Select.Item
+                key={item}
+                value={item}
+                disabled={!!selectedFilter || disabled}
+              >
                 {item}
               </Select.Item>
             ))}
