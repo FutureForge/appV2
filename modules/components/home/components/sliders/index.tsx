@@ -84,7 +84,7 @@ export function Sliders() {
   }
 
   return (
-    <div className="px-6 w-full overflow-hidden flex flex-col">
+    <div className="px-6 w-full overflow-hidden flex flex-col max-w-[1730px] mx-auto">
       {/* collection List */}
       <DataSlider
         isLoading={isCollectionLoading}

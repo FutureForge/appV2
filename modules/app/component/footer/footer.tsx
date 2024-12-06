@@ -62,7 +62,7 @@ export function Footer() {
     setEmail(event.currentTarget.value);
   };
   return (
-    <div className="w-full py-20 flex items-center justify-between px-6 mt-28">
+    <div className="w-full py-20 flex items-center justify-between px-6 mt-28 max-w-[1730px] mx-auto">
       <div className="w-full mx-auto flex items-start justify-between max-md:flex-col gap-12 ">
         {/* <div className="flex flex-col gap-6 max-md:w-full">
           <h4 className="font-medium text-2xl">Stay in the loop</h4>

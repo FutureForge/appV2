@@ -58,7 +58,7 @@ export function Hero() {
           }
         )}
       >
-        <div className="flex w-full h-full relative rounded-full">
+        <div className="flex w-full h-[full] relative rounded-full">
           <Image
             src={promotedCollections?.[i]?.promotionBackgroundImage!}
             alt={`Thumbnail ${i + 1}`}
@@ -78,14 +78,82 @@ export function Hero() {
   };
 
   return (
-    <div className="h-screen w-full relative overflow-x-hidden">
+    // <div className="h-[60vh] w-full relative overflow-x-hidden">
+    //   {/* Banner */}
+    //   {promotedCollections && promotedCollections.length > 1 ? (
+    //     <Slider {...settings}>
+    //       {promotedCollections.map((collection, index) => (
+    //         <div
+    //           key={index}
+    //           className="relative w-full overflow-hidden"
+    //         >
+    //           <Image
+    //             src={collection.promotionBackgroundImage}
+    //             alt="banner"
+    //             layout="fill"
+    //             objectFit="cover"
+    //             quality={100}
+    //           />
+    //           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+    //         </div>
+    //       ))}
+    //     </Slider>
+    //   ) : (
+    //     promotedCollections?.map((collection, index) => (
+    //       <div key={index} className="relative h-full w-full overflow-hidden">
+    //         <Image
+    //           src={collection.promotionBackgroundImage}
+    //           alt="banner"
+    //           layout="fill"
+    //           objectFit="cover"
+    //           quality={100}
+    //         />
+    //         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+    //       </div>
+    //     ))
+    //   )}
+
+    //   {/* collection cards */}
+    //   <div className="absolute bottom-0 w-full h-fit flex items-center justify-center gap-5">
+    //     {isLoading || isError ? (
+    //       <>
+    //         {Array.from({ length }).map((_, index) => (
+    //           <NftCardSkeleton />
+    //         ))}
+    //       </>
+    //     ) : (
+    //       <>
+    //         {promotedCollections &&
+    //           promotedCollections.map((collection: Collection) => {
+    //             const contractAddress = collection.collectionAddress;
+    //             const handleClick = () => {
+    //               router.push(`/collections/${contractAddress}`);
+    //             };
+    //             return (
+    //               <CollectionsNFTCard
+    //                 key={collection._id}
+    //                 collectionAddress={collection.collectionAddress}
+    //                 collectionImage={collection.collectionImage}
+    //                 collectionName={collection.collectionName}
+    //                 floorPrice={collection.floorPrice}
+    //                 totalVolume={collection.totalVolume}
+    //                 onClick={handleClick}
+    //                 cta="Shop Collections"
+    //               />
+    //             );
+    //           })}
+    //       </>
+    //     )}
+    //   </div>
+    // </div>
+    <div className="h-[90vh] min-[1680px]:h-[60vh] w-full relative border mb-16">
       {/* Banner */}
       {promotedCollections && promotedCollections.length > 1 ? (
         <Slider {...settings}>
-          {promotedCollections.map((collection, index) => (
+          {promotedCollections?.map((collection, index) => (
             <div
               key={index}
-              className="relative h-[90vh] w-full overflow-hidden"
+              className="h-[90vh] min-[1680px]:h-[60vh]  relative w-full"
             >
               <Image
                 src={collection.promotionBackgroundImage}
@@ -94,13 +162,12 @@ export function Hero() {
                 objectFit="cover"
                 quality={100}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
             </div>
           ))}
         </Slider>
       ) : (
         promotedCollections?.map((collection, index) => (
-          <div key={index} className="relative h-[90vh] w-full overflow-hidden">
+          <div key={index} className="h-full w-full overflow-hidden">
             <Image
               src={collection.promotionBackgroundImage}
               alt="banner"
@@ -108,13 +175,12 @@ export function Hero() {
               objectFit="cover"
               quality={100}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
           </div>
         ))
       )}
-
+      <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent h-[90vh] min-[1780px]:h-[60vh] " />
       {/* collection cards */}
-      <div className="absolute bottom-2 w-full h-fit flex items-center justify-center gap-5">
+      <div className="absolute -bottom-12 w-full h-fit flex items-center justify-center gap-5">
         {isLoading || isError ? (
           <>
             {Array.from({ length }).map((_, index) => (
@@ -148,3 +214,5 @@ export function Hero() {
     </div>
   );
 }
+
+const promoted = ['/image-3.png',]
