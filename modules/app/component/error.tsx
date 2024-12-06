@@ -13,6 +13,7 @@ export function ErrorComponent() {
   const handleHome = () => {
     router.push("/");
   };
+
   return (
     <div className="w-full h-[calc(100vh-139px)] max-md:px-4 flex items-center justify-center">
       <Head>

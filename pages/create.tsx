@@ -1,5 +1,6 @@
 import { CreatePage } from "@/modules/components/create";
 import Head from "next/head";
+import React from "react";
 
 export default function Create() {
   return (

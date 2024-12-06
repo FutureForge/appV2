@@ -6,7 +6,7 @@ import {
   Label,
   TextField,
 } from "@/modules/app";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
@@ -65,7 +65,8 @@ export function PlaceBidDialog({
     !value ||
     !auctionId ||
     !buyoutBidAmount ||
-    error !== "";
+    !activeAccount ||
+    Boolean(error);
 
   const notes = [
     [
@@ -77,6 +78,15 @@ export function PlaceBidDialog({
       `Buyout price: ${decimalOffChain(buyoutBidAmount as string)} XFI`,
     ],
   ];
+
+  useEffect(() => {
+    if (Number(value) > Number(balanceData?.displayValue)) {
+      setError("Insufficient balance");
+    } else {
+      setError("");
+    }
+  }, [value, balanceData]);
+
   return (
     <>
       <DialogHeader>

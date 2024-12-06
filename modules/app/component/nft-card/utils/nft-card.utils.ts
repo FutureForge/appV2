@@ -1,4 +1,5 @@
 import {
+  AcceptedOffer,
   Auction,
   AuctionClosed,
   Listing,
@@ -33,6 +34,7 @@ export type NFTType =
   | NewSaleListing
   | AuctionClosed
   | NewBid
+  | AcceptedOffer
   | Offer;
 
 export type NFTStatus = "listed" | "auctioned";
@@ -113,8 +115,8 @@ export const getNFTCardInfo = ({
         "totalPricePaid" in data ? data.totalPricePaid : "";
 
       return {
-        title1: "Price Offered",
-        title2: "Accepted By",
+        title1: "Price Accepted",
+        title2: "Seller",
         info1: `${decimalOffChain(totalPriceAccepted)} XFI`,
         info2: getFormatAddress(seller as string),
       };

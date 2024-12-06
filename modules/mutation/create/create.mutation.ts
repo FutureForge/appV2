@@ -29,17 +29,22 @@ type CreateNFTMetadata = {
 // https://2551fcbc3ba71a7d708b7442aeb628f9.ipfscdn.io/ipfs/id
 
 export function useCreateNFTMutation() {
+  const queryClient = useQueryClient();
+  const { activeAccount, isChainSupported } = useUserChainInfo();
+
   const toast = useToast();
   const router = useRouter();
-
-  const queryClient = useQueryClient();
-  const { activeAccount } = useUserChainInfo();
 
   const { data: mintFee } = useMintFeeQuery();
 
   return useMutation({
-    mutationFn: async (createNFTData: CreateNFTMetadata) => {
+    mutationFn: async ({
+      createNFTData,
+    }: {
+      createNFTData: CreateNFTMetadata;
+    }) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
+      if (!isChainSupported) return toast.error("Unsupported chain");
 
       const NFTBaseContract = getContractEthers({
         contractAddress: createNFTData.contractAddress,
@@ -47,6 +52,8 @@ export function useCreateNFTMutation() {
       });
 
       if (!NFTBaseContract) throw new Error("No file");
+
+      // return { receipt: { transactionHash: "12345" }, tokenId: 1 };
 
       // upload file to ipfs
       const uri = await upload({
@@ -111,7 +118,13 @@ export function useCreateNFTMutation() {
       });
     },
     onError: (error, variables, context) => {},
+    onMutate: (variables) => {
+      if (!isChainSupported) {
+        throw new Error("Please switch to the correct network");
+      }
+    },
     meta: {
+      checkOnMutate: false,
       successMessage: {
         description: MessagesEnum.NFT_MINTED_SUCCESS,
       },
@@ -125,7 +138,7 @@ export function useCreateNFTMutation() {
 export function useCreateNFTContractMutation() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { activeAccount } = useUserChainInfo();
+  const { activeAccount, isChainSupported } = useUserChainInfo();
 
   const { data: creationFee } = useCreationFeeQuery();
 
@@ -137,6 +150,7 @@ export function useCreateNFTContractMutation() {
   return useMutation({
     mutationFn: async ({ name, symbol }: { name: string; symbol: string }) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
+      if (!isChainSupported) return toast.error("Unsupported chain");
 
       const transaction =
         await NFTFactoryContract.populateTransaction.createNFTContract(

@@ -114,7 +114,7 @@ export default function CreateNFTContract({
                             variant="secondary"
                             className="rounded-xl h-[42px] px-4 text-muted-foreground"
                           >
-                            <Select.Value placeholder="Choose a collection" />
+                            <Select.Value placeholder="Your Collections" />
                             <Select.Icon />
                           </Button>
                         </Select.Trigger>

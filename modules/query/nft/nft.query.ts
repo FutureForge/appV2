@@ -196,9 +196,9 @@ export function useSingleNFTQuery({
         const isActiveTypeExpired = isAuctionStatusExpired || isListingExpired;
 
         const activeType =
-          (nftAuctionList && isAuctionPendingPayout) || isAuctionExpired
+          nftAuctionList && isAuctionPendingPayout
             ? "pending-payout"
-            : isListingExpired || isAuctionStatusExpired
+            : isListingExpired || isAuctionStatusExpired || isAuctionExpired
             ? "expired"
             : nftListingList
             ? "listing"

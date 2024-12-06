@@ -95,43 +95,43 @@ export function useFilteredAllAuctionsQuery({
   });
 }
 
-export function useSingleAuctionQuery({
-  contractAddress,
-  tokenId,
-}: {
-  contractAddress: string;
-  tokenId: string;
-}) {
-  return useQuery({
-    queryKey: [queryKeys.auction.single],
-    queryFn: async () => {
-      const response = await request<SingleAuctionQueryResponse>(
-        indexerEndpoint,
-        singleAuctionQuery,
-        {
-          contractAddress,
-          tokenId,
-        }
-      );
+// export function useSingleAuctionQuery({
+//   contractAddress,
+//   tokenId,
+// }: {
+//   contractAddress: string;
+//   tokenId: string;
+// }) {
+//   return useQuery({
+//     queryKey: [queryKeys.auction.single],
+//     queryFn: async () => {
+//       const response = await request<SingleAuctionQueryResponse>(
+//         indexerEndpoint,
+//         singleAuctionQuery,
+//         {
+//           contractAddress,
+//           tokenId,
+//         }
+//       );
 
-      const updatedAuction = response.allAuctions.filter((auction) => {
-        const { endTimestamp } = auction;
-        const endTime = formatBlockchainTimestamp(endTimestamp);
-        const endTimeFormatted = new Date(endTime).getTime();
-        const currentTime = new Date().getTime();
+//       const updatedAuction = response.allAuctions.filter((auction) => {
+//         const { endTimestamp } = auction;
+//         const endTime = formatBlockchainTimestamp(endTimestamp);
+//         const endTimeFormatted = new Date(endTime).getTime();
+//         const currentTime = new Date().getTime();
 
-        // looking for active listings
-        return { ...auction, expired: endTimeFormatted < currentTime };
-      });
+//         // looking for active listings
+//         return { ...auction, expired: endTimeFormatted < currentTime };
+//       });
 
-      return updatedAuction;
-    },
-    enabled: !!contractAddress || !!tokenId,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
-}
+//       return updatedAuction;
+//     },
+//     enabled: !!contractAddress || !!tokenId,
+//     // refetchInterval: 5000,
+//     staleTime: Infinity,
+//     gcTime: Infinity,
+//   });
+// }
 
 // export function useCompletedAuctionsQuery() {
 //   return useQuery({

@@ -96,6 +96,7 @@ export function MakeOfferDialog({
   const balance = isWrappedBalanceLoading
     ? "0"
     : Number(wrappedBalance?.displayValue).toFixed(2) || 0;
+
   const symbol = wrappedBalance?.symbol || "WXFI";
 
   useEffect(() => {
@@ -171,7 +172,9 @@ export function MakeOfferDialog({
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
                   containerClass="bg-transparent rounded-lg"
-                  placeholder={`Balance ${balance} ${symbol}`}
+                  placeholder={`Balance: ${
+                    balance === "NaN" ? "0" : balance
+                  } ${symbol}`}
                   type="number"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">

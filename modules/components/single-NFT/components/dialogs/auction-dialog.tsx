@@ -123,6 +123,7 @@ export function AuctionDialog({
       ))}
     </div>
   );
+
   return (
     <>
       <DialogHeader>

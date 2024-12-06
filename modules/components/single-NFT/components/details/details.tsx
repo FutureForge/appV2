@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogRoot,
   DialogTrigger,
+  ErrorComponent,
 } from "@/modules/app";
 import React, { useEffect, useState } from "react";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
@@ -347,9 +348,13 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     setAuctionInfo(auctionPricingData as Auction);
   }, [listingPricingData, auctionPricingData]);
 
+  if (isError && !nft?.metadata.image && !isNFTDataLoading) {
+    return <ErrorComponent />;
+  }
+
   return (
     <div className="flex gap-6 pt-14 max-[910px]:flex-col items-stretch">
-      {isNFTDataLoading || isNFTDataPending || isError ? (
+      {isNFTDataLoading || isNFTDataPending ? (
         <>
           <DetailsSkeleton />
         </>

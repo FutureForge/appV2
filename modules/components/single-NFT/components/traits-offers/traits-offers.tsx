@@ -47,6 +47,10 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
 
   const isOwner = userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
 
+  if (isError) {
+    return null;
+  }
+
   return (
     <>
       {isNFTDataLoading || isNFTDataPending || isError ? (
