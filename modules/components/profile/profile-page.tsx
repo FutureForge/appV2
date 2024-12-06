@@ -188,6 +188,11 @@ export function ProfilePage() {
 
   const handleFilterClick = (filter: string) => {
     if (filter) setSelectedFilter(filter);
+    // if (filter) {
+    //   setSelectedFilter(filter);
+    //   const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
+    //   router.push(`/profile?filter=${queryFilter}`);
+    // }
   };
 
   const handleViewItemClick = ({

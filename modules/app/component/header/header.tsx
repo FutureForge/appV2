@@ -9,13 +9,12 @@ import {
 } from "@/modules/app";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/modules/app/utils";
-import { ScrollArea } from "../scroll-area/scroll-area";
+import { useSearchParams } from "next/navigation";
 
 // icons
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
-import { useSearchParams } from "next/navigation";
 
 type HeaderProps = {
   title?: string;
@@ -47,6 +46,8 @@ export function Header({
 }: HeaderProps) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
+  const [visibleFilters, setVisibleFilters] = useState(filters.slice(0, 5));
+  const [remainingFilters, setRemainingFilters] = useState(filters.slice(5));
 
   const searchParams = useSearchParams();
   const currentFilter = searchParams.get("filter") || "";
@@ -57,14 +58,53 @@ export function Header({
         (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
       );
       if (matchingFilter) {
+        const selectedFilterIndex = filters.indexOf(matchingFilter);
+        if (selectedFilterIndex >= 4) {
+          const newVisibleFilters = filters.slice(0, 4);
+          newVisibleFilters.push(matchingFilter);
+          setVisibleFilters(newVisibleFilters);
+
+          const newRemainingFilters = filters.filter(
+            (f, index) =>
+              index >= 4 && // Only consider filters after index 4
+              f !== matchingFilter // Exclude the selected filter
+          );
+          setRemainingFilters(newRemainingFilters);
+        }
         setFilter(matchingFilter);
       }
     } else {
       setFilter(filters[0]);
+      // Reset to default visible and remaining filters
+      setVisibleFilters(filters.slice(0, 5));
+      setRemainingFilters(filters.slice(5));
     }
-  }, [currentFilter]);
-  const visibleFilters = filters.slice(0, 5); // First 5 filters
-  const remainingFilters = filters.slice(5); // Filters beyond the first 5
+  }, [currentFilter, filters]);
+
+  useEffect(() => {
+    if (!currentFilter) {
+      if (filter) {
+        const selectedFilterIndex = filters.indexOf(filter);
+        if (selectedFilterIndex >= 4) {
+          const newVisibleFilters = filters.slice(0, 4);
+          newVisibleFilters.push(filter);
+          setVisibleFilters(newVisibleFilters);
+
+          const newRemainingFilters = filters.filter(
+            (f, index) =>
+              index >= 4 && // Only consider filters after index 4
+              f !== filter // Exclude the selected filter
+          );
+          setRemainingFilters(newRemainingFilters);
+        }
+        setFilter(filter);
+      }
+    }
+  }, [filter, filters]);
+
+  // const visibleFilters = filters.slice(0, 5);
+  // const remainingFilters = filters.slice(5);
+
   return (
     <div className="w-full flex min-[1160px]:items-center gap-4 justify-between max-[1160px]:flex-col">
       <div className="w-full flex justify-between items-center">
