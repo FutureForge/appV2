@@ -21,7 +21,7 @@ export const Checkbox = React.forwardRef<CheckboxElement, CheckboxProps>((props,
       {...checkboxProps}
     >
       <CheckboxPrimiteve.Indicator>
-        <Check />
+        <Check className="size-2.5"/>
       </CheckboxPrimiteve.Indicator>
     </CheckboxPrimiteve.Root>
   )

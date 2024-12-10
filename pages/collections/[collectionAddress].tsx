@@ -388,7 +388,7 @@ export default function CollectionPage() {
         <SingleCollectionSkeleton />
       ) : (
         <>
-          <div className="h-[395px] relative w-full px-[35px] py-10 flex items-end">
+          <div className="h-[395px] relative w-full px-[35px] max-sm:px-4 py-10 flex items-end">
             <Image
               src={collection?.collectionBackgroundImage || ""}
               alt={collection?.collectionName || ""}
