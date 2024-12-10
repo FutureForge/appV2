@@ -379,6 +379,7 @@ export function BrowsePage() {
         handleSearch={handleSearch}
         onFilterClick={handleFilterClick}
         filters={filters}
+        showFilters
       />
       {/* Conditionally render based on selectedFilter */}
       <div className="mt-8 w-full">

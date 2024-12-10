@@ -105,7 +105,7 @@ export function NFTCard(props: NFTCardProps) {
       <div className="flex items-center w-full justify-between">
         <div>
           <div className="flex items-center gap-1">
-            <XFI className="size-4" />
+            <XFI className="size-6" />
             <p className="text-lg font-medium text-white">
               {info1 || extraInfo}
             </p>
