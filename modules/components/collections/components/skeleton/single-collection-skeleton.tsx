@@ -4,7 +4,7 @@ import React from "react";
 export default function SingleCollectionSkeleton() {
   return (
     <div className="mt-20 w-full min-h-screen px-6">
-      <div className="h-[395px] relative w-full px-[35px] py-10 flex items-end">
+      <div className="h-[395px] relative w-full px-[35px] max-sm:px-4 py-10 flex items-end">
         <div className="!w-full skeleton-el h-full absolute inset-0" />
         <div className="bg-gradient-to-tr from-background via-background/95 to-transparent absolute inset-0 z-10" />
         <div className="z-40 flex items-end justify-between w-full max-sm:flex-col max-sm:items-start">

@@ -522,7 +522,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                       Make Offer
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="w-[787px]">
+                  <DialogContent className="w-[787px] max-[440px]:w-full">
                     <MakeOfferDialog
                       src={image!}
                       alt={name!}

@@ -115,7 +115,7 @@ export function MakeOfferDialog({
         </DialogTitle>
       </DialogHeader>
       <DialogBody>
-        <div className="flex gap-6 items-stretch max-[440px]:flex-col max-h-[76vh] h-full max-[440px]:h-full">
+        <div className="flex gap-6 items-stretch max-[440px]:flex-col max-h-[76vh] h-full max-[440px]:h-full max-[440px]:overflow-x-hidden">
           <div className="relative h-full w-1/2 max-[440px]:w-full">
             <div className="w-full relative h-[500px] border-2 border-border z-40 rounded-2xl">
               <MediaRenderer
@@ -192,8 +192,8 @@ export function MakeOfferDialog({
               {error && <p className="text-red-500 text-sm">{error}</p>}
             </form>
 
-            <div className="flex w-full mt-8 flex-col gap-4">
-              <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 rounded-xl w-full border border-border">
+            <div className="flex w-full mt-8 flex-col gap-4 max-[440px]:pb-4">
+              <div className="flex flex-col gap-3 bg-gradient-to-r from-border/80 via-black/95 to-transparent p-3 max-[440px]:p-2 rounded-xl w-full border border-border">
                 <Label className="mb-2 block">Duration</Label>
                 <div className="flex items-center gap-2 w-full">
                   <DatePicker
