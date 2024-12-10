@@ -44,27 +44,30 @@ export function makeCollectionColumns() {
   /* -------------------------------------------------------------------------------------------------
    * Floor Price column
    * -----------------------------------------------------------------------------------------------*/
+   const FLOORPRICE_HEADER_NAME = "Floor Price";
   const floorPriceColumn = columns.accessor("floorPrice", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>Floor Price</ColumnHeader>
+        <ColumnHeader column={column}>{FLOORPRICE_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
-      <div className="flex gap-2">
-        <XFI className="size-4" />
+      <div className="flex gap-2 items-center">
+        <XFI className="size-6" />
         <p>{getValue()} XFI</p>
       </div>
     ),
+    meta: { headerName: FLOORPRICE_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Volume column
    * -----------------------------------------------------------------------------------------------*/
+  const VOLUME_HEADER_NAME = "Volume";
   const volumeColumn = columns.accessor("totalVolume", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>Volume</ColumnHeader>
+        <ColumnHeader column={column}>{VOLUME_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -72,15 +75,17 @@ export function makeCollectionColumns() {
         <p>{getValue()} XFI</p>
       </div>
     ),
+    meta: { headerName: VOLUME_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Holder Count column
    * -----------------------------------------------------------------------------------------------*/
+  const HOLDERCOUNT_HEADER_NAME = "Holder Count";
   const holderCountColumn = columns.accessor("holderCount", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>Holder Count</ColumnHeader>
+        <ColumnHeader column={column}>{HOLDERCOUNT_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -88,6 +93,7 @@ export function makeCollectionColumns() {
         <p>{getValue()}</p>
       </div>
     ),
+    meta: { headerName: HOLDERCOUNT_HEADER_NAME },
   });
 
   return [collectionColumn, floorPriceColumn, volumeColumn, holderCountColumn];

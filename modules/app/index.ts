@@ -15,6 +15,7 @@ export {ToggleGroup} from './component/toggle-group'
 export {SwitchView} from './component/switch-view'
 export {Card} from './component/card'
 export { Table } from "./component/table";
+export { TableLayout } from "./component/table/table-layout";
 export {IconButton} from './component/icon-button'
 export {Select} from './component/select'
 export {

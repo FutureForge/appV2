@@ -90,7 +90,14 @@ export function CustomSlider({
       {
         breakpoint: 487,
         settings: {
-          slidesToShow: 1.2,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 400,
+        settings: {
+          slidesToShow: 0.9,
           slidesToScroll: 0.8,
         },
       },
