@@ -525,6 +525,7 @@ export function ProfilePage() {
             onFilterClick={handleFilterClick}
             filters={filters}
             showRightSide={false}
+            showFilters
             disabled={!userAddress || isLoading}
           />
           <div className="w-full items-center flex justify-end flex-wrap">
