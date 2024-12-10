@@ -78,26 +78,30 @@ export function CollectionPage() {
 
   return (
     <div
-      className="pt-12 flex flex-col gap-8 min-h-screen"
+      className="pt-12 flex flex-col gap-8 min-h-screen w-full"
       suppressHydrationWarning
     >
-      <CollectionsHeader
-        isActive={isActive}
-        setIsActive={setIsActive}
-        searchQuery={searchQuery}
-        handleSearch={handleSearch}
-      />
       {mounted && (
         <motion.div>
           {!isActive ? (
             <motion.div>
               <CollectionTable
+                isActive={isActive}
+                setIsActive={setIsActive}
+                searchQuery={searchQuery}
+                handleSearch={handleSearch}
                 isCollectionLoading={isLoading || isPending}
                 collectionData={currentPageData ?? []}
               />
             </motion.div>
           ) : (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center flex-col gap-8 justify-center w-full">
+              <CollectionsHeader
+                isActive={isActive}
+                setIsActive={setIsActive}
+                searchQuery={searchQuery}
+                handleSearch={handleSearch}
+              />
               <motion.div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center gap-5">
                 {isLoading || isPending || isError ? (
                   <>

@@ -6,6 +6,9 @@ import { Auction } from "@/utils/types/graphql";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { decimalOffChain } from "@/modules/blockchain";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
+import Image from "next/image";
+import { MediaRenderer } from "thirdweb/react";
+import { client } from "@/utils/configs";
 
 export function makeAllAuctionsColumn() {
   const columns = createColumnHelper<Auction>();
@@ -27,7 +30,12 @@ export function makeAllAuctionsColumn() {
         <div className="flex items-center gap-3 w-full">
           <div className="text-center min-w-[30px]">{row.index + 1}</div>
           <div className="flex items-center gap-3">
-            <ImageHolder src={image} alt={name} width={40} height={40} />
+            <MediaRenderer
+              client={client}
+              src={image}
+              alt={name}
+              className="mr-3 size-10 rounded-xl border border-border"
+            />
             <span className="text-sm">{name}</span>
           </div>
         </div>
@@ -38,10 +46,11 @@ export function makeAllAuctionsColumn() {
   /* -------------------------------------------------------------------------------------------------
    * Buyout Price column
    * -----------------------------------------------------------------------------------------------*/
+  const MINIMUMBID_HEADER_NAME = "Minimum Bid";
   const minimumBidAmountColumn = columns.accessor("minimumBidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>Minimum Bid</ColumnHeader>
+        <ColumnHeader column={column}>{MINIMUMBID_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -50,15 +59,17 @@ export function makeAllAuctionsColumn() {
         <p>{decimalOffChain(getValue())} XFI</p>
       </div>
     ),
+    meta: { headerName: MINIMUMBID_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Buyout Price column
    * -----------------------------------------------------------------------------------------------*/
+  const BUYOUTBID_HEADER_NAME = "Buyout Price";
   const buyoutBidAmountColumn = columns.accessor("buyoutBidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>Buyout Price</ColumnHeader>
+        <ColumnHeader column={column}>{BUYOUTBID_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -67,15 +78,19 @@ export function makeAllAuctionsColumn() {
         <p>{decimalOffChain(getValue())} XFI</p>
       </div>
     ),
+    meta: { headerName: BUYOUTBID_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Creator column
    * -----------------------------------------------------------------------------------------------*/
+  const AUCTIONCREATOR_HEADER_NAME = "Creator";
   const auctionCreatorColumn = columns.accessor("auctionCreator", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>Creator</ColumnHeader>
+        <ColumnHeader column={column}>
+          {AUCTIONCREATOR_HEADER_NAME}
+        </ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -83,15 +98,17 @@ export function makeAllAuctionsColumn() {
         <p>{getFormatAddress(getValue())}</p>
       </div>
     ),
+    meta: { headerName: AUCTIONCREATOR_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * End Time column
    * -----------------------------------------------------------------------------------------------*/
+  const ENDTIME_HEADER_NAME = "End Time";
   const endTimestampColumn = columns.accessor("endTimestamp", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>End Time</ColumnHeader>
+        <ColumnHeader column={column}>{ENDTIME_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -99,6 +116,7 @@ export function makeAllAuctionsColumn() {
         <p>{formatBlockchainTimestamp(getValue())}</p>
       </div>
     ),
+    meta: { headerName: ENDTIME_HEADER_NAME },
   });
 
   return [

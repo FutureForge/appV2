@@ -359,7 +359,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
           <DetailsSkeleton />
         </>
       ) : (
-        <div className="flex items-stretch h-full gap-6">
+        <div className="flex items-stretch h-full gap-6 max-[910px]:flex-col">
           {/* image section */}
           <div className="w-[40%] max-[910px]:w-full flex flex-col gap-6 h-full">
             {collectionDetails && (

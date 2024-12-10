@@ -156,7 +156,7 @@ export function Nav() {
           <Search />
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-8 max-sm:gap-2">
           <TransitionLinks
             href="/profile"
             className={cn(
@@ -174,7 +174,7 @@ export function Nav() {
               connectButton={{
                 label: "Connect Wallet",
                 className:
-                  "!font-space !rounded-lg !p-2 max-sm:!w-full !w-fit !text-sm !min-w-0 !flex !items-center !max-w-[28] !justify-center hover:!bg-primary/85 !duration-300 !ease-in-out !transition !bg-primary !text-white !h-[34px]",
+                  "!font-space !rounded-lg !p-2 max-sm:!w-full !whitespace-nowrap !w-fit !text-sm !min-w-0 !flex !items-center !max-w-[28] !justify-center hover:!bg-primary/85 !duration-300 !ease-in-out !transition !bg-primary !text-white !h-[34px]",
               }}
             />
           ) : (

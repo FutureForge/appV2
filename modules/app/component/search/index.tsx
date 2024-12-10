@@ -174,12 +174,12 @@ export function Search() {
   };
 
   return (
-    <RadixPopover.Root 
-      open={open} 
+    <RadixPopover.Root
+      open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
         if (!isOpen) {
-          setSearchValue('');
+          setSearchValue("");
           setActiveTag(null);
           setShowResults(false);
         }
@@ -224,13 +224,32 @@ export function Search() {
           }}
           className="bg-background/95 filter backdrop-blur-2xl max-w-[--radix-popover-trigger-width] h-[351px] min-w-[315px] border border-border rounded-2xl z-40 overflow-hidden"
         >
-          <ScrollArea.Root>
-            <div className="flex-col flex gap-4">
-              <div className="flex flex-col gap-2 p-4 border-b border-b-border relative">
-                <p className="text-xs text-muted-foreground z-30">
-                  Searching for
-                </p>
-                <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex-col flex">
+            <div className="flex flex-col gap-2 p-4 border-b border-b-border relative">
+              <p className="text-xs text-muted-foreground z-30">
+                Searching for
+              </p>
+              <ScrollArea.Root
+                rootClassName="h-fit"
+                onScroll={(event) => {
+                  const target = event.target as HTMLElement;
+                  const scrollLeft = target.scrollLeft;
+                  const scrollWidth = target.scrollWidth;
+                  const clientWidth = target.clientWidth;
+                  if (scrollLeft === 0) {
+                    target.style.setProperty("--right-black", "0%");
+                  } else if (scrollLeft + clientWidth === scrollWidth) {
+                    //
+                  } else {
+                    target.style.setProperty("--right-black", "8%");
+                  }
+                }}
+                style={{
+                  maskImage:
+                    "linear-gradient(to right, transparent 0%, black var(--right-black, 0%), black 95%, transparent 100%)",
+                }}
+              >
+                <div className="flex items-center gap-2 pb-4">
                   {popular_tags.map((tag) => (
                     <Button
                       onClick={() => handleToggleTag(tag.label)}
@@ -252,12 +271,29 @@ export function Search() {
                       />
                     </Button>
                   ))}
-                  <div className="bg-gradient-to-l from-black via-background to-transparent w-14 h-full top-0 absolute right-1" />
-                  <div className="bg-gradient-to-r from-black via-background to-transparent w-14 h-full top-0 absolute left-0" />
                 </div>
-              </div>
+              </ScrollArea.Root>
+            </div>
+            <ScrollArea.Root
+              onScroll={(event) => {
+                const target = event.target as HTMLElement;
+                const scrollTop = target.scrollTop;
 
-              <div className="p-4 flex flex-col">
+                if (scrollTop === 0) {
+                  target.style.setProperty("--top-black", "0%");
+                } else {
+                  target.style.setProperty("--top-black", "10%");
+                }
+              }}
+              style={{
+                maskImage:
+                  "linear-gradient(to bottom, black var(--top-black, 0%), black 90%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, black var(--top-black, 0%), black 90%, transparent 100%)",
+                maskType: "luminance",
+              }}
+            >
+              <div className="flex flex-col p-4">
                 {showResults && searchValue && (
                   <>
                     {isSearching ? (
@@ -298,8 +334,8 @@ export function Search() {
                   </div>
                 )}
               </div>
-            </div>
-          </ScrollArea.Root>
+            </ScrollArea.Root>
+          </div>
         </RadixPopover.Content>
       </ComboboxProvider>
     </RadixPopover.Root>
@@ -337,7 +373,7 @@ export function SearchResultItem({
     >
       <div className="relative">
         {type === "collection" ? (
-          <div className="flex items-center gap-3 p-2 hover:bg-muted/50 rounded-lg group cursor-pointer">
+          <div className="flex items-center gap-3 hover:bg-muted/50 rounded-lg group cursor-pointer">
             <div className="relative w-10 h-10">
               <img
                 src={data?.collectionImage}
