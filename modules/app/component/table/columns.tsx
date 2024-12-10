@@ -7,7 +7,7 @@ import { Button } from "../button";
 import { Popover } from "../popover";
 
 type ColumnsProps<T> = {
-  table: Table<T>;
+  table: Table<T> | undefined;
 };
 
 function ColumnsIcon() {
@@ -29,9 +29,7 @@ function ColumnsIcon() {
 }
 
 export function Columns<T>({ table }: ColumnsProps<T>) {
-  const columns = table
-    .getAllColumns()
-    .filter((col) => !!col.columnDef.meta?.headerName);
+  const columns = table?.getAllColumns().filter((col) => !!col.columnDef.meta?.headerName);
 
   return (
     <Popover.Root>
@@ -52,7 +50,7 @@ export function Columns<T>({ table }: ColumnsProps<T>) {
       >
         <div className="w-full h-[0.5px] bg-new-elements-border" />
         <ScrollArea.Root className="p-3 flex flex-col gap-1 max-h-[300px]">
-          {columns.map((col) => (
+          {columns?.map((col) => (
             <div
               key={col.id}
               className="flex items-center  gap-2 py-2 text-sm cursor-pointer"

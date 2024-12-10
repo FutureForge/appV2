@@ -181,7 +181,7 @@ export function Table<T>({
                           delay: index * 0.08,
                         }}
                         
-                        className="hover:bg-table-hover cursor-pointer group"
+                        className="hover:bg-table-hover hover:z-20 cursor-pointer z-20"
                       >
                         {/* First Column Sticky with Padding to the Right */}
                         {row.getVisibleCells().map((cell, index) => {

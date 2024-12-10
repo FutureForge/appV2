@@ -15,35 +15,42 @@ import { useSearchParams } from "next/navigation";
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
+import { Table } from "@tanstack/react-table";
+import { Columns } from "../table/columns";
 
-type HeaderProps = {
+type HeaderProps<T> = {
   title?: string;
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
   searchQuery?: string;
   handleSearch?: (query: string) => void;
-  filters: string[];
+  filters?: string[] | undefined;
   onFilterClick?: (filter: string) => void;
   showDurationToggle?: boolean;
   showRightSide?: boolean;
   renderDurationToggle?: boolean;
   selectedFilter?: string;
   disabled?: boolean;
+  showFilters?: boolean;
+  table?: Table<T>;
 };
 
-export function Header({
+export function Header<T>({
   isActive,
   setIsActive,
   searchQuery,
   handleSearch,
-  filters,
+  filters = [],
   onFilterClick,
   showDurationToggle = false,
   showRightSide = true,
   renderDurationToggle = false,
   selectedFilter,
   disabled = false,
-}: HeaderProps) {
+  showFilters = false,
+  title,
+  table,
+}: HeaderProps<T>) {
   const [filter, setFilter] = useState<string>(filters[0]);
   const [duration, setDuration] = useState<string>("1H");
   const [visibleFilters, setVisibleFilters] = useState(filters.slice(0, 5));
@@ -52,55 +59,83 @@ export function Header({
   const searchParams = useSearchParams();
   const currentFilter = searchParams.get("filter") || "";
 
+  const updateFilters = (selectedFilter: string) => {
+    const selectedFilterIndex = filters.indexOf(selectedFilter);
+    if (selectedFilterIndex >= 4) {
+      setVisibleFilters([...filters.slice(0, 4), selectedFilter]);
+      setRemainingFilters(
+        filters.filter((f, index) => index >= 4 && f !== selectedFilter)
+      );
+    } else {
+      setVisibleFilters(filters.slice(0, 5));
+      setRemainingFilters(filters.slice(5));
+    }
+  };
+
   useEffect(() => {
     if (currentFilter) {
       const matchingFilter = filters.find(
         (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
       );
       if (matchingFilter) {
-        const selectedFilterIndex = filters.indexOf(matchingFilter);
-        if (selectedFilterIndex >= 4) {
-          const newVisibleFilters = filters.slice(0, 4);
-          newVisibleFilters.push(matchingFilter);
-          setVisibleFilters(newVisibleFilters);
-
-          const newRemainingFilters = filters.filter(
-            (f, index) =>
-              index >= 4 && // Only consider filters after index 4
-              f !== matchingFilter // Exclude the selected filter
-          );
-          setRemainingFilters(newRemainingFilters);
-        }
+        updateFilters(matchingFilter);
         setFilter(matchingFilter);
       }
     } else {
       setFilter(filters[0]);
-      // Reset to default visible and remaining filters
-      setVisibleFilters(filters.slice(0, 5));
-      setRemainingFilters(filters.slice(5));
+      updateFilters(filters[0]);
     }
   }, [currentFilter, filters]);
 
-  useEffect(() => {
-    if (!currentFilter) {
-      if (filter) {
-        const selectedFilterIndex = filters.indexOf(filter);
-        if (selectedFilterIndex >= 4) {
-          const newVisibleFilters = filters.slice(0, 4);
-          newVisibleFilters.push(filter);
-          setVisibleFilters(newVisibleFilters);
+  // useEffect(() => {
+  //   if (currentFilter) {
+  //     const matchingFilter = filters.find(
+  //       (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
+  //     );
+  //     if (matchingFilter) {
+  //       const selectedFilterIndex = filters.indexOf(matchingFilter);
+  //       if (selectedFilterIndex >= 4) {
+  //         const newVisibleFilters = filters.slice(0, 4);
+  //         newVisibleFilters.push(matchingFilter);
+  //         setVisibleFilters(newVisibleFilters);
 
-          const newRemainingFilters = filters.filter(
-            (f, index) =>
-              index >= 4 && // Only consider filters after index 4
-              f !== filter // Exclude the selected filter
-          );
-          setRemainingFilters(newRemainingFilters);
-        }
-        setFilter(filter);
-      }
-    }
-  }, [filter, filters]);
+  //         const newRemainingFilters = filters.filter(
+  //           (f, index) =>
+  //             index >= 4 && // Only consider filters after index 4
+  //             f !== matchingFilter // Exclude the selected filter
+  //         );
+  //         setRemainingFilters(newRemainingFilters);
+  //       }
+  //       setFilter(matchingFilter);
+  //     }
+  //   } else {
+  //     setFilter(filters[0]);
+  //     // Reset to default visible and remaining filters
+  //     setVisibleFilters(filters.slice(0, 5));
+  //     setRemainingFilters(filters.slice(5));
+  //   }
+  // }, [currentFilter, filters]);
+
+  // useEffect(() => {
+  //   if (!currentFilter) {
+  //     if (filter) {
+  //       const selectedFilterIndex = filters.indexOf(filter);
+  //       if (selectedFilterIndex >= 4) {
+  //         const newVisibleFilters = filters.slice(0, 4);
+  //         newVisibleFilters.push(filter);
+  //         setVisibleFilters(newVisibleFilters);
+
+  //         const newRemainingFilters = filters.filter(
+  //           (f, index) =>
+  //             index >= 4 && // Only consider filters after index 4
+  //             f !== filter // Exclude the selected filter
+  //         );
+  //         setRemainingFilters(newRemainingFilters);
+  //       }
+  //       setFilter(filter);
+  //     }
+  //   }
+  // }, [filter, filters]);
 
   // const visibleFilters = filters.slice(0, 5);
   // const remainingFilters = filters.slice(5);
@@ -108,61 +143,67 @@ export function Header({
   return (
     <div className="w-full flex min-[1160px]:items-center gap-4 justify-between max-[1160px]:flex-col">
       <div className="w-full flex justify-between items-center">
-        <Card className="bg-transparent w-fit border overflow-x-auto border-new-muted-text p-1 rounded-xl h-10 max-[1160px]:h-[42px]">
-          <ToggleGroup.Root
-            type="single"
+        {!showFilters ? (
+          <h4 className="font-medium tex-[28px]">{title}</h4>
+        ) : (
+          <Card className="bg-transparent w-fit border overflow-x-auto border-new-muted-text p-1 rounded-xl h-10 max-[1160px]:h-[42px]">
+            <ToggleGroup.Root
+              type="single"
+              value={selectedFilter ? selectedFilter : filter}
+              onValueChange={(value) => {
+                if (value) setFilter(value);
+                onFilterClick && onFilterClick(value);
+              }}
+              className={cn({ "justify-between": !showRightSide })}
+            >
+              {visibleFilters.map((value) => (
+                <ToggleGroup.Item
+                  key={value}
+                  variant="select"
+                  value={value}
+                  disabled={!!selectedFilter || disabled}
+                  className={cn(
+                    "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
+                    "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",
+                    { "justify-center": !showRightSide }
+                  )}
+                >
+                  {value}
+                </ToggleGroup.Item>
+              ))}
+            </ToggleGroup.Root>
+          </Card>
+        )}
+      </div>
+      <div className="flex items-center gap-4 justify-end">
+        {showFilters && (
+          <Select.Root
             value={selectedFilter ? selectedFilter : filter}
             onValueChange={(value) => {
               if (value) setFilter(value);
               onFilterClick && onFilterClick(value);
             }}
-            className={cn({ "justify-between": !showRightSide })}
           >
-            {visibleFilters.map((value) => (
-              <ToggleGroup.Item
-                key={value}
-                variant="select"
-                value={value}
-                disabled={!!selectedFilter || disabled}
-                className={cn(
-                  "data-[state=on]:bg-tertiary data-[state=on]:text-primary",
-                  "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent",
-                  { "justify-center": !showRightSide }
-                )}
-              >
-                {value}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup.Root>
-        </Card>
-      </div>
-      <div className="flex items-center gap-4 justify-end">
-        <Select.Root
-          value={selectedFilter ? selectedFilter : filter}
-          onValueChange={(value) => {
-            if (value) setFilter(value);
-            onFilterClick && onFilterClick(value);
-          }}
-        >
-          <Tooltip content={"More Filters"}>
-            <Select.Trigger>
-              <IconButton variant="ghost" className="size-[42px]">
-                <FilterIcon className="size-4 text-muted-foreground" />
-              </IconButton>
-            </Select.Trigger>
-          </Tooltip>
-          <Select.Content align="end" className="w-fit border border-border">
-            {remainingFilters.map((item) => (
-              <Select.Item
-                key={item}
-                value={item}
-                disabled={!!selectedFilter || disabled}
-              >
-                {item}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select.Root>
+            <Tooltip content={"More Filters"}>
+              <Select.Trigger>
+                <IconButton variant="ghost" className="size-[42px]">
+                  <FilterIcon className="size-4 text-muted-foreground" />
+                </IconButton>
+              </Select.Trigger>
+            </Tooltip>
+            <Select.Content align="end" className="w-fit border border-border">
+              {remainingFilters.map((item) => (
+                <Select.Item
+                  key={item}
+                  value={item}
+                  disabled={!!selectedFilter || disabled}
+                >
+                  {item}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Root>
+        )}
         {showRightSide && (
           <div className="flex items-center gap-2 justify-end">
             <TextField
@@ -219,6 +260,9 @@ export function Header({
                 </div>
               </SwitchView.SecondOption>
             </SwitchView.Root>
+            {table && table.getRowModel().rows.length > 0 && (
+              <Columns table={table} />
+            )}
           </div>
         )}
       </div>
