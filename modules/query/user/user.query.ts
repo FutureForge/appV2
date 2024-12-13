@@ -10,7 +10,7 @@ import {
   backendURL,
   chainInfo,
   client,
-  CROSSFI_API_TESTNET,
+  CROSSFI_API_URL,
   NFT_FACTORY_ADDRESS,
   WRAPPED_TOKEN_CONTRACT,
 } from "@/utils/configs";
@@ -130,7 +130,7 @@ export function useUserNFTsQuery() {
     queryKey: [queryKeys.user.nfts, userAddress],
     queryFn: async () => {
       const response = await axios.get<UserNFTResponse>(
-        `${CROSSFI_API_TESTNET}/token-holders?address=${userAddress}&tokenType=CFC-721&page=1&limit=1000&sort=-balance`
+        `${CROSSFI_API_URL}/token-holders?address=${userAddress}&tokenType=CFC-721&page=1&limit=1000&sort=-balance`
       );
 
       const userNFTs = response.data.docs;
@@ -621,7 +621,7 @@ export function useUserNFTActivitiesQuery() {
     queryKey: [queryKeys.user.nftActivities, userAddress],
     queryFn: async () => {
       const response = await axios.get<NFTActivityResponse>(
-        `${CROSSFI_API_TESTNET}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
+        `${CROSSFI_API_URL}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
       );
 
       const tokenTransfers = response.data.docs;

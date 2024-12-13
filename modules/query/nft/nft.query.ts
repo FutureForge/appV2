@@ -2,7 +2,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
-  CROSSFI_API_TESTNET,
+  CROSSFI_API_URL,
   MARKETPLACE_ADDRESS_TESTNET,
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
@@ -75,7 +75,7 @@ export function useSingleNFTQuery({
           allAuctions,
         ] = await Promise.all([
           axios.get<NFTActivityResponse>(
-            `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
+            `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
           ),
           // axios.get(
           //   `https://test.xfiscan.com/api/1.0/token-inventory/${contractAddress}/${tokenId}`
