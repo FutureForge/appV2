@@ -3,7 +3,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
   backendURL,
-  CROSSFI_API_TESTNET,
+  CROSSFI_API_URL,
   MARKETPLACE_ADDRESS_TESTNET,
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
@@ -66,7 +66,7 @@ export function useCheckIfItsACollectionQuery({
     queryKey: [queryKeys.collection.checkContractIsACollection],
     queryFn: async () => {
       const response = await axios.get(
-        `${CROSSFI_API_TESTNET}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
+        `${CROSSFI_API_URL}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
       );
       const nftData = response.data.docs;
 
@@ -240,7 +240,7 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
         try {
           const [collectionDetailsResponse] = await Promise.all([
             axios.get(
-              `${CROSSFI_API_TESTNET}/tokens/${collection.collectionAddress}`
+              `${CROSSFI_API_URL}/tokens/${collection.collectionAddress}`
             ),
           ]);
 
@@ -384,9 +384,9 @@ export function useSingleCollectionQuery({
         //   `${backendURL}/collection/${contractAddress}`
         // ),
         axios.get<NFTActivityResponse>(
-          `${CROSSFI_API_TESTNET}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
+          `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
         ),
-        axios.get(`${CROSSFI_API_TESTNET}/tokens/${contractAddress}`),
+        axios.get(`${CROSSFI_API_URL}/tokens/${contractAddress}`),
         getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
         getPlatformFeeInfoCustom({
           contractAddress: MARKETPLACE_ADDRESS_TESTNET,
