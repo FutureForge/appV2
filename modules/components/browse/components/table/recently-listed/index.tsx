@@ -7,8 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { makeRecentlyListedColumn } from "./columns";
 
-import { Table } from "@/modules/app";
-import { Collection } from "@/utils/types/collection/collection.type";
+import { Table, TableLayout } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Listing } from "@/utils/types/graphql";
@@ -36,16 +35,18 @@ export function RecentlyListedTable({
   return (
     <HydrationBoundary state={dehydrate}>
       <div suppressHydrationWarning>
-        <Table
-          onRowClick={(_row) => {
-            const collectionAddress = _row.assetContract;
-            const tokenId = _row.nft.tokenId;
-            router.push(`/nft/${collectionAddress}/${tokenId}`);
-          }}
-          isLoading={isLoading}
-          hasHover
-          table={table}
-        />
+        <TableLayout table={table} title="Recent Listings">
+          <Table
+            onRowClick={(_row) => {
+              const collectionAddress = _row.assetContract;
+              const tokenId = _row.nft.tokenId;
+              router.push(`/nft/${collectionAddress}/${tokenId}`);
+            }}
+            isLoading={isLoading}
+            hasHover
+            table={table}
+          />
+        </TableLayout>
       </div>
     </HydrationBoundary>
   );

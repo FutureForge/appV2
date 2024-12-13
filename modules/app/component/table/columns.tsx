@@ -37,7 +37,7 @@ export function Columns<T>({ table }: ColumnsProps<T>) {
         <Button
           shape="square"
           variant="secondary"
-          className="!h-[43px] !px-2 gap-2 !text-sm !text-new-foreground md:hidden !font-sans !bg-new-terciary !border !border-new-elements-border !font-medium"
+          className="!h-9 !px-2 gap-2 !text-sm !text-new-foreground !font-sans !bg-new-terciary !border !border-new-elements-border !font-medium"
         >
           <ColumnsIcon />
           Columns

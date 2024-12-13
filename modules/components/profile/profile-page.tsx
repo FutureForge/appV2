@@ -486,13 +486,6 @@ export function ProfilePage() {
         <div className="z-40 flex items-end justify-between w-full">
           <div className="z-30 flex flex-col gap-6 w-[40%]">
             <div className="flex flex-col gap-4 z-40">
-              {/* <Image
-                src={"/image-2.png"}
-                alt={"profile image"}
-                width={123}
-                height={123}
-                className="size-[123px] rounded-[22px] z-40"
-              /> */}
               <div
                 className="size-[123px] rounded-[22px] z-40"
                 style={{

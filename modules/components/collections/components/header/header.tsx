@@ -1,5 +1,5 @@
-import { Card, SwitchView, TextField, ToggleGroup } from "@/modules/app";
-import React, { useState } from "react";
+import {SwitchView, TextField,} from "@/modules/app";
+import React from "react";
 // icons
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
@@ -10,7 +10,6 @@ type HeaderProps = {
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
   searchQuery: string;
-  // setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: (query: string) => void;
 };
 
@@ -21,8 +20,7 @@ export function CollectionsHeader({
   handleSearch 
 }: HeaderProps) {
   return (
-    <div className="w-full flex md:items-center gap-4 justify-between max-md:flex-col">
-      <h4 className="font-medium tex-[28px]">Collections</h4>
+    <div className="w-full flex md:items-center gap-4 justify-end max-md:flex-col">
       <div className="flex items-center gap-2 justify-end">
         <TextField
           type="search"
@@ -31,15 +29,6 @@ export function CollectionsHeader({
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
         />
-        {/* <Card className="bg-new-muted-bg border border-new-muted-text p-1 rounded-lg">
-          <ToggleGroup.Root type="single">
-            {["1H", "1D", "7D", "30D"].map((value) => (
-              <ToggleGroup.Item variant="select" value={value}>
-                {value}
-              </ToggleGroup.Item>
-            ))}
-          </ToggleGroup.Root>
-        </Card> */}
         <SwitchView.Root
           falseoption="list"
           trueoption="grid"

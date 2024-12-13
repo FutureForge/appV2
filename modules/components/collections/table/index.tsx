@@ -15,20 +15,11 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 type CollectionTableProps = {
   isCollectionLoading: boolean;
   collectionData: Collection[];
-  isActive: boolean;
-  setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
-  searchQuery: string;
-  // setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-  handleSearch: (query: string) => void;
 };
 
 export function CollectionTable({
   isCollectionLoading,
   collectionData,
-  isActive,
-  setIsActive,
-  searchQuery,
-  handleSearch,
 }: CollectionTableProps) {
   const router = useRouter();
 
@@ -46,11 +37,7 @@ export function CollectionTable({
       <div suppressHydrationWarning>
         <TableLayout
           table={table}
-          title="Collection"
-          isActive={isActive}
-          setIsActive={setIsActive}
-          searchQuery={searchQuery}
-          handleSearch={handleSearch}
+          title="Collections"
         >
           <Table
             onRowClick={(_row) => {
