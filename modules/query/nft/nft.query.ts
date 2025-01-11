@@ -33,15 +33,7 @@ import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
 import { indexerEndpoint } from "@/utils/graphql";
 import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
 import request from "graphql-request";
-
-export const StatusType = {
-  UNSET: 0,
-  CREATED: 1,
-  COMPLETED: 2,
-  CANCELLED: 3,
-  ACTIVE: 4,
-  EXPIRED: 5,
-};
+import { StatusType } from "@/utils/enums/messages/index.enum";
 
 export function useSingleNFTQuery({
   contractAddress,

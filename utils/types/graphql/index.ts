@@ -15,18 +15,18 @@ export type WinningBid = {
 };
 
 export type NFTMetadata = {
-  animationUrl: string;
+  animationUrl?: string;
   attributes: Attribute[];
-  backgroundColor: string;
-  customAnimationUrl: string;
-  customImage: string;
+  backgroundColor?: string;
+  customAnimationUrl?: string;
+  customImage?: string;
   description: string;
-  externalUrl: string;
+  externalUrl?: string;
   image: string;
-  imageUrl: string;
+  imageUrl?: string;
   name: string;
   properties: Property[];
-  supply: number;
+  supply?: number;
 };
 
 export type NFT = {

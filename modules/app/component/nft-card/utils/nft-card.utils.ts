@@ -83,7 +83,7 @@ export const getNFTCardInfo = ({
       return {
         title1: "Buyout Price",
         title2: "Auctioned By",
-        info1: `${decimalOffChain(buyoutBidAmountNewAuction)} XFI`,
+        info1: `${buyoutBidAmountNewAuction} XFI`,
         info2: getFormatAddress(auctionCreatorNewAuction),
       };
 
@@ -94,7 +94,7 @@ export const getNFTCardInfo = ({
       return {
         title1: "Buyout Price",
         title2: "Bought By",
-        info1: `${decimalOffChain(bidAmount)} XFI`,
+        info1: `${(bidAmount)} XFI`,
         info2: getFormatAddress(closer),
       };
 

@@ -48,13 +48,23 @@ export const CROSSFI_API_MAINNET = "https://api.xfiscan.com/api/1.0";
 
 export const testnetProviderUrl = "https://rpc.xfi.ms/archive/4157";
 
+export const testnetProviderUrlMap = [
+  "https://rpc.testnet.ms/",
+  // "https://rpc.xfi.ms/archive/4157",
+];
+
 export const crossFiTestnet = defineChain({
   id: 4157,
-  rpc: testnetProviderUrl,
+  // rpc: testnetProviderUrl,
   nativeCurrency: {
     decimals: 18,
     name: "XFI",
     symbol: "XFI",
+  },
+  rpcUrls: {
+    default: {
+      http: testnetProviderUrlMap,
+    },
   },
   testnet: true,
   blockExplorers: [
@@ -85,6 +95,10 @@ export const crossFiMainnet = defineChain({
 });
 
 export const chainInfo = IS_TESTNET ? crossFiTestnet : crossFiMainnet;
+
+export const MARKETPLACE_ADDRESS = IS_TESTNET
+  ? MARKETPLACE_ADDRESS_TESTNET
+  : MARKETPLACE_ADDRESS_MAINNET;
 
 export const NFT_FACTORY_ADDRESS = IS_TESTNET
   ? NFT_FACTORY_ADDRESS_TESTNET

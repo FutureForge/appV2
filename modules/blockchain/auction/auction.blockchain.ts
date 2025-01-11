@@ -1,4 +1,4 @@
-import { MARKETPLACE_ADDRESS_TESTNET, nativeCurrency } from "@/utils/configs";
+import { MARKETPLACE_ADDRESS, MARKETPLACE_ADDRESS_TESTNET, nativeCurrency } from "@/utils/configs";
 import {
   getCurrentBlockchainTimestamp,
   getEndBlockchainTimestamp,
@@ -44,7 +44,7 @@ export async function getCreateAuction({
 
 export async function getWinningBid({ auctionId }: { auctionId: bigint }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await readContract({
@@ -63,7 +63,7 @@ export async function getIsAuctionExpired({
   auctionId: bigint;
 }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await readContract({
@@ -81,7 +81,7 @@ export async function getCollectAuctionPayout({
   auctionId: string;
 }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await prepareContractCall({
@@ -99,7 +99,7 @@ export async function getCollectAuctionTokens({
   auctionId: string;
 }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await prepareContractCall({
@@ -113,7 +113,7 @@ export async function getCollectAuctionTokens({
 
 export async function getCancelAuction({ auctionId }: { auctionId: string }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await prepareContractCall({
@@ -133,7 +133,7 @@ export async function getBidInAuction({
   bidAmount: string;
 }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const transaction = await prepareContractCall({
@@ -153,7 +153,7 @@ export async function getAuctionByAuctionId({
   auctionId: string;
 }) {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
 
   const data = await readContract({
@@ -168,7 +168,7 @@ export async function getAuctionByAuctionId({
 
 export async function getTotalAuctions() {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
   const totalAuctions = await readContract({
     contract,
@@ -185,7 +185,7 @@ export async function getTotalAuctions() {
 
 export async function getAllAuctions() {
   const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+    contractAddress: MARKETPLACE_ADDRESS,
   });
   const totalAuctions = await getTotalAuctions();
 

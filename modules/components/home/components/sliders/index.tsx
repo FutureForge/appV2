@@ -2,6 +2,7 @@ import { CustomSlider, ErrorComponent, NFTCard } from "@/modules/app";
 import {
   useAllCollectionsQuery,
   useAuctionClosedQuery,
+  useAllAuctionsBlockchainQuery,
   useNewAuctionsQuery,
   useNewBidsQuery,
   useNewListingsQuery,
@@ -20,54 +21,60 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 export function Sliders() {
   const router = useRouter();
-  const { data: CollectionQuery, isLoading: isCollectionLoading } =
-    useAllCollectionsQuery({});
+  const {
+    data: collectionQuery,
+    isLoading: isCollectionLoading,
+    isError: isErrorCollectionQuery,
+  } = useAllCollectionsQuery({});
 
   const {
-    data: NewListings,
-    isLoading: isNewListingsLoading,
-    isError: isNewListingError,
-  } = useNewListingsQuery({ limit: 15 });
-
-  const {
-    data: NewSalesListing,
-    isLoading: isNewSalesLoading,
-    isError: isNewSalesError,
-  } = useNewSaleListingsQuery({ limit: 15 });
-
-  const {
-    data: NewAuction,
-    isLoading: isNewAuctionLoading,
-    isError: isNewAuctionError,
-  } = useNewAuctionsQuery({ limit: 15 });
-
-  const {
-    data: AuctionClosed,
-    isLoading: isAuctionClosedLoading,
-    isError: isAuctionClosedError,
-  } = useAuctionClosedQuery({ limit: 15 });
-
-  const {
-    data: RecentOffers,
-    isLoading: isRecentOffersLoading,
-    isError: isRecentOffersError,
-  } = useNewOffersQuery({ limit: 15 });
-
-  const {
-    data: NewBids,
-    isLoading: isNewBidsLoading,
-    isError: isNewBidsError,
-  } = useNewBidsQuery({
-    limit: 15,
+    data: newAuction,
+    isLoading: isLoadingNewAuction,
+    isError: isErrorNewAuction,
+  } = useAllAuctionsBlockchainQuery({
+    limit: 2,
+    type: "new-listing",
   });
 
-  const isError =
-    isNewBidsError ||
-    isNewListingError ||
-    isNewSalesError ||
-    isNewAuctionError ||
-    isAuctionClosedError ||
-    isRecentOffersError;
+  // const {
+  //   data: NewListings,
+  //   isLoading: isNewListingsLoading,
+  //   isError: isNewListingError,
+  // } = useNewListingsQuery({ limit: 15 });
+
+  // const {
+  //   data: NewSalesListing,
+  //   isLoading: isNewSalesLoading,
+  //   isError: isNewSalesError,
+  // } = useNewSaleListingsQuery({ limit: 15 });
+
+  // const {
+  //   data: NewAuction,
+  //   isLoading: isNewAuctionLoading,
+  //   isError: isNewAuctionError,
+  // } = useNewAuctionsQuery({ limit: 15 });
+
+  // const {
+  //   data: AuctionClosed,
+  //   isLoading: isAuctionClosedLoading,
+  //   isError: isAuctionClosedError,
+  // } = useAuctionClosedQuery({ limit: 15 });
+
+  // const {
+  //   data: RecentOffers,
+  //   isLoading: isRecentOffersLoading,
+  //   isError: isRecentOffersError,
+  // } = useNewOffersQuery({ limit: 15 });
+
+  // const {
+  //   data: NewBids,
+  //   isLoading: isNewBidsLoading,
+  //   isError: isNewBidsError,
+  // } = useNewBidsQuery({
+  //   limit: 15,
+  // });
+
+  const isError = isErrorNewAuction;
 
   const handleViewItem = ({
     contractAddress,
@@ -91,7 +98,7 @@ export function Sliders() {
         title="Collection List"
         cta="View More"
         href="/collections"
-        data={CollectionQuery?.collections || []}
+        data={collectionQuery?.collections || []}
         renderItem={(collection: CollectionNFTCardProps) => {
           const handleClick = () => {
             router.push(`/collections/${collection.collectionAddress}`);
@@ -112,7 +119,7 @@ export function Sliders() {
       />
 
       {/* Recently Listed */}
-      <DataSlider
+      {/* <DataSlider
         isLoading={isNewListingsLoading}
         title="Recently Listed"
         cta="View More"
@@ -134,15 +141,15 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
 
       {/* Recently Auctioned */}
       <DataSlider
-        isLoading={isNewAuctionLoading}
+        isLoading={isLoadingNewAuction}
         title="Recently Auctioned NFTs"
         cta="View More"
         href="/browse?filter=recent_auctions"
-        data={NewAuction || []}
+        data={newAuction || []}
         renderItem={(auction: Auction) => {
           return (
             <NFTCard
@@ -162,7 +169,7 @@ export function Sliders() {
       />
 
       {/* Recent Bids */}
-      <DataSlider
+      {/* <DataSlider
         isLoading={isNewBidsLoading}
         title="Recent Bids"
         cta="View More"
@@ -184,10 +191,10 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
 
       {/* Recently Sold Listing */}
-      <DataSlider
+      {/* <DataSlider
         isLoading={isNewSalesLoading}
         title="Recently Sold Listing"
         cta="View More"
@@ -209,15 +216,15 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
 
       {/* Recently Sold Auction */}
-      <DataSlider
-        isLoading={isAuctionClosedLoading}
+      {/* <DataSlider
+        isLoading={isLoadingCompletedAuction}
         title="Recently Sold Auction"
         cta="View More"
         href="/browse?filter=recent_sold_auctions"
-        data={AuctionClosed || []}
+        data={completedAuction || []}
         renderItem={(auction: Auction) => {
           return (
             <NFTCard
@@ -234,10 +241,10 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
 
       {/* Recent Offers */}
-      <DataSlider
+      {/* <DataSlider
         isLoading={isRecentOffersLoading}
         title="Recent Offers"
         cta="View More"
@@ -259,7 +266,7 @@ export function Sliders() {
             />
           );
         }}
-      />
+      /> */}
 
       {/* Accepted Offers */}
       {/* <DataSlider

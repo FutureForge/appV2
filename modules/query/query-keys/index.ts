@@ -22,6 +22,8 @@ export const queryKeys = {
     filteredAll: ["filtered-all-auctions"] as const,
     filteredNew: ["filtered-new-auctions"] as const,
     filteredClosed: ["filtered-closed-auctions"] as const,
+    blockchain: ["auction-blockchain"] as const,
+    filtered: ["auction-blockchain-filtered"] as const,
   },
   offers: {
     all: ["offers"] as const,

@@ -1,5 +1,6 @@
 export * from "./listing/listing.query";
 export * from "./auction/auction.query";
+export * from "./auction/auction.blockchain.query";
 export * from "./offers/offers.query";
 export * from "./collection/collection.query.";
 export * from "./nft/nft.query";
