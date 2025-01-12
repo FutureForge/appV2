@@ -1,6 +1,8 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { ConnectButton } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getFormatAddress } from "@/utils/functions";
@@ -8,9 +10,7 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useInView } from "react-intersection-observer";
 import {
   useUserAuctionsQuery,
-  useUserBidsQuery,
   useUserChainInfo,
-  useUserCollectionsQuery,
   useUserExpiredAuctionsQuery,
   useUserExpiredListingsQuery,
   useUserExpiredOffersQuery,
@@ -18,7 +18,6 @@ import {
   useUserNFTActivitiesQuery,
   useUserNFTsQuery,
   useUserOffersQuery,
-  useUserOffersReceivedQuery,
   useUserPendingPayoutQuery,
 } from "@/modules/query";
 import {
@@ -35,23 +34,17 @@ import {
   NFTCard,
   NftCardSkeleton,
 } from "@/modules/app";
-
-import { ConnectButton } from "thirdweb/react";
-import { createWallet } from "thirdweb/wallets";
-
 import { motion } from "framer-motion";
-import {
-  CollectionsNFTCard,
-  ImageHolder,
-} from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import {
-  Collection,
-  UserNFTData,
-} from "@/utils/types/collection/collection.type";
-import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
+import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import { UserNFTData } from "@/utils/types/collection/collection.type";
 import { chainInfo, client } from "@/utils/configs";
 import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
 import { useUserImageStore } from "@/utils/store/user-image.store";
+import {
+  Auction,
+  Listing,
+  Offer,
+} from "@/modules/query/utils/index.utils.query";
 
 // Icons
 import CopyIcon from "@/assets/copy.svg";
@@ -62,11 +55,11 @@ const filters = [
   "Listed",
   "Auctions",
   "Offers Made",
-  "Offers Received",
-  "Bids Placed",
+  // "Offers Received",
+  // "Bids Placed",
   "NFT Activities",
   "Expired",
-  "Collections",
+  // "Collections",
   "Pending Payout",
 ];
 
@@ -109,66 +102,77 @@ export function ProfilePage() {
     isPending: isUserNFTsPending,
     isError: isUserNFTsError,
   } = useUserNFTsQuery();
+
   const {
     data: userListings,
     isLoading: isUserListingsLoading,
     isPending: isUserListingsPending,
     isError: isUserListingsError,
   } = useUserListingsQuery();
+
   const {
     data: userAuctions,
     isLoading: isUserAuctionsLoading,
     isPending: isUserAuctionsPending,
     isError: isUserAuctionsError,
   } = useUserAuctionsQuery();
+
   const {
     data: userPendingPayout,
     isLoading: isUserPendingPayoutLoading,
     isPending: isUserPendingPayoutPending,
     isError: isUserPendingPayoutError,
   } = useUserPendingPayoutQuery();
+
   const {
     data: userOffers,
     isLoading: isUserOffersLoading,
     isPending: isUserOffersPending,
     isError: isUserOffersError,
   } = useUserOffersQuery();
-  const {
-    data: userOffersReceived,
-    isLoading: isUserOffersReceivedLoading,
-    isPending: isUserOffersReceivedPending,
-    isError: isUserOffersReceivedError,
-  } = useUserOffersReceivedQuery();
-  const {
-    data: userBids,
-    isLoading: isUserBidsLoading,
-    isPending: isUserBidsPending,
-    isError: isUserBidsError,
-  } = useUserBidsQuery();
+
+  // const {
+  //   data: userOffersReceived,
+  //   isLoading: isUserOffersReceivedLoading,
+  //   isPending: isUserOffersReceivedPending,
+  //   isError: isUserOffersReceivedError,
+  // } = useUserOffersReceivedQuery();
+
+  // const {
+  //   data: userBids,
+  //   isLoading: isUserBidsLoading,
+  //   isPending: isUserBidsPending,
+  //   isError: isUserBidsError,
+  // } = useUserBidsQuery();
+
   const {
     data: userExpiredListings,
     isLoading: isUserExpiredListingsLoading,
     isPending: isUserExpiredListingsPending,
     isError: isUserExpiredListingsError,
   } = useUserExpiredListingsQuery();
+
   const {
     data: userExpiredAuctions,
     isLoading: isUserExpiredAuctionsLoading,
     isPending: isUserExpiredAuctionsPending,
     isError: isUserExpiredAuctionsError,
   } = useUserExpiredAuctionsQuery();
+
   const {
     data: userExpiredOffers,
     isLoading: isUserExpiredOffersLoading,
     isPending: isUserExpiredOffersPending,
     isError: isUserExpiredOffersError,
   } = useUserExpiredOffersQuery();
-  const {
-    data: userCollections,
-    isLoading: isUserCollectionsLoading,
-    isPending: isUserCollectionsPending,
-    isError: isUserCollectionsError,
-  } = useUserCollectionsQuery();
+
+  // const {
+  //   data: userCollections,
+  //   isLoading: isUserCollectionsLoading,
+  //   isPending: isUserCollectionsPending,
+  //   isError: isUserCollectionsError,
+  // } = useUserCollectionsQuery();
+
   const {
     data: userNFTActivities,
     isLoading: isUserNFTActivitiesLoading,
@@ -241,23 +245,23 @@ export function ProfilePage() {
     isUserListingsLoading ||
     isUserAuctionsLoading ||
     isUserOffersLoading ||
-    isUserOffersReceivedLoading ||
-    isUserBidsLoading ||
+    // isUserOffersReceivedLoading ||
+    // isUserBidsLoading ||
     isUserExpiredListingsLoading ||
     isUserExpiredAuctionsLoading ||
     isUserExpiredOffersLoading ||
-    isUserCollectionsLoading ||
-    isUserPendingPayoutLoading ||
-    isUserNFTActivitiesLoading;
+    // isUserCollectionsLoading ||
+    isUserNFTActivitiesLoading ||
+    isUserPendingPayoutLoading;
 
   const isError =
     isUserAuctionsError ||
-    isUserBidsError ||
-    isUserOffersReceivedError ||
+    // isUserBidsError ||
+    // isUserOffersReceivedError ||
     isUserExpiredListingsError ||
     isUserExpiredAuctionsError ||
     isUserExpiredOffersError ||
-    isUserCollectionsError ||
+    // isUserCollectionsError ||
     isUserNFTActivitiesError ||
     isUserOffersError ||
     isUserNFTsError ||
@@ -298,7 +302,7 @@ export function ProfilePage() {
               .replace(/\s+/g, "");
 
             const nameNoSpace = listing?.nft?.metadata?.name
-              .toLowerCase()
+              ?.toLowerCase()
               .replace(/\s+/g, "");
             const tokenIdNoSpace = listing.tokenId
               .toString()
@@ -321,7 +325,7 @@ export function ProfilePage() {
               .replace(/\s+/g, "");
 
             const nameNoSpace = auction?.nft?.metadata?.name
-              .toLowerCase()
+              ?.toLowerCase()
               .replace(/\s+/g, "");
             const tokenIdNoSpace = auction.tokenId
               .toString()
@@ -342,7 +346,7 @@ export function ProfilePage() {
             .replace(/\s+/g, "");
 
           const nameNoSpace = offer?.nft?.metadata?.name
-            .toLowerCase()
+            ?.toLowerCase()
             .replace(/\s+/g, "");
           const tokenIdNoSpace = offer.tokenId
             .toString()
@@ -354,48 +358,48 @@ export function ProfilePage() {
         });
         return filteredOffers;
 
-      case filters[4]:
-        const filteredOffersReceived =
-          userOffersReceived?.userOffersReceived?.filter((offer) => {
-            const searchTerm = searchQuery
-              .toLowerCase()
-              .trim()
-              .replace(/\s+/g, "");
+      // case filters[4]:
+      //   const filteredOffersReceived =
+      //     userOffersReceived?.userOffersReceived?.filter((offer) => {
+      //       const searchTerm = searchQuery
+      //         .toLowerCase()
+      //         .trim()
+      //         .replace(/\s+/g, "");
 
-            const nameNoSpace = offer?.nft?.metadata?.name
-              .toLowerCase()
-              .replace(/\s+/g, "");
-            const tokenIdNoSpace = offer.tokenId
-              .toString()
-              .toLowerCase()
-              .replace(/\s+/g, "");
-            const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+      //       const nameNoSpace = offer?.nft?.metadata?.name
+      //         .toLowerCase()
+      //         .replace(/\s+/g, "");
+      //       const tokenIdNoSpace = offer.tokenId
+      //         .toString()
+      //         .toLowerCase()
+      //         .replace(/\s+/g, "");
+      //       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
-            return combinedField.includes(searchTerm);
-          });
-        return filteredOffersReceived;
+      //       return combinedField.includes(searchTerm);
+      //     });
+      //   return filteredOffersReceived;
 
-      case filters[5]:
-        const filteredBids = userBids?.userBids?.filter((bid) => {
-          const searchTerm = searchQuery
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, "");
+      // case filters[5]:
+      //   const filteredBids = userBids?.userBids?.filter((bid) => {
+      //     const searchTerm = searchQuery
+      //       .toLowerCase()
+      //       .trim()
+      //       .replace(/\s+/g, "");
 
-          const nameNoSpace = bid?.nft?.metadata?.name
-            .toLowerCase()
-            .replace(/\s+/g, "");
-          const tokenIdNoSpace = bid.tokenId
-            .toString()
-            .toLowerCase()
-            .replace(/\s+/g, "");
-          const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+      //     const nameNoSpace = bid?.nft?.metadata?.name
+      //       .toLowerCase()
+      //       .replace(/\s+/g, "");
+      //     const tokenIdNoSpace = bid.tokenId
+      //       .toString()
+      //       .toLowerCase()
+      //       .replace(/\s+/g, "");
+      //     const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
-          return combinedField.includes(searchTerm);
-        });
-        return filteredBids;
+      //     return combinedField.includes(searchTerm);
+      //   });
+      //   return filteredBids;
 
-      case filters[9]:
+      case filters[6]:
         const filteredPendingPayout =
           userPendingPayout?.userPendingPayout?.filter((auction) => {
             const searchTerm = searchQuery
@@ -404,7 +408,7 @@ export function ProfilePage() {
               .replace(/\s+/g, "");
 
             const nameNoSpace = auction?.nft?.metadata?.name
-              .toLowerCase()
+              ?.toLowerCase()
               .replace(/\s+/g, "");
             const tokenIdNoSpace = auction.tokenId
               .toString()
@@ -427,8 +431,8 @@ export function ProfilePage() {
   const expiredAuctions = userExpiredAuctions?.expiredAuctions;
   const expiredOffers = userExpiredOffers?.expiredOffers;
 
-  const paginatedCollectionsData = userCollections?.slice(0, displayCount);
-  const paginatedNFTActivitiesData = userNFTActivities?.slice(0, displayCount);
+  // const paginatedCollectionsData = userCollections?.slice(0, displayCount);
+  // const paginatedNFTActivitiesData = userNFTActivities?.slice(0, displayCount);
   const paginatedExpiredListingsData = expiredListings?.slice(0, displayCount);
   const paginatedExpiredAuctionsData = expiredAuctions?.slice(0, displayCount);
   const paginatedExpiredOffersData = expiredOffers?.slice(0, displayCount);
@@ -614,13 +618,13 @@ export function ProfilePage() {
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                           actionCTA="Cancel Listing"
                           actionOnClick={() => {
                             handleCancelListing({
-                              listingId: data.listingId,
+                              listingId: data.listingId.toString(),
                             });
                           }}
                           isDisabled={isDisabled}
@@ -673,13 +677,13 @@ export function ProfilePage() {
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                           actionCTA="Cancel Auction"
                           actionOnClick={() => {
                             handleCancelAuction({
-                              auctionId: data.auctionId,
+                              auctionId: data.auctionId.toString(),
                             });
                           }}
                           isDisabled={isDisabled}
@@ -701,65 +705,6 @@ export function ProfilePage() {
                         searchQuery.length > 0
                           ? "No NFTs found"
                           : "No NFT Auctioned"
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Pending Payout NFTS */}
-            {selectedFilter === filters[9] && (
-              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
-                {isUserPendingPayoutLoading || isUserPendingPayoutPending ? (
-                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
-                    {Array.from({ length: 4 }, (_, index) => (
-                      <NftCardSkeleton key={index} />
-                    ))}
-                  </div>
-                ) : filteredData &&
-                  paginatedData &&
-                  paginatedData.length > 0 ? (
-                  <>
-                    {paginatedData?.map((auction, index) => {
-                      const data = auction as Auction;
-                      return (
-                        <NFTCard
-                          key={index}
-                          data={data}
-                          type="user-auction"
-                          cta="View Item"
-                          onClick={() => {
-                            handleViewItemClick({
-                              contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
-                            });
-                          }}
-                          actionCTA="Collect Payout"
-                          actionOnClick={() => {
-                            handleCollectAuctionPayout({
-                              auctionId: data.auctionId,
-                            });
-                          }}
-                          isDisabled={isDisabled}
-                        />
-                      );
-                    })}
-                    {filteredData?.length > displayCount && (
-                      <div
-                        ref={loadMoreRef}
-                        className="w-full h-20 col-span-full"
-                        style={{ gridColumn: "1 / -1" }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
-                    <EmptyState
-                      message={
-                        searchQuery.length > 0
-                          ? "No NFTs found"
-                          : "No NFT Pending Payout"
                       }
                     />
                   </div>
@@ -791,13 +736,13 @@ export function ProfilePage() {
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                           actionCTA="Cancel Offer"
                           actionOnClick={() => {
                             handleCancelOffer({
-                              offerId: data.offerId,
+                              offerId: data.offerId.toString(),
                             });
                           }}
                           isDisabled={isDisabled}
@@ -826,122 +771,16 @@ export function ProfilePage() {
               </div>
             )}
 
-            {/* Offers Received NFTS */}
-            {selectedFilter === filters[4] && (
-              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
-                {isUserOffersReceivedLoading || isUserOffersReceivedPending ? (
-                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
-                    {Array.from({ length: 4 }, (_, index) => (
-                      <NftCardSkeleton key={index} />
-                    ))}
-                  </div>
-                ) : filteredData &&
-                  paginatedData &&
-                  paginatedData.length > 0 ? (
-                  <>
-                    {paginatedData?.map((offer, index) => {
-                      const data = offer as Offer;
-                      return (
-                        <NFTCard
-                          key={index}
-                          data={data}
-                          type="user-offers-received"
-                          cta="View Item"
-                          onClick={() => {
-                            handleViewItemClick({
-                              contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
-                            });
-                          }}
-                          extraTitle="Total Offers"
-                          extraInfo={
-                            userOffersReceived?.userOffersReceivedLength
-                          }
-                        />
-                      );
-                    })}
-                    {filteredData?.length > displayCount && (
-                      <div
-                        ref={loadMoreRef}
-                        className="w-full h-20 col-span-full"
-                        style={{ gridColumn: "1 / -1" }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
-                    <EmptyState
-                      message={
-                        searchQuery.length > 0
-                          ? "No NFTs found"
-                          : "No NFT Offers Received"
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Bids NFTS */}
-            {selectedFilter === filters[5] && (
-              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
-                {isUserBidsLoading || isUserBidsPending ? (
-                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
-                    {Array.from({ length: 4 }, (_, index) => (
-                      <NftCardSkeleton key={index} />
-                    ))}
-                  </div>
-                ) : filteredData &&
-                  paginatedData &&
-                  paginatedData.length > 0 ? (
-                  <>
-                    {paginatedData?.map((bid, index) => {
-                      const data = bid as NewBid;
-                      return (
-                        <NFTCard
-                          key={index}
-                          data={data}
-                          type="user-bids"
-                          cta="View Item"
-                          onClick={() => {
-                            handleViewItemClick({
-                              contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
-                            });
-                          }}
-                        />
-                      );
-                    })}
-                    {filteredData?.length > displayCount && (
-                      <div
-                        ref={loadMoreRef}
-                        className="w-full h-20 col-span-full"
-                        style={{ gridColumn: "1 / -1" }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
-                    <EmptyState
-                      message={
-                        searchQuery.length > 0 ? "No NFTs found" : "No Bids Placed"
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* User NFT Activities */}
-            {selectedFilter === filters[6] && (
+            {selectedFilter === filters[4] && (
               <div className="flex items-center gap-8 flex-wrap w-full">
                 {userNFTActivities &&
-                paginatedNFTActivitiesData &&
-                paginatedNFTActivitiesData.length > 0 ? (
+                userNFTActivities &&
+                userNFTActivities.length > 0 ? (
                   <div className="mt-6 w-full">
-                    {paginatedNFTActivitiesData &&
+                    {userNFTActivities &&
                       Object.entries(
-                        paginatedNFTActivitiesData.reduce((acc, transfer) => {
+                        userNFTActivities.reduce((acc, transfer) => {
                           const date = new Date(
                             transfer.timestamp
                           ).toLocaleDateString();
@@ -949,7 +788,7 @@ export function ProfilePage() {
                             ...acc,
                             [date]: [...(acc[date] || []), transfer],
                           };
-                        }, {} as Record<string, typeof paginatedNFTActivitiesData>)
+                        }, {} as Record<string, typeof userNFTActivities>)
                       ).map(([date, transfers]) => {
                         return (
                           <div key={date} className="mb-8">
@@ -1046,7 +885,7 @@ export function ProfilePage() {
             )}
 
             {/* Expired Data */}
-            {selectedFilter === filters[7] && (
+            {selectedFilter === filters[5] && (
               <>
                 {/** Expired Listings */}
                 {selectedOption === options[0] && (
@@ -1073,13 +912,13 @@ export function ProfilePage() {
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
-                                  tokenId: data.tokenId,
+                                  tokenId: data.tokenId.toString(),
                                 });
                               }}
                               actionCTA="Cancel Listing"
                               actionOnClick={() => {
                                 handleCancelListing({
-                                  listingId: data.listingId,
+                                  listingId: data.listingId.toString(),
                                 });
                               }}
                               isDisabled={isDisabled}
@@ -1133,13 +972,13 @@ export function ProfilePage() {
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
-                                  tokenId: data.tokenId,
+                                  tokenId: data.tokenId.toString(),
                                 });
                               }}
                               actionCTA="Cancel Auction"
                               actionOnClick={() => {
                                 handleCancelAuction({
-                                  auctionId: data.auctionId,
+                                  auctionId: data.auctionId.toString(),
                                 });
                               }}
                               isDisabled={isDisabled}
@@ -1193,13 +1032,13 @@ export function ProfilePage() {
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
-                                  tokenId: data.tokenId,
+                                  tokenId: data.tokenId.toString(),
                                 });
                               }}
                               actionCTA="Cancel Offer"
                               actionOnClick={() => {
                                 handleCancelOffer({
-                                  offerId: data.offerId,
+                                  offerId: data.offerId.toString(),
                                 });
                               }}
                               isDisabled={isDisabled}
@@ -1230,8 +1069,175 @@ export function ProfilePage() {
               </>
             )}
 
+            {/* Pending Payout NFTS */}
+            {selectedFilter === filters[6] && (
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
+                {isUserPendingPayoutLoading || isUserPendingPayoutPending ? (
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
+                  <>
+                    {paginatedData?.map((auction, index) => {
+                      const data = auction as Auction;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-auction"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
+                            });
+                          }}
+                          actionCTA="Collect Payout"
+                          actionOnClick={() => {
+                            handleCollectAuctionPayout({
+                              auctionId: data.auctionId.toString(),
+                            });
+                          }}
+                          isDisabled={isDisabled}
+                        />
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Pending Payout"
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Offers Received NFTS */}
+            {/* {selectedFilter === filters[4] && (
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
+                {isUserOffersReceivedLoading || isUserOffersReceivedPending ? (
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
+                  <>
+                    {paginatedData?.map((offer, index) => {
+                      const data = offer as Offer;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-offers-received"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                          extraTitle="Total Offers"
+                          extraInfo={
+                            userOffersReceived?.userOffersReceivedLength
+                          }
+                        />
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No NFT Offers Received"
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )} */}
+
+            {/* Bids NFTS */}
+            {/* {selectedFilter === filters[5] && (
+              <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
+                {isUserBidsLoading || isUserBidsPending ? (
+                  <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <NftCardSkeleton key={index} />
+                    ))}
+                  </div>
+                ) : filteredData &&
+                  paginatedData &&
+                  paginatedData.length > 0 ? (
+                  <>
+                    {paginatedData?.map((bid, index) => {
+                      const data = bid as NewBid;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          type="user-bids"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItemClick({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                    {filteredData?.length > displayCount && (
+                      <div
+                        ref={loadMoreRef}
+                        className="w-full h-20 col-span-full"
+                        style={{ gridColumn: "1 / -1" }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="col-span-full w-full flex items-center justify-center min-h-[400px]">
+                    <EmptyState
+                      message={
+                        searchQuery.length > 0
+                          ? "No NFTs found"
+                          : "No Bids Placed"
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )} */}
+
             {/* User Collections */}
-            {selectedFilter === filters[8] && (
+            {/* {selectedFilter === filters[8] && (
               <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {userCollections &&
                 paginatedCollectionsData &&
@@ -1273,7 +1279,7 @@ export function ProfilePage() {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         ) : (
           <div className="w-full h-[80vh] flex flex-col items-center justify-center gap-4">

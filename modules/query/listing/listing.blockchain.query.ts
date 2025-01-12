@@ -72,7 +72,7 @@ export function useAllListingBlockchainQuery({
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
 
@@ -149,6 +149,6 @@ export function useUserListingBlockchainQuery({
     },
     enabled: !!allListingQuery.data && (!!limit || !!type) && !!userAddress,
     staleTime: 1000 * 60,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
