@@ -20,6 +20,21 @@ export interface Auction {
   nft: ThirdwebNFTType;
 }
 
+export interface Listing {
+  assetContract: string;
+  currency: string;
+  endTimestamp: string;
+  listingCreator: string;
+  listingId: number;
+  pricePerToken: number;
+  quantity: number;
+  reserved: boolean;
+  startTimestamp: string;
+  status: number;
+  tokenId: number;
+  nft: ThirdwebNFTType;
+}
+
 export async function formatAuctionData(
   rawAuction: any,
   nft: ThirdwebNFTType
@@ -41,6 +56,28 @@ export async function formatAuctionData(
     status: rawAuction.status,
     timeBufferInSeconds: Number(rawAuction.timeBufferInSeconds),
     tokenId: Number(rawAuction.tokenId),
+  };
+}
+
+export async function formatListingData(
+  rawListing: any,
+  nft: ThirdwebNFTType
+): Promise<Listing> {
+  return {
+    assetContract: rawListing.assetContract,
+    listingCreator: rawListing.listingCreator,
+    listingId: Number(rawListing.listingId),
+    currency: rawListing.currency,
+    endTimestamp: formatBlockchainTimestamp(rawListing.endTimestamp.toString()),
+    pricePerToken: Number(decimalOffChain(rawListing.pricePerToken)),
+    nft,
+    quantity: Number(rawListing.quantity),
+    startTimestamp: formatBlockchainTimestamp(
+      rawListing.startTimestamp.toString()
+    ),
+    status: rawListing.status,
+    tokenId: Number(rawListing.tokenId),
+    reserved: false,
   };
 }
 

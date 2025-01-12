@@ -3,6 +3,7 @@ import {
   useAllCollectionsQuery,
   useAuctionClosedQuery,
   useAllAuctionsBlockchainQuery,
+  useAllListingBlockchainQuery,
   useNewAuctionsQuery,
   useNewBidsQuery,
   useNewListingsQuery,
@@ -33,7 +34,22 @@ export function Sliders() {
     isError: isErrorNewAuction,
   } = useAllAuctionsBlockchainQuery({
     limit: 2,
+    type: "new-auction",
+  });
+
+  const {
+    data: newListing,
+    isLoading: isLoadingNewListing,
+    isError: isErrorNewListing,
+  } = useAllListingBlockchainQuery({
+    limit: 2,
     type: "new-listing",
+  });
+
+  console.log({
+    newListing,
+    isLoadingNewListing,
+    isErrorNewListing,
   });
 
   // const {
@@ -119,12 +135,12 @@ export function Sliders() {
       />
 
       {/* Recently Listed */}
-      {/* <DataSlider
-        isLoading={isNewListingsLoading}
+      <DataSlider
+        isLoading={isLoadingNewListing}
         title="Recently Listed"
         cta="View More"
         href="/browse?filter=recent_listings"
-        data={NewListings || []}
+        data={newListing || []}
         renderItem={(listing: Listing) => {
           return (
             <NFTCard
@@ -141,7 +157,7 @@ export function Sliders() {
             />
           );
         }}
-      /> */}
+      />
 
       {/* Recently Auctioned */}
       <DataSlider

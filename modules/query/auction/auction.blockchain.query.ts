@@ -5,7 +5,7 @@ import { StatusType } from "@/utils/enums/messages/index.enum";
 import { NFT as ThirdwebNFTType } from "thirdweb";
 import { fetchNFT, formatAuctionData } from "../utils/index.utils.query";
 
-type AuctionQueryType = "new-listing" | "live-auction" | "completed-auction";
+type AuctionQueryType = "new-auction" | "live-auction" | "completed-auction";
 
 // Base query to fetch and cache all auctions
 export function useAllAuctionsBaseQuery() {
@@ -43,7 +43,7 @@ export function useAllAuctionsBlockchainQuery({
             return allAuctionsQuery.data.filter(isCreated).slice(0, limit);
           case "completed-auction":
             return allAuctionsQuery.data.filter(isCompleted).slice(0, limit);
-          case "new-listing":
+          case "new-auction":
             return allAuctionsQuery.data
               .filter(isCreated)
               .reverse()

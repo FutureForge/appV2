@@ -1,6 +1,6 @@
 //** EXTERNAL EXPORTS */
 export * from "./auction/auction.blockchain";
-
+export * from "./listing/listing.blockchain";
 
 //** INTERNAL EXPORTS */
 

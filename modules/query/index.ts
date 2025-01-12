@@ -1,4 +1,5 @@
 export * from "./listing/listing.query";
+export * from './listing/listing.blockchain.query'
 export * from "./auction/auction.query";
 export * from "./auction/auction.blockchain.query";
 export * from "./offers/offers.query";

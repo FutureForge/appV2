@@ -8,6 +8,8 @@ export const queryKeys = {
     newFiltered: ["new-listing-filtered"] as const,
     newSaleFiltered: ["newSale-listing-filtered"] as const,
     filteredAll: ["filtered-all-listings"] as const,
+    blockchain: ["listing-blockchain"] as const,
+    filtered: ["listing-blockchain-filtered"] as const,
   },
   auction: {
     all: ["auction"] as const,
