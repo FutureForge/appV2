@@ -10,7 +10,8 @@ import { makeAllListingsColumn } from "./columns";
 import { Table, TableLayout } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Listing } from "@/utils/types/graphql";
+import { Listing } from "@/modules/query/utils/index.utils.query";
+// import { Listing } from "@/utils/types/graphql";
 
 type AllListingTableProps = {
   isLoading: boolean;

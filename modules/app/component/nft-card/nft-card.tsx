@@ -12,12 +12,12 @@ import {
   useListingInfoStore,
   useAuctionInfoStore,
 } from "@/modules/components/now-dialog/store";
-import { Auction, Listing } from "@/utils/types/graphql";
 
 // icons
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
 import { useUserChainInfo } from "@/modules/query";
+import { Listing, Auction } from "@/modules/query/utils/index.utils.query";
 
 export function NFTCard(props: NFTCardProps) {
   const { activeAccount } = useUserChainInfo();

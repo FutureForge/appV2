@@ -14,9 +14,13 @@ import {
   CollectionsNFTCard,
 } from "../collections-nft-card/collections-nft-card";
 import { useRouter } from "next/navigation";
-import { Auction, Listing, NewBid, Offer } from "@/utils/types/graphql";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import { useWindowSize } from "@uidotdev/usehooks";
+import {
+  Auction,
+  Listing,
+  Offer,
+} from "@/modules/query/utils/index.utils.query";
 
 export function Sliders() {
   const router = useRouter();
@@ -138,14 +142,14 @@ export function Sliders() {
         renderItem={(listing: Listing) => {
           return (
             <NFTCard
-              key={listing.id}
+              key={listing.listingId}
               data={listing}
               type="listing"
               cta="View Item"
               onClick={() => {
                 handleViewItem({
                   contractAddress: listing.assetContract,
-                  tokenId: listing.tokenId,
+                  tokenId: listing.tokenId.toString(),
                 });
               }}
             />
@@ -163,14 +167,14 @@ export function Sliders() {
         renderItem={(auction: Auction) => {
           return (
             <NFTCard
-              key={auction.id}
+              key={auction.auctionId}
               data={auction}
               type="new-auction"
               cta="View Item"
               onClick={() => {
                 handleViewItem({
                   contractAddress: auction.assetContract,
-                  tokenId: auction.tokenId,
+                  tokenId: auction.tokenId.toString(),
                 });
               }}
             />
@@ -188,14 +192,14 @@ export function Sliders() {
         renderItem={(offer: Offer) => {
           return (
             <NFTCard
-              key={offer.id}
+              key={offer.offerId}
               data={offer}
               type="new-offers"
               cta="View Item"
               onClick={() => {
                 handleViewItem({
                   contractAddress: offer.assetContract,
-                  tokenId: offer.tokenId,
+                  tokenId: offer.tokenId.toString(),
                 });
               }}
             />

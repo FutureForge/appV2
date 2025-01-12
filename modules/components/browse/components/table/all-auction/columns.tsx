@@ -2,13 +2,10 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { Auction } from "@/utils/types/graphql";
-import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { decimalOffChain } from "@/modules/blockchain";
-import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
-import Image from "next/image";
+import { getFormatAddress } from "@/utils/functions";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
+import { Auction } from "@/modules/query/utils/index.utils.query";
 
 export function makeAllAuctionsColumn() {
   const columns = createColumnHelper<Auction>();
@@ -46,50 +43,50 @@ export function makeAllAuctionsColumn() {
   /* -------------------------------------------------------------------------------------------------
    * Buyout Price column
    * -----------------------------------------------------------------------------------------------*/
-  const MINIMUMBID_HEADER_NAME = "Minimum Bid";
+  const MINIMUM_BID_HEADER_NAME = "Minimum Bid";
   const minimumBidAmountColumn = columns.accessor("minimumBidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>{MINIMUMBID_HEADER_NAME}</ColumnHeader>
+        <ColumnHeader column={column}>{MINIMUM_BID_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{decimalOffChain(getValue())} XFI</p>
+        <p>{getValue()} XFI</p>
       </div>
     ),
-    meta: { headerName: MINIMUMBID_HEADER_NAME },
+    meta: { headerName: MINIMUM_BID_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Buyout Price column
    * -----------------------------------------------------------------------------------------------*/
-  const BUYOUTBID_HEADER_NAME = "Buyout Price";
+  const BUYOUT_BID_HEADER_NAME = "Buyout Price";
   const buyoutBidAmountColumn = columns.accessor("buyoutBidAmount", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>{BUYOUTBID_HEADER_NAME}</ColumnHeader>
+        <ColumnHeader column={column}>{BUYOUT_BID_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{decimalOffChain(getValue())} XFI</p>
+        <p>{getValue()} XFI</p>
       </div>
     ),
-    meta: { headerName: BUYOUTBID_HEADER_NAME },
+    meta: { headerName: BUYOUT_BID_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Creator column
    * -----------------------------------------------------------------------------------------------*/
-  const AUCTIONCREATOR_HEADER_NAME = "Creator";
+  const AUCTION_CREATOR_HEADER_NAME = "Creator";
   const auctionCreatorColumn = columns.accessor("auctionCreator", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
         <ColumnHeader column={column}>
-          {AUCTIONCREATOR_HEADER_NAME}
+          {AUCTION_CREATOR_HEADER_NAME}
         </ColumnHeader>
       </div>
     ),
@@ -98,7 +95,7 @@ export function makeAllAuctionsColumn() {
         <p>{getFormatAddress(getValue())}</p>
       </div>
     ),
-    meta: { headerName: AUCTIONCREATOR_HEADER_NAME },
+    meta: { headerName: AUCTION_CREATOR_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
@@ -113,7 +110,7 @@ export function makeAllAuctionsColumn() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{formatBlockchainTimestamp(getValue())}</p>
+        <p>{getValue()}</p>
       </div>
     ),
     meta: { headerName: ENDTIME_HEADER_NAME },

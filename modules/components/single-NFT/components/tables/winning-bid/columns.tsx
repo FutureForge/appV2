@@ -3,9 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
 import { WinningBid } from "@/utils/types/graphql";
-import { decimalOffChain } from "@/modules/blockchain";
-import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
-import { Button } from "@/modules/app";
+import { getFormatAddress } from "@/utils/functions";
 
 export function makeWinningBidColumn() {
   const columns = createColumnHelper<WinningBid>();
@@ -41,7 +39,7 @@ export function makeWinningBidColumn() {
       return (
         <div className="flex gap-2">
           <XFI className="size-4" />
-          <p>{decimalOffChain(getValue())} XFI</p>
+          <p>{getValue()} XFI</p>
         </div>
       );
     },

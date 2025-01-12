@@ -20,7 +20,7 @@ import {
 } from "@/utils/functions";
 
 import { NFTActivityResponse } from "@/utils/types/global";
-import { Auction, Listing, NFT as CustomNFTType } from "@/utils/types/graphql";
+import { NFT as CustomNFTType } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
 import { indexerEndpoint } from "@/utils/graphql";
@@ -28,7 +28,7 @@ import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
 import request from "graphql-request";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { useSingleCollectionWithoutNFTsQuery } from "..";
-import { Offer } from "../utils/index.utils.query";
+import { Auction, Listing, Offer } from "../utils/index.utils.query";
 
 export function useSingleNFTQuery({
   contractAddress,

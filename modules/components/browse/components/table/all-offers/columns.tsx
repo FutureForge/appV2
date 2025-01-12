@@ -2,12 +2,10 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { Offer } from "@/utils/types/graphql";
-import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { decimalOffChain } from "@/modules/blockchain";
-import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
+import { getFormatAddress } from "@/utils/functions";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
+import { Offer } from "@/modules/query/utils/index.utils.query";
 
 export function makeAllOffersColumn() {
   const columns = createColumnHelper<Offer>();
@@ -45,20 +43,20 @@ export function makeAllOffersColumn() {
   /* -------------------------------------------------------------------------------------------------
    * Offered Price column
    * -----------------------------------------------------------------------------------------------*/
-  const OFFEREDPRICE_HEADER_NAME = "Offered Price";
+  const OFFERED_PRICE_HEADER_NAME = "Offered Price";
   const offeredPrice = columns.accessor("totalPrice", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>{OFFEREDPRICE_HEADER_NAME}</ColumnHeader>
+        <ColumnHeader column={column}>{OFFERED_PRICE_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{decimalOffChain(getValue())} XFI</p>
+        <p>{getValue()} XFI</p>
       </div>
     ),
-    meta: { headerName: OFFEREDPRICE_HEADER_NAME },
+    meta: { headerName: OFFERED_PRICE_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
@@ -92,7 +90,7 @@ export function makeAllOffersColumn() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{formatBlockchainTimestamp(getValue())}</p>
+        <p>{getValue()}</p>
       </div>
     ),
     meta: { headerName: ENDTIME_HEADER_NAME },

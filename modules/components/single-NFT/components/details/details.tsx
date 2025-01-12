@@ -32,7 +32,6 @@ import {
   useAuctionInfoStore,
   useListingInfoStore,
 } from "@/modules/components/now-dialog/store";
-import { Auction, Listing } from "@/utils/types/graphql";
 import {
   useCancelAuctionMutation,
   useCancelDirectListingMutation,
@@ -43,6 +42,7 @@ import {
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
+import { Auction, Listing } from "@/modules/query/utils/index.utils.query";
 
 export const singleNFTFilters = [
   "Not Listed",
@@ -264,6 +264,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const collectionDetails = nftData?.collectionDetails;
   const listingPricingData = nftData?.listingData;
   const auctionPricingData = nftData?.auctionData;
+  const winningBid = nftData?.winningBidBody;
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};
@@ -291,8 +292,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     : nft?.owner?.toLowerCase() || undefined;
 
   const isWinningBidder =
-    userAddress?.toLowerCase() ===
-    auctionPricingData?.winningBid?.bidder?.toLowerCase();
+    userAddress?.toLowerCase() === winningBid?.bidder?.toLowerCase();
 
   const getListingStatus = () => {
     if (activeType === "listing")
@@ -307,11 +307,15 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   };
 
   const handleCancelListing = () => {
-    cancelListingMutation.mutate({ listingId: listingInfo.listingId });
+    cancelListingMutation.mutate({
+      listingId: listingInfo.listingId.toString(),
+    });
   };
 
   const handleCancelAuction = () => {
-    cancelAuctionMutation.mutate({ auctionId: auctionInfo.auctionId });
+    cancelAuctionMutation.mutate({
+      auctionId: auctionInfo.auctionId.toString(),
+    });
   };
 
   const handleCollectAuctionPayout = () => {
@@ -320,7 +324,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     if (!auctionId) return;
 
     collectAuctionPayoutMutation.mutate({
-      auctionId,
+      auctionId: auctionId.toString(),
     });
   };
 

@@ -2,12 +2,10 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { Listing } from "@/utils/types/graphql";
-import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { decimalOffChain } from "@/modules/blockchain";
-import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
+import { getFormatAddress } from "@/utils/functions";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
+import { Listing } from "@/modules/query/utils/index.utils.query";
 
 export function makeAllListingsColumn() {
   const columns = createColumnHelper<Listing>();
@@ -22,7 +20,7 @@ export function makeAllListingsColumn() {
         <ColumnHeader column={column}>NFT</ColumnHeader>
       </div>
     ),
-    cell: ({ row}) => {
+    cell: ({ row }) => {
       const { name, image } = row.original.nft.metadata;
 
       return (
@@ -45,30 +43,32 @@ export function makeAllListingsColumn() {
   /* -------------------------------------------------------------------------------------------------
    *Price Per Token column
    * -----------------------------------------------------------------------------------------------*/
-  const LISTINGPRICE_HEADER_NAME = "Listing Price";
+  const LISTING_PRICE_HEADER_NAME = "Listing Price";
   const pricePerTokenColumn = columns.accessor("pricePerToken", {
     header: ({ column }) => (
       <div className="min-w-[120px]">
-        <ColumnHeader column={column}>{LISTINGPRICE_HEADER_NAME}</ColumnHeader>
+        <ColumnHeader column={column}>{LISTING_PRICE_HEADER_NAME}</ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{decimalOffChain(getValue())} XFI</p>
+        <p>{getValue()} XFI</p>
       </div>
     ),
-    meta: { headerName: LISTINGPRICE_HEADER_NAME },
+    meta: { headerName: LISTING_PRICE_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * Listing Creator column
    * -----------------------------------------------------------------------------------------------*/
-  const LISTINGCREATOR_HEADER_NAME = "Creator";
+  const LISTING_CREATOR_HEADER_NAME = "Creator";
   const listingCreatorColumn = columns.accessor("listingCreator", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
-        <ColumnHeader column={column}>{LISTINGCREATOR_HEADER_NAME}</ColumnHeader>
+        <ColumnHeader column={column}>
+          {LISTING_CREATOR_HEADER_NAME}
+        </ColumnHeader>
       </div>
     ),
     cell: ({ getValue }) => (
@@ -76,13 +76,13 @@ export function makeAllListingsColumn() {
         <p>{getFormatAddress(getValue())}</p>
       </div>
     ),
-    meta: { headerName: LISTINGCREATOR_HEADER_NAME },
+    meta: { headerName: LISTING_CREATOR_HEADER_NAME },
   });
 
   /* -------------------------------------------------------------------------------------------------
    * End Timestamp column
    * -----------------------------------------------------------------------------------------------*/
-   const ENDTIME_HEADER_NAME = "Ends";
+  const ENDTIME_HEADER_NAME = "Ends";
   const endTimestampColumn = columns.accessor("endTimestamp", {
     header: ({ column }) => (
       <div className="flex min-w-[120px]">
@@ -91,7 +91,7 @@ export function makeAllListingsColumn() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{formatBlockchainTimestamp(getValue())}</p>
+        <p>{getValue()}</p>
       </div>
     ),
     meta: { headerName: ENDTIME_HEADER_NAME },

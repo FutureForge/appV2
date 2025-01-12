@@ -9,7 +9,7 @@ import { makeAllAuctionsColumn } from "./columns";
 import { Table, TableLayout } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Auction } from "@/utils/types/graphql";
+import { Auction } from "@/modules/query/utils/index.utils.query";
 
 type AllAuctionTableProps = {
   isLoading: boolean;
@@ -35,7 +35,7 @@ export function AllAuctionTable({ isLoading, data }: AllAuctionTableProps) {
           <Table
             onRowClick={(_row) => {
               const collectionAddress = _row.assetContract;
-              const tokenId = _row.nft.tokenId;
+              const tokenId = _row.tokenId.toString();
               router.push(`/nft/${collectionAddress}/${tokenId}`);
             }}
             isLoading={isLoading}

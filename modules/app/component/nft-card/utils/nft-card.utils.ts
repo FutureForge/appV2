@@ -1,14 +1,9 @@
-import {
-  AcceptedOffer,
-  Auction,
-  AuctionClosed,
-  Listing,
-  NewBid,
-  NewSaleListing,
-  Offer,
-} from "@/utils/types/graphql";
 import { getFormatAddress } from "@/utils/functions";
-import { decimalOffChain } from "@/modules/blockchain";
+import {
+  Listing,
+  Auction,
+  Offer,
+} from "@/modules/query/utils/index.utils.query";
 
 export type NFTCardInfo =
   | "listing"
@@ -19,23 +14,16 @@ export type NFTCardInfo =
   | "user-offers"
   | "user-offers-received"
   | "new-listing"
-  | "bids"
+  // | "bids"
   | "user-bids"
   | "completed-listing"
-  | "new-sale-listing"
-  | "new-sold-auction"
+  // | "new-sale-listing"
+  // | "new-sold-auction"
   | "new-accepted-offers"
   | "new-offers"
   | "new-auction";
 
-export type NFTType =
-  | Listing
-  | Auction
-  | NewSaleListing
-  | AuctionClosed
-  | NewBid
-  | AcceptedOffer
-  | Offer;
+export type NFTType = Listing | Auction | Offer;
 
 export type NFTStatus = "listed" | "auctioned";
 
@@ -62,17 +50,17 @@ export const getNFTCardInfo = ({
   data: NFTType;
 }) => {
   switch (type) {
-    case "new-sale-listing":
-      const buyer = "buyer" in data ? data.buyer : "";
-      const totalPricePaid =
-        "totalPricePaid" in data ? data.totalPricePaid : "";
+    // case "new-sale-listing":
+    //   const buyer = "buyer" in data ? data.buyer : "";
+    //   const totalPricePaid =
+    //     "totalPricePaid" in data ? data.totalPricePaid : "";
 
-      return {
-        title1: "Price Paid",
-        title2: "Bought By",
-        info1: `${decimalOffChain(totalPricePaid)} XFI`,
-        info2: getFormatAddress(buyer),
-      };
+    //   return {
+    //     title1: "Price Paid",
+    //     title2: "Bought By",
+    //     info1: `${(totalPricePaid)} XFI`,
+    //     info2: getFormatAddress(buyer),
+    //   };
 
     case "new-auction":
       const auctionCreatorNewAuction =
@@ -87,16 +75,16 @@ export const getNFTCardInfo = ({
         info2: getFormatAddress(auctionCreatorNewAuction),
       };
 
-    case "new-sold-auction":
-      const closer = "closer" in data ? data.closer : "";
-      const bidAmount = "bidAmount" in data ? (data.bidAmount as string) : "";
+    // case "new-sold-auction":
+    //   const closer = "closer" in data ? data.closer : "";
+    //   const bidAmount = "bidAmount" in data ? (data.bidAmount as string) : "";
 
-      return {
-        title1: "Buyout Price",
-        title2: "Bought By",
-        info1: `${bidAmount} XFI`,
-        info2: getFormatAddress(closer),
-      };
+    //   return {
+    //     title1: "Buyout Price",
+    //     title2: "Bought By",
+    //     info1: `${bidAmount} XFI`,
+    //     info2: getFormatAddress(closer),
+    //   };
 
     case "new-offers":
       const offerorNewOffers = "offeror" in data ? data.offeror : "";
@@ -109,17 +97,17 @@ export const getNFTCardInfo = ({
         info2: getFormatAddress(offerorNewOffers),
       };
 
-    case "new-accepted-offers":
-      const seller = "seller" in data ? data.seller : "";
-      const totalPriceAccepted =
-        "totalPricePaid" in data ? data.totalPricePaid : "";
+    // case "new-accepted-offers":
+    //   const seller = "seller" in data ? data.seller : "";
+    //   const totalPriceAccepted =
+    //     "totalPricePaid" in data ? data.totalPricePaid : "";
 
-      return {
-        title1: "Price Accepted",
-        title2: "Seller",
-        info1: `${decimalOffChain(totalPriceAccepted)} XFI`,
-        info2: getFormatAddress(seller as string),
-      };
+    //   return {
+    //     title1: "Price Accepted",
+    //     title2: "Seller",
+    //     info1: `${(totalPriceAccepted)} XFI`,
+    //     info2: getFormatAddress(seller as string),
+    //   };
 
     case "listing":
       const listingCreator =
@@ -139,7 +127,7 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Listing Price",
-        info1: `${decimalOffChain(listingPriceUserListing as string)} XFI`,
+        info1: `${listingPriceUserListing as string} XFI`,
       };
 
     case "auction":
@@ -151,7 +139,7 @@ export const getNFTCardInfo = ({
       return {
         title1: "Buyout Price",
         title2: "Auctioned By",
-        info1: `${decimalOffChain(buyoutBidAmount as string)} XFI`,
+        info1: `${buyoutBidAmount as string} XFI`,
         info2: getFormatAddress(auctionCreator),
       };
 
@@ -164,8 +152,8 @@ export const getNFTCardInfo = ({
       return {
         title1: "Buyout Price",
         title2: "Minimum Bid",
-        info1: `${decimalOffChain(buyoutBidAmountUserAuction as string)} XFI`,
-        info2: `${decimalOffChain(minimumBidAmountUserAuction as string)} XFI`,
+        info1: `${buyoutBidAmountUserAuction as string} XFI`,
+        info2: `${minimumBidAmountUserAuction as string} XFI`,
       };
 
     case "offers":
@@ -175,7 +163,7 @@ export const getNFTCardInfo = ({
       return {
         title1: "Price Offered",
         title2: "Offered By",
-        info1: `${decimalOffChain(totalPrice as string)} WXFI`,
+        info1: `${totalPrice as string} WXFI`,
         info2: getFormatAddress(offeror),
       };
 
@@ -184,7 +172,7 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Price Offered",
-        info1: `${decimalOffChain(totalPriceUserOffers as string)} WXFI`,
+        info1: `${totalPriceUserOffers as string} WXFI`,
       };
 
     case "user-offers-received":
@@ -193,9 +181,7 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Highest Offer",
-        info1: `${decimalOffChain(
-          totalPriceUserOffersRecieved as string
-        )} WXFI`,
+        info1: `${totalPriceUserOffersRecieved as string} WXFI`,
       };
 
     case "completed-listing":
@@ -207,27 +193,27 @@ export const getNFTCardInfo = ({
       return {
         title1: "Price Paid",
         title2: "Bought By",
-        info1: `${decimalOffChain(totalPricePaidCompletedListing)} XFI`,
+        info1: `${totalPricePaidCompletedListing} XFI`,
         info2: getFormatAddress(buyerCompletedListing),
       };
 
-    case "bids":
-      const bidderBids = "bidder" in data ? data.bidder : "";
-      const bidAmountBids = "bidAmount" in data ? data.bidAmount : "";
+    // case "bids":
+    //   const bidderBids = "bidder" in data ? data.bidder : "";
+    //   const bidAmountBids = "bidAmount" in data ? data.bidAmount : "";
 
-      return {
-        title1: "Bid Amount",
-        title2: "Bid By",
-        info1: `${decimalOffChain(bidAmountBids as string)} XFI`,
-        info2: getFormatAddress(bidderBids),
-      };
+    //   return {
+    //     title1: "Bid Amount",
+    //     title2: "Bid By",
+    //     info1: `${(bidAmountBids as string)} XFI`,
+    //     info2: getFormatAddress(bidderBids),
+    //   };
 
     case "user-bids":
       const bidAmountUserBids = "bidAmount" in data ? data.bidAmount : "";
 
       return {
         title1: "Bid Amount",
-        info1: `${decimalOffChain(bidAmountUserBids as string)} XFI`,
+        info1: `${bidAmountUserBids as string} XFI`,
       };
 
     default:

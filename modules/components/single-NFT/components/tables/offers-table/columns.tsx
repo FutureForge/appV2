@@ -3,7 +3,6 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
 import { Offer } from "@/utils/types/graphql";
-import { decimalOffChain } from "@/modules/blockchain";
 import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { Button } from "@/modules/app";
 import {
@@ -61,7 +60,7 @@ export function makeOffersColumn({
       return (
         <div className="flex gap-2">
           <XFI className="size-4" />
-          <p>{decimalOffChain(getValue())} WXFI</p>
+          <p>{getValue()} WXFI</p>
         </div>
       );
     },
