@@ -4,6 +4,9 @@ import {
   useAllAuctionsBlockchainQuery,
   useAllListingBlockchainQuery,
   useAllOffersBlockchainQuery,
+  useUserListingBlockchainQuery,
+  useUserAuctionBlockchainQuery,
+  useUserOfferBlockchainQuery,
 } from "@/modules/query";
 import React from "react";
 import {
@@ -49,6 +52,27 @@ export function Sliders() {
     limit: 2,
     type: "new-offer",
   });
+
+  const { data: userListing } = useUserListingBlockchainQuery({
+    limit: 2,
+    type: "expired-listing",
+  });
+
+  console.log({ userListing });
+
+  const { data: userAuction } = useUserAuctionBlockchainQuery({
+    limit: 2,
+    type: "expired-auction",
+  });
+
+  console.log({ userAuction });
+
+  const { data: userOffer } = useUserOfferBlockchainQuery({
+    limit: 2,
+    type: "expired-offer",
+  });
+
+  console.log({ userOffer });
 
   console.log({
     newOffer,

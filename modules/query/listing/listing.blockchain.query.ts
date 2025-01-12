@@ -3,8 +3,11 @@ import { queryKeys } from "../query-keys";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { fetchNFT, formatListingData } from "../utils/index.utils.query";
 import { getAllListing } from "@/modules/blockchain";
+import { useUserChainInfo } from "../user/user.query";
+import { formatBlockchainTimestamp } from "@/utils/functions";
 
 type ListingQueryType = "new-listing" | "live-listing" | "completed-listing";
+type UserListingQueryType = "active-listing" | "expired-listing";
 
 export function useAllListingBaseQuery() {
   return useQuery({
@@ -68,6 +71,83 @@ export function useAllListingBlockchainQuery({
       //   });
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
+    staleTime: 1000 * 60,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserListingBlockchainQuery({
+  limit = 50,
+  type = "active-listing",
+}: {
+  limit?: number;
+  type?: UserListingQueryType;
+}) {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const allListingQuery = useAllListingBaseQuery();
+
+  return useQuery({
+    queryKey: [queryKeys.listing.userBlockchain, { type, limit }],
+    queryFn: async () => {
+      if (!allListingQuery.data) return [];
+
+      const userListing = allListingQuery.data.filter((listing) => {
+        return (
+          listing.status === StatusType.CREATED &&
+          listing.listingCreator.toLowerCase() === userAddress?.toLowerCase()
+        );
+      });
+
+      const filteredListing = (() => {
+        switch (type) {
+          case "active-listing":
+            return userListing
+              .filter((listing) => {
+                const endTime = formatBlockchainTimestamp(
+                  listing.endTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isNotExpired = currentTime <= endTimeFormatted;
+                return isNotExpired;
+              })
+              .slice(0, limit);
+
+          case "expired-listing":
+            return userListing
+              .filter((listing) => {
+                const endTime = formatBlockchainTimestamp(
+                  listing.endTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isExpired = currentTime > endTimeFormatted;
+                return isExpired;
+              })
+              .slice(0, limit);
+          default:
+            return [];
+        }
+      })();
+
+      const formattedData = await Promise.all(
+        filteredListing.map(async (listing) => {
+          const nft = await fetchNFT({
+            assetContract: listing.assetContract,
+            tokenId: listing.tokenId,
+          });
+
+          return formatListingData(listing, nft);
+        })
+      );
+
+      return formattedData;
+    },
+    enabled: !!allListingQuery.data && (!!limit || !!type) && !!userAddress,
     staleTime: 1000 * 60,
     refetchInterval: 5000,
   });

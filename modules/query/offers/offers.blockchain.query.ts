@@ -3,8 +3,11 @@ import { queryKeys } from "../query-keys";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { fetchNFT, formatOfferData } from "../utils/index.utils.query";
 import { getAllOffers } from "@/modules/blockchain";
+import { formatBlockchainTimestamp } from "@/utils/functions";
+import { useUserChainInfo } from "../user/user.query";
 
 type OfferQueryType = "new-offer" | "live-offer" | "completed-offer";
+type UserOfferQueryType = "active-offer" | "expired-offer";
 
 export function useAllOffersBaseQuery() {
   return useQuery({
@@ -66,6 +69,83 @@ export function useAllOffersBlockchainQuery({
       //   });
     },
     enabled: !!allOfferQuery.data && (!!limit || !!type),
+    staleTime: 1000 * 60,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserOfferBlockchainQuery({
+  limit = 50,
+  type = "active-offer",
+}: {
+  limit?: number;
+  type?: UserOfferQueryType;
+}) {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const allOffersQuery = useAllOffersBaseQuery();
+
+  return useQuery({
+    queryKey: [queryKeys.offers.userBlockchain, { type, limit }],
+    queryFn: async () => {
+      if (!allOffersQuery.data) return [];
+
+      const userOffer = allOffersQuery.data.filter((auction) => {
+        return (
+          auction.status === StatusType.CREATED &&
+          auction.offeror.toLowerCase() === userAddress?.toLowerCase()
+        );
+      });
+
+      const filteredAuction = (() => {
+        switch (type) {
+          case "active-offer":
+            return userOffer
+              .filter((auction) => {
+                const endTime = formatBlockchainTimestamp(
+                  auction.expirationTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isNotExpired = currentTime <= endTimeFormatted;
+                return isNotExpired;
+              })
+              .slice(0, limit);
+
+          case "expired-offer":
+            return userOffer
+              .filter((auction) => {
+                const endTime = formatBlockchainTimestamp(
+                  auction.expirationTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isExpired = currentTime > endTimeFormatted;
+                return isExpired;
+              })
+              .slice(0, limit);
+          default:
+            return [];
+        }
+      })();
+
+      const formattedData = await Promise.all(
+        filteredAuction.map(async (auction) => {
+          const nft = await fetchNFT({
+            assetContract: auction.assetContract,
+            tokenId: auction.tokenId,
+          });
+
+          return formatOfferData(auction, nft);
+        })
+      );
+
+      return formattedData;
+    },
+    enabled: !!allOffersQuery.data && (!!limit || !!type) && !!userAddress,
     staleTime: 1000 * 60,
     refetchInterval: 5000,
   });

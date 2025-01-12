@@ -1,11 +1,13 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import { getAllAuctions } from "@/modules/blockchain";
 import { StatusType } from "@/utils/enums/messages/index.enum";
-import { NFT as ThirdwebNFTType } from "thirdweb";
 import { fetchNFT, formatAuctionData } from "../utils/index.utils.query";
+import { formatBlockchainTimestamp } from "@/utils/functions";
+import { useUserChainInfo } from "../user/user.query";
 
 type AuctionQueryType = "new-auction" | "live-auction" | "completed-auction";
+type UserAuctionQueryType = "active-auction" | "expired-auction";
 
 // Base query to fetch and cache all auctions
 export function useAllAuctionsBaseQuery() {
@@ -79,5 +81,82 @@ export function useAllAuctionsBlockchainQuery({
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60, // Consider data fresh for 1 minute
+  });
+}
+
+export function useUserAuctionBlockchainQuery({
+  limit = 50,
+  type = "active-auction",
+}: {
+  limit?: number;
+  type?: UserAuctionQueryType;
+}) {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  const allAuctionsQuery = useAllAuctionsBaseQuery();
+
+  return useQuery({
+    queryKey: [queryKeys.auction.userBlockchain, { type, limit }],
+    queryFn: async () => {
+      if (!allAuctionsQuery.data) return [];
+
+      const userAuction = allAuctionsQuery.data.filter((auction) => {
+        return (
+          auction.status === StatusType.CREATED &&
+          auction.auctionCreator.toLowerCase() === userAddress?.toLowerCase()
+        );
+      });
+
+      const filteredAuction = (() => {
+        switch (type) {
+          case "active-auction":
+            return userAuction
+              .filter((auction) => {
+                const endTime = formatBlockchainTimestamp(
+                  auction.endTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isNotExpired = currentTime <= endTimeFormatted;
+                return isNotExpired;
+              })
+              .slice(0, limit);
+
+          case "expired-auction":
+            return userAuction
+              .filter((auction) => {
+                const endTime = formatBlockchainTimestamp(
+                  auction.endTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isExpired = currentTime > endTimeFormatted;
+                return isExpired;
+              })
+              .slice(0, limit);
+          default:
+            return [];
+        }
+      })();
+
+      const formattedData = await Promise.all(
+        filteredAuction.map(async (auction) => {
+          const nft = await fetchNFT({
+            assetContract: auction.assetContract,
+            tokenId: auction.tokenId,
+          });
+
+          return formatAuctionData(auction, nft);
+        })
+      );
+
+      return formattedData;
+    },
+    enabled: !!allAuctionsQuery.data && (!!limit || !!type) && !!userAddress,
+    staleTime: 1000 * 60,
+    refetchInterval: 5000,
   });
 }

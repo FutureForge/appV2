@@ -10,6 +10,7 @@ export const queryKeys = {
     filteredAll: ["filtered-all-listings"] as const,
     blockchain: ["listing-blockchain"] as const,
     filtered: ["listing-blockchain-filtered"] as const,
+    userBlockchain: ["user-listing-blockchain"] as const,
   },
   auction: {
     all: ["auction"] as const,
@@ -26,6 +27,7 @@ export const queryKeys = {
     filteredClosed: ["filtered-closed-auctions"] as const,
     blockchain: ["auction-blockchain"] as const,
     filtered: ["auction-blockchain-filtered"] as const,
+    userBlockchain: ["user-auction-blockchain"] as const,
   },
   offers: {
     all: ["offers"] as const,
@@ -36,6 +38,7 @@ export const queryKeys = {
     filteredAll: ["filtered-all-offers"] as const,
     blockchain: ["offers-blockchain"] as const,
     filtered: ["offers-blockchain-filtered"] as const,
+    userBlockchain: ["user-offers-blockchain"] as const,
   },
   collection: {
     all: ["collection"] as const,
