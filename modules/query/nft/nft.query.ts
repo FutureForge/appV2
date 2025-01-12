@@ -1,14 +1,12 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import {
-  CROSSFI_API_URL,
-  MARKETPLACE_ADDRESS_TESTNET,
-} from "@/utils/configs";
+import { CROSSFI_API_URL, MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
   getAllAuctions,
+  getAllOffers,
   getContractCustom,
   getIsAuctionExpired,
   getWinningBid,
@@ -20,20 +18,17 @@ import {
   formatBlockchainTimestamp,
   tryParseJSON,
 } from "@/utils/functions";
-import { useSingleCollectionWithoutNFTsQuery, useSingleOfferQuery } from "..";
+
 import { NFTActivityResponse } from "@/utils/types/global";
-import {
-  Auction,
-  Listing,
-  NFT as CustomNFTType,
-  Offer,
-} from "@/utils/types/graphql";
+import { Auction, Listing, NFT as CustomNFTType } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
 import { indexerEndpoint } from "@/utils/graphql";
 import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
 import request from "graphql-request";
 import { StatusType } from "@/utils/enums/messages/index.enum";
+import { useSingleCollectionWithoutNFTsQuery } from "..";
+import { Offer } from "../utils/index.utils.query";
 
 export function useSingleNFTQuery({
   contractAddress,
@@ -49,11 +44,6 @@ export function useSingleNFTQuery({
     contractAddress,
   });
 
-  const { data: nftOffers, isLoading: isLoadingOffers } = useSingleOfferQuery({
-    contractAddress,
-    tokenId,
-  });
-
   return useQuery({
     queryKey: [queryKeys.nft.single, tokenId, contractAddress],
     queryFn: async () => {
@@ -65,6 +55,7 @@ export function useSingleNFTQuery({
           marketplaceFee,
           allListings,
           allAuctions,
+          allOffers,
         ] = await Promise.all([
           axios.get<NFTActivityResponse>(
             `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
@@ -78,6 +69,7 @@ export function useSingleNFTQuery({
           }).catch(() => ({})),
           getAllListing(),
           getAllAuctions(),
+          getAllOffers(),
         ]);
 
         const nftAuctionList = allAuctions.find(
@@ -94,6 +86,14 @@ export function useSingleNFTQuery({
               contractAddress.toLowerCase() &&
             listing.tokenId === BigInt(tokenId) &&
             listing.status === StatusType.CREATED
+        );
+
+        const nftOffers = allOffers.find(
+          (offer) =>
+            offer.assetContract.toLowerCase() ===
+              contractAddress.toLowerCase() &&
+            offer.tokenId === BigInt(tokenId) &&
+            offer.status === StatusType.CREATED
         );
 
         const nftActivity = tokenTransfersResponse.data.docs;
@@ -208,18 +208,14 @@ export function useSingleNFTQuery({
           isAuctionPendingPayout,
           isActiveTypeExpired,
           winningBidBody,
-          offers: nftOffers as Offer[],
+          offers: ensureSerializable(nftOffers) as Offer,
           collectionDetails: collectionWithoutNFTs?.collection as Collection,
           listingData: ensureSerializable(updatedNFTListingList) as Listing,
           auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };
       } catch (error) {}
     },
-    enabled:
-      !!contractAddress &&
-      !!tokenId &&
-      !isLoadingOffers &&
-      !isLoadingCollectionWithoutNFTs,
+    enabled: !!contractAddress && !!tokenId && !isLoadingCollectionWithoutNFTs,
     refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,

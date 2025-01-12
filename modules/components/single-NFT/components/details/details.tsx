@@ -10,7 +10,6 @@ import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
 import { useFilterStore } from "../../store";
 import {
   useCheckApprovalStatusQuery,
-  useCheckApprovedForTokenIdQuery,
   useSingleNFTQuery,
   useUserChainInfo,
 } from "@/modules/query";
@@ -248,6 +247,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     isLoading: isNFTDataLoading,
     isPending: isNFTDataPending,
     isError,
+    error,
   } = useSingleNFTQuery({
     contractAddress: contractAddress as string,
     tokenId: tokenId as string,
