@@ -6,24 +6,31 @@ import { getAllOffers } from "@/modules/blockchain";
 import { formatBlockchainTimestamp } from "@/utils/functions";
 import { useUserChainInfo } from "../user/user.query";
 
-type OfferQueryType = "new-offer" | "live-offer" | "completed-offer";
+type OfferQueryType =
+  | "new-offer"
+  | "live-offer"
+  | "completed-offer"
+  | "live-offer-collection"
+  | "completed-offer-collection";
 type UserOfferQueryType = "active-offer" | "expired-offer";
 
 export function useAllOffersBaseQuery() {
   return useQuery({
     queryKey: [queryKeys.offers.blockchain],
     queryFn: getAllOffers,
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
+    staleTime: 1000 * 60 * 39, // Consider data fresh for 30 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
   });
 }
 
 export function useAllOffersBlockchainQuery({
   limit = 50,
   type = "live-offer",
+  contractAddress,
 }: {
   limit?: number;
   type?: OfferQueryType;
+  contractAddress?: string;
 }) {
   const allOfferQuery = useAllOffersBaseQuery();
 
@@ -40,13 +47,34 @@ export function useAllOffersBlockchainQuery({
         switch (type) {
           case "live-offer":
             return allOfferQuery.data.filter(isCreated).slice(0, limit);
+
           case "completed-offer":
             return allOfferQuery.data.filter(isCompleted).slice(0, limit);
+
           case "new-offer":
             return allOfferQuery.data
               .filter(isCreated)
               .reverse()
               .slice(0, limit);
+
+          case "live-offer-collection":
+            return allOfferQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.CREATED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
+          case "completed-offer-collection":
+            return allOfferQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.COMPLETED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
           default:
             return [];
         }
@@ -69,8 +97,10 @@ export function useAllOffersBlockchainQuery({
       //   });
     },
     enabled: !!allOfferQuery.data && (!!limit || !!type),
-    staleTime: 1000 * 60,
-    refetchInterval: 5000,
+    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
+    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
+    refetchOnMount: true, // Refetch when component mounts if data is stale
+    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
   });
 }
 
@@ -146,7 +176,9 @@ export function useUserOfferBlockchainQuery({
       return formattedData;
     },
     enabled: !!allOffersQuery.data && (!!limit || !!type) && !!userAddress,
-    staleTime: 1000 * 60,
-    refetchInterval: 5000,
+    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
+    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
+    refetchOnMount: true, // Refetch when component mounts if data is stale
+    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
   });
 }

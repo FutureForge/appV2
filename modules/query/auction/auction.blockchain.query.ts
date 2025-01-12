@@ -6,7 +6,12 @@ import { fetchNFT, formatAuctionData } from "../utils/index.utils.query";
 import { formatBlockchainTimestamp } from "@/utils/functions";
 import { useUserChainInfo } from "../user/user.query";
 
-type AuctionQueryType = "new-auction" | "live-auction" | "completed-auction";
+type AuctionQueryType =
+  | "new-auction"
+  | "live-auction"
+  | "completed-auction"
+  | "live-auction-collection"
+  | "completed-auction-collection";
 type UserAuctionQueryType = "active-auction" | "expired-auction";
 
 // Base query to fetch and cache all auctions
@@ -14,22 +19,24 @@ export function useAllAuctionsBaseQuery() {
   return useQuery({
     queryKey: [queryKeys.auction.blockchain],
     queryFn: getAllAuctions,
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
+    staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
+    gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
   });
 }
 
 export function useAllAuctionsBlockchainQuery({
   limit = 50,
   type = "live-auction",
+  contractAddress,
 }: {
   limit?: number;
   type?: AuctionQueryType;
+  contractAddress?: string;
 }) {
   const allAuctionsQuery = useAllAuctionsBaseQuery();
 
   return useQuery({
-    queryKey: [queryKeys.auction.filtered, { type, limit }],
+    queryKey: [queryKeys.auction.filtered, { type, limit, contractAddress }],
     queryFn: async () => {
       if (!allAuctionsQuery.data) return [];
 
@@ -43,13 +50,34 @@ export function useAllAuctionsBlockchainQuery({
         switch (type) {
           case "live-auction":
             return allAuctionsQuery.data.filter(isCreated).slice(0, limit);
+
           case "completed-auction":
             return allAuctionsQuery.data.filter(isCompleted).slice(0, limit);
+
           case "new-auction":
             return allAuctionsQuery.data
               .filter(isCreated)
               .reverse()
               .slice(0, limit);
+
+          case "live-auction-collection":
+            return allAuctionsQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.CREATED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
+          case "completed-auction-collection":
+            return allAuctionsQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.COMPLETED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
           default:
             return [];
         }
@@ -58,12 +86,6 @@ export function useAllAuctionsBlockchainQuery({
       // Format auctions in parallel
       const formattedData = await Promise.all(
         filteredAuctions.map(async (auction) => {
-          //   const nft = await getNFT({
-          //     contract,
-          //     tokenId: auction.tokenId,
-          //     includeOwner: true,
-          //   });
-
           const nft = await fetchNFT({
             assetContract: auction.assetContract,
             tokenId: auction.tokenId,
@@ -79,8 +101,11 @@ export function useAllAuctionsBlockchainQuery({
       //     return !data.isAuctionExpired;
       //   });
     },
-    enabled: !!allAuctionsQuery.data && (!!limit || !!type),
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }
 
@@ -156,7 +181,9 @@ export function useUserAuctionBlockchainQuery({
       return formattedData;
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type) && !!userAddress,
-    staleTime: 1000 * 60,
-    refetchInterval: 5000,
+    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
+    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
+    refetchOnMount: true, // Refetch when component mounts if data is stale
+    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
   });
 }

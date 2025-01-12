@@ -6,29 +6,36 @@ import { getAllListing } from "@/modules/blockchain";
 import { useUserChainInfo } from "../user/user.query";
 import { formatBlockchainTimestamp } from "@/utils/functions";
 
-type ListingQueryType = "new-listing" | "live-listing" | "completed-listing";
+type ListingQueryType =
+  | "new-listing"
+  | "live-listing"
+  | "completed-listing"
+  | "live-listing-collection"
+  | "completed-listing-collection";
 type UserListingQueryType = "active-listing" | "expired-listing";
 
 export function useAllListingBaseQuery() {
   return useQuery({
     queryKey: [queryKeys.listing.blockchain],
     queryFn: getAllListing,
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
+    staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
+    gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
   });
 }
 
 export function useAllListingBlockchainQuery({
   limit = 50,
   type = "live-listing",
+  contractAddress,
 }: {
   limit?: number;
   type?: ListingQueryType;
+  contractAddress?: string;
 }) {
   const allListingQuery = useAllListingBaseQuery();
 
   return useQuery({
-    queryKey: [queryKeys.listing.filtered, { type, limit }],
+    queryKey: [queryKeys.listing.filtered, { type, limit, contractAddress }],
     queryFn: async () => {
       if (!allListingQuery.data) return [];
 
@@ -41,13 +48,34 @@ export function useAllListingBlockchainQuery({
         switch (type) {
           case "live-listing":
             return allListingQuery.data.filter(isCreated).slice(0, limit);
+
           case "completed-listing":
             return allListingQuery.data.filter(isCompleted).slice(0, limit);
+
           case "new-listing":
             return allListingQuery.data
               .filter(isCreated)
               .reverse()
               .slice(0, limit);
+
+          case "live-listing-collection":
+            return allListingQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.CREATED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
+          case "completed-listing-collection":
+            return allListingQuery.data.filter((auction) => {
+              return (
+                auction.status === StatusType.COMPLETED &&
+                auction.assetContract.toLowerCase() ===
+                  contractAddress?.toLowerCase()
+              );
+            });
+
           default:
             return [];
         }
@@ -71,8 +99,11 @@ export function useAllListingBlockchainQuery({
       //   });
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
-    staleTime: 1000 * 60,
-    // refetchInterval: 5000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }
 
@@ -148,7 +179,10 @@ export function useUserListingBlockchainQuery({
       return formattedData;
     },
     enabled: !!allListingQuery.data && (!!limit || !!type) && !!userAddress,
-    staleTime: 1000 * 60,
-    // refetchInterval: 5000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }

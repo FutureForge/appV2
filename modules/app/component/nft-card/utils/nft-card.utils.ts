@@ -17,7 +17,7 @@ export type NFTCardInfo =
   // | "bids"
   | "user-bids"
   | "completed-listing"
-  // | "new-sale-listing"
+  | "new-sale-listing"
   // | "new-sold-auction"
   | "new-accepted-offers"
   | "new-offers"
@@ -51,15 +51,18 @@ export const getNFTCardInfo = ({
 }) => {
   switch (type) {
     // case "new-sale-listing":
-    //   const buyer = "buyer" in data ? data.buyer : "";
+
+    // console.log('new-sale-listing', {data})
+
+    //   const buyer = "buyer" in data ? data.nft.owner : "";
     //   const totalPricePaid =
     //     "totalPricePaid" in data ? data.totalPricePaid : "";
 
     //   return {
     //     title1: "Price Paid",
     //     title2: "Bought By",
-    //     info1: `${(totalPricePaid)} XFI`,
-    //     info2: getFormatAddress(buyer),
+    //     info1: `${totalPricePaid} XFI`,
+    //     info2: getFormatAddress(buyer as string),
     //   };
 
     case "new-auction":

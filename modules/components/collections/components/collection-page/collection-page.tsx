@@ -22,7 +22,7 @@ export function CollectionPage() {
   const currentBatch = Math.ceil((currentPage * itemsPerPage) / fetchLimit);
 
   const {
-    data: CollectionQuery,
+    data: collectionQuery,
     isLoading,
     isPending,
     isError,
@@ -30,6 +30,8 @@ export function CollectionPage() {
     limit: fetchLimit,
     page: currentBatch,
   });
+
+  console.log({ collectionQuery, isLoading, isPending, isError });
 
   const { width } = useWindowSize();
   const router = useRouter();
@@ -45,7 +47,7 @@ export function CollectionPage() {
   };
 
   const filteredCollections =
-    CollectionQuery?.collections?.filter((collection) => {
+    collectionQuery?.collections?.filter((collection) => {
       const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
       const nameNoSpace = collection.collectionName
         .toLowerCase()
@@ -56,7 +58,7 @@ export function CollectionPage() {
     }) ?? [];
 
   const totalCount =
-    filteredCollections?.length || CollectionQuery?.totalCount || 0;
+    filteredCollections?.length || collectionQuery?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handlePageChange = (pageNum: number) => {

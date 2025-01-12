@@ -7,7 +7,6 @@ import {
 import { queryKeys } from "../query-keys";
 import axios from "axios";
 import {
-  backendURL,
   chainInfo,
   client,
   CROSSFI_API_URL,
@@ -16,45 +15,12 @@ import {
 } from "@/utils/configs";
 import { NFTActivityResponse, UserNFTResponse } from "@/utils/types/global";
 import {
-  useAllOffersQuery,
-  useFilteredAllAuctionsQuery,
-  useFilteredAllListingsQuery,
-  useFilteredAllOffersQuery,
-  useFilteredUserNewBidsQuery,
   useUserAuctionBlockchainQuery,
   useUserListingBlockchainQuery,
   useUserOfferBlockchainQuery,
 } from "..";
-import {
-  decimalOffChain,
-  getContractCustom,
-  getContractEthers,
-  getIsAuctionExpired,
-} from "@/modules/blockchain";
-import { getNFT } from "thirdweb/extensions/erc721";
-import {
-  formatBlockchainTimestamp,
-  to3DP,
-  tryParseJSON,
-} from "@/utils/functions";
-// import {
-//   AllAuctionsQueryResponse,
-//   AllListingsQueryResponse,
-//   AllOffersQueryResponse,
-//   Auction,
-//   Listing,
-//   NewSaleListingsQueryResponse,
-//   Offer,
-// } from "@/utils/types/graphql";
-import { Collection } from "@/utils/types/collection/collection.type";
-import {
-  filteredAllListingsQuery,
-  filteredNewSaleListingsQuery,
-} from "@/utils/graphql/queries/listing.queries";
-import request from "graphql-request";
-import { indexerEndpoint } from "@/utils/graphql";
-import { filteredAllAuctionsQuery } from "@/utils/graphql/queries/auction.queries";
-import { filteredAllOffersQuery } from "@/utils/graphql/queries/offers.queries";
+import { getContractEthers, getIsAuctionExpired } from "@/modules/blockchain";
+import { tryParseJSON } from "@/utils/functions";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
 import nftBaseABI from "@/utils/abi/nftBase.json";
 import { Auction, fetchNFT, Listing } from "../utils/index.utils.query";

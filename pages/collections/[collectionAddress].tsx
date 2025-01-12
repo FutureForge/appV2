@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Head from "next/head";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 
 import {
   useSingleCollectionInfoQuery,
@@ -30,7 +30,7 @@ import {
 import XFI from "@/assets/xfi.svg";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { motion } from "framer-motion";
-import { Auction, Listing, Offer } from "@/utils/types/graphql";
+// import { Auction, Listing, Offer } from "@/utils/types/graphql";
 import {
   NFTCardInfo,
   NFTStatus,
@@ -42,6 +42,11 @@ import { useUpdateCollectionMutation } from "@/modules/mutation";
 import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 import { validateSocialLink } from "@/modules/components/add-collection/add-collection.utils";
 import { Social } from "@/utils/types/global";
+import {
+  Auction,
+  Listing,
+  Offer,
+} from "@/modules/query/utils/index.utils.query";
 
 // icons
 import VerifyIcon from "@/assets/verified.svg";
@@ -56,14 +61,14 @@ import LinkIcon2 from "@/assets/link-01.svg";
 type FilterType =
   | "Items"
   | "Offers"
-  | "Sales"
+  // | "Sales"
   | "Activity"
   | "Collection Settings";
 
 const filters: FilterType[] = [
   "Items",
   "Offers",
-  "Sales",
+  // "Sales",
   "Activity",
   "Collection Settings",
 ];
@@ -74,9 +79,8 @@ const defaultCollectionSocials = [
   { icon: <Telegram className="size-[14px]" />, link: "" },
 ];
 
-export const ITEMS_PER_PAGE = 4;
-const INITIAL_FETCH_LIMIT = 20;
-const FETCH_MORE_INCREMENT = 20;
+export const ITEMS_PER_PAGE = 10;
+const INITIAL_FETCH_LIMIT = 50;
 
 export default function CollectionPage() {
   const router = useRouter();
@@ -101,7 +105,7 @@ export default function CollectionPage() {
     isLoading,
     isError,
   } = useSingleCollectionQuery({
-    contractAddress: collectionAddress as string,
+    contractAddress: collectionAddress?.toString() as string,
   });
 
   const {
@@ -109,7 +113,7 @@ export default function CollectionPage() {
     isPending: isPendingCollectionInfo,
     isLoading: isLoadingCollectionInfo,
   } = useSingleCollectionInfoQuery({
-    contractAddress: collectionAddress as string,
+    contractAddress: collectionAddress?.toString() as string,
   });
 
   const collection = singleCollectionInfo?.collection;
@@ -127,10 +131,10 @@ export default function CollectionPage() {
   const collectionAllListings =
     singleCollection?.collectionListings?.allListings;
   const collectionAllOffers = singleCollection?.collectionOffers?.allOffers;
-  const collectionListingSales =
-    singleCollection?.collectionListings?.newSaleListings;
-  const collectionAuctionSales =
-    singleCollection?.collectionAuctions?.auctionClosed;
+  // const collectionListingSales =
+  //   singleCollection?.collectionListings?.completedListing;
+  // const collectionAuctionSales =
+  //   singleCollection?.collectionAuctions?.completedAuction;
 
   const isCollectionOwner =
     collection?.collectionOwnerAddress.toLowerCase() ===
@@ -148,18 +152,18 @@ export default function CollectionPage() {
     link: item.socialLink,
   }));
 
-  const collectionSales = [
-    ...(collectionListingSales?.map((sale) => ({
-      ...sale,
-      saleType: "new-sale-listing",
-      nftStatus: "listed",
-    })) || []),
-    ...(collectionAuctionSales?.map((sale) => ({
-      ...sale,
-      saleType: "new-sold-auction",
-      nftStatus: "auctioned",
-    })) || []),
-  ].flat();
+  // const collectionSales = [
+  //   ...(collectionListingSales?.map((sale) => ({
+  //     ...sale,
+  //     saleType: "new-sale-listing",
+  //     nftStatus: "listed",
+  //   })) || []),
+  //   ...(collectionAuctionSales?.map((sale) => ({
+  //     ...sale,
+  //     saleType: "new-sold-auction",
+  //     nftStatus: "auctioned",
+  //   })) || []),
+  // ].flat();
 
   const collectionLabels = {
     floorPrice: "Floor Price",
@@ -181,30 +185,24 @@ export default function CollectionPage() {
     "percentageOfListed",
   ];
 
-  const filteredCollectionNFTs: CollectionNFTType[] =
+  const filteredCollectionNFTs = useMemo(() => 
     collectionNFTs?.filter((nft) => {
-      // First apply search filter
       const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-      const nameNoSpace = nft?.metadata?.name
-        ?.toLowerCase()
-        .replace(/\s+/g, "");
-      const tokenIdNoSpace = nft?.tokenId?.toLowerCase().replace(/\s+/g, "");
+      const nameNoSpace = nft.metadata.name.toLowerCase().replace(/\s+/g, "");
+      const tokenIdNoSpace = nft.tokenId.toLowerCase().replace(/\s+/g, "");
       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
       const matchesSearch = combinedField.includes(searchTerm);
 
-      // Then apply type filter
       const isListed = collectionAllListings?.some(
-        (listing) => listing.tokenId === nft.tokenId
+        (listing) => Number(listing.tokenId) === Number(nft.tokenId)
       );
       const isAuctioned = collectionAllAuctions?.some(
-        (auction) => auction.tokenId === nft.tokenId
+        (auction) => Number(auction.tokenId) === Number(nft.tokenId)
       );
 
       switch (selectedFilter) {
         case "All":
           return matchesSearch;
-        // case "Token Id":
-        //   return matchesSearch && tokenIdNoSpace.includes(searchTerm);
         case "Auction":
           return matchesSearch && isAuctioned;
         case "Listing":
@@ -212,35 +210,41 @@ export default function CollectionPage() {
         default:
           return matchesSearch;
       }
-    }) ?? [];
+    }) ?? [],
+    [collectionNFTs, searchQuery, selectedFilter, collectionAllListings, collectionAllAuctions]
+  );
 
   const filteredCollectionOffers: Offer[] =
     collectionAllOffers?.filter((offer) => {
       const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
       const nameNoSpace = offer.nft.metadata.name
-        .toLowerCase()
-        .replace(/\s+/g, "");
-      const tokenIdNoSpace = offer.nft.tokenId
-        .toLowerCase()
-        .replace(/\s+/g, "");
-      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
-
-      return combinedField.includes(searchTerm);
-    }) ?? [];
-
-  const filteredCollectionSales =
-    collectionSales?.filter((sale) => {
-      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-      const nameNoSpace = sale?.nft?.metadata?.name
-        .toLowerCase()
-        .replace(/\s+/g, "");
-      const tokenIdNoSpace = sale?.nft?.tokenId
         ?.toLowerCase()
         .replace(/\s+/g, "");
+      const tokenIdNoSpace = offer.tokenId
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, "");
       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
       return combinedField.includes(searchTerm);
     }) ?? [];
+
+  // const filteredCollectionSales =
+  //   collectionSales?.filter((sale) => {
+  //     const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+  //     const nameNoSpace = sale.nft.metadata.name
+  //       ?.toLowerCase()
+  //       .replace(/\s+/g, "");
+  //     const tokenIdNoSpace = sale.tokenId
+  //       .toString()
+  //       .toLowerCase()
+  //       .replace(/\s+/g, "");
+  //     const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+  //     return combinedField.includes(searchTerm);
+  //   }) ?? [];
+
+  // console.log({ filteredCollectionSales });
 
   const filteredCollectionTokenTransfers =
     collectionTokenTransfers?.filter((transfer) => {
@@ -262,18 +266,18 @@ export default function CollectionPage() {
       return combinedField.includes(searchTerm);
     }) ?? [];
 
-  const paginatedCollectionNFTs = filteredCollectionNFTs?.slice(
-    0,
-    displayCount
+  const paginatedCollectionNFTs = useMemo(() => 
+    filteredCollectionNFTs?.slice(0, displayCount),
+    [filteredCollectionNFTs, displayCount]
   );
   const paginatedCollectionOffers = filteredCollectionOffers?.slice(
     0,
     displayCount
   );
-  const paginatedCollectionSales = filteredCollectionSales?.slice(
-    0,
-    displayCount
-  );
+  // const paginatedCollectionSales = filteredCollectionSales?.slice(
+  //   0,
+  //   displayCount
+  // );
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
@@ -291,19 +295,13 @@ export default function CollectionPage() {
     if (inView) {
       const timeoutId = setTimeout(() => {
         setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
-      }, 300);
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [
-    inView,
-    filter,
-    displayCount,
-    filteredCollectionNFTs,
-    filteredCollectionOffers,
-    filteredCollectionSales,
-    filteredCollectionTokenTransfers,
-  ]);
+  }, [inView]);
+
+  console.log({ filter });
 
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
@@ -471,7 +469,7 @@ export default function CollectionPage() {
                 >
                   {filters
                     .filter(
-                      (value) => isCollectionOwner || value !== filters[4]
+                      (value) => isCollectionOwner || value !== filters[3]
                     )
                     .map((value) => (
                       <ToggleGroup.Item
@@ -486,7 +484,7 @@ export default function CollectionPage() {
               </Card>
 
               <div className="flex items-center gap-2 justify-end">
-                {filter !== filters[4] && (
+                {filter !== filters[3] && (
                   <TextField
                     type="search"
                     placeholder="Search by collections"
@@ -495,7 +493,7 @@ export default function CollectionPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 )}
-                {(filter === filters[2] || filter === filters[0]) && (
+                {filter === filters[0] && (
                   <div className="flex items-center gap-2">
                     <span className="text-sm h-[42px] flex items-center justify-center text-muted-foreground bg-tertiary px-3 py-1 rounded-lg font-medium">
                       {selectedFilter}
@@ -533,11 +531,13 @@ export default function CollectionPage() {
                     {paginatedCollectionNFTs.map((nft, index) => {
                       const isListed: Listing | undefined =
                         collectionAllListings?.find(
-                          (listing) => listing.tokenId === nft.tokenId
+                          (listing) =>
+                            Number(listing.tokenId) === Number(nft.tokenId)
                         );
                       const isAuctioned: Auction | undefined =
                         collectionAllAuctions?.find(
-                          (auction) => auction.tokenId === nft.tokenId
+                          (auction) =>
+                            Number(auction.tokenId) === Number(nft.tokenId)
                         );
 
                       const status = isListed
@@ -561,7 +561,7 @@ export default function CollectionPage() {
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -608,7 +608,7 @@ export default function CollectionPage() {
                         onClick={() => {
                           handleViewItemClick({
                             contractAddress: offer.assetContract,
-                            tokenId: offer.tokenId,
+                            tokenId: offer.tokenId.toString(),
                           });
                         }}
                       />
@@ -633,7 +633,7 @@ export default function CollectionPage() {
           )}
 
           {/* Render Sales Content */}
-          {filter === filters[2] && (
+          {/* {filter === filters[2] && (
             <div className="mt-6">
               <div className="w-full grid min-[1250px]:grid-cols-4 min-[1550px]:grid-cols-5 min-[970px]:grid-cols-3 max-[970px]:flex flex-wrap grid-cols-1 place-content-center gap-5">
                 {paginatedCollectionSales &&
@@ -650,7 +650,7 @@ export default function CollectionPage() {
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: sale.assetContract,
-                              tokenId: sale.tokenId,
+                              tokenId: sale.tokenId.toString(),
                             });
                           }}
                         />
@@ -673,10 +673,10 @@ export default function CollectionPage() {
                 )}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Render Activity Content */}
-          {filter === filters[3] &&
+          {filter === filters[2] &&
             (filteredCollectionTokenTransfers &&
             filteredCollectionTokenTransfers.length > 0 ? (
               <div className="mt-6">
@@ -788,7 +788,7 @@ export default function CollectionPage() {
       )}
 
       {/* Render Collection Settings Content */}
-      {isCollectionOwner && filter === filters[4] && collection && (
+      {isCollectionOwner && filter === filters[3] && collection && (
         <CollectionSettings collection={collection} />
       )}
     </div>

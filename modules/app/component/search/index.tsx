@@ -2,7 +2,6 @@
 import {
   Combobox,
   ComboboxItem,
-  ComboboxList,
   ComboboxProvider,
 } from "@ariakit/react";
 import * as RadixPopover from "@radix-ui/react-popover";
@@ -12,7 +11,6 @@ import {
   startTransition,
   useMemo,
   ComponentPropsWithoutRef,
-  useEffect,
 } from "react";
 import CloseIcon from "@/assets/close.svg";
 import { matchSorter } from "match-sorter";
@@ -21,10 +19,9 @@ import { Button } from "../button";
 import { cn } from "../../utils";
 import { ScrollArea } from "../scroll-area/scroll-area";
 import {
+  useAllAuctionsBlockchainQuery,
   useAllCollectionsQuery,
-  useAllAuctionsQuery,
-  useAllNFTQuery,
-  useAllListingsQuery,
+  useAllListingBlockchainQuery,
 } from "@/modules/query";
 import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
 import { useRouter } from "next/navigation";
@@ -58,9 +55,15 @@ export function Search() {
   const isTab = width && width <= 1170;
 
   const { data: allCollectionsQuery } = useAllCollectionsQuery({ limit: 100 });
-  const { data: listingData } = useAllListingsQuery({ limit: 100 });
-  const { data: auctionData } = useAllAuctionsQuery({ limit: 100 });
-  const { data: allNFTs } = useAllNFTQuery();
+  const { data: listingData } = useAllListingBlockchainQuery({
+    limit: 100,
+    type: "live-listing",
+  });
+  const { data: auctionData } = useAllAuctionsBlockchainQuery({
+    limit: 100,
+    type: "live-auction",
+  });
+  // const { data: allNFTs } = useAllNFTQuery();
 
   const collectionData = allCollectionsQuery?.collections;
 
@@ -76,7 +79,7 @@ export function Search() {
     listingData?.forEach((listing) => {
       if (
         listing.nft.metadata.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchValue.toLowerCase())
       ) {
         results.set(listing.nft.metadata.name.toLowerCase(), {
@@ -89,7 +92,7 @@ export function Search() {
     auctionData?.forEach((auction) => {
       if (
         auction.nft.metadata.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchValue.toLowerCase())
       ) {
         results.set(auction.nft.metadata.name.toLowerCase(), {
@@ -112,31 +115,9 @@ export function Search() {
       }
     });
 
-    allNFTs?.forEach((nft) => {
-      if (nft.metadata.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        collectionData?.forEach((collection) => {
-          if (
-            collection.collectionAddress.toLowerCase() ===
-            nft.assetContract.toLowerCase()
-          ) {
-            results.set(nft.metadata.name.toLowerCase(), {
-              ...nft,
-              type: "collection-nft" as SearchType,
-              collectionName: collection.collectionName,
-            });
-          } else {
-            results.set(nft.metadata.name.toLowerCase(), {
-              ...nft,
-              type: "nft" as SearchType,
-            });
-          }
-        });
-      }
-    });
-
     setIsSearching(false);
     return Array.from(results.values());
-  }, [searchValue, collectionData, listingData, auctionData, allNFTs]);
+  }, [searchValue, collectionData, listingData, auctionData]);
 
   const matches = useMemo(() => {
     return matchSorter(searchResults, searchValue, {

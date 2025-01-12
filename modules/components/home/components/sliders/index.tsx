@@ -62,26 +62,14 @@ export function Sliders() {
     type: "expired-listing",
   });
 
-  console.log({ userListing });
-
   const { data: userAuction } = useUserAuctionBlockchainQuery({
     limit: 2,
     type: "expired-auction",
   });
 
-  console.log({ userAuction });
-
   const { data: userOffer } = useUserOfferBlockchainQuery({
     limit: 2,
     type: "expired-offer",
-  });
-
-  console.log({ userOffer });
-
-  console.log({
-    newOffer,
-    isLoadingNewOffer,
-    isError: isErrorNewOffer,
   });
 
   const isError =

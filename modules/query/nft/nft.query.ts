@@ -23,8 +23,6 @@ import { NFTActivityResponse } from "@/utils/types/global";
 import { NFT as CustomNFTType } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
-import { indexerEndpoint } from "@/utils/graphql";
-import { allNFTsQuery } from "@/utils/graphql/queries/nft.queries";
 import request from "graphql-request";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { useSingleCollectionWithoutNFTsQuery } from "..";
@@ -219,21 +217,5 @@ export function useSingleNFTQuery({
     refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
-  });
-}
-
-export function useAllNFTQuery() {
-  return useQuery({
-    queryKey: [queryKeys.nft.single, "global-nft"],
-    queryFn: async () => {
-      const response = await request<{ nfts: CustomNFTType[] }>(
-        indexerEndpoint,
-        allNFTsQuery
-      );
-
-      return response.nfts;
-    },
-    enabled: true,
-    refetchInterval: 600000,
   });
 }

@@ -1,5 +1,10 @@
 import { formatBlockchainTimestamp } from "@/utils/functions";
-import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
+import {
+  decimalOffChain,
+  getContractCustom,
+  getIsAuctionExpired,
+  getWinningBid,
+} from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { NFT as ThirdwebNFTType } from "thirdweb";
 
@@ -18,6 +23,12 @@ export interface Auction {
   timeBufferInSeconds: number;
   tokenId: number;
   isAuctionExpired?: boolean;
+  isAuctionActivityExpired?: boolean;
+  winningBid?: {
+    bidder: string;
+    currency: string;
+    bidAmount: string;
+  };
   nft: ThirdwebNFTType;
 }
 
@@ -61,6 +72,22 @@ export async function formatAuctionData(
 
   const isExpired = currentTime > endTimeFormatted;
 
+  const isAuctionActive = await getIsAuctionExpired({
+    auctionId: rawAuction.auctionId,
+  });
+
+  const isAuctionExpired = !isAuctionActive;
+
+  const winningBid = await getWinningBid({
+    auctionId: rawAuction.auctionId,
+  });
+
+  const winningBidBody = {
+    bidder: winningBid[0],
+    currency: winningBid[1],
+    bidAmount: decimalOffChain(winningBid[2].toString())!,
+  };
+
   return {
     assetContract: rawAuction.assetContract,
     auctionCreator: rawAuction.auctionCreator,
@@ -79,6 +106,8 @@ export async function formatAuctionData(
     timeBufferInSeconds: Number(rawAuction.timeBufferInSeconds),
     tokenId: Number(rawAuction.tokenId),
     isAuctionExpired: isExpired,
+    winningBid: winningBidBody,
+    isAuctionActivityExpired: isExpired,
   };
 }
 

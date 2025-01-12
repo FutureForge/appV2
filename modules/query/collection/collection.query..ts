@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
   backendURL,
@@ -8,48 +8,21 @@ import {
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import {
-  useFilteredAllListingsQuery,
-  useFilteredCompletedListingsQuery,
-  useFilteredNewListingsQuery,
-  useFilteredNewSaleListingsQuery,
-  useFilteredAuctionClosedQuery,
-  useFilteredNewAuctionsQuery,
-  useFilteredAllAuctionsQuery,
-  useFilteredCompletedAuctionsQuery,
-  useFilteredNewOffersQuery,
-  useFilteredAllOffersQuery,
-  useFilteredCompletedOffersQuery,
-  useFilteredAcceptedOffersQuery,
-} from "..";
-import {
   decimalOffChain,
   getContractCustom,
   getIsAuctionExpired,
 } from "@/modules/blockchain";
-import { formatBlockchainTimestamp, to3DP } from "@/utils/functions";
+import { to3DP } from "@/utils/functions";
 import { getNFT, isERC721 } from "thirdweb/extensions/erc721";
-import { useMemo } from "react";
 import {
   CollectionsQueryResponse,
   SingleCollection,
 } from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
-import {
-  AllAuctionsQueryResponse,
-  AllListingsQueryResponse,
-  AuctionClosedQueryResponse,
-  NewSaleListingsQueryResponse,
-} from "@/utils/types/graphql";
-import request from "graphql-request";
-import { indexerEndpoint } from "@/utils/graphql";
-import {
-  filteredAllListingsQuery,
-  filteredNewSaleListingsQuery,
-} from "@/utils/graphql/queries/listing.queries";
-import {
-  filteredAllAuctionsQuery,
-  filteredAuctionClosedQuery,
-} from "@/utils/graphql/queries/auction.queries";
+import { useAllAuctionsBlockchainQuery } from "../auction/auction.blockchain.query";
+import { useAllListingBlockchainQuery } from "../listing/listing.blockchain.query";
+import { useAllOffersBlockchainQuery } from "../offers/offers.blockchain.query";
+import { Auction, Listing } from "../utils/index.utils.query";
 
 export async function isNFTContract(contractAddress: string) {
   const contract = await getContractCustom({ contractAddress });
@@ -120,152 +93,95 @@ export function useSingleCollectionWithoutNFTsQuery({
   });
 }
 
-async function getTotalVolumeAndFloorPrice({
-  contractAddress,
-}: {
-  contractAddress: string;
-}) {
-  const [
-    newSaleListingResponse,
-    allListingsResponse,
-    auctionClosedResponse,
-    allAuctionsResponse,
-  ] = await Promise.all([
-    request<NewSaleListingsQueryResponse>(
-      indexerEndpoint,
-      filteredNewSaleListingsQuery,
-      {
-        contractAddress: contractAddress.toLowerCase(),
-        address: "",
-      }
-    ),
-    request<AllListingsQueryResponse>(
-      indexerEndpoint,
-      filteredAllListingsQuery,
-      {
-        contractAddress: contractAddress.toLowerCase(),
-        address: "",
-      }
-    ),
-    request<AuctionClosedQueryResponse>(
-      indexerEndpoint,
-      filteredAuctionClosedQuery,
-      {
-        contractAddress: contractAddress.toLowerCase(),
-        address: "",
-      }
-    ),
-    request<AllAuctionsQueryResponse>(
-      indexerEndpoint,
-      filteredAllAuctionsQuery,
-      {
-        contractAddress: contractAddress.toLowerCase(),
-        address: "",
-      }
-    ),
-  ]);
+// function useCollectionVolumeData({
+//   liveAuction = [],
+//   completedAuction = [],
+//   liveListing = [],
+//   completedListing = [],
+// }: {
+//   liveAuction?: any[];
+//   completedAuction?: any[];
+//   liveListing?: any[];
+//   completedListing?: any[];
+// }) {
+//   const totalListingVolume = completedListing.reduce((acc: number, listing) => {
+//     const price = parseFloat(decimalOffChain(listing.pricePerToken) || "0");
+//     return acc + price;
+//   }, 0);
 
-  const newSaleListings = newSaleListingResponse.newSaleListings;
-  const allListings = allListingsResponse.allListings;
-  const auctionClosed = auctionClosedResponse.auctionCloseds;
-  const allAuctions = allAuctionsResponse.allAuctions;
+//   const totalAuctionVolume = completedAuction.reduce((acc, auction) => {
+//     const price = parseFloat(
+//       decimalOffChain(auction?.winningBid?.bidAmount!) || "0"
+//     );
+//     return acc + price;
+//   }, 0);
 
-  const updatedListings = allListings.filter((listing) => {
-    const { endTimestamp } = listing;
-    const endTime = formatBlockchainTimestamp(endTimestamp);
-    const endTimeFormatted = new Date(endTime).getTime();
-    const currentTime = new Date().getTime();
+//   const totalVolume = totalListingVolume + totalAuctionVolume;
+//   const formattedTotalVolume = to3DP(totalVolume || 0);
 
-    // looking for active listings
-    return endTimeFormatted > currentTime;
-  });
+//   const floorPrice = (() => {
+//     let floor = Infinity;
 
-  const updatedAllAuctions = allAuctions.filter((auction) => {
-    const { endTimestamp } = auction;
-    const endTime = formatBlockchainTimestamp(endTimestamp);
-    const endTimeFormatted = new Date(endTime).getTime();
-    const currentTime = new Date().getTime();
+//     for (const listing of liveListing) {
+//       const price = decimalOffChain(listing.pricePerToken) || "0";
+//       const listingPrice = parseFloat(price);
+//       floor = Math.min(floor, listingPrice);
+//     }
 
-    // looking for active listings
-    return endTimeFormatted > currentTime;
-  });
+//     for (const auction of liveAuction) {
+//       const price = decimalOffChain(auction.minimumBidAmount) || "0";
+//       const auctionPrice = parseFloat(price);
+//       floor = Math.min(floor, auctionPrice);
+//     }
 
-  const totalListingVolume = newSaleListings?.reduce((acc, listing) => {
-    const price = parseFloat(decimalOffChain(listing.totalPricePaid) || "0");
-    return acc + price;
-  }, 0);
+//     return floor === Infinity ? 0 : floor;
+//   })();
 
-  const totalAuctionVolume = auctionClosed?.reduce((acc, auction) => {
-    const price = parseFloat(decimalOffChain(auction.bidAmount) || "0");
-    return acc + price;
-  }, 0);
-
-  const totalVolume = (totalListingVolume ?? 0) + (totalAuctionVolume ?? 0);
-
-  const formattedTotalVolume = to3DP(totalVolume || 0);
-
-  const floorPrice = (() => {
-    let floor = Infinity;
-
-    for (const listing of updatedListings) {
-      const price = decimalOffChain(listing.pricePerToken) || "0";
-      const listingPrice = parseFloat(price);
-      floor = Math.min(floor, listingPrice);
-    }
-
-    for (const auction of updatedAllAuctions) {
-      const price = decimalOffChain(auction.minimumBidAmount) || "0";
-      const auctionPrice = parseFloat(price);
-      floor = Math.min(floor, auctionPrice);
-    }
-
-    return floor === Infinity ? 0 : floor;
-  })();
-
-  return {
-    floorPrice: floorPrice,
-    formattedTotalVolume: formattedTotalVolume,
-  };
-}
+//   return {
+//     floorPrice: floorPrice,
+//     formattedTotalVolume: Number(formattedTotalVolume),
+//   };
+// }
 
 export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
   return useQuery({
-    queryKey: [queryKeys.collection.all],
+    queryKey: [queryKeys.collection.all, limit, page],
     queryFn: async () => {
       const response = await axios.get<CollectionsQueryResponse>(
         `${backendURL}/collection?limit=${limit}&page=${page}`
       );
 
-      for (const collection of response.data.collections) {
-        try {
-          const [collectionDetailsResponse] = await Promise.all([
-            axios.get(
+      const updatedCollections = await Promise.all(
+        response.data.collections.map(async (collection) => {
+          try {
+            const collectionDetailsResponse = await axios.get(
               `${CROSSFI_API_URL}/tokens/${collection.collectionAddress}`
-            ),
-          ]);
+            );
 
-          const holderCount = collectionDetailsResponse.data.holderCount;
+            const holderCount = collectionDetailsResponse.data.holderCount;
 
-          const { floorPrice, formattedTotalVolume } =
-            await getTotalVolumeAndFloorPrice({
-              contractAddress: collection.collectionAddress,
-            });
-
-          collection.floorPrice = floorPrice;
-          collection.totalVolume = Number(formattedTotalVolume);
-          collection.holderCount = holderCount;
-        } catch (error) {}
-      }
+            return {
+              ...collection,
+              holderCount,
+              floorPrice: 8,
+              totalVolume: 8,
+            };
+          } catch (error) {
+            console.log("all collection query", { error });
+            return collection;
+          }
+        })
+      );
 
       return {
-        collections: response.data.collections.reverse(),
+        collections: updatedCollections.reverse(),
         totalCount: response.data.totalCount,
       };
     },
     enabled: !!limit && !!page,
-    // refetchInterval: 60000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    // refetchInterval: 5000,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -275,7 +191,7 @@ export function useSingleCollectionInfoQuery({
   contractAddress: string;
 }) {
   return useQuery({
-    queryKey: [queryKeys.collection.single, contractAddress, "info"],
+    queryKey: [queryKeys.collection.single, { contractAddress }, "info"],
     queryFn: async () => {
       const response = await axios.get<SingleCollection>(
         `${backendURL}/collection/${contractAddress}`
@@ -304,85 +220,45 @@ export function useSingleCollectionQuery({
 }: {
   contractAddress: string;
 }) {
-  /**
-   * GETTING COLLECTION LISTING DATA
-   */
-  const { data: newSaleListings, isLoading: isLoadingNewSaleListings } =
-    useFilteredNewSaleListingsQuery({
-      contractAddress,
-    });
+  const { data: liveAuction } = useAllAuctionsBlockchainQuery({
+    type: "live-auction-collection",
+    contractAddress,
+  });
 
-  const { data: allListings, isLoading: isLoadingAllListings } =
-    useFilteredAllListingsQuery({
-      contractAddress,
-    });
+  const { data: completedAuction } = useAllAuctionsBlockchainQuery({
+    type: "completed-auction-collection",
+    contractAddress,
+  });
 
-  const { data: newListings, isLoading: isLoadingNewListings } =
-    useFilteredNewListingsQuery({
-      contractAddress,
-    });
+  const { data: liveListing } = useAllListingBlockchainQuery({
+    type: "live-listing-collection",
+    contractAddress,
+  });
 
-  const { data: completedListings, isLoading: isLoadingCompletedListings } =
-    useFilteredCompletedListingsQuery({
-      contractAddress,
-    });
+  const { data: completedListing } = useAllListingBlockchainQuery({
+    type: "completed-listing-collection",
+    contractAddress,
+  });
 
-  /**
-   * GETTING COLLECTION AUCTION DATA
-   */
+  const { data: liveOffer } = useAllOffersBlockchainQuery({
+    type: "live-offer-collection",
+    contractAddress,
+  });
 
-  const { data: auctionClosed, isLoading: isLoadingAuctionClosed } =
-    useFilteredAuctionClosedQuery({
-      contractAddress,
-    });
-
-  const { data: newAuctions, isLoading: isLoadingNewAuctions } =
-    useFilteredNewAuctionsQuery({
-      contractAddress,
-    });
-
-  const { data: allAuctions, isLoading: isLoadingAllAuctions } =
-    useFilteredAllAuctionsQuery({
-      contractAddress,
-    });
-
-  /**
-   * GETTING COLLECTION OFFERS DATA
-   */
-
-  const { data: newOffers, isLoading: isLoadingNewOffers } =
-    useFilteredNewOffersQuery({
-      contractAddress,
-    });
-
-  const { data: allOffers, isLoading: isLoadingAllOffers } =
-    useFilteredAllOffersQuery({
-      contractAddress,
-    });
-
-  const { data: acceptedOffers, isLoading: isLoadingAcceptedOffers } =
-    useFilteredAcceptedOffersQuery({
-      contractAddress,
-    });
+  const { data: completedOffer } = useAllOffersBlockchainQuery({
+    type: "completed-offer-collection",
+    contractAddress,
+  });
 
   return useQuery({
-    queryKey: [queryKeys.collection.single, contractAddress],
+    queryKey: [queryKeys.collection.single, { contractAddress }],
     queryFn: async () => {
-      const { floorPrice, formattedTotalVolume } =
-        await getTotalVolumeAndFloorPrice({
-          contractAddress: contractAddress,
-        });
-
       const [
-        // collectionResponse,
         collectionTransfersResponse,
         collectionDetailsResponse,
         collectionFee,
         marketplaceFee,
       ] = await Promise.all([
-        // axios.get<SingleCollection>(
-        //   `${backendURL}/collection/${contractAddress}`
-        // ),
         axios.get<NFTActivityResponse>(
           `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
         ),
@@ -393,16 +269,11 @@ export function useSingleCollectionQuery({
         }).catch(() => ({})),
       ]);
 
-      // const { collection, nftLength, nfts } = collectionResponse.data;
       const tokenTransfers = collectionTransfersResponse.data.docs;
 
-      // const updatedNFTs = nfts.filter((nft) => {
-      //   return nft.owner !== undefined && nft.owner !== null;
-      // });
-
       const totalSupply = collectionDetailsResponse.data.totalSupply;
-      const listedNFTs = allListings?.length;
-      const auctionedNFTs = allAuctions?.length;
+      const listedNFTs = liveListing?.length;
+      const auctionedNFTs = liveAuction?.length;
       const percentageOfListed = ((listedNFTs ?? 0) / totalSupply) * 100;
       const percentageOfAuctioned = ((auctionedNFTs ?? 0) / totalSupply) * 100;
 
@@ -412,10 +283,9 @@ export function useSingleCollectionQuery({
         percentageOfListed,
         percentageOfAuctioned,
         holderCount: collectionDetailsResponse.data.holderCount,
-        totalVolume: formattedTotalVolume,
+        totalVolume: 1000,
         totalSupply,
-        floorPrice,
-        // totalNFTs: nftLength,
+        floorPrice: 5,
       };
 
       const updatedTokenTransfers = await Promise.all(
@@ -444,82 +314,31 @@ export function useSingleCollectionQuery({
         })
       );
 
-      const updatedAllAuctions = await Promise.all(
-        (allAuctions ?? []).map(async (auction) => {
-          const isExpired = await getIsAuctionExpired({
-            auctionId: BigInt(auction.auctionId),
-          });
-
-          // Inverting the result to correct the naming mismatch
-          const isAuctionExpired = !isExpired;
-
-          return { ...auction, isAuctionExpired };
-        })
-      );
-
-      const updatedNewAuctions = await Promise.all(
-        (newAuctions ?? []).map(async (auction) => {
-          const isExpired = await getIsAuctionExpired({
-            auctionId: BigInt(auction.auctionId),
-          });
-
-          // Inverting the result to correct the naming mismatch
-          const isAuctionExpired = !isExpired;
-
-          return { ...auction, isAuctionExpired };
-        })
-      );
-
       return {
-        // collection,
-        // collectionNFTs: updatedNFTs,
         tokenTransfers: updatedTokenTransfers,
         marketplaceFee,
         collectionDetails,
         collectionFee,
         collectionOffers: {
-          newOffers: newOffers || [],
-          allOffers: allOffers || [],
-          acceptedOffers: acceptedOffers || [],
+          allOffers: liveOffer,
+          completedOffer: completedOffer,
         },
         collectionAuctions: {
-          auctionClosed: auctionClosed || [],
-          newAuctions: updatedNewAuctions || [],
-          allAuctions: updatedAllAuctions || [],
+          completedAuction,
+          allAuctions: liveAuction,
         },
         collectionListings: {
-          allListings: allListings || [],
-          newListings: newListings || [],
-          newSaleListings: newSaleListings?.slice(0, 20) || [],
-          completedListings: completedListings || [],
+          allListings: liveListing,
+          completedListing,
         },
       };
     },
-    enabled:
-      !!contractAddress &&
-      !isLoadingNewSaleListings &&
-      !isLoadingAllListings &&
-      !isLoadingNewListings &&
-      !isLoadingAuctionClosed &&
-      !isLoadingNewAuctions &&
-      !isLoadingAllAuctions &&
-      !isLoadingNewOffers &&
-      !isLoadingAllOffers &&
-      !isLoadingAcceptedOffers,
-    // enabled:
-    //   !!contractAddress &&
-    //   (!!isLoadingNewSaleListings ||
-    //     !!isLoadingAllListings ||
-    //     !!isLoadingNewListings ||
-    //     !!isLoadingAuctionClosed ||
-    //     !!isLoadingNewAuctions ||
-    //     !!isLoadingAllAuctions ||
-    //     !!isLoadingNewOffers ||
-    //     !!isLoadingAllOffers ||
-    //     !!isLoadingAcceptedOffers),
-    // refetchInterval: 5000,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
+    enabled: !!contractAddress,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }
 
