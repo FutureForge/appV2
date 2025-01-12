@@ -17,6 +17,7 @@ export interface Auction {
   status: number;
   timeBufferInSeconds: number;
   tokenId: number;
+  isAuctionExpired?: boolean;
   nft: ThirdwebNFTType;
 }
 
@@ -32,6 +33,21 @@ export interface Listing {
   startTimestamp: string;
   status: number;
   tokenId: number;
+  isListingExpired?: boolean;
+  nft: ThirdwebNFTType;
+}
+
+export interface Offer {
+  assetContract: string;
+  currency: string;
+  expirationTimestamp: string;
+  offerId: number;
+  offeror: string;
+  quantity: number;
+  status: number;
+  tokenId: number;
+  totalPrice: number;
+  isOfferExpired?: boolean;
   nft: ThirdwebNFTType;
 }
 
@@ -39,6 +55,12 @@ export async function formatAuctionData(
   rawAuction: any,
   nft: ThirdwebNFTType
 ): Promise<Auction> {
+  const endTime = formatBlockchainTimestamp(rawAuction.endTimestamp);
+  const endTimeFormatted = new Date(endTime).getTime();
+  const currentTime = new Date().getTime();
+
+  const isExpired = currentTime > endTimeFormatted;
+
   return {
     assetContract: rawAuction.assetContract,
     auctionCreator: rawAuction.auctionCreator,
@@ -56,6 +78,7 @@ export async function formatAuctionData(
     status: rawAuction.status,
     timeBufferInSeconds: Number(rawAuction.timeBufferInSeconds),
     tokenId: Number(rawAuction.tokenId),
+    isAuctionExpired: isExpired,
   };
 }
 
@@ -63,12 +86,18 @@ export async function formatListingData(
   rawListing: any,
   nft: ThirdwebNFTType
 ): Promise<Listing> {
+  const endTime = formatBlockchainTimestamp(rawListing.endTimestamp);
+  const endTimeFormatted = new Date(endTime).getTime();
+  const currentTime = new Date().getTime();
+
+  const isExpired = currentTime > endTimeFormatted;
+
   return {
     assetContract: rawListing.assetContract,
     listingCreator: rawListing.listingCreator,
     listingId: Number(rawListing.listingId),
     currency: rawListing.currency,
-    endTimestamp: formatBlockchainTimestamp(rawListing.endTimestamp.toString()),
+    endTimestamp: formatBlockchainTimestamp(rawListing.endTimestamp),
     pricePerToken: Number(decimalOffChain(rawListing.pricePerToken)),
     nft,
     quantity: Number(rawListing.quantity),
@@ -78,6 +107,34 @@ export async function formatListingData(
     status: rawListing.status,
     tokenId: Number(rawListing.tokenId),
     reserved: false,
+    isListingExpired: isExpired,
+  };
+}
+
+export async function formatOfferData(
+  rawOffer: any,
+  nft: ThirdwebNFTType
+): Promise<Offer> {
+  const endTime = formatBlockchainTimestamp(rawOffer.expirationTimestamp);
+  const endTimeFormatted = new Date(endTime).getTime();
+  const currentTime = new Date().getTime();
+
+  const isExpired = currentTime > endTimeFormatted;
+
+  return {
+    assetContract: rawOffer.assetContract,
+    offeror: rawOffer.offeror,
+    offerId: Number(rawOffer.offerId),
+    currency: rawOffer.currency,
+    expirationTimestamp: formatBlockchainTimestamp(
+      rawOffer.expirationTimestamp
+    ),
+    totalPrice: Number(decimalOffChain(rawOffer.totalPrice)),
+    nft,
+    quantity: Number(rawOffer.quantity),
+    status: rawOffer.status,
+    tokenId: Number(rawOffer.tokenId),
+    isOfferExpired: isExpired,
   };
 }
 

@@ -1,13 +1,7 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import { getAllAuctions } from "@/modules/blockchain";
 import { StatusType } from "@/utils/enums/messages/index.enum";
-import { NFT as ThirdwebNFTType } from "thirdweb";
-import {
-  fetchNFT,
-  formatAuctionData,
-  formatListingData,
-} from "../utils/index.utils.query";
+import { fetchNFT, formatListingData } from "../utils/index.utils.query";
 import { getAllListing } from "@/modules/blockchain";
 
 type ListingQueryType = "new-listing" | "live-listing" | "completed-listing";
@@ -31,7 +25,7 @@ export function useAllListingBlockchainQuery({
   const allListingQuery = useAllListingBaseQuery();
 
   return useQuery({
-    queryKey: [queryKeys.auction.filtered, { type, limit }],
+    queryKey: [queryKeys.listing.filtered, { type, limit }],
     queryFn: async () => {
       if (!allListingQuery.data) return [];
 
@@ -56,8 +50,6 @@ export function useAllListingBlockchainQuery({
         }
       })();
 
-      console.log({ filteredListing });
-
       const formattedData = await Promise.all(
         filteredListing.map(async (listing) => {
           const nft = await fetchNFT({
@@ -70,6 +62,10 @@ export function useAllListingBlockchainQuery({
       );
 
       return formattedData;
+
+      //   return formattedData.filter((data) => {
+      //     return !data.isListingExpired;
+      //   });
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60,

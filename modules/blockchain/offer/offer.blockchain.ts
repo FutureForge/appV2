@@ -64,41 +64,41 @@ export async function getCancelOffer({ offerId }: { offerId: string }) {
   return transaction;
 }
 
-export async function getCollectAuctionPayout({
-  auctionId,
-}: {
-  auctionId: string;
-}) {
-  const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
-  });
+// export async function getCollectAuctionPayout({
+//   auctionId,
+// }: {
+//   auctionId: string;
+// }) {
+//   const contract = getContractCustom({
+//     contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+//   });
 
-  const transaction = await prepareContractCall({
-    contract,
-    method: "function collectAuctionPayout(uint256 _auctionId)",
-    params: [BigInt(auctionId)],
-  });
+//   const transaction = await prepareContractCall({
+//     contract,
+//     method: "function collectAuctionPayout(uint256 _auctionId)",
+//     params: [BigInt(auctionId)],
+//   });
 
-  return transaction;
-}
+//   return transaction;
+// }
 
-export async function getCollectAuctionTokens({
-  auctionId,
-}: {
-  auctionId: string;
-}) {
-  const contract = getContractCustom({
-    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
-  });
+// export async function getCollectAuctionTokens({
+//   auctionId,
+// }: {
+//   auctionId: string;
+// }) {
+//   const contract = getContractCustom({
+//     contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+//   });
 
-  const transaction = await prepareContractCall({
-    contract,
-    method: "function collectAuctionTokens(uint256 _auctionId)",
-    params: [BigInt(auctionId)],
-  });
+//   const transaction = await prepareContractCall({
+//     contract,
+//     method: "function collectAuctionTokens(uint256 _auctionId)",
+//     params: [BigInt(auctionId)],
+//   });
 
-  return transaction;
-}
+//   return transaction;
+// }
 
 export async function getTotalOffers() {
   const contract = getContractCustom({

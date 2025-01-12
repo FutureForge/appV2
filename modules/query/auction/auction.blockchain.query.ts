@@ -72,6 +72,10 @@ export function useAllAuctionsBlockchainQuery({
       );
 
       return formattedData;
+
+      //   return formattedData.filter((data) => {
+      //     return !data.isAuctionExpired;
+      //   });
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60, // Consider data fresh for 1 minute

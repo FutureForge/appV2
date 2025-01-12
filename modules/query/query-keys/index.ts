@@ -34,6 +34,8 @@ export const queryKeys = {
     new: ["new-offer"] as const,
     single: ["single-offer"] as const,
     filteredAll: ["filtered-all-offers"] as const,
+    blockchain: ["offers-blockchain"] as const,
+    filtered: ["offers-blockchain-filtered"] as const,
   },
   collection: {
     all: ["collection"] as const,

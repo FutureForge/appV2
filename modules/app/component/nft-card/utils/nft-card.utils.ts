@@ -105,7 +105,7 @@ export const getNFTCardInfo = ({
       return {
         title1: "Price Offered",
         title2: "Offered By",
-        info1: `${decimalOffChain(totalPriceOffered)} WXFI`,
+        info1: `${totalPriceOffered} WXFI`,
         info2: getFormatAddress(offerorNewOffers),
       };
 
