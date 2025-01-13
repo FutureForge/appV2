@@ -8,7 +8,7 @@ import {
   useAcceptOfferMutation,
   useCancelOfferMutation,
 } from "@/modules/mutation";
-import { Offer } from "@/modules/query/utils/index.utils.query";
+import { Offer } from "@/modules/query/utils";
 
 export function makeOffersColumn({
   isOwner,

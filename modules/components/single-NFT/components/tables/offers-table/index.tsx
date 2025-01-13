@@ -9,7 +9,7 @@ import { makeOffersColumn } from "./columns";
 import { Table } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Offer } from "@/modules/query/utils/index.utils.query";
+import { Offer } from "@/modules/query/utils";
 
 type OffersTableProps = {
   isLoading: boolean;

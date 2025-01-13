@@ -40,11 +40,7 @@ import { UserNFTData } from "@/utils/types/collection/collection.type";
 import { chainInfo, client } from "@/utils/configs";
 import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
 import { useUserImageStore } from "@/utils/store/user-image.store";
-import {
-  Auction,
-  Listing,
-  Offer,
-} from "@/modules/query/utils/index.utils.query";
+import { Auction, Listing, Offer } from "@/modules/query/utils";
 
 // Icons
 import CopyIcon from "@/assets/copy.svg";
@@ -615,6 +611,7 @@ export function ProfilePage() {
                           data={data}
                           type="user-listing"
                           cta="View Item"
+                          nft={listing.nft}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
@@ -674,6 +671,7 @@ export function ProfilePage() {
                           data={data}
                           type="user-auction"
                           cta="View Item"
+                          nft={auction.nft}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
@@ -733,6 +731,7 @@ export function ProfilePage() {
                           data={data}
                           type="offers"
                           cta="View Item"
+                          nft={offer.nft}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
@@ -909,6 +908,7 @@ export function ProfilePage() {
                               data={data}
                               type="user-listing"
                               cta="View Item"
+                              nft={listing.nft}
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
@@ -969,6 +969,7 @@ export function ProfilePage() {
                               data={data}
                               type="user-auction"
                               cta="View Item"
+                              nft={auction.nft}
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
@@ -1029,6 +1030,7 @@ export function ProfilePage() {
                               data={data}
                               type="user-offers"
                               cta="View Item"
+                              nft={offer.nft}
                               onClick={() => {
                                 handleViewItemClick({
                                   contractAddress: data.assetContract,
@@ -1090,6 +1092,7 @@ export function ProfilePage() {
                           data={data}
                           type="user-auction"
                           cta="View Item"
+                          nft={auction.nft}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,

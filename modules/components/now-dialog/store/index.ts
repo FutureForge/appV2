@@ -1,5 +1,5 @@
-import { Listing, Auction } from "@/modules/query/utils/index.utils.query";
-import { NFT } from "@/utils/types/graphql";
+import { Listing, Auction } from "@/modules/query/utils";
+import { NFT } from "thirdweb";
 import { create } from "zustand";
 
 interface BuyNowListingDialogStore {

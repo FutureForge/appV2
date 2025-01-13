@@ -534,6 +534,7 @@ export default function CollectionPage() {
                           data={data}
                           status={status}
                           type={type}
+                          nft={data.nft}
                           cta="View Item"
                           extraCTA={isListed ? "Buy Listing" : "Buy Auction"}
                           ctaStyles="!bg-border"
@@ -584,6 +585,7 @@ export default function CollectionPage() {
                         data={offer}
                         type="offers"
                         cta="View Items"
+                        nft={offer.nft}
                         onClick={() => {
                           handleViewItemClick({
                             contractAddress: offer.assetContract,

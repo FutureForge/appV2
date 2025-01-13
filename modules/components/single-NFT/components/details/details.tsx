@@ -42,7 +42,7 @@ import {
 import Line from "@/assets/line.svg";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
-import { Auction, Listing } from "@/modules/query/utils/index.utils.query";
+import { Auction, Listing } from "@/modules/query/utils";
 
 export const singleNFTFilters = [
   "Not Listed",

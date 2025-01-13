@@ -2,11 +2,13 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { WinningBid } from "@/utils/types/graphql";
 import { getFormatAddress } from "@/utils/functions";
 
 export function makeWinningBidColumn() {
-  const columns = createColumnHelper<WinningBid>();
+  const columns = createColumnHelper<{
+    bidder: string;
+    bidAmount: string;
+  }>();
 
   /* -------------------------------------------------------------------------------------------------
    * Bidder column

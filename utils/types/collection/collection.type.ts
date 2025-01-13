@@ -1,4 +1,33 @@
-import { NFTMetadata } from "../graphql";
+export type Attribute = {
+  trait_type: string;
+  value: string;
+};
+
+type Property = {
+  name: string;
+  value: string;
+};
+
+export type WinningBid = {
+  bidAmount: string;
+  bidder: string;
+  currency: string;
+};
+
+export type NFTMetadata = {
+  animationUrl: string;
+  attributes: Attribute[];
+  backgroundColor: string;
+  customAnimationUrl: string;
+  customImage: string;
+  description: string;
+  externalUrl: string;
+  image: string;
+  imageUrl: string;
+  name: string;
+  properties: Property[];
+  supply: number;
+};
 
 export type Collection = {
   _id: number;

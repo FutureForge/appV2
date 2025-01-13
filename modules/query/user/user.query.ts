@@ -23,7 +23,7 @@ import { getContractEthers, getIsAuctionExpired } from "@/modules/blockchain";
 import { tryParseJSON } from "@/utils/functions";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
 import nftBaseABI from "@/utils/abi/nftBase.json";
-import { Auction, fetchNFT, Listing } from "../utils/index.utils.query";
+import { Listing, Auction, fetchNFT } from "../utils";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
