@@ -10,13 +10,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { cn } from "@/modules/app/utils";
 import { useSearchParams } from "next/navigation";
+import { Table } from "@tanstack/react-table";
+import { Columns } from "../table/columns";
 
 // icons
 import List from "@/assets/list.svg";
 import Grid from "@/assets/grid.svg";
 import FilterIcon from "@/assets/filter-lines.svg";
-import { Table } from "@tanstack/react-table";
-import { Columns } from "../table/columns";
 
 type HeaderProps<T> = {
   title?: string;
@@ -72,20 +72,20 @@ export function Header<T>({
     }
   };
 
-  // useEffect(() => {
-  //   if (currentFilter) {
-  //     const matchingFilter = filters.find(
-  //       (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
-  //     );
-  //     if (matchingFilter) {
-  //       updateFilters(matchingFilter);
-  //       setFilter(matchingFilter);
-  //     }
-  //   } else {
-  //     setFilter(filters[0]);
-  //     updateFilters(filters[0]);
-  //   }
-  // }, [currentFilter, filters]);
+  useEffect(() => {
+    if (currentFilter) {
+      const matchingFilter = filters.find(
+        (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
+      );
+      if (matchingFilter) {
+        updateFilters(matchingFilter);
+        setFilter(matchingFilter);
+      }
+    } else {
+      setFilter(filters[0]);
+      updateFilters(filters[0]);
+    }
+  }, [currentFilter, filters]);
 
   return (
     <div className="w-full flex min-[1160px]:items-center gap-4 justify-between max-[1160px]:flex-col">

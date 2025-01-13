@@ -30,6 +30,7 @@ import {
   Listing,
   Offer,
 } from "@/modules/query/utils";
+import { QueryBrowsePageFilters } from "@/modules/components/browse/components/browse-page/browse-page";
 
 export function Sliders() {
   const router = useRouter();
@@ -115,7 +116,7 @@ export function Sliders() {
     data: auctionBidEventQuery,
     isLoading: isLoadingAuctionBidEvent,
     isError: isErrorAuctionBidEvent,
-  } = useAuctionBidEventQuery();
+  } = useAuctionBidEventQuery({});
 
   const {
     data: completedListingEventQuery,
@@ -207,7 +208,7 @@ export function Sliders() {
         isLoading={isLoadingNewListing}
         title="Recently Listed"
         cta="View More"
-        href="/browse?filter=recent_listings"
+        href={`/browse?filter=${QueryBrowsePageFilters.ALL_LISTINGS}`}
         data={newListing || []}
         renderItem={(listing: Listing) => {
           return (
@@ -233,7 +234,7 @@ export function Sliders() {
         isLoading={isLoadingNewAuction}
         title="Recently Auctioned NFTs"
         cta="View More"
-        href="/browse?filter=recent_auctions"
+        href={`/browse?filter=${QueryBrowsePageFilters.ALL_AUCTIONS}`}
         data={newAuction || []}
         renderItem={(auction: Auction) => {
           return (
@@ -259,7 +260,7 @@ export function Sliders() {
         isLoading={isLoadingNewOffer}
         title="Recent Offers"
         cta="View More"
-        href="/browse?filter=recent_offers"
+        href={`/browse?filter=${QueryBrowsePageFilters.ALL_OFFERS}`}
         data={newOffer || []}
         renderItem={(offer: Offer) => {
           return (
@@ -285,7 +286,7 @@ export function Sliders() {
         isLoading={isLoadingAuctionBidEvent}
         title="Recent Auction Bids"
         cta="View More"
-        href="/browse?filter=recent_bids"
+        href={`/browse?filter=${QueryBrowsePageFilters.AUCTION_BIDS}`}
         data={auctionBidEventQuery || []}
         renderItem={(auctionBid: AuctionBidEvent) => {
           return (
@@ -311,7 +312,7 @@ export function Sliders() {
         isLoading={isLoadingCompletedListing}
         title="Completed Listing"
         cta="View More"
-        href="/browse?filter=recent_sales"
+        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_LISTING}`}
         data={completedListingEventQuery || []}
         renderItem={(completedListing: CompletedListingEvent) => {
           return (
@@ -337,7 +338,7 @@ export function Sliders() {
         isLoading={isLoadingCompletedAuction}
         title="Completed Auction"
         cta="View More"
-        href="/browse?filter=recent_sold_auctions"
+        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_AUCTION}`}
         data={completedAuctionEventQuery || []}
         renderItem={(completedAuction: CompletedAuctionEvent) => {
           return (
@@ -363,7 +364,7 @@ export function Sliders() {
         isLoading={isLoadingAcceptedOffer}
         title="Accepted Offers"
         cta="View More"
-        href="/browse?filter=accepted_offers"
+        href={`/browse?filter=${QueryBrowsePageFilters.ACCEPTED_OFFERS}`}
         data={acceptedOfferEventQuery || []}
         renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
           return (

@@ -232,11 +232,11 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
   });
 }
 
-export function useAuctionBidEventQuery() {
+export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["auction-bid-event"],
+    queryKey: ["auction-bid-event", { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -278,9 +278,9 @@ export function useAuctionBidEventQuery() {
         );
       });
 
-      return formattedData;
+      return formattedData.slice(0, limit);
     },
-    enabled: !!allContractEventQuery.data,
+    enabled: !!allContractEventQuery.data && !!limit,
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,

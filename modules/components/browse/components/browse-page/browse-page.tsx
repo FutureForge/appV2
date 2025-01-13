@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
+  useAcceptedOfferEventQuery,
   useAllAuctionsBlockchainQuery,
   useAllListingBlockchainQuery,
   useAllOffersBlockchainQuery,
+  useAuctionBidEventQuery,
   useCompletedAuctionEventQuery,
   useCompletedListingEventQuery,
 } from "@/modules/query";
@@ -19,9 +21,13 @@ import {
   Auction,
   CompletedListingEvent,
   CompletedAuctionEvent,
+  AcceptedOfferEvent,
+  AuctionBidEvent,
 } from "@/modules/query/utils";
 import { CompletedListingTable } from "../table/completed-listing";
 import { CompletedAuctionTable } from "../table/completed-auction";
+import { AcceptedOfferTable } from "../table/accepted-offers";
+import { AuctionBidsTable } from "../table/auction-bids";
 
 export const browsePageFilters = [
   "All Listings",
@@ -29,7 +35,19 @@ export const browsePageFilters = [
   "All Offers",
   "Completed Listing",
   "Completed Auction",
+  "Accepted Offers",
+  "Auction Bids",
 ];
+
+export enum QueryBrowsePageFilters {
+  ALL_LISTINGS = "all_listings",
+  ALL_AUCTIONS = "all_auctions",
+  ALL_OFFERS = "all_offers",
+  COMPLETED_LISTING = "completed_listing",
+  COMPLETED_AUCTION = "completed_auction",
+  ACCEPTED_OFFERS = "accepted_offers",
+  AUCTION_BIDS = "auction_bids",
+}
 
 export function BrowsePage() {
   const router = useRouter();
@@ -84,17 +102,33 @@ export function BrowsePage() {
     isLoading: isLoadingCompletedAuction,
     isError: isErrorCompletedAuction,
   } = useCompletedAuctionEventQuery({
-    limit: 1,
+    limit: fetchLimit,
   });
 
-  console.log({ completedAuctionEventQuery });
+  const {
+    data: acceptedOfferEventQuery,
+    isLoading: isLoadingAcceptedOffer,
+    isError: isErrorAcceptedOffer,
+  } = useAcceptedOfferEventQuery({
+    limit: fetchLimit,
+  });
+
+  const {
+    data: auctionBidEventQuery,
+    isLoading: isLoadingAuctionBidEvent,
+    isError: isErrorAuctionBidEvent,
+  } = useAuctionBidEventQuery({
+    limit: fetchLimit,
+  });
 
   const isError =
     isAllListingsError ||
     isAllOffersError ||
     isAllAuctionsError ||
     isErrorCompletedListing ||
-    isErrorCompletedAuction;
+    isErrorCompletedAuction ||
+    isErrorAuctionBidEvent ||
+    isErrorAcceptedOffer;
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -105,8 +139,8 @@ export function BrowsePage() {
     // if (filter) setSelectedFilter(filter);
     if (filter) {
       setSelectedFilter(filter);
-      // const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
-      // router.push(`/browse?filter=${queryFilter}`);
+      const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
+      router.push(`/browse?filter=${queryFilter}`);
     }
   };
 
@@ -177,16 +211,16 @@ export function BrowsePage() {
 
       case browsePageFilters[3]:
         const filteredCompletedListing = completedListingEventQuery?.filter(
-          (listing) => {
+          (completedListing) => {
             const searchTerm = searchQuery
               .toLowerCase()
               .trim()
               .replace(/\s+/g, "");
 
-            const nameNoSpace = listing?.nft?.metadata?.name
+            const nameNoSpace = completedListing?.nft?.metadata?.name
               ?.toLowerCase()
               ?.replace(/\s+/g, "");
-            const tokenIdNoSpace = listing?.tokenId
+            const tokenIdNoSpace = completedListing?.tokenId
               .toString()
               ?.toLowerCase()
               ?.replace(/\s+/g, "");
@@ -200,16 +234,16 @@ export function BrowsePage() {
 
       case browsePageFilters[4]:
         const filteredCompletedAuction = completedAuctionEventQuery?.filter(
-          (listing) => {
+          (completedAuction) => {
             const searchTerm = searchQuery
               .toLowerCase()
               .trim()
               .replace(/\s+/g, "");
 
-            const nameNoSpace = listing?.nft?.metadata?.name
+            const nameNoSpace = completedAuction?.nft?.metadata?.name
               ?.toLowerCase()
               ?.replace(/\s+/g, "");
-            const tokenIdNoSpace = listing?.tokenId
+            const tokenIdNoSpace = completedAuction?.tokenId
               .toString()
               ?.toLowerCase()
               ?.replace(/\s+/g, "");
@@ -221,14 +255,58 @@ export function BrowsePage() {
 
         return filteredCompletedAuction as CompletedAuctionEvent[];
 
+      case browsePageFilters[5]:
+        const filteredAcceptedOffers = acceptedOfferEventQuery?.filter(
+          (acceptedOffer) => {
+            const searchTerm = searchQuery
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "");
+
+            const nameNoSpace = acceptedOffer?.nft?.metadata?.name
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
+            const tokenIdNoSpace = acceptedOffer?.tokenId
+              .toString()
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
+            const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+            return combinedField.includes(searchTerm);
+          }
+        );
+
+        return filteredAcceptedOffers as AcceptedOfferEvent[];
+
+      case browsePageFilters[6]:
+        const filteredAuctionBids = auctionBidEventQuery?.filter(
+          (auctionBids) => {
+            const searchTerm = searchQuery
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "");
+
+            const nameNoSpace = auctionBids.auction.nft.metadata?.name
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
+            const tokenIdNoSpace = auctionBids.auction.tokenId
+              .toString()
+              ?.toLowerCase()
+              ?.replace(/\s+/g, "");
+            const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+            return combinedField.includes(searchTerm);
+          }
+        );
+
+        return filteredAuctionBids as AuctionBidEvent[];
+
       default:
         return null;
     }
   };
 
   const filteredData = getFilteredData();
-
-  console.log({ filteredData });
 
   const totalCount = filteredData?.length || 0;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -253,17 +331,17 @@ export function BrowsePage() {
   };
 
   useEffect(() => {
-    // if (currentFilter) {
-    //   const matchingFilter = browsePageFilters.find(
-    //     (browsePageFilters) =>
-    //       browsePageFilters.toLowerCase().replace(/\s+/g, "_") === currentFilter
-    //   );
-    //   if (matchingFilter) {
-    //     setSelectedFilter(matchingFilter);
-    //   }
-    // } else {
-    setSelectedFilter(browsePageFilters[0]);
-    // }
+    if (currentFilter) {
+      const matchingFilter = browsePageFilters.find(
+        (browsePageFilters) =>
+          browsePageFilters.toLowerCase().replace(/\s+/g, "_") === currentFilter
+      );
+      if (matchingFilter) {
+        setSelectedFilter(matchingFilter);
+      }
+    } else {
+      setSelectedFilter(browsePageFilters[0]);
+    }
   }, [currentFilter]);
 
   if (isError) {
@@ -296,19 +374,20 @@ export function BrowsePage() {
                 ) : (
                   <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
                     {currentPageData?.map((listing, index) => {
+                      const data = listing as Listing;
                       return (
                         <NFTCard
                           key={index}
-                          data={listing}
-                          nft={listing.nft}
+                          data={data}
+                          nft={data.nft}
                           type="listing"
                           cta="View Item"
                           extraCTA="Buy Now"
                           status="listed"
                           onClick={() => {
                             handleViewItem({
-                              contractAddress: listing.assetContract,
-                              tokenId: listing.tokenId.toString(),
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -348,19 +427,20 @@ export function BrowsePage() {
                 ) : (
                   <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
                     {currentPageData?.map((auction, index) => {
+                      const data = auction as Auction;
                       return (
                         <NFTCard
                           key={index}
-                          data={auction}
-                          nft={auction.nft}
+                          data={data}
+                          nft={data.nft}
                           type="auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
                           status="auctioned"
                           onClick={() => {
                             handleViewItem({
-                              contractAddress: auction.assetContract,
-                              tokenId: auction.tokenId.toString(),
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -400,17 +480,18 @@ export function BrowsePage() {
                 ) : (
                   <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
                     {currentPageData?.map((offers, index) => {
+                      const data = offers as Offer;
                       return (
                         <NFTCard
                           key={index}
-                          data={offers}
-                          nft={offers.nft}
+                          data={data}
+                          nft={data.nft}
                           type="offers"
                           cta="View Item"
                           onClick={() => {
                             handleViewItem({
-                              contractAddress: offers.assetContract,
-                              tokenId: offers.tokenId.toString(),
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -449,18 +530,19 @@ export function BrowsePage() {
                   />
                 ) : (
                   <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
-                    {currentPageData?.map((offers, index) => {
+                    {currentPageData?.map((completedListing, index) => {
+                      const data = completedListing as CompletedListingEvent;
                       return (
                         <NFTCard
                           key={index}
-                          data={offers}
-                          nft={offers.nft}
+                          data={data}
+                          nft={data.nft}
                           type="completed-listing"
                           cta="View Item"
                           onClick={() => {
                             handleViewItem({
-                              contractAddress: offers.assetContract,
-                              tokenId: offers.tokenId.toString(),
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -481,7 +563,7 @@ export function BrowsePage() {
                 message={
                   searchQuery.length > 0
                     ? "No items found according to your search"
-                    : "No offers found"
+                    : "No completed listing found"
                 }
               />
             )}
@@ -499,18 +581,19 @@ export function BrowsePage() {
                   />
                 ) : (
                   <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
-                    {currentPageData?.map((offers, index) => {
+                    {currentPageData?.map((completedAuction, index) => {
+                      const data = completedAuction as CompletedAuctionEvent;
                       return (
                         <NFTCard
                           key={index}
-                          data={offers}
-                          nft={offers.nft}
+                          data={data}
+                          nft={data.nft}
                           type="completed-auction"
                           cta="View Item"
                           onClick={() => {
                             handleViewItem({
-                              contractAddress: offers.assetContract,
-                              tokenId: offers.tokenId.toString(),
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                         />
@@ -531,7 +614,109 @@ export function BrowsePage() {
                 message={
                   searchQuery.length > 0
                     ? "No items found according to your search"
-                    : "No offers found"
+                    : "No completed auction found"
+                }
+              />
+            )}
+          </>
+        )}
+        {/* Accepted Offer */}
+        {selectedFilter === browsePageFilters[5] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AcceptedOfferTable
+                    isLoading={isLoadingAcceptedOffer}
+                    data={currentPageData as AcceptedOfferEvent[]}
+                  />
+                ) : (
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((acceptedOffer, index) => {
+                      const data = acceptedOffer as AcceptedOfferEvent;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          nft={data.nft}
+                          type="accepted-offers"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: data.assetContract,
+                              tokenId: data.tokenId.toString(),
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No accepted offer found"
+                }
+              />
+            )}
+          </>
+        )}
+        {/* Auction Bids Offer */}
+        {selectedFilter === browsePageFilters[6] && (
+          <>
+            {currentPageData && currentPageData.length > 0 ? (
+              <>
+                {!isActive ? (
+                  <AuctionBidsTable
+                    isLoading={isLoadingAuctionBidEvent}
+                    data={currentPageData as AuctionBidEvent[]}
+                  />
+                ) : (
+                  <div className="w-full max-sm:flex flex-col items-center justify-center grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-2 place-content-center gap-5">
+                    {currentPageData?.map((auctionBid, index) => {
+                      const data = auctionBid as AuctionBidEvent;
+                      return (
+                        <NFTCard
+                          key={index}
+                          data={data}
+                          nft={data.auction.nft}
+                          type="auction-bids"
+                          cta="View Item"
+                          onClick={() => {
+                            handleViewItem({
+                              contractAddress: auctionBid.assetContract,
+                              tokenId: data.auction.tokenId.toString(),
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                message={
+                  searchQuery.length > 0
+                    ? "No items found according to your search"
+                    : "No auction bids found"
                 }
               />
             )}
