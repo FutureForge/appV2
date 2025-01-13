@@ -5,7 +5,7 @@ import XFI from "@/assets/xfi.svg";
 import { getFormatAddress } from "@/utils/functions";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
-import { Auction } from "@/modules/query/utils/index.utils.query";
+import { Auction } from "@/modules/query/utils";
 
 export function makeAllAuctionsColumn() {
   const columns = createColumnHelper<Auction>();

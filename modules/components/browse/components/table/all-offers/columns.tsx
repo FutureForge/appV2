@@ -5,7 +5,7 @@ import XFI from "@/assets/xfi.svg";
 import { getFormatAddress } from "@/utils/functions";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/configs";
-import { Offer } from "@/modules/query/utils/index.utils.query";
+import { Offer } from "@/modules/query/utils/";
 
 export function makeAllOffersColumn() {
   const columns = createColumnHelper<Offer>();

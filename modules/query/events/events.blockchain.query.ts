@@ -39,8 +39,6 @@ async function getEventArgs(event: any, blockHash: string) {
     blockHash: blockHash as Hex,
   });
 
-  //   console.log({ eventResult });
-
   return eventResult[0].args;
 }
 
@@ -62,18 +60,14 @@ export function useAllContractEventQuery() {
 export function useCompletedListingEventQuery() {
   const allContractEventQuery = useAllContractEventQuery();
 
-  console.log({ allContractEventQuery });
-
   return useQuery({
     queryKey: ["completed-listing-event"],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
       const completedListingEvent = await getCompletedListingEvent();
-      console.log({ completedListingEvent });
 
       const eventLogs = allContractEventQuery.data;
-      console.log({ eventLogs });
 
       const completedListingEvents = eventLogs
         .filter((event) => {
@@ -85,8 +79,6 @@ export function useCompletedListingEventQuery() {
         })
         .map((event) => event.blockHash);
 
-      console.log({ completedListingEvents });
-
       const completedEventResults = await Promise.all(
         completedListingEvents.map(async (blockHash) => {
           const eventData = await getEventArgs(
@@ -96,8 +88,6 @@ export function useCompletedListingEventQuery() {
           return eventData as unknown as RawCompletedListingEvent;
         })
       );
-
-      console.log({ completedEventResults });
 
       const formattedData = await Promise.all(
         completedEventResults.map(async (listing) => {

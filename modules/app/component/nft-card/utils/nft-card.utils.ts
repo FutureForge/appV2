@@ -1,5 +1,14 @@
 import { getFormatAddress } from "@/utils/functions";
-import { Listing, Auction, Offer } from "@/modules/query/utils";
+import {
+  Listing,
+  Auction,
+  Offer,
+  AuctionBidEvent,
+  CompletedListingEvent,
+  CompletedAuctionEvent,
+  AcceptedOfferEvent,
+} from "@/modules/query/utils";
+import { NFT } from "thirdweb";
 
 export type NFTCardInfo =
   | "listing"
@@ -10,16 +19,22 @@ export type NFTCardInfo =
   | "user-offers"
   | "user-offers-received"
   | "new-listing"
-  // | "bids"
+  | "auction-bids"
   | "user-bids"
   | "completed-listing"
-  | "new-sale-listing"
-  // | "new-sold-auction"
-  | "new-accepted-offers"
+  | "completed-auction"
+  | "accepted-offers"
   | "new-offers"
   | "new-auction";
 
-export type NFTType = Listing | Auction | Offer;
+export type NFTType =
+  | Listing
+  | Auction
+  | Offer
+  | AuctionBidEvent
+  | CompletedListingEvent
+  | CompletedAuctionEvent
+  | AcceptedOfferEvent;
 
 export type NFTStatus = "listed" | "auctioned";
 
@@ -36,6 +51,7 @@ export type NFTCardProps = {
   actionCTA?: string;
   actionOnClick?: React.MouseEventHandler<HTMLButtonElement>;
   isDisabled?: boolean;
+  nft: NFT;
 };
 
 export const getNFTCardInfo = ({
@@ -44,23 +60,13 @@ export const getNFTCardInfo = ({
 }: {
   type: NFTCardInfo;
   data: NFTType;
-}) => {
+}): {
+  title1: string;
+  title2: string;
+  info1: string;
+  info2: string;
+} => {
   switch (type) {
-    // case "new-sale-listing":
-
-    // console.log('new-sale-listing', {data})
-
-    //   const buyer = "buyer" in data ? data.nft.owner : "";
-    //   const totalPricePaid =
-    //     "totalPricePaid" in data ? data.totalPricePaid : "";
-
-    //   return {
-    //     title1: "Price Paid",
-    //     title2: "Bought By",
-    //     info1: `${totalPricePaid} XFI`,
-    //     info2: getFormatAddress(buyer as string),
-    //   };
-
     case "new-auction":
       const auctionCreatorNewAuction =
         "auctionCreator" in data ? data.auctionCreator : "";
@@ -74,17 +80,6 @@ export const getNFTCardInfo = ({
         info2: getFormatAddress(auctionCreatorNewAuction),
       };
 
-    // case "new-sold-auction":
-    //   const closer = "closer" in data ? data.closer : "";
-    //   const bidAmount = "bidAmount" in data ? (data.bidAmount as string) : "";
-
-    //   return {
-    //     title1: "Buyout Price",
-    //     title2: "Bought By",
-    //     info1: `${bidAmount} XFI`,
-    //     info2: getFormatAddress(closer),
-    //   };
-
     case "new-offers":
       const offerorNewOffers = "offeror" in data ? data.offeror : "";
       const totalPriceOffered = "totalPrice" in data ? data.totalPrice : "";
@@ -95,18 +90,6 @@ export const getNFTCardInfo = ({
         info1: `${totalPriceOffered} WXFI`,
         info2: getFormatAddress(offerorNewOffers),
       };
-
-    // case "new-accepted-offers":
-    //   const seller = "seller" in data ? data.seller : "";
-    //   const totalPriceAccepted =
-    //     "totalPricePaid" in data ? data.totalPricePaid : "";
-
-    //   return {
-    //     title1: "Price Accepted",
-    //     title2: "Seller",
-    //     info1: `${(totalPriceAccepted)} XFI`,
-    //     info2: getFormatAddress(seller as string),
-    //   };
 
     case "listing":
       const listingCreator =
@@ -126,7 +109,9 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Listing Price",
+        title2: "",
         info1: `${listingPriceUserListing as string} XFI`,
+        info2: "",
       };
 
     case "auction":
@@ -171,7 +156,9 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Price Offered",
+        title2: "",
         info1: `${totalPriceUserOffers as string} WXFI`,
+        info2: "",
       };
 
     case "user-offers-received":
@@ -180,14 +167,15 @@ export const getNFTCardInfo = ({
 
       return {
         title1: "Highest Offer",
+        title2: "",
         info1: `${totalPriceUserOffersRecieved as string} WXFI`,
+        info2: "",
       };
 
     case "completed-listing":
-      const buyerCompletedListing =
-        "nft" in data && data.nft?.owner ? data.nft.owner : "";
+      const buyerCompletedListing = "buyer" in data && data ? data.buyer : "";
       const totalPricePaidCompletedListing =
-        "pricePerToken" in data ? data.pricePerToken : "";
+        "totalPricePaid" in data ? data.totalPricePaid : "";
 
       return {
         title1: "Price Paid",
@@ -196,29 +184,57 @@ export const getNFTCardInfo = ({
         info2: getFormatAddress(buyerCompletedListing),
       };
 
-    // case "bids":
-    //   const bidderBids = "bidder" in data ? data.bidder : "";
-    //   const bidAmountBids = "bidAmount" in data ? data.bidAmount : "";
+    case "completed-auction":
+      const winningBidAuction =
+        "winningBidder" in data && data ? data.winningBidder : "";
+      const bidAmountAuction = "bidAmount" in data ? data.bidAmount : "";
 
-    //   return {
-    //     title1: "Bid Amount",
-    //     title2: "Bid By",
-    //     info1: `${(bidAmountBids as string)} XFI`,
-    //     info2: getFormatAddress(bidderBids),
-    //   };
+      return {
+        title1: "Price Paid",
+        title2: "Bought By",
+        info1: `${bidAmountAuction} XFI`,
+        info2: getFormatAddress(winningBidAuction),
+      };
+
+    case "accepted-offers":
+      const acceptedOfferSeller = "seller" in data && data ? data.seller : "";
+      const acceptedOfferTotalPricePaid =
+        "totalPricePaid" in data ? data.totalPricePaid : "";
+
+      return {
+        title1: "Price Paid",
+        title2: "Bought By",
+        info1: `${acceptedOfferTotalPricePaid} XFI`,
+        info2: getFormatAddress(acceptedOfferSeller),
+      };
+
+    case "auction-bids":
+      const bidderBids = "bidder" in data ? data.bidder : "";
+      const bidAmountBids = "bidAmount" in data ? data.bidAmount : "";
+
+      return {
+        title1: "Bid Amount",
+        title2: "Bidder",
+        info1: `${bidAmountBids as string} XFI`,
+        info2: getFormatAddress(bidderBids),
+      };
 
     case "user-bids":
       const bidAmountUserBids = "bidAmount" in data ? data.bidAmount : "";
 
       return {
         title1: "Bid Amount",
+        title2: "",
         info1: `${bidAmountUserBids as string} XFI`,
+        info2: "",
       };
 
     default:
       return {
         title1: "Floor Price",
         title2: "Volume",
+        info1: "",
+        info2: "",
       };
   }
 };

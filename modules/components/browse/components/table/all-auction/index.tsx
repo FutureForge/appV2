@@ -9,7 +9,7 @@ import { makeAllAuctionsColumn } from "./columns";
 import { Table, TableLayout } from "@/modules/app";
 import { useRouter } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Auction } from "@/modules/query/utils/index.utils.query";
+import { Auction } from "@/modules/query/utils";
 
 type AllAuctionTableProps = {
   isLoading: boolean;

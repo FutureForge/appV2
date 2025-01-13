@@ -11,11 +11,7 @@ import { AllAuctionTable } from "../table/all-auction";
 import { AllOffersTable } from "../table/all-offers";
 import { Pagination } from "@/modules/app/component/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Listing,
-  Offer,
-  Auction,
-} from "@/modules/query/utils/index.utils.query";
+import { Listing, Offer, Auction } from "@/modules/query/utils";
 
 const filters = ["All Listings", "All Auctions", "All Offers"];
 
@@ -216,6 +212,7 @@ export function BrowsePage() {
                         <NFTCard
                           key={index}
                           data={listing}
+                          nft={listing.nft}
                           type="listing"
                           cta="View Item"
                           extraCTA="Buy Now"
@@ -268,6 +265,7 @@ export function BrowsePage() {
                         <NFTCard
                           key={index}
                           data={auction}
+                          nft={auction.nft}
                           type="auction"
                           cta="View Item"
                           extraCTA="Buy Auction"
@@ -320,6 +318,7 @@ export function BrowsePage() {
                         <NFTCard
                           key={index}
                           data={offers}
+                          nft={offers.nft}
                           type="offers"
                           cta="View Item"
                           onClick={() => {

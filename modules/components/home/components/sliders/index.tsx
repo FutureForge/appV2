@@ -21,7 +21,15 @@ import {
 import { useRouter } from "next/navigation";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import { useWindowSize } from "@uidotdev/usehooks";
-import { Auction, Listing, Offer } from "@/modules/query/utils";
+import {
+  AcceptedOfferEvent,
+  Auction,
+  AuctionBidEvent,
+  CompletedAuctionEvent,
+  CompletedListingEvent,
+  Listing,
+  Offer,
+} from "@/modules/query/utils";
 
 export function Sliders() {
   const router = useRouter();
@@ -30,21 +38,6 @@ export function Sliders() {
     isLoading: isCollectionLoading,
     isError: isErrorCollectionQuery,
   } = useAllCollectionsQuery({});
-
-  // const { data: completedListingEventQuery } = useCompletedListingEventQuery();
-  // console.log({ completedListingEventQuery });
-
-  // const { data: completedAuctionEventQuery } = useCompletedAuctionEventQuery();
-  // console.log({ completedAuctionEventQuery });
-
-  // const { data: acceptedOfferEventQuery } = useAcceptedOfferEventQuery();
-  // console.log({ acceptedOfferEventQuery });
-
-  // const { data: auctionBidEventQuery } = useAuctionBidEventQuery();
-  // console.log({ auctionBidEventQuery });
-
-  const { data: newOfferEventQuery } = useNewOfferEventQuery();
-  console.log({ newOfferEventQuery });
 
   // useEffect(() => {
   //   const getEvent = async () => {
@@ -100,8 +93,6 @@ export function Sliders() {
     type: "new-auction",
   });
 
-  console.log({ newAuction });
-
   const {
     data: newListing,
     isLoading: isLoadingNewListing,
@@ -120,25 +111,53 @@ export function Sliders() {
     type: "new-offer",
   });
 
-  const { data: userListing } = useUserListingBlockchainQuery({
-    limit: 2,
-    type: "expired-listing",
-  });
+  const {
+    data: auctionBidEventQuery,
+    isLoading: isLoadingAuctionBidEvent,
+    isError: isErrorAuctionBidEvent,
+  } = useAuctionBidEventQuery();
 
-  const { data: userAuction } = useUserAuctionBlockchainQuery({
-    limit: 2,
-    type: "expired-auction",
-  });
+  const {
+    data: completedListingEventQuery,
+    isLoading: isLoadingCompletedListing,
+    isError: isErrorCompletedListing,
+  } = useCompletedListingEventQuery();
 
-  const { data: userOffer } = useUserOfferBlockchainQuery({
-    limit: 2,
-    type: "expired-offer",
-  });
+  const {
+    data: completedAuctionEventQuery,
+    isLoading: isLoadingCompletedAuction,
+    isError: isErrorCompletedAuction,
+  } = useCompletedAuctionEventQuery();
+
+  const {
+    data: acceptedOfferEventQuery,
+    isLoading: isLoadingAcceptedOffer,
+    isError: isErrorAcceptedOffer,
+  } = useAcceptedOfferEventQuery();
+
+  // const { data: userListing } = useUserListingBlockchainQuery({
+  //   limit: 2,
+  //   type: "expired-listing",
+  // });
+
+  // const { data: userAuction } = useUserAuctionBlockchainQuery({
+  //   limit: 2,
+  //   type: "expired-auction",
+  // });
+
+  // const { data: userOffer } = useUserOfferBlockchainQuery({
+  //   limit: 2,
+  //   type: "expired-offer",
+  // });
 
   const isError =
     isErrorCollectionQuery ||
     isErrorNewAuction ||
     isErrorNewListing ||
+    isErrorAuctionBidEvent ||
+    isErrorCompletedListing ||
+    isErrorCompletedAuction ||
+    isErrorAcceptedOffer ||
     isErrorNewOffer;
 
   const handleViewItem = ({
@@ -196,6 +215,7 @@ export function Sliders() {
               key={listing.listingId}
               data={listing}
               type="listing"
+              nft={listing.nft}
               cta="View Item"
               onClick={() => {
                 handleViewItem({
@@ -222,6 +242,7 @@ export function Sliders() {
               data={auction}
               type="new-auction"
               cta="View Item"
+              nft={auction.nft}
               onClick={() => {
                 handleViewItem({
                   contractAddress: auction.assetContract,
@@ -235,7 +256,7 @@ export function Sliders() {
 
       {/* Recent Offers */}
       <DataSlider
-        isLoading={isErrorNewOffer}
+        isLoading={isLoadingNewOffer}
         title="Recent Offers"
         cta="View More"
         href="/browse?filter=recent_offers"
@@ -247,6 +268,7 @@ export function Sliders() {
               data={offer}
               type="new-offers"
               cta="View Item"
+              nft={offer.nft}
               onClick={() => {
                 handleViewItem({
                   contractAddress: offer.assetContract,
@@ -258,105 +280,109 @@ export function Sliders() {
         }}
       />
 
-      {/* Recent Bids */}
-      {/* <DataSlider
-        isLoading={isNewBidsLoading}
-        title="Recent Bids"
+      {/* Recent Auction Bids */}
+      <DataSlider
+        isLoading={isLoadingAuctionBidEvent}
+        title="Recent Auction Bids"
         cta="View More"
         href="/browse?filter=recent_bids"
-        data={NewBids || []}
-        renderItem={(bid: NewBid) => {
+        data={auctionBidEventQuery || []}
+        renderItem={(auctionBid: AuctionBidEvent) => {
           return (
             <NFTCard
-              key={bid.id}
-              data={bid}
-              type="bids"
+              key={auctionBid.auctionId}
+              data={auctionBid}
+              type="auction-bids"
               cta="View Item"
+              nft={auctionBid.auction.nft}
               onClick={() => {
                 handleViewItem({
-                  contractAddress: bid.assetContract,
-                  tokenId: bid.tokenId,
+                  contractAddress: auctionBid.assetContract,
+                  tokenId: auctionBid.auction.tokenId.toString(),
                 });
               }}
             />
           );
         }}
-      /> */}
+      />
 
-      {/* Recently Sold Listing */}
-      {/* <DataSlider
-        isLoading={isNewSalesLoading}
-        title="Recently Sold Listing"
+      {/* Completed Listing */}
+      <DataSlider
+        isLoading={isLoadingCompletedListing}
+        title="Completed Listing"
         cta="View More"
         href="/browse?filter=recent_sales"
-        data={NewSalesListing || []}
-        renderItem={(sale: Listing) => {
+        data={completedListingEventQuery || []}
+        renderItem={(completedListing: CompletedListingEvent) => {
           return (
             <NFTCard
-              key={sale.id}
-              data={sale}
-              type="new-sale-listing"
+              key={completedListing.listingId}
+              data={completedListing}
+              type="completed-listing"
               cta="View Item"
+              nft={completedListing.nft}
               onClick={() => {
                 handleViewItem({
-                  contractAddress: sale.assetContract,
-                  tokenId: sale.tokenId,
+                  contractAddress: completedListing.assetContract,
+                  tokenId: completedListing.tokenId.toString(),
                 });
               }}
             />
           );
         }}
-      /> */}
+      />
 
-      {/* Recently Sold Auction */}
-      {/* <DataSlider
+      {/* Completed Auction */}
+      <DataSlider
         isLoading={isLoadingCompletedAuction}
-        title="Recently Sold Auction"
+        title="Completed Auction"
         cta="View More"
         href="/browse?filter=recent_sold_auctions"
-        data={completedAuction || []}
-        renderItem={(auction: Auction) => {
+        data={completedAuctionEventQuery || []}
+        renderItem={(completedAuction: CompletedAuctionEvent) => {
           return (
             <NFTCard
-              key={auction.id}
-              data={auction}
-              type="new-sold-auction"
+              key={completedAuction.auctionId}
+              data={completedAuction}
+              nft={completedAuction.nft}
+              type="completed-auction"
               cta="View Item"
               onClick={() => {
                 handleViewItem({
-                  contractAddress: auction.assetContract,
-                  tokenId: auction.tokenId,
+                  contractAddress: completedAuction.assetContract,
+                  tokenId: completedAuction.tokenId.toString(),
                 });
               }}
             />
           );
         }}
-      /> */}
+      />
 
       {/* Accepted Offers */}
-      {/* <DataSlider
-        isLoading={isAcceptedOffersLoading}
+      <DataSlider
+        isLoading={isLoadingAcceptedOffer}
         title="Accepted Offers"
         cta="View More"
         href="/browse?filter=accepted_offers"
-        data={AcceptedOffers || []}
-        renderItem={(offer: Offer) => {
+        data={acceptedOfferEventQuery || []}
+        renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
           return (
             <NFTCard
-              key={offer.id}
-              data={offer}
-              type="new-accepted-offers"
+              key={acceptedOfferEvent.offerId}
+              data={acceptedOfferEvent}
+              nft={acceptedOfferEvent.nft}
+              type="accepted-offers"
               cta="View Item"
               onClick={() => {
                 handleViewItem({
-                  contractAddress: offer.assetContract,
-                  tokenId: offer.tokenId,
+                  contractAddress: acceptedOfferEvent.assetContract,
+                  tokenId: acceptedOfferEvent.tokenId.toString(),
                 });
               }}
             />
           );
         }}
-      /> */}
+      />
     </div>
   );
 }

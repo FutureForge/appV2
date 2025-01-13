@@ -17,7 +17,7 @@ import {
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
 import { useUserChainInfo } from "@/modules/query";
-import { Listing, Auction } from "@/modules/query/utils/index.utils.query";
+import { Listing, Auction } from "@/modules/query/utils";
 
 export function NFTCard(props: NFTCardProps) {
   const { activeAccount } = useUserChainInfo();
@@ -39,12 +39,13 @@ export function NFTCard(props: NFTCardProps) {
     actionCTA,
     actionOnClick,
     isDisabled,
+    nft,
   } = props;
 
-  const { metadata, owner } = data.nft || {};
-  const image = metadata?.image || "";
-  const name = metadata?.name || "";
-  const tokenId = data.tokenId || "";
+  const { metadata, owner } = nft;
+  const image = metadata.image || "";
+  const name = metadata.name || "";
+  const tokenId = nft.id.toString();
 
   const { setListingInfo } = useListingInfoStore();
   const { setAuctionInfo } = useAuctionInfoStore();
