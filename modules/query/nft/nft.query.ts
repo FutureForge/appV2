@@ -20,13 +20,12 @@ import {
 } from "@/utils/functions";
 
 import { NFTActivityResponse } from "@/utils/types/global";
-import { NFT as CustomNFTType } from "@/utils/types/graphql";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
 import request from "graphql-request";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { useSingleCollectionWithoutNFTsQuery } from "..";
-import { Auction, Listing, Offer } from "../utils/index.utils.query";
+import { Auction, Listing, Offer } from "../utils/";
 
 export function useSingleNFTQuery({
   contractAddress,
@@ -43,7 +42,7 @@ export function useSingleNFTQuery({
   });
 
   return useQuery({
-    queryKey: [queryKeys.nft.single,{ tokenId, contractAddress}],
+    queryKey: [queryKeys.nft.single, { tokenId, contractAddress }],
     queryFn: async () => {
       try {
         const [
@@ -214,7 +213,7 @@ export function useSingleNFTQuery({
       } catch (error) {}
     },
     enabled: !!contractAddress && !!tokenId && !isLoadingCollectionWithoutNFTs,
-    // refetchInterval: 5000,
+    refetchInterval: 5000,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
   });

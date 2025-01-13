@@ -22,7 +22,7 @@ import { NFTActivityResponse } from "@/utils/types/global";
 import { useAllAuctionsBlockchainQuery } from "../auction/auction.blockchain.query";
 import { useAllListingBlockchainQuery } from "../listing/listing.blockchain.query";
 import { useAllOffersBlockchainQuery } from "../offers/offers.blockchain.query";
-import { Auction, Listing } from "../utils/index.utils.query";
+import { Auction, Listing } from "../utils/";
 
 export async function isNFTContract(contractAddress: string) {
   const contract = await getContractCustom({ contractAddress });

@@ -7,8 +7,13 @@ import {
   useUserListingBlockchainQuery,
   useUserAuctionBlockchainQuery,
   useUserOfferBlockchainQuery,
+  useCompletedListingEventQuery,
+  useCompletedAuctionEventQuery,
+  useAcceptedOfferEventQuery,
+  useAuctionBidEventQuery,
+  useNewOfferEventQuery,
 } from "@/modules/query";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   CollectionNFTCardProps,
   CollectionsNFTCard,
@@ -16,11 +21,7 @@ import {
 import { useRouter } from "next/navigation";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
 import { useWindowSize } from "@uidotdev/usehooks";
-import {
-  Auction,
-  Listing,
-  Offer,
-} from "@/modules/query/utils/index.utils.query";
+import { Auction, Listing, Offer } from "@/modules/query/utils";
 
 export function Sliders() {
   const router = useRouter();
@@ -30,6 +31,66 @@ export function Sliders() {
     isError: isErrorCollectionQuery,
   } = useAllCollectionsQuery({});
 
+  // const { data: completedListingEventQuery } = useCompletedListingEventQuery();
+  // console.log({ completedListingEventQuery });
+
+  // const { data: completedAuctionEventQuery } = useCompletedAuctionEventQuery();
+  // console.log({ completedAuctionEventQuery });
+
+  // const { data: acceptedOfferEventQuery } = useAcceptedOfferEventQuery();
+  // console.log({ acceptedOfferEventQuery });
+
+  // const { data: auctionBidEventQuery } = useAuctionBidEventQuery();
+  // console.log({ auctionBidEventQuery });
+
+  const { data: newOfferEventQuery } = useNewOfferEventQuery();
+  console.log({ newOfferEventQuery });
+
+  // useEffect(() => {
+  //   const getEvent = async () => {
+  //     // const listings = await getAllListings({
+  //     //   contract,
+  //     //   start: 0,
+  //     //   count: BigInt(100),
+  //     // });
+
+  //     // console.log({ listings });
+
+  //     // const offers = await getAllOffers({
+  //     //   contract,
+  //     //   start: 0,
+  //     //   count: BigInt(100),
+  //     // });
+
+  //     // console.log({ offers });
+
+  //     const newListingEvent = prepareEvent({
+  //       signature:
+  //         "event NewListing(address indexed listingCreator, uint256 indexed listingId, address indexed assetContract, (uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved) listing)",
+  //     });
+
+  //     console.log({ newListingEvent });
+  //     console.log({ topic: newListingEvent.topics });
+
+  //     const customEvent = await getCompletedListingEvent();
+  //     console.log({ customEvent });
+
+  //     const eventsV2 = await getContractEvents({
+  //       contract,
+  //       events: [customEvent],
+  //       // blockRange: BigInt(7009702),
+  //       // fromBlock: BigInt(6302547),
+  //       // blockHash: '0x359026f295440ecc96f2700ccbf2186fe7d860b08d312cafaeda70e88c6a8e1d',
+  //       blockHash:
+  //         "0xbb20968c710bccec27847ac540efcddd9d530e6749426793801b515a4b234b9a",
+  //     });
+
+  //     console.log({ eventsV2 });
+  //   };
+
+  //   getEvent();
+  // }, [contract]);
+
   const {
     data: newAuction,
     isLoading: isLoadingNewAuction,
@@ -38,6 +99,8 @@ export function Sliders() {
     limit: 2,
     type: "new-auction",
   });
+
+  console.log({ newAuction });
 
   const {
     data: newListing,

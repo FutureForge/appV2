@@ -114,7 +114,7 @@ export function useCreateNFTMutation() {
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.user.createNFT, queryKeys.user.nfts],
+        refetchType: "all",
       });
     },
     onError: (error, variables, context) => {},
@@ -169,7 +169,7 @@ export function useCreateNFTContractMutation() {
     },
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.user.nftContracts],
+        refetchType: "all",
       });
     },
     meta: {

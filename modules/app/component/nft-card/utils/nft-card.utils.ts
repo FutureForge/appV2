@@ -1,9 +1,5 @@
 import { getFormatAddress } from "@/utils/functions";
-import {
-  Listing,
-  Auction,
-  Offer,
-} from "@/modules/query/utils/index.utils.query";
+import { Listing, Auction, Offer } from "@/modules/query/utils";
 
 export type NFTCardInfo =
   | "listing"

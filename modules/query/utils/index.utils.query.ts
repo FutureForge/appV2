@@ -7,60 +7,23 @@ import {
 } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import { NFT as ThirdwebNFTType } from "thirdweb";
-
-export interface Auction {
-  assetContract: string;
-  auctionCreator: string;
-  auctionId: number;
-  bidBufferBps: number;
-  buyoutBidAmount: number;
-  currency: string;
-  endTimestamp: string;
-  minimumBidAmount: number;
-  quantity: number;
-  startTimestamp: string;
-  status: number;
-  timeBufferInSeconds: number;
-  tokenId: number;
-  isAuctionExpired?: boolean;
-  isAuctionActivityExpired?: boolean;
-  winningBid?: {
-    bidder: string;
-    currency: string;
-    bidAmount: string;
-  };
-  nft: ThirdwebNFTType;
-}
-
-export interface Listing {
-  assetContract: string;
-  currency: string;
-  endTimestamp: string;
-  listingCreator: string;
-  listingId: number;
-  pricePerToken: number;
-  quantity: number;
-  reserved: boolean;
-  startTimestamp: string;
-  status: number;
-  tokenId: number;
-  isListingExpired?: boolean;
-  nft: ThirdwebNFTType;
-}
-
-export interface Offer {
-  assetContract: string;
-  currency: string;
-  expirationTimestamp: string;
-  offerId: number;
-  offeror: string;
-  quantity: number;
-  status: number;
-  tokenId: number;
-  totalPrice: number;
-  isOfferExpired?: boolean;
-  nft: ThirdwebNFTType;
-}
+import {
+  AcceptedOfferEvent,
+  Auction,
+  AuctionBidEvent,
+  CompletedAuctionEvent,
+  CompletedListingEvent,
+  Listing,
+  Offer,
+  OfferEvent,
+} from "./query.type";
+import {
+  RawAcceptedOfferEvent,
+  RawAuctionBidEvent,
+  RawCompletedAuctionEvent,
+  RawCompletedListingEvent,
+  RawOfferEvent,
+} from "../events/type.events";
 
 export async function formatAuctionData(
   rawAuction: any,
@@ -107,7 +70,7 @@ export async function formatAuctionData(
     tokenId: Number(rawAuction.tokenId),
     isAuctionExpired: isExpired,
     winningBid: winningBidBody,
-    isAuctionActivityExpired: isExpired,
+    isAuctionActivityExpired: isAuctionExpired,
   };
 }
 
@@ -164,6 +127,131 @@ export async function formatOfferData(
     status: rawOffer.status,
     tokenId: Number(rawOffer.tokenId),
     isOfferExpired: isExpired,
+  };
+}
+
+export async function formatCompletedListingSale(
+  rawListingData: RawCompletedListingEvent,
+  nft: ThirdwebNFTType
+): Promise<CompletedListingEvent> {
+  return {
+    assetContract: rawListingData.assetContract,
+    buyer: rawListingData.buyer,
+    listingCreator: rawListingData.listingCreator,
+    listingId: Number(rawListingData.listingId),
+    quantityBought: Number(rawListingData.quantityBought),
+    tokenId: Number(rawListingData.tokenId),
+    totalPricePaid: Number(decimalOffChain(rawListingData.totalPricePaid)),
+    nft,
+  };
+}
+
+export async function formatCompletedAuctionSale(
+  rawAuctionData: RawCompletedAuctionEvent,
+  nft: ThirdwebNFTType
+): Promise<CompletedAuctionEvent> {
+  const winningBid = await getWinningBid({
+    auctionId: rawAuctionData.auctionId,
+  });
+
+  const winningBidBody = {
+    bidder: winningBid[0],
+    currency: winningBid[1],
+    bidAmount: decimalOffChain(winningBid[2].toString())!,
+  };
+
+  return {
+    assetContract: rawAuctionData.assetContract,
+    closer: rawAuctionData.closer,
+    auctionCreator: rawAuctionData.auctionCreator,
+    auctionId: Number(rawAuctionData.auctionId),
+    tokenId: Number(rawAuctionData.tokenId),
+    winningBidder: rawAuctionData.winningBidder,
+    bidAmount: Number(winningBidBody.bidAmount),
+    nft,
+  };
+}
+
+export async function formatAcceptedOffer(
+  rawAcceptedOfferData: RawAcceptedOfferEvent,
+  nft: ThirdwebNFTType
+): Promise<AcceptedOfferEvent> {
+  return {
+    assetContract: rawAcceptedOfferData.assetContract,
+    offeror: rawAcceptedOfferData.offeror,
+    seller: rawAcceptedOfferData.seller,
+    offerId: Number(rawAcceptedOfferData.offerId),
+    tokenId: Number(rawAcceptedOfferData.tokenId),
+    totalPricePaid: Number(
+      decimalOffChain(rawAcceptedOfferData.totalPricePaid)
+    ),
+    quantityBought: Number(rawAcceptedOfferData.quantityBought),
+    nft,
+  };
+}
+
+export async function formatNewAuctionBid(
+  rawNewAuctionBidData: RawAuctionBidEvent,
+  nft: ThirdwebNFTType
+): Promise<AuctionBidEvent> {
+  const auction = {
+    assetContract: rawNewAuctionBidData.auction.assetContract,
+    auctionCreator: rawNewAuctionBidData.auction.auctionCreator,
+    auctionId: Number(rawNewAuctionBidData.auction.auctionId),
+    bidBufferBps: Number(rawNewAuctionBidData.auction.bidBufferBps),
+    buyoutBidAmount: Number(
+      decimalOffChain(rawNewAuctionBidData.auction.buyoutBidAmount)
+    ),
+    currency: rawNewAuctionBidData.auction.currency,
+    endTimestamp: formatBlockchainTimestamp(
+      rawNewAuctionBidData.auction.endTimestamp.toString()
+    ),
+    minimumBidAmount: Number(
+      decimalOffChain(rawNewAuctionBidData.auction.minimumBidAmount)
+    ),
+    nft,
+    quantity: Number(rawNewAuctionBidData.auction.quantity),
+    startTimestamp: formatBlockchainTimestamp(
+      rawNewAuctionBidData.auction.startTimestamp.toString()
+    ),
+    status: rawNewAuctionBidData.auction.status,
+    timeBufferInSeconds: Number(
+      rawNewAuctionBidData.auction.timeBufferInSeconds
+    ),
+    tokenId: Number(rawNewAuctionBidData.auction.tokenId),
+  };
+
+  return {
+    assetContract: rawNewAuctionBidData.assetContract,
+    auction,
+    auctionId: Number(rawNewAuctionBidData.auctionId),
+    bidAmount: Number(decimalOffChain(rawNewAuctionBidData.bidAmount)),
+    bidder: rawNewAuctionBidData.bidder,
+  };
+}
+
+export async function formatNewOffer(
+  rawNewOfferData: RawOfferEvent,
+  nft: ThirdwebNFTType
+): Promise<OfferEvent> {
+  return {
+    assetContract: rawNewOfferData.assetContract,
+    offerId: Number(rawNewOfferData.offerId),
+    offeror: rawNewOfferData.offeror,
+    offer: {
+      assetContract: rawNewOfferData.assetContract,
+      currency: rawNewOfferData.offer.currency,
+      expirationTimestamp: formatBlockchainTimestamp(
+        rawNewOfferData.offer.expirationTimestamp.toString()
+      ),
+      nft,
+      offerId: Number(rawNewOfferData.offerId),
+      offeror: rawNewOfferData.offeror,
+      quantity: Number(rawNewOfferData.offer.quantity),
+      status: rawNewOfferData.offer.status,
+      tokenId: Number(rawNewOfferData.offer.tokenId),
+      totalPrice: Number(decimalOffChain(rawNewOfferData.offer.totalPrice)),
+    },
   };
 }
 

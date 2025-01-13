@@ -49,17 +49,17 @@ export function QueryProvider({ children }: QueryProviderProps) {
         defaultOptions: { queries: { retry: 0 } },
         mutationCache: new MutationCache({
           onMutate: (_variables, mutation) => {
-            const checkOnMutate = mutation?.meta?.checkOnMutate;
+            // const checkOnMutate = mutation?.meta?.checkOnMutate;
 
-            if (
-              checkOnMutate ||
-              checkOnMutate === null ||
-              checkOnMutate === undefined
-            ) {
-              if (!isChainSupported) {
-                throw new Error("Please switch to the correct network");
-              }
-            }
+            // if (
+            //   checkOnMutate ||
+            //   checkOnMutate === null ||
+            //   checkOnMutate === undefined
+            // ) {
+            //   if (!isChainSupported) {
+            //     throw new Error("Please switch to the correct network");
+            //   }
+            // }
 
             const showLoading = mutation?.meta?.showLoading;
 

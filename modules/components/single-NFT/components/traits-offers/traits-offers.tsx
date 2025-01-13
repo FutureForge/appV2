@@ -6,13 +6,11 @@ import { ScrollArea } from "@/modules/app";
 import { getFormatAddress } from "@/utils/functions";
 import Link from "next/link";
 import { useSingleNFTQuery, useUserChainInfo } from "@/modules/query";
-import { Attribute } from "@/utils/types/graphql";
 import { chainInfo } from "@/utils/configs";
 import { singleNFTFilters } from "../details/details";
 import { WinningBidTable } from "../tables/winning-bid";
 import { OffersTable } from "../tables/offers-table";
 import { TraitsSkeleton } from "../skeleton/traits-skeleton";
-import { Offer } from "@/modules/query/utils/index.utils.query";
 
 type Traits_OffersProps = {
   contractAddress: string;
@@ -42,9 +40,9 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
 
   const nft = nftData?.nft;
   const { metadata } = nft || {};
-  const attributes = (
-    Array.isArray(metadata?.attributes) ? metadata.attributes : []
-  ) as Attribute[];
+  const attributes = Array.isArray(metadata?.attributes)
+    ? metadata.attributes
+    : [];
 
   const isOwner = userAddress?.toLowerCase() === nft?.owner?.toLowerCase();
 

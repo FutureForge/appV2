@@ -72,7 +72,7 @@ export function useAddCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.collection.all],
+        refetchType: "all"
       });
     },
     onError: () => {},
@@ -152,7 +152,7 @@ export function useUpdateCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.collection.single, queryKeys.collection.all],
+        refetchType: "all"
       });
     },
     onError: () => {},

@@ -42,11 +42,6 @@ export function useApprovedForAllMutation() {
     },
     onSuccess: (_, { collectionContractAddress }) => {
       queryClient.invalidateQueries({
-        queryKey: [
-          "approval-all",
-          collectionContractAddress,
-          activeAccount?.address,
-        ],
         refetchType: "all",
       });
     },
@@ -97,11 +92,6 @@ export function useApprovedForTokenIdMutation() {
     },
     onSuccess: (_, { collectionContractAddress }) => {
       queryClient.invalidateQueries({
-        queryKey: [
-          "approval-token-id",
-          collectionContractAddress,
-          activeAccount?.address,
-        ],
         refetchType: "all",
       });
     },

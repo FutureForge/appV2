@@ -42,11 +42,7 @@ import { useUpdateCollectionMutation } from "@/modules/mutation";
 import SingleCollectionSkeleton from "@/modules/components/collections/components/skeleton/single-collection-skeleton";
 import { validateSocialLink } from "@/modules/components/add-collection/add-collection.utils";
 import { Social } from "@/utils/types/global";
-import {
-  Auction,
-  Listing,
-  Offer,
-} from "@/modules/query/utils/index.utils.query";
+import { Auction, Listing, Offer } from "@/modules/query/utils";
 
 // icons
 import VerifyIcon from "@/assets/verified.svg";

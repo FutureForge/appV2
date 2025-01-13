@@ -5,6 +5,7 @@ export * from "./collection/collection.query.";
 export * from "./nft/nft.query";
 export * from "./user/user.query";
 export * from "./lib/lib.query";
+export * from "./events/events.blockchain.query";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 

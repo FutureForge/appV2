@@ -68,6 +68,9 @@ export function useCreateListingMutation() {
           queryKeys.collection.all,
         ],
       });
+      queryClient.invalidateQueries({
+        refetchType: "all",
+      });
     },
     onError: () => {},
     meta: {
@@ -125,6 +128,9 @@ export function useUpdateListingMutation() {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.user.all, queryKeys.nft.single],
       });
+      queryClient.invalidateQueries({
+        refetchType: "all",
+      });
     },
     onError: () => {},
     meta: {
@@ -171,6 +177,10 @@ export function useCancelDirectListingMutation() {
           queryKeys.user.listings,
           queryKeys.listing.all,
         ],
+      });
+
+      queryClient.invalidateQueries({
+        refetchType: "all",
       });
     },
     onError: () => {},
@@ -229,6 +239,10 @@ export function useBuyFromDirectListingMutation() {
           queryKeys.user.listings,
           queryKeys.listing.all,
         ],
+      });
+
+      queryClient.invalidateQueries({
+        refetchType: "all",
       });
     },
     onError: () => {},
