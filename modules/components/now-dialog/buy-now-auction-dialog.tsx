@@ -45,7 +45,7 @@ export function BuyNowAuctionDialog({
 
     bidInAuctionMutation.mutate(
       {
-        auctionId,
+        auctionId: auctionId.toString(),
         bidAmount: decimalOffChain(buyoutBidAmount) as unknown as string,
       },
       {

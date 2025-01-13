@@ -47,8 +47,8 @@ export function BuyNowListingDialog({
       {
         buyFromListing: {
           buyFor: activeAccount.address,
-          listingId,
-          quantity,
+          listingId: listingId.toString(),
+          quantity: quantity.toString(),
           totalPrice: decimalOffChain(pricePerToken) as unknown as string,
           nativeTokenValue: decimalOffChain(pricePerToken) as unknown as string,
         },

@@ -12,6 +12,7 @@ import { singleNFTFilters } from "../details/details";
 import { WinningBidTable } from "../tables/winning-bid";
 import { OffersTable } from "../tables/offers-table";
 import { TraitsSkeleton } from "../skeleton/traits-skeleton";
+import { Offer } from "@/modules/query/utils/index.utils.query";
 
 type Traits_OffersProps = {
   contractAddress: string;
@@ -202,7 +203,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
                 {selectedFilter !== singleNFTFilters[2] &&
                   selectedFilter !== singleNFTFilters[4] && (
                     <OffersTable
-                      data={nftOffers ?? []}
+                      data={Array.isArray(nftOffers) ? nftOffers : []}
                       isLoading={isNFTDataLoading || isNFTDataPending}
                       isOwner={isOwner}
                       userAddress={userAddress!}

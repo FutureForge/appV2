@@ -2,13 +2,13 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ColumnHeader } from "@/modules/app/component/table/header";
 import XFI from "@/assets/xfi.svg";
-import { Offer } from "@/utils/types/graphql";
-import { formatBlockchainTimestamp, getFormatAddress } from "@/utils/functions";
+import { getFormatAddress } from "@/utils/functions";
 import { Button } from "@/modules/app";
 import {
   useAcceptOfferMutation,
   useCancelOfferMutation,
 } from "@/modules/mutation";
+import { Offer } from "@/modules/query/utils/index.utils.query";
 
 export function makeOffersColumn({
   isOwner,
@@ -77,7 +77,7 @@ export function makeOffersColumn({
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{formatBlockchainTimestamp(getValue())}</p>
+        <p>{getValue()}</p>
       </div>
     ),
   });
@@ -95,12 +95,18 @@ export function makeOffersColumn({
       return (
         <div className="pr-6 flex justify-center items-center gap-2">
           {isOwner && (
-            <Button onClick={() => handleAcceptOffer(offerId)} shape="square">
+            <Button
+              onClick={() => handleAcceptOffer(offerId.toString())}
+              shape="square"
+            >
               Accept Offer
             </Button>
           )}
           {isOfferor && (
-            <Button onClick={() => handleCancelOffer(offerId)} shape="square">
+            <Button
+              onClick={() => handleCancelOffer(offerId.toString())}
+              shape="square"
+            >
               Cancel Offer
             </Button>
           )}

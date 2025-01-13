@@ -43,7 +43,7 @@ export function useSingleNFTQuery({
   });
 
   return useQuery({
-    queryKey: [queryKeys.nft.single, tokenId, contractAddress],
+    queryKey: [queryKeys.nft.single,{ tokenId, contractAddress}],
     queryFn: async () => {
       try {
         const [
@@ -214,8 +214,8 @@ export function useSingleNFTQuery({
       } catch (error) {}
     },
     enabled: !!contractAddress && !!tokenId && !isLoadingCollectionWithoutNFTs,
-    refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    // refetchInterval: 5000,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
 }

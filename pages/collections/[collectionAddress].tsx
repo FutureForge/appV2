@@ -185,33 +185,40 @@ export default function CollectionPage() {
     "percentageOfListed",
   ];
 
-  const filteredCollectionNFTs = useMemo(() => 
-    collectionNFTs?.filter((nft) => {
-      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-      const nameNoSpace = nft.metadata.name.toLowerCase().replace(/\s+/g, "");
-      const tokenIdNoSpace = nft.tokenId.toLowerCase().replace(/\s+/g, "");
-      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
-      const matchesSearch = combinedField.includes(searchTerm);
+  const filteredCollectionNFTs = useMemo(
+    () =>
+      collectionNFTs?.filter((nft) => {
+        const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+        const nameNoSpace = nft.metadata.name.toLowerCase().replace(/\s+/g, "");
+        const tokenIdNoSpace = nft.tokenId.toLowerCase().replace(/\s+/g, "");
+        const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+        const matchesSearch = combinedField.includes(searchTerm);
 
-      const isListed = collectionAllListings?.some(
-        (listing) => Number(listing.tokenId) === Number(nft.tokenId)
-      );
-      const isAuctioned = collectionAllAuctions?.some(
-        (auction) => Number(auction.tokenId) === Number(nft.tokenId)
-      );
+        const isListed = collectionAllListings?.some(
+          (listing) => Number(listing.tokenId) === Number(nft.tokenId)
+        );
+        const isAuctioned = collectionAllAuctions?.some(
+          (auction) => Number(auction.tokenId) === Number(nft.tokenId)
+        );
 
-      switch (selectedFilter) {
-        case "All":
-          return matchesSearch;
-        case "Auction":
-          return matchesSearch && isAuctioned;
-        case "Listing":
-          return matchesSearch && isListed;
-        default:
-          return matchesSearch;
-      }
-    }) ?? [],
-    [collectionNFTs, searchQuery, selectedFilter, collectionAllListings, collectionAllAuctions]
+        switch (selectedFilter) {
+          case "All":
+            return matchesSearch;
+          case "Auction":
+            return matchesSearch && isAuctioned;
+          case "Listing":
+            return matchesSearch && isListed;
+          default:
+            return matchesSearch;
+        }
+      }) ?? [],
+    [
+      collectionNFTs,
+      searchQuery,
+      selectedFilter,
+      collectionAllListings,
+      collectionAllAuctions,
+    ]
   );
 
   const filteredCollectionOffers: Offer[] =
@@ -266,8 +273,8 @@ export default function CollectionPage() {
       return combinedField.includes(searchTerm);
     }) ?? [];
 
-  const paginatedCollectionNFTs = useMemo(() => 
-    filteredCollectionNFTs?.slice(0, displayCount),
+  const paginatedCollectionNFTs = useMemo(
+    () => filteredCollectionNFTs?.slice(0, displayCount),
     [filteredCollectionNFTs, displayCount]
   );
   const paginatedCollectionOffers = filteredCollectionOffers?.slice(
@@ -301,35 +308,11 @@ export default function CollectionPage() {
     }
   }, [inView]);
 
-  console.log({ filter });
-
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
   }, [filter, searchQuery, selectedFilter]);
 
-  // useEffect(() => {
-  //   if (inView && !isPendingCollectionInfo && !isLoadingCollectionInfo) {
-  //     const timeoutId = setTimeout(() => {
-  //       if (singleCollectionInfo?.collectionNFTs?.length === queryLimit) {
-  //         setQueryLimit((prev) => prev + FETCH_MORE_INCREMENT);
-  //       }
-  //     }, 300);
-
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [
-  //   inView,
-  //   isPendingCollectionInfo,
-  //   isLoadingCollectionInfo,
-  //   queryLimit,
-  //   singleCollectionInfo?.collectionNFTs?.length,
-  // ]);
-
-  // useEffect(() => {
-  //   setQueryLimit(INITIAL_FETCH_LIMIT);
-  // }, [filter, searchQuery, selectedFilter]);
-
-  if (isError) {
+  if (isError || !singleCollectionInfo) {
     return <ErrorComponent />;
   }
 

@@ -46,7 +46,7 @@ export function PlaceBidDialog({
 
     bidInAuctionMutation.mutate(
       {
-        auctionId,
+        auctionId: auctionId.toString(),
         bidAmount: value,
       },
       {
@@ -71,11 +71,11 @@ export function PlaceBidDialog({
   const notes = [
     [
       "Bids must be greater than the minimum bid amount.",
-      `Minimum bid amount: ${decimalOffChain(minimumBidAmount as string)} XFI`,
+      `Minimum bid amount: ${decimalOffChain(minimumBidAmount)} XFI`,
     ],
     [
       "Bids must be less than the buyout price.",
-      `Buyout price: ${decimalOffChain(buyoutBidAmount as string)} XFI`,
+      `Buyout price: ${decimalOffChain(buyoutBidAmount)} XFI`,
     ],
   ];
 
@@ -153,10 +153,10 @@ export function PlaceBidDialog({
                   onChange={(e) => {
                     const newValue = e.target.value;
                     const minBid = Number(
-                      decimalOffChain(minimumBidAmount as string)
+                      decimalOffChain(minimumBidAmount)
                     );
                     const maxBid = Number(
-                      decimalOffChain(buyoutBidAmount as string)
+                      decimalOffChain(buyoutBidAmount)
                     );
 
                     setValue(newValue);
