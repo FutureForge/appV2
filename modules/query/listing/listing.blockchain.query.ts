@@ -34,7 +34,7 @@ export function useAllListingBlockchainQuery({
 }) {
   const allListingQuery = useAllListingBaseQuery();
 
-  console.log({ allListingQuery });
+//   console.log({ allListingQuery });
 
   return useQuery({
     queryKey: [queryKeys.listing.filtered, { type, limit, contractAddress }],

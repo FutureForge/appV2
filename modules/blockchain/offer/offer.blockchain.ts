@@ -132,3 +132,18 @@ export async function getAllOffers() {
 
   return allOffers;
 }
+
+export async function getOfferByOfferId({ offerId }: { offerId: string }) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const data = await readContract({
+    contract,
+    method:
+      "function getOffer(uint256 _offerId) view returns ((uint256 offerId, uint256 tokenId, uint256 quantity, uint256 totalPrice, uint256 expirationTimestamp, address offeror, address assetContract, address currency, uint8 tokenType, uint8 status) _offer)",
+    params: [BigInt(offerId)],
+  });
+
+  return data;
+}

@@ -26,6 +26,7 @@ import {
   RawCompletedListingEvent,
   RawOfferEvent,
 } from "./type.events";
+import { StatusType } from "@/utils/enums/messages/index.enum";
 
 const EventQueryLimit = 1000;
 
@@ -272,6 +273,13 @@ export function useAuctionBidEventQuery() {
         })
       );
 
+      const filteredFormattedData = formattedData.filter((auctionBid) => {
+        return !(
+          auctionBid.auction.isAuctionExpired ||
+          auctionBid.auction.isAuctionActivityExpired
+        );
+      });
+
       return formattedData;
     },
     enabled: !!allContractEventQuery.data,
@@ -292,10 +300,8 @@ export function useNewOfferEventQuery() {
       if (!allContractEventQuery.data) return;
 
       const newOfferEvent = await getNewOfferEvent();
-      console.log({ newOfferEvent });
 
       const eventLogs = allContractEventQuery.data;
-      console.log({ eventLogs });
 
       const newOfferBidEvent = eventLogs
         .filter((event) => {
@@ -306,8 +312,6 @@ export function useNewOfferEventQuery() {
         })
         .map((event) => event.blockHash);
 
-      console.log({ newOfferBidEvent });
-
       const completedEventResults = await Promise.all(
         newOfferBidEvent.map(async (blockHash) => {
           const eventData = await getEventArgs(newOfferEvent, blockHash);
@@ -315,8 +319,6 @@ export function useNewOfferEventQuery() {
           return eventData as unknown as RawOfferEvent;
         })
       );
-
-      console.log({ completedEventResults });
 
       const formattedData = await Promise.all(
         completedEventResults.map(async (newOffer) => {
@@ -327,6 +329,20 @@ export function useNewOfferEventQuery() {
           return formatNewOffer(newOffer, nft);
         })
       );
+
+      const filteredFormattedData = formattedData.filter((offer) => {
+        const endTimeFormatted = new Date(
+          offer.offer.expirationTimestamp
+        ).getTime();
+        const currentTime = new Date().getTime();
+
+        const isExpired = currentTime > endTimeFormatted;
+
+        return (
+          (offer.offer.status === StatusType.CREATED && !isExpired) ||
+          !isExpired
+        );
+      });
 
       return formattedData;
     },

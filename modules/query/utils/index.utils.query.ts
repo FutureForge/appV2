@@ -3,6 +3,7 @@ import {
   decimalOffChain,
   getContractCustom,
   getIsAuctionExpired,
+  getOfferByOfferId,
   getWinningBid,
 } from "@/modules/blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
@@ -194,6 +195,23 @@ export async function formatNewAuctionBid(
   rawNewAuctionBidData: RawAuctionBidEvent,
   nft: ThirdwebNFTType
 ): Promise<AuctionBidEvent> {
+  const endTime = formatBlockchainTimestamp(
+    rawNewAuctionBidData.auction.endTimestamp.toString()
+  );
+  const endTimeFormatted = new Date(endTime).getTime();
+  const currentTime = new Date().getTime();
+
+  const isExpired = currentTime > endTimeFormatted;
+
+  let isAuctionExpired = true;
+
+  if (!isExpired) {
+    const isAuctionActive = await getIsAuctionExpired({
+      auctionId: rawNewAuctionBidData.auctionId,
+    });
+    isAuctionExpired = !isAuctionActive;
+  }
+
   const auction = {
     assetContract: rawNewAuctionBidData.auction.assetContract,
     auctionCreator: rawNewAuctionBidData.auction.auctionCreator,
@@ -219,6 +237,8 @@ export async function formatNewAuctionBid(
       rawNewAuctionBidData.auction.timeBufferInSeconds
     ),
     tokenId: Number(rawNewAuctionBidData.auction.tokenId),
+    isAuctionExpired: isExpired,
+    isAuctionActivityExpired: isAuctionExpired,
   };
 
   return {
@@ -234,6 +254,12 @@ export async function formatNewOffer(
   rawNewOfferData: RawOfferEvent,
   nft: ThirdwebNFTType
 ): Promise<OfferEvent> {
+  const offer = await getOfferByOfferId({
+    offerId: rawNewOfferData.offerId.toString(),
+  });
+
+  const status = offer.status;
+
   return {
     assetContract: rawNewOfferData.assetContract,
     offerId: Number(rawNewOfferData.offerId),
@@ -248,7 +274,7 @@ export async function formatNewOffer(
       offerId: Number(rawNewOfferData.offerId),
       offeror: rawNewOfferData.offeror,
       quantity: Number(rawNewOfferData.offer.quantity),
-      status: rawNewOfferData.offer.status,
+      status,
       tokenId: Number(rawNewOfferData.offer.tokenId),
       totalPrice: Number(decimalOffChain(rawNewOfferData.offer.totalPrice)),
     },

@@ -1,4 +1,8 @@
-import { MARKETPLACE_ADDRESS, MARKETPLACE_ADDRESS_TESTNET, nativeCurrency } from "@/utils/configs";
+import {
+  MARKETPLACE_ADDRESS,
+  MARKETPLACE_ADDRESS_TESTNET,
+  nativeCurrency,
+} from "@/utils/configs";
 import {
   getCurrentBlockchainTimestamp,
   getEndBlockchainTimestamp,

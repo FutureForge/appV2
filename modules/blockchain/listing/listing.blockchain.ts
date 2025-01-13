@@ -162,3 +162,18 @@ export async function getAllListing() {
 
   return allListings;
 }
+
+export async function getListingByListingId({ listingId }: { listingId: string }) {
+  const contract = getContractCustom({
+    contractAddress: MARKETPLACE_ADDRESS_TESTNET,
+  });
+
+  const data = await readContract({
+    contract,
+    method:
+      "function getListing(uint256 _listingId) view returns ((uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved) listing)",
+    params: [BigInt(listingId)],
+  });
+
+  return data;
+}
