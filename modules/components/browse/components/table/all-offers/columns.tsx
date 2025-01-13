@@ -71,7 +71,6 @@ export function makeAllOffersColumn() {
     ),
     cell: ({ getValue }) => (
       <div className="flex gap-2">
-        <XFI className="size-4" />
         <p>{getFormatAddress(getValue())}</p>
       </div>
     ),

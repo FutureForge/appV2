@@ -72,73 +72,20 @@ export function Header<T>({
     }
   };
 
-  useEffect(() => {
-    if (currentFilter) {
-      const matchingFilter = filters.find(
-        (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
-      );
-      if (matchingFilter) {
-        updateFilters(matchingFilter);
-        setFilter(matchingFilter);
-      }
-    } else {
-      setFilter(filters[0]);
-      updateFilters(filters[0]);
-    }
-  }, [currentFilter, filters]);
-
   // useEffect(() => {
   //   if (currentFilter) {
   //     const matchingFilter = filters.find(
   //       (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
   //     );
   //     if (matchingFilter) {
-  //       const selectedFilterIndex = filters.indexOf(matchingFilter);
-  //       if (selectedFilterIndex >= 4) {
-  //         const newVisibleFilters = filters.slice(0, 4);
-  //         newVisibleFilters.push(matchingFilter);
-  //         setVisibleFilters(newVisibleFilters);
-
-  //         const newRemainingFilters = filters.filter(
-  //           (f, index) =>
-  //             index >= 4 && // Only consider filters after index 4
-  //             f !== matchingFilter // Exclude the selected filter
-  //         );
-  //         setRemainingFilters(newRemainingFilters);
-  //       }
+  //       updateFilters(matchingFilter);
   //       setFilter(matchingFilter);
   //     }
   //   } else {
   //     setFilter(filters[0]);
-  //     // Reset to default visible and remaining filters
-  //     setVisibleFilters(filters.slice(0, 5));
-  //     setRemainingFilters(filters.slice(5));
+  //     updateFilters(filters[0]);
   //   }
   // }, [currentFilter, filters]);
-
-  // useEffect(() => {
-  //   if (!currentFilter) {
-  //     if (filter) {
-  //       const selectedFilterIndex = filters.indexOf(filter);
-  //       if (selectedFilterIndex >= 4) {
-  //         const newVisibleFilters = filters.slice(0, 4);
-  //         newVisibleFilters.push(filter);
-  //         setVisibleFilters(newVisibleFilters);
-
-  //         const newRemainingFilters = filters.filter(
-  //           (f, index) =>
-  //             index >= 4 && // Only consider filters after index 4
-  //             f !== filter // Exclude the selected filter
-  //         );
-  //         setRemainingFilters(newRemainingFilters);
-  //       }
-  //       setFilter(filter);
-  //     }
-  //   }
-  // }, [filter, filters]);
-
-  // const visibleFilters = filters.slice(0, 5);
-  // const remainingFilters = filters.slice(5);
 
   return (
     <div className="w-full flex min-[1160px]:items-center gap-4 justify-between max-[1160px]:flex-col">
@@ -176,7 +123,7 @@ export function Header<T>({
         )}
       </div>
       <div className="flex items-center gap-4 justify-end">
-        {showFilters && (
+        {filters.length > 5 && showFilters && (
           <Select.Root
             value={selectedFilter ? selectedFilter : filter}
             onValueChange={(value) => {

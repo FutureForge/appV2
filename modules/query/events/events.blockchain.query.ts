@@ -57,11 +57,15 @@ export function useAllContractEventQuery() {
   });
 }
 
-export function useCompletedListingEventQuery() {
+export function useCompletedListingEventQuery({
+  limit = 50,
+}: {
+  limit?: number;
+}) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-listing-event"],
+    queryKey: ["completed-listing-event", { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -99,9 +103,9 @@ export function useCompletedListingEventQuery() {
         })
       );
 
-      return formattedData;
+      return formattedData.slice(0, limit);
     },
-    enabled: !!allContractEventQuery.data,
+    enabled: !!allContractEventQuery.data && !!limit,
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,
@@ -110,11 +114,15 @@ export function useCompletedListingEventQuery() {
   });
 }
 
-export function useCompletedAuctionEventQuery() {
+export function useCompletedAuctionEventQuery({
+  limit = 50,
+}: {
+  limit?: number;
+}) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-auction-event"],
+    queryKey: ["completed-auction-event", { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -163,9 +171,9 @@ export function useCompletedAuctionEventQuery() {
         })
       );
 
-      return formattedData;
+      return formattedData.slice(0, limit);
     },
-    enabled: !!allContractEventQuery.data,
+    enabled: !!allContractEventQuery.data && !!limit,
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,
@@ -174,11 +182,11 @@ export function useCompletedAuctionEventQuery() {
   });
 }
 
-export function useAcceptedOfferEventQuery() {
+export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["accepted-offer-event"],
+    queryKey: ["accepted-offer-event", { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -213,9 +221,9 @@ export function useAcceptedOfferEventQuery() {
         })
       );
 
-      return formattedData;
+      return formattedData.slice(0, limit);
     },
-    enabled: !!allContractEventQuery.data,
+    enabled: !!allContractEventQuery.data && !!limit,
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,

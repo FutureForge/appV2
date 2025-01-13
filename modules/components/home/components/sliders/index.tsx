@@ -121,19 +121,19 @@ export function Sliders() {
     data: completedListingEventQuery,
     isLoading: isLoadingCompletedListing,
     isError: isErrorCompletedListing,
-  } = useCompletedListingEventQuery();
+  } = useCompletedListingEventQuery({});
 
   const {
     data: completedAuctionEventQuery,
     isLoading: isLoadingCompletedAuction,
     isError: isErrorCompletedAuction,
-  } = useCompletedAuctionEventQuery();
+  } = useCompletedAuctionEventQuery({});
 
   const {
     data: acceptedOfferEventQuery,
     isLoading: isLoadingAcceptedOffer,
     isError: isErrorAcceptedOffer,
-  } = useAcceptedOfferEventQuery();
+  } = useAcceptedOfferEventQuery({});
 
   // const { data: userListing } = useUserListingBlockchainQuery({
   //   limit: 2,
