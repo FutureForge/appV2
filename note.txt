@@ -4,5 +4,6 @@ fix the calculation for total volume and floor-price
 update the [collectionAddress] to include collection sales ✅
 go over the auction data (especially the isAuctionExpired and isAuctionActivityExpired)
 work on the href in the homepage (create an exported array and read from that) ✅
-revisit the user profile 
+revisit the user profile ✅
 update the event queries cache setting
+collection filter according to attribute

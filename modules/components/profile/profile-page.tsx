@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ConnectButton } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getFormatAddress } from "@/utils/functions";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
@@ -11,6 +11,7 @@ import { useInView } from "react-intersection-observer";
 import {
   useUserAuctionsQuery,
   useUserChainInfo,
+  useUserCollectionsQuery,
   useUserExpiredAuctionsQuery,
   useUserExpiredListingsQuery,
   useUserExpiredOffersQuery,
@@ -18,6 +19,7 @@ import {
   useUserNFTActivitiesQuery,
   useUserNFTsQuery,
   useUserOffersQuery,
+  useUserOffersReceivedQuery,
   useUserPendingPayoutQuery,
 } from "@/modules/query";
 import {
@@ -35,8 +37,14 @@ import {
   NftCardSkeleton,
 } from "@/modules/app";
 import { motion } from "framer-motion";
-import { ImageHolder } from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
-import { UserNFTData } from "@/utils/types/collection/collection.type";
+import {
+  CollectionsNFTCard,
+  ImageHolder,
+} from "@/modules/components/home/components/collections-nft-card/collections-nft-card";
+import {
+  Collection,
+  UserNFTData,
+} from "@/utils/types/collection/collection.type";
 import { chainInfo, client } from "@/utils/configs";
 import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
 import { useUserImageStore } from "@/utils/store/user-image.store";
@@ -51,12 +59,12 @@ const filters = [
   "Listed",
   "Auctions",
   "Offers Made",
-  // "Offers Received",
-  // "Bids Placed",
   "NFT Activities",
   "Expired",
-  // "Collections",
   "Pending Payout",
+  "Offers Received",
+  // "Bids Placed",
+  "Collections",
 ];
 
 const options = [
@@ -71,6 +79,9 @@ export function ProfilePage() {
   const userAddress = activeAccount?.address;
 
   const { backgroundImage } = useUserImageStore();
+
+  const searchParams = useSearchParams();
+  const currentFilter = searchParams.get("filter") || "";
 
   const cancelListingMutation = useCancelDirectListingMutation();
   const cancelAuctionMutation = useCancelAuctionMutation();
@@ -127,12 +138,12 @@ export function ProfilePage() {
     isError: isUserOffersError,
   } = useUserOffersQuery();
 
-  // const {
-  //   data: userOffersReceived,
-  //   isLoading: isUserOffersReceivedLoading,
-  //   isPending: isUserOffersReceivedPending,
-  //   isError: isUserOffersReceivedError,
-  // } = useUserOffersReceivedQuery();
+  const {
+    data: userOffersReceived,
+    isLoading: isUserOffersReceivedLoading,
+    isPending: isUserOffersReceivedPending,
+    isError: isUserOffersReceivedError,
+  } = useUserOffersReceivedQuery();
 
   // const {
   //   data: userBids,
@@ -162,17 +173,15 @@ export function ProfilePage() {
     isError: isUserExpiredOffersError,
   } = useUserExpiredOffersQuery();
 
-  // const {
-  //   data: userCollections,
-  //   isLoading: isUserCollectionsLoading,
-  //   isPending: isUserCollectionsPending,
-  //   isError: isUserCollectionsError,
-  // } = useUserCollectionsQuery();
+  const {
+    data: userCollections,
+    isLoading: isUserCollectionsLoading,
+    isError: isUserCollectionsError,
+  } = useUserCollectionsQuery();
 
   const {
     data: userNFTActivities,
     isLoading: isUserNFTActivitiesLoading,
-    isPending: isUserNFTActivitiesPending,
     isError: isUserNFTActivitiesError,
   } = useUserNFTActivitiesQuery();
 
@@ -187,12 +196,11 @@ export function ProfilePage() {
   };
 
   const handleFilterClick = (filter: string) => {
-    if (filter) setSelectedFilter(filter);
-    // if (filter) {
-    //   setSelectedFilter(filter);
-    //   const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
-    //   router.push(`/profile?filter=${queryFilter}`);
-    // }
+    if (filter) {
+      setSelectedFilter(filter);
+      const queryFilter = filter.toLowerCase().replace(/\s+/g, "_");
+      router.push(`/profile?filter=${queryFilter}`);
+    }
   };
 
   const handleViewItemClick = ({
@@ -241,23 +249,23 @@ export function ProfilePage() {
     isUserListingsLoading ||
     isUserAuctionsLoading ||
     isUserOffersLoading ||
-    // isUserOffersReceivedLoading ||
+    isUserOffersReceivedLoading ||
     // isUserBidsLoading ||
     isUserExpiredListingsLoading ||
     isUserExpiredAuctionsLoading ||
     isUserExpiredOffersLoading ||
-    // isUserCollectionsLoading ||
+    isUserCollectionsLoading ||
     isUserNFTActivitiesLoading ||
     isUserPendingPayoutLoading;
 
   const isError =
     isUserAuctionsError ||
     // isUserBidsError ||
-    // isUserOffersReceivedError ||
+    isUserOffersReceivedError ||
     isUserExpiredListingsError ||
     isUserExpiredAuctionsError ||
     isUserExpiredOffersError ||
-    // isUserCollectionsError ||
+    isUserCollectionsError ||
     isUserNFTActivitiesError ||
     isUserOffersError ||
     isUserNFTsError ||
@@ -354,47 +362,6 @@ export function ProfilePage() {
         });
         return filteredOffers;
 
-      // case filters[4]:
-      //   const filteredOffersReceived =
-      //     userOffersReceived?.userOffersReceived?.filter((offer) => {
-      //       const searchTerm = searchQuery
-      //         .toLowerCase()
-      //         .trim()
-      //         .replace(/\s+/g, "");
-
-      //       const nameNoSpace = offer?.nft?.metadata?.name
-      //         .toLowerCase()
-      //         .replace(/\s+/g, "");
-      //       const tokenIdNoSpace = offer.tokenId
-      //         .toString()
-      //         .toLowerCase()
-      //         .replace(/\s+/g, "");
-      //       const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
-
-      //       return combinedField.includes(searchTerm);
-      //     });
-      //   return filteredOffersReceived;
-
-      // case filters[5]:
-      //   const filteredBids = userBids?.userBids?.filter((bid) => {
-      //     const searchTerm = searchQuery
-      //       .toLowerCase()
-      //       .trim()
-      //       .replace(/\s+/g, "");
-
-      //     const nameNoSpace = bid?.nft?.metadata?.name
-      //       .toLowerCase()
-      //       .replace(/\s+/g, "");
-      //     const tokenIdNoSpace = bid.tokenId
-      //       .toString()
-      //       .toLowerCase()
-      //       .replace(/\s+/g, "");
-      //     const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
-
-      //     return combinedField.includes(searchTerm);
-      //   });
-      //   return filteredBids;
-
       case filters[6]:
         const filteredPendingPayout =
           userPendingPayout?.userPendingPayout?.filter((auction) => {
@@ -416,6 +383,27 @@ export function ProfilePage() {
           });
         return filteredPendingPayout;
 
+      case filters[7]:
+        const filteredOffersReceived =
+          userOffersReceived?.userOffersReceived?.filter((offer) => {
+            const searchTerm = searchQuery
+              .toLowerCase()
+              .trim()
+              .replace(/\s+/g, "");
+
+            const nameNoSpace = offer.nft.metadata.name
+              ?.toLowerCase()
+              .replace(/\s+/g, "");
+            const tokenIdNoSpace = offer.tokenId
+              .toString()
+              .toLowerCase()
+              .replace(/\s+/g, "");
+            const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+
+            return combinedField.includes(searchTerm);
+          });
+        return filteredOffersReceived;
+
       default:
         return [];
     }
@@ -427,7 +415,7 @@ export function ProfilePage() {
   const expiredAuctions = userExpiredAuctions?.expiredAuctions;
   const expiredOffers = userExpiredOffers?.expiredOffers;
 
-  // const paginatedCollectionsData = userCollections?.slice(0, displayCount);
+  const paginatedCollectionsData = userCollections?.slice(0, displayCount);
   // const paginatedNFTActivitiesData = userNFTActivities?.slice(0, displayCount);
   const paginatedExpiredListingsData = expiredListings?.slice(0, displayCount);
   const paginatedExpiredAuctionsData = expiredAuctions?.slice(0, displayCount);
@@ -458,6 +446,19 @@ export function ProfilePage() {
   useEffect(() => {
     setDisplayCount(ITEMS_PER_PAGE);
   }, [searchQuery, selectedFilter, selectedOption]);
+
+  useEffect(() => {
+    if (currentFilter) {
+      const matchingFilter = filters.find(
+        (filter) => filter.toLowerCase().replace(/\s+/g, "_") === currentFilter
+      );
+      if (matchingFilter) {
+        setSelectedFilter(matchingFilter);
+      }
+    } else {
+      setSelectedFilter(filters[0]);
+    }
+  }, [currentFilter]);
 
   if (!mounted) {
     return null;
@@ -522,7 +523,7 @@ export function ProfilePage() {
             disabled={!userAddress || isLoading}
           />
           <div className="w-full items-center flex justify-end flex-wrap">
-            {selectedFilter === filters[7] && (
+            {selectedFilter === filters[5] && (
               <div className="flex items-center flex-wrap gap-4 whitespace-nowrap text-sm">
                 {options.map((option) => (
                   <div
@@ -710,7 +711,7 @@ export function ProfilePage() {
               </div>
             )}
 
-            {/* Offers NFTS */}
+            {/* Offers Made */}
             {selectedFilter === filters[3] && (
               <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserOffersLoading || isUserOffersPending ? (
@@ -1132,7 +1133,7 @@ export function ProfilePage() {
             )}
 
             {/* Offers Received NFTS */}
-            {/* {selectedFilter === filters[4] && (
+            {selectedFilter === filters[7] && (
               <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {isUserOffersReceivedLoading || isUserOffersReceivedPending ? (
                   <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-1 max-sm w-full">
@@ -1152,10 +1153,11 @@ export function ProfilePage() {
                           data={data}
                           type="user-offers-received"
                           cta="View Item"
+                          nft={offer.nft}
                           onClick={() => {
                             handleViewItemClick({
                               contractAddress: data.assetContract,
-                              tokenId: data.tokenId,
+                              tokenId: data.tokenId.toString(),
                             });
                           }}
                           extraTitle="Total Offers"
@@ -1185,7 +1187,7 @@ export function ProfilePage() {
                   </div>
                 )}
               </div>
-            )} */}
+            )}
 
             {/* Bids NFTS */}
             {/* {selectedFilter === filters[5] && (
@@ -1240,7 +1242,7 @@ export function ProfilePage() {
             )} */}
 
             {/* User Collections */}
-            {/* {selectedFilter === filters[8] && (
+            {selectedFilter === filters[8] && (
               <div className="w-full grid min-[1250px]:grid-cols-4 md:grid-cols-3 lg:grid-cols-3 grid-cols-1 place-content-center justify-items-center gap-5">
                 {userCollections &&
                 paginatedCollectionsData &&
@@ -1282,7 +1284,7 @@ export function ProfilePage() {
                   </div>
                 )}
               </div>
-            )} */}
+            )}
           </div>
         ) : (
           <div className="w-full h-[80vh] flex flex-col items-center justify-center gap-4">

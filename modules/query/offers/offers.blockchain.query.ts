@@ -12,14 +12,15 @@ type OfferQueryType =
   | "completed-offer"
   | "live-offer-collection"
   | "completed-offer-collection";
-type UserOfferQueryType = "active-offer" | "expired-offer";
+type UserOfferQueryType = "active-offer" | "expired-offer" | "offer-received"; // active-offer === offers made
 
 export function useAllOffersBaseQuery() {
   return useQuery({
     queryKey: [queryKeys.offers.blockchain],
     queryFn: getAllOffers,
-    staleTime: 1000 * 60 * 39, // Consider data fresh for 30 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    staleTime: 1000 * 30, // Consider data fresh for 30 seconds
+    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 }
 
@@ -58,19 +59,19 @@ export function useAllOffersBlockchainQuery({
               .slice(0, limit);
 
           case "live-offer-collection":
-            return allOfferQuery.data.filter((auction) => {
+            return allOfferQuery.data.filter((offer) => {
               return (
-                auction.status === StatusType.CREATED &&
-                auction.assetContract.toLowerCase() ===
+                offer.status === StatusType.CREATED &&
+                offer.assetContract.toLowerCase() ===
                   contractAddress?.toLowerCase()
               );
             });
 
           case "completed-offer-collection":
-            return allOfferQuery.data.filter((auction) => {
+            return allOfferQuery.data.filter((offer) => {
               return (
-                auction.status === StatusType.COMPLETED &&
-                auction.assetContract.toLowerCase() ===
+                offer.status === StatusType.COMPLETED &&
+                offer.assetContract.toLowerCase() ===
                   contractAddress?.toLowerCase()
               );
             });
@@ -97,10 +98,9 @@ export function useAllOffersBlockchainQuery({
       //   });
     },
     enabled: !!allOfferQuery.data && (!!limit || !!type),
-    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
-    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
-    refetchOnMount: true, // Refetch when component mounts if data is stale
-    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
+    staleTime: 1000 * 30, // 30 seconds
+    gcTime: 1000 * 60 * 5, // 5 minutes
+    refetchInterval: 5000,
   });
 }
 
@@ -121,20 +121,35 @@ export function useUserOfferBlockchainQuery({
     queryFn: async () => {
       if (!allOffersQuery.data) return [];
 
-      const userOffer = allOffersQuery.data.filter((auction) => {
-        return (
-          auction.status === StatusType.CREATED &&
-          auction.offeror.toLowerCase() === userAddress?.toLowerCase()
-        );
-      });
+      const userCreatedOffers = allOffersQuery.data.filter(
+        (offer) =>
+          offer.status === StatusType.CREATED &&
+          offer.offeror.toLowerCase() === userAddress?.toLowerCase()
+      );
 
-      const filteredAuction = (() => {
+      // const activeOffers = allOffersQuery.data;
+
+      const activeOffers = allOffersQuery.data.filter(
+        (offer) => offer.status === StatusType.CREATED
+      );
+
+      const offersWithNFTDetails = await Promise.all(
+        activeOffers.map(async (offer) => ({
+          ...offer,
+          nft: await fetchNFT({
+            assetContract: offer.assetContract,
+            tokenId: offer.tokenId,
+          }),
+        }))
+      );
+
+      const filteredOffer = (() => {
         switch (type) {
           case "active-offer":
-            return userOffer
-              .filter((auction) => {
+            return userCreatedOffers
+              .filter((offer) => {
                 const endTime = formatBlockchainTimestamp(
-                  auction.expirationTimestamp.toString()
+                  offer.expirationTimestamp.toString()
                 );
                 const endTimeFormatted = new Date(endTime).getTime();
                 const currentTime = new Date().getTime();
@@ -145,10 +160,10 @@ export function useUserOfferBlockchainQuery({
               .slice(0, limit);
 
           case "expired-offer":
-            return userOffer
-              .filter((auction) => {
+            return userCreatedOffers
+              .filter((offer) => {
                 const endTime = formatBlockchainTimestamp(
-                  auction.expirationTimestamp.toString()
+                  offer.expirationTimestamp.toString()
                 );
                 const endTimeFormatted = new Date(endTime).getTime();
                 const currentTime = new Date().getTime();
@@ -157,28 +172,44 @@ export function useUserOfferBlockchainQuery({
                 return isExpired;
               })
               .slice(0, limit);
+
+          case "offer-received":
+            return offersWithNFTDetails
+              .filter((offer) => {
+                const endTime = formatBlockchainTimestamp(
+                  offer.expirationTimestamp.toString()
+                );
+                const endTimeFormatted = new Date(endTime).getTime();
+                const currentTime = new Date().getTime();
+
+                const isNotExpired = currentTime <= endTimeFormatted;
+                return (
+                  isNotExpired &&
+                  offer.nft.owner?.toLowerCase() === userAddress?.toLowerCase()
+                );
+              })
+              .slice(0, limit);
           default:
             return [];
         }
       })();
 
       const formattedData = await Promise.all(
-        filteredAuction.map(async (auction) => {
+        filteredOffer.map(async (offer) => {
           const nft = await fetchNFT({
-            assetContract: auction.assetContract,
-            tokenId: auction.tokenId,
+            assetContract: offer.assetContract,
+            tokenId: offer.tokenId,
           });
 
-          return formatOfferData(auction, nft);
+          return formatOfferData(offer, nft);
         })
       );
 
       return formattedData;
     },
     enabled: !!allOffersQuery.data && (!!limit || !!type) && !!userAddress,
-    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
-    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
-    refetchOnMount: true, // Refetch when component mounts if data is stale
-    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }

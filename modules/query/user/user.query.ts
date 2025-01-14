@@ -7,6 +7,7 @@ import {
 import { queryKeys } from "../query-keys";
 import axios from "axios";
 import {
+  backendURL,
   chainInfo,
   client,
   CROSSFI_API_URL,
@@ -24,6 +25,7 @@ import { tryParseJSON } from "@/utils/functions";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
 import nftBaseABI from "@/utils/abi/nftBase.json";
 import { Listing, Auction, fetchNFT } from "../utils";
+import { Collection } from "@/utils/types/collection/collection.type";
 
 export function useUserChainInfo() {
   const activeAccount = useActiveAccount();
@@ -173,11 +175,9 @@ export function useUserNFTsQuery() {
       return userNFTsNotAuctioned;
     },
     enabled: !!userAddress && !isUserListingsLoading && !isUserAuctionsLoading,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    // refetchInterval: 5000,
-    // staleTime: Infinity,
-    // gcTime: Infinity,
+    refetchInterval: 5000,
   });
 }
 
@@ -199,9 +199,9 @@ export function useUserListingsQuery() {
       };
     },
     enabled: !!userAddress && !isUserListingsLoading,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -242,9 +242,9 @@ export function useUserAuctionsQuery() {
       };
     },
     enabled: !!userAddress && !isUserAuctionsLoading,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
     refetchInterval: 5000,
-    // staleTime: Infinity,
-    // gcTime: Infinity,
   });
 }
 
@@ -266,8 +266,9 @@ export function useUserOffersQuery() {
       };
     },
     enabled: !!userAddress && !isUserOffersLoading,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -308,9 +309,9 @@ export function useUserPendingPayoutQuery() {
       };
     },
     enabled: !!userAddress && !isUserAuctionsLoading,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -318,10 +319,10 @@ export function useUserPendingPayoutQuery() {
 //   const { activeAccount } = useUserChainInfo();
 //   const userAddress = activeAccount?.address;
 
-//   const { data: userBids, isLoading: isUserBidsLoading } =
-//     useFilteredUserNewBidsQuery({
-//       address: userAddress?.toLowerCase() || "",
-//     });
+//   // const { data: userBids, isLoading: isUserBidsLoading } =
+//   //   useFilteredUserNewBidsQuery({
+//   //     address: userAddress?.toLowerCase() || "",
+//   //   });
 
 //   return useQuery({
 //     queryKey: [queryKeys.user.bids, userAddress],
@@ -338,53 +339,47 @@ export function useUserPendingPayoutQuery() {
 //   });
 // }
 
-// export function useUserOffersReceivedQuery() {
-//   const { activeAccount } = useUserChainInfo();
-//   const userAddress = activeAccount?.address;
+export function useUserOffersReceivedQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
 
-//   const { data: allOffers, isLoading: isAllOffersLoading } = useAllOffersQuery(
-//     {}
-//   );
+  const { data: userOffersReceived, isLoading: isUserOffersReceivedLoading } =
+    useUserOfferBlockchainQuery({
+      type: "offer-received",
+    });
 
-//   // First filter offers received by the user
-//   const userOffersReceived = allOffers?.filter((offer) => {
-//     const offerOwner = offer.nft?.owner?.toLowerCase();
-//     return offerOwner === userAddress?.toLowerCase();
-//   });
+  return useQuery({
+    queryKey: [queryKeys.user.offersReceived, { userAddress }],
+    queryFn: async () => {
+      // Group offers by tokenId and assetContract
+      const groupedOffers = userOffersReceived?.reduce((acc, offer) => {
+        const key = `${offer.assetContract}_${offer.tokenId.toString()}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(offer);
+        return acc;
+      }, {} as Record<string, typeof userOffersReceived>);
 
-//   return useQuery({
-//     queryKey: [queryKeys.user.offersReceived, userAddress],
-//     queryFn: async () => {
-//       // Group offers by tokenId and assetContract
-//       const groupedOffers = userOffersReceived?.reduce((acc, offer) => {
-//         const key = `${offer.nft.assetContract}_${offer.nft.tokenId}`;
-//         if (!acc[key]) {
-//           acc[key] = [];
-//         }
-//         acc[key].push(offer);
-//         return acc;
-//       }, {} as Record<string, typeof userOffersReceived>);
-
-//       // Get highest offer for each NFT
-//       const highestOffers = Object.values(groupedOffers || {}).map((offers) => {
-//         return offers.reduce((highest, current) => {
-//           const highestPrice = parseFloat(highest.totalPrice);
-//           const currentPrice = parseFloat(current.totalPrice);
-//           return currentPrice > highestPrice ? current : highest;
-//         });
-//       });
-
-//       return {
-//         userOffersReceived: highestOffers,
-//         userOffersReceivedLength: highestOffers?.length,
-//       };
-//     },
-//     enabled: !!userAddress && !isAllOffersLoading,
-//     // refetchInterval: 5000,
-//     staleTime: Infinity,
-//     gcTime: Infinity,
-//   });
-// }
+      // Get highest offer for each NFT
+      const highestOffers = Object.values(groupedOffers || {}).map((offers) => {
+        return offers.reduce((highest, current) => {
+          const highestPrice = highest.totalPrice;
+          const currentPrice = current.totalPrice;
+          return currentPrice > highestPrice ? current : highest;
+        });
+      });
+      return {
+        userOffersReceived: highestOffers,
+        userOffersReceivedLength: highestOffers?.length,
+      };
+    },
+    enabled: !!userAddress && !isUserOffersReceivedLoading,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
+  });
+}
 
 export function useUserExpiredListingsQuery() {
   const { activeAccount } = useUserChainInfo();
@@ -404,9 +399,9 @@ export function useUserExpiredListingsQuery() {
       };
     },
     enabled: !!userAddress && !isUserListingsLoading,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -428,9 +423,9 @@ export function useUserExpiredAuctionsQuery() {
       };
     },
     enabled: !!userAddress && !isUserAuctionLoading,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -452,82 +447,40 @@ export function useUserExpiredOffersQuery() {
       };
     },
     enabled: !!userAddress && !isUserOfferLoading,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
+  });
+}
+
+export function useUserCollectionsQuery() {
+  const { activeAccount } = useUserChainInfo();
+  const userAddress = activeAccount?.address;
+
+  return useQuery({
+    queryKey: [queryKeys.user.all, { userAddress }],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
+      );
+
+      const collections = response.data.filteredCollections as Collection[];
+
+      for (const collection of collections) {
+        try {
+          collection.floorPrice = 8;
+          collection.totalVolume = 8;
+        } catch (error) {}
+      }
+
+      return collections;
+    },
+    enabled: !!userAddress,
     // refetchInterval: 5000,
     staleTime: Infinity,
     gcTime: Infinity,
   });
 }
-
-// export function useUserCollectionsQuery() {
-//   const { activeAccount } = useUserChainInfo();
-//   const userAddress = activeAccount?.address;
-
-//   return useQuery({
-//     queryKey: [queryKeys.user.all, { userAddress }],
-//     queryFn: async () => {
-//       const response = await axios.get(
-//         `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
-//       );
-
-//       const collections = response.data.filteredCollections as Collection[];
-
-//       for (const collection of collections) {
-//         try {
-//           const [newListingResponse, allListingsResponse] = await Promise.all([
-//             request<NewSaleListingsQueryResponse>(
-//               indexerEndpoint,
-//               filteredNewSaleListingsQuery,
-//               {
-//                 contractAddress: collection.collectionAddress.toLowerCase(),
-//                 address: "",
-//               }
-//             ),
-//             request<AllListingsQueryResponse>(
-//               indexerEndpoint,
-//               filteredAllListingsQuery,
-//               {
-//                 contractAddress: collection.collectionAddress.toLowerCase(),
-//                 address: "",
-//               }
-//             ),
-//           ]);
-
-//           const newSaleListings = newListingResponse.newSaleListings;
-//           const allListings = allListingsResponse.allListings;
-
-//           const totalListingVolume =
-//             newSaleListings?.reduce((acc, listing) => {
-//               const price = parseFloat(
-//                 decimalOffChain(listing.totalPricePaid) || "0"
-//               );
-//               return acc + price;
-//             }, 0) ?? 0;
-
-//           const formattedTotalVolume = to3DP(totalListingVolume || 0);
-
-//           const floorPrice = (() => {
-//             let floor = 0;
-//             for (const listing of allListings || []) {
-//               const price = decimalOffChain(listing.pricePerToken) || "0";
-//               const listingPrice = parseFloat(price);
-//               floor = Math.min(floor, listingPrice);
-//             }
-//             return floor;
-//           })();
-
-//           collection.floorPrice = floorPrice;
-//           collection.totalVolume = Number(formattedTotalVolume);
-//         } catch (error) {}
-//       }
-
-//       return collections;
-//     },
-//     enabled: !!userAddress,
-//     // refetchInterval: 5000,
-//     staleTime: Infinity,
-//     gcTime: Infinity,
-//   });
-// }
 
 export function useUserNFTActivitiesQuery() {
   const { activeAccount } = useUserChainInfo();
@@ -566,9 +519,9 @@ export function useUserNFTActivitiesQuery() {
       return updatedTokenTransfers;
     },
     enabled: !!userAddress,
-    //  refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    refetchInterval: 5000,
+    // staleTime: 1000 * 60,
+    // gcTime: 1000 * 60 * 5,
   });
 }
 
@@ -622,8 +575,8 @@ export function useUserNFTContractQuery() {
       return deployedContractsUpdated;
     },
     enabled: !!userAddress,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    refetchInterval: 5000,
+    // staleTime: 1000 * 60,
+    // gcTime: 1000 * 60 * 5,
   });
 }
