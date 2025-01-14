@@ -59,13 +59,15 @@ export function useAllContractEventQuery() {
 
 export function useCompletedListingEventQuery({
   limit = 50,
+  contractAddress,
 }: {
   limit?: number;
+  contractAddress?: string;
 }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-listing-event", { limit }],
+    queryKey: ["completed-listing-event", { limit, contractAddress }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -103,9 +105,17 @@ export function useCompletedListingEventQuery({
         })
       );
 
-      return formattedData.slice(0, limit);
+      if (contractAddress) {
+        return formattedData.filter((data) => {
+          return (
+            data.assetContract.toLowerCase() === contractAddress.toLowerCase()
+          );
+        });
+      } else {
+        return formattedData.slice(0, limit);
+      }
     },
-    enabled: !!allContractEventQuery.data && !!limit,
+    enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,
@@ -116,13 +126,15 @@ export function useCompletedListingEventQuery({
 
 export function useCompletedAuctionEventQuery({
   limit = 50,
+  contractAddress,
 }: {
   limit?: number;
+  contractAddress?: string;
 }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-auction-event", { limit }],
+    queryKey: ["completed-auction-event", { limit, contractAddress }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -171,9 +183,17 @@ export function useCompletedAuctionEventQuery({
         })
       );
 
-      return formattedData.slice(0, limit);
+      if (contractAddress) {
+        return formattedData.filter((data) => {
+          return (
+            data.assetContract.toLowerCase() === contractAddress.toLowerCase()
+          );
+        });
+      } else {
+        return formattedData.slice(0, limit);
+      }
     },
-    enabled: !!allContractEventQuery.data && !!limit,
+    enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
     // staleTime: 1000 * 60 * 5, // 5 minutes
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,

@@ -57,14 +57,14 @@ import LinkIcon2 from "@/assets/link-01.svg";
 type FilterType =
   | "Items"
   | "Offers"
-  // | "Sales"
+  | "Sales"
   | "Activity"
   | "Collection Settings";
 
 const filters: FilterType[] = [
   "Items",
   "Offers",
-  // "Sales",
+  "Sales",
   "Activity",
   "Collection Settings",
 ];
@@ -127,10 +127,10 @@ export default function CollectionPage() {
   const collectionAllListings =
     singleCollection?.collectionListings?.allListings;
   const collectionAllOffers = singleCollection?.collectionOffers?.allOffers;
-  // const collectionListingSales =
-  //   singleCollection?.collectionListings?.completedListing;
-  // const collectionAuctionSales =
-  //   singleCollection?.collectionAuctions?.completedAuction;
+  const collectionCompletedListing =
+    singleCollection?.collectionListings.completedListing;
+  const collectionCompletedAuction =
+    singleCollection?.collectionAuctions.completedAuction;
 
   const isCollectionOwner =
     collection?.collectionOwnerAddress.toLowerCase() ===
@@ -148,18 +148,18 @@ export default function CollectionPage() {
     link: item.socialLink,
   }));
 
-  // const collectionSales = [
-  //   ...(collectionListingSales?.map((sale) => ({
-  //     ...sale,
-  //     saleType: "new-sale-listing",
-  //     nftStatus: "listed",
-  //   })) || []),
-  //   ...(collectionAuctionSales?.map((sale) => ({
-  //     ...sale,
-  //     saleType: "new-sold-auction",
-  //     nftStatus: "auctioned",
-  //   })) || []),
-  // ].flat();
+  const collectionSales = [
+    ...(collectionCompletedListing?.map((sale) => ({
+      ...sale,
+      saleType: "completed-listing" as NFTCardInfo,
+      nftStatus: "listed",
+    })) || []),
+    ...(collectionCompletedAuction?.map((sale) => ({
+      ...sale,
+      saleType: "completed-auction" as NFTCardInfo,
+      nftStatus: "auctioned",
+    })) || []),
+  ].flat();
 
   const collectionLabels = {
     floorPrice: "Floor Price",
@@ -232,22 +232,20 @@ export default function CollectionPage() {
       return combinedField.includes(searchTerm);
     }) ?? [];
 
-  // const filteredCollectionSales =
-  //   collectionSales?.filter((sale) => {
-  //     const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
-  //     const nameNoSpace = sale.nft.metadata.name
-  //       ?.toLowerCase()
-  //       .replace(/\s+/g, "");
-  //     const tokenIdNoSpace = sale.tokenId
-  //       .toString()
-  //       .toLowerCase()
-  //       .replace(/\s+/g, "");
-  //     const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
+  const filteredCollectionSales =
+    collectionSales?.filter((sale) => {
+      const searchTerm = searchQuery.toLowerCase().trim().replace(/\s+/g, "");
+      const nameNoSpace = sale.nft.metadata.name
+        ?.toLowerCase()
+        .replace(/\s+/g, "");
+      const tokenIdNoSpace = sale.tokenId
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const combinedField = `${nameNoSpace}${tokenIdNoSpace}`;
 
-  //     return combinedField.includes(searchTerm);
-  //   }) ?? [];
-
-  // console.log({ filteredCollectionSales });
+      return combinedField.includes(searchTerm);
+    }) ?? [];
 
   const filteredCollectionTokenTransfers =
     collectionTokenTransfers?.filter((transfer) => {
@@ -277,10 +275,10 @@ export default function CollectionPage() {
     0,
     displayCount
   );
-  // const paginatedCollectionSales = filteredCollectionSales?.slice(
-  //   0,
-  //   displayCount
-  // );
+  const paginatedCollectionSales = filteredCollectionSales?.slice(
+    0,
+    displayCount
+  );
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
@@ -308,7 +306,7 @@ export default function CollectionPage() {
     setDisplayCount(ITEMS_PER_PAGE);
   }, [filter, searchQuery, selectedFilter]);
 
-  if (isError || !singleCollectionInfo) {
+  if (isError) {
     return <ErrorComponent />;
   }
 
@@ -448,7 +446,7 @@ export default function CollectionPage() {
                 >
                   {filters
                     .filter(
-                      (value) => isCollectionOwner || value !== filters[3]
+                      (value) => isCollectionOwner || value !== filters[4]
                     )
                     .map((value) => (
                       <ToggleGroup.Item
@@ -463,7 +461,7 @@ export default function CollectionPage() {
               </Card>
 
               <div className="flex items-center gap-2 justify-end">
-                {filter !== filters[3] && (
+                {filter !== filters[4] && (
                   <TextField
                     type="search"
                     placeholder="Search by collections"
@@ -614,7 +612,7 @@ export default function CollectionPage() {
           )}
 
           {/* Render Sales Content */}
-          {/* {filter === filters[2] && (
+          {filter === filters[2] && (
             <div className="mt-6">
               <div className="w-full grid min-[1250px]:grid-cols-4 min-[1550px]:grid-cols-5 min-[970px]:grid-cols-3 max-[970px]:flex flex-wrap grid-cols-1 place-content-center gap-5">
                 {paginatedCollectionSales &&
@@ -627,6 +625,7 @@ export default function CollectionPage() {
                           data={sale}
                           type={sale.saleType as NFTCardInfo}
                           status={sale.nftStatus as NFTStatus}
+                          nft={sale.nft}
                           cta="View Item"
                           onClick={() => {
                             handleViewItemClick({
@@ -654,10 +653,10 @@ export default function CollectionPage() {
                 )}
               </div>
             </div>
-          )} */}
+          )}
 
           {/* Render Activity Content */}
-          {filter === filters[2] &&
+          {filter === filters[3] &&
             (filteredCollectionTokenTransfers &&
             filteredCollectionTokenTransfers.length > 0 ? (
               <div className="mt-6">
@@ -769,7 +768,7 @@ export default function CollectionPage() {
       )}
 
       {/* Render Collection Settings Content */}
-      {isCollectionOwner && filter === filters[3] && collection && (
+      {isCollectionOwner && filter === filters[4] && collection && (
         <CollectionSettings collection={collection} />
       )}
     </div>

@@ -7,12 +7,7 @@ import {
   MARKETPLACE_ADDRESS_TESTNET,
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
-import {
-  decimalOffChain,
-  getContractCustom,
-  getIsAuctionExpired,
-} from "@/modules/blockchain";
-import { to3DP } from "@/utils/functions";
+import { getContractCustom } from "@/modules/blockchain";
 import { getNFT, isERC721 } from "thirdweb/extensions/erc721";
 import {
   CollectionsQueryResponse,
@@ -22,7 +17,10 @@ import { NFTActivityResponse } from "@/utils/types/global";
 import { useAllAuctionsBlockchainQuery } from "../auction/auction.blockchain.query";
 import { useAllListingBlockchainQuery } from "../listing/listing.blockchain.query";
 import { useAllOffersBlockchainQuery } from "../offers/offers.blockchain.query";
-import { Auction, Listing } from "../utils/";
+import {
+  useCompletedAuctionEventQuery,
+  useCompletedListingEventQuery,
+} from "..";
 
 export async function isNFTContract(contractAddress: string) {
   const contract = await getContractCustom({ contractAddress });
@@ -220,35 +218,43 @@ export function useSingleCollectionQuery({
 }: {
   contractAddress: string;
 }) {
-  const { data: liveAuction } = useAllAuctionsBlockchainQuery({
-    type: "live-auction-collection",
+  const { data: liveAuction, isLoading: isLoadingLiveAuction } =
+    useAllAuctionsBlockchainQuery({
+      type: "live-auction-collection",
+      contractAddress,
+    });
+
+  const {
+    data: completedAuctionEventQuery,
+    isLoading: isLoadingCompletedAuction,
+  } = useCompletedAuctionEventQuery({
     contractAddress,
   });
 
-  const { data: completedAuction } = useAllAuctionsBlockchainQuery({
-    type: "completed-auction-collection",
+  const { data: liveListing, isLoading: isLoadingLiveListing } =
+    useAllListingBlockchainQuery({
+      type: "live-listing-collection",
+      contractAddress,
+    });
+
+  const {
+    data: completedListingEventQuery,
+    isLoading: isLoadingCompletedListing,
+  } = useCompletedListingEventQuery({
     contractAddress,
   });
 
-  const { data: liveListing } = useAllListingBlockchainQuery({
-    type: "live-listing-collection",
-    contractAddress,
-  });
+  const { data: liveOffer, isLoading: isLoadingLiveOffer } =
+    useAllOffersBlockchainQuery({
+      type: "live-offer-collection",
+      contractAddress,
+    });
 
-  const { data: completedListing } = useAllListingBlockchainQuery({
-    type: "completed-listing-collection",
-    contractAddress,
-  });
-
-  const { data: liveOffer } = useAllOffersBlockchainQuery({
-    type: "live-offer-collection",
-    contractAddress,
-  });
-
-  const { data: completedOffer } = useAllOffersBlockchainQuery({
-    type: "completed-offer-collection",
-    contractAddress,
-  });
+  const { data: completedOffer, isLoading: isLoadingCompletedOffer } =
+    useAllOffersBlockchainQuery({
+      type: "completed-offer-collection",
+      contractAddress,
+    });
 
   return useQuery({
     queryKey: [queryKeys.collection.single, { contractAddress }],
@@ -324,16 +330,23 @@ export function useSingleCollectionQuery({
           completedOffer: completedOffer,
         },
         collectionAuctions: {
-          completedAuction,
+          completedAuction: completedAuctionEventQuery,
           allAuctions: liveAuction,
         },
         collectionListings: {
           allListings: liveListing,
-          completedListing,
+          completedListing: completedListingEventQuery,
         },
       };
     },
-    enabled: !!contractAddress,
+    enabled:
+      !!contractAddress &&
+      !isLoadingLiveAuction &&
+      !isLoadingLiveListing &&
+      !isLoadingLiveOffer &&
+      !isLoadingCompletedOffer &&
+      !isLoadingCompletedAuction &&
+      !isLoadingCompletedListing,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 30, // 30 minutes
     refetchOnMount: false,

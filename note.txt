@@ -1,6 +1,6 @@
 right now all the data are expired when all is done update it to filter expired listing/auction
-add a completed offer section in the collection query and page
+add a completed offer section in the collection query and page ✅
 fix the calculation for total volume and floor-price
-update the [collectionAddress] to include collection sales
+update the [collectionAddress] to include collection sales ✅
 go over the auction data (especially the isAuctionExpired and isAuctionActivityExpired)
 work on the href in the homepage (create an exported array and read from that)
