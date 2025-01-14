@@ -71,26 +71,6 @@ export function useCheckCollectionExistsQuery({
   });
 }
 
-export function useSingleCollectionWithoutNFTsQuery({
-  contractAddress,
-}: {
-  contractAddress: string;
-}) {
-  return useQuery({
-    queryKey: [queryKeys.collection.checkCollectionExists],
-    queryFn: async () => {
-      try {
-        const response = await axios.get(
-          `${backendURL}/collection/${contractAddress}/without-nfts`
-        );
-
-        return response.data;
-      } catch (error) {}
-    },
-    enabled: !!contractAddress,
-  });
-}
-
 // function useCollectionVolumeData({
 //   liveAuction = [],
 //   completedAuction = [],

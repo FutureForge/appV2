@@ -56,6 +56,7 @@ export const testnetProviderUrlMap = [
 export const crossFiTestnet = defineChain({
   id: 4157,
   // rpc: testnetProviderUrl,
+  name: "CrossFi Testnet",
   nativeCurrency: {
     decimals: 18,
     name: "XFI",

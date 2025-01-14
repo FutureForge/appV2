@@ -1,7 +1,11 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import { CROSSFI_API_URL, MARKETPLACE_ADDRESS_TESTNET } from "@/utils/configs";
+import {
+  backendURL,
+  CROSSFI_API_URL,
+  MARKETPLACE_ADDRESS_TESTNET,
+} from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { getNFT } from "thirdweb/extensions/erc721";
 import {
@@ -22,9 +26,7 @@ import {
 import { NFTActivityResponse } from "@/utils/types/global";
 import { Collection } from "@/utils/types/collection/collection.type";
 import { getAllListing } from "@/modules/blockchain/listing/listing.blockchain";
-import request from "graphql-request";
 import { StatusType } from "@/utils/enums/messages/index.enum";
-import { useSingleCollectionWithoutNFTsQuery } from "..";
 import { Auction, Listing, Offer } from "../utils/";
 
 export function useSingleNFTQuery({
@@ -34,20 +36,13 @@ export function useSingleNFTQuery({
   contractAddress: string;
   tokenId: string;
 }) {
-  const {
-    data: collectionWithoutNFTs,
-    isLoading: isLoadingCollectionWithoutNFTs,
-  } = useSingleCollectionWithoutNFTsQuery({
-    contractAddress,
-  });
-
   return useQuery({
     queryKey: [queryKeys.nft.single, { tokenId, contractAddress }],
     queryFn: async () => {
       try {
         const [
           tokenTransfersResponse,
-          // tokenInventoryResponse,
+          collectionDetailsResponse,
           collectionFee,
           marketplaceFee,
           allListings,
@@ -57,9 +52,9 @@ export function useSingleNFTQuery({
           axios.get<NFTActivityResponse>(
             `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
           ),
-          // axios.get(
-          //   `https://test.xfiscan.com/api/1.0/token-inventory/${contractAddress}/${tokenId}`
-          // ),
+          await axios.get(
+            `${backendURL}/collection/${contractAddress}/without-nfts`
+          ),
           getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
           getPlatformFeeInfoCustom({
             contractAddress: MARKETPLACE_ADDRESS_TESTNET,
@@ -94,6 +89,7 @@ export function useSingleNFTQuery({
         );
 
         const nftActivity = tokenTransfersResponse.data.docs;
+        const collectionDetails = collectionDetailsResponse.data;
 
         const contract = getContractCustom({
           contractAddress,
@@ -206,15 +202,17 @@ export function useSingleNFTQuery({
           isActiveTypeExpired,
           winningBidBody,
           offers: ensureSerializable(nftOffers) as Offer,
-          collectionDetails: collectionWithoutNFTs?.collection as Collection,
+          collectionDetails: collectionDetails as Collection,
           listingData: ensureSerializable(updatedNFTListingList) as Listing,
           auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };
       } catch (error) {}
     },
-    enabled: !!contractAddress && !!tokenId && !isLoadingCollectionWithoutNFTs,
+    enabled: !!contractAddress || !!tokenId,
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
     refetchInterval: 5000,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
+    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }

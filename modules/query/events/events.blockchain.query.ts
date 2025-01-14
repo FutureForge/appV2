@@ -54,6 +54,7 @@ export function useAllContractEventQuery() {
     },
     staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
     gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
+    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }
 
@@ -120,6 +121,7 @@ export function useCompletedListingEventQuery({
     // gcTime: 1000 * 60 * 30, // 30 minutes
     // refetchOnMount: false,
     // refetchOnWindowFocus: false,
+    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
     refetchInterval: 5000, // Refetch every 5 minutes
   });
 }

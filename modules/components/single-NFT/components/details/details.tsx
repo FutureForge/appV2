@@ -253,8 +253,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     tokenId: tokenId as string,
   });
 
-  console.log({ nftData, error });
-
   const isApproved = useCheckApprovalStatusQuery({
     collectionContractAddress: contractAddress as string,
     tokenId: tokenId as string,
@@ -442,7 +440,7 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
                   { label: "Token Standard", value: "CRC-721" },
                   {
                     label: "Chain",
-                    value: "CrossFi Mainnet",
+                    value: `${chainInfo.name || 'CrossFi'}`,
                     icon: <XFI className="size-5" />,
                   },
                 ].map((item, index) => (
