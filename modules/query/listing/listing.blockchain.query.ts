@@ -59,19 +59,19 @@ export function useAllListingBlockchainQuery({
               .slice(0, limit);
 
           case "live-listing-collection":
-            return allListingQuery.data.filter((auction) => {
+            return allListingQuery.data.filter((listing) => {
               return (
-                auction.status === StatusType.CREATED &&
-                auction.assetContract.toLowerCase() ===
+                listing.status === StatusType.CREATED &&
+                listing.assetContract.toLowerCase() ===
                   contractAddress?.toLowerCase()
               );
             });
 
           case "completed-listing-collection":
-            return allListingQuery.data.filter((auction) => {
+            return allListingQuery.data.filter((listing) => {
               return (
-                auction.status === StatusType.COMPLETED &&
-                auction.assetContract.toLowerCase() ===
+                listing.status === StatusType.COMPLETED &&
+                listing.assetContract.toLowerCase() ===
                   contractAddress?.toLowerCase()
               );
             });
@@ -94,9 +94,11 @@ export function useAllListingBlockchainQuery({
 
       // return formattedData;
 
-      return formattedData.filter((data) => {
-        return !data.isListingExpired;
-      });
+      return type.includes("completed")
+        ? formattedData
+        : formattedData.filter((data) => {
+            return !data.isListingExpired;
+          });
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60 * 5, // 5 minutes

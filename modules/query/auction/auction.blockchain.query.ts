@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
-import { getAllAuctions } from "@/modules/blockchain";
+import { getAllAuctions, getWinningBid } from "@/modules/blockchain";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { fetchNFT, formatAuctionData } from "../utils/index.utils.query";
 import { formatBlockchainTimestamp } from "@/utils/functions";
 import { useUserChainInfo } from "../user/user.query";
 
-type AuctionQueryType =
+export type AuctionQueryType =
   | "new-auction"
   | "live-auction"
   | "completed-auction"
@@ -86,7 +86,6 @@ export function useAllAuctionsBlockchainQuery({
         }
       })();
 
-      // Format auctions in parallel
       const formattedData = await Promise.all(
         filteredAuctions.map(async (auction) => {
           const nft = await fetchNFT({
@@ -94,15 +93,16 @@ export function useAllAuctionsBlockchainQuery({
             tokenId: auction.tokenId,
           });
 
-          return formatAuctionData(auction, nft);
+          return formatAuctionData({ rawAuction: auction, nft, type });
         })
       );
-
       // return formattedData;
 
-      return formattedData.filter((data) => {
-        return !data.isAuctionExpired;
-      });
+      return type.includes("completed")
+        ? formattedData
+        : formattedData.filter((data) => {
+            return !data.isAuctionExpired;
+          });
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type),
     staleTime: 1000 * 30,
@@ -176,7 +176,7 @@ export function useUserAuctionBlockchainQuery({
             tokenId: auction.tokenId,
           });
 
-          return formatAuctionData(auction, nft);
+          return formatAuctionData({ rawAuction: auction, nft });
         })
       );
 

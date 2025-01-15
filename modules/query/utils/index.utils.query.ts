@@ -25,20 +25,30 @@ import {
   RawCompletedListingEvent,
   RawOfferEvent,
 } from "../events/type.events";
+import { AuctionQueryType } from "..";
 
-export async function formatAuctionData(
-  rawAuction: any,
-  nft: ThirdwebNFTType
-): Promise<Auction> {
+export async function formatAuctionData({
+  rawAuction,
+  nft,
+  type,
+}: {
+  rawAuction: any;
+  nft: ThirdwebNFTType;
+  type?: AuctionQueryType;
+}): Promise<Auction> {
   const endTime = formatBlockchainTimestamp(rawAuction.endTimestamp);
   const endTimeFormatted = new Date(endTime).getTime();
   const currentTime = new Date().getTime();
 
   const isExpired = currentTime > endTimeFormatted;
 
-  const isAuctionActive = await getIsAuctionExpired({
-    auctionId: rawAuction.auctionId,
-  });
+  let isAuctionActive = undefined;
+
+  if (type && type !== "completed-auction-collection") {
+    isAuctionActive = await getIsAuctionExpired({
+      auctionId: rawAuction.auctionId,
+    });
+  }
 
   const isAuctionExpired = !isAuctionActive;
 
