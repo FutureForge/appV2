@@ -40,51 +40,6 @@ export function Sliders() {
     isError: isErrorCollectionQuery,
   } = useAllCollectionsQuery({});
 
-  // useEffect(() => {
-  //   const getEvent = async () => {
-  //     // const listings = await getAllListings({
-  //     //   contract,
-  //     //   start: 0,
-  //     //   count: BigInt(100),
-  //     // });
-
-  //     // console.log({ listings });
-
-  //     // const offers = await getAllOffers({
-  //     //   contract,
-  //     //   start: 0,
-  //     //   count: BigInt(100),
-  //     // });
-
-  //     // console.log({ offers });
-
-  //     const newListingEvent = prepareEvent({
-  //       signature:
-  //         "event NewListing(address indexed listingCreator, uint256 indexed listingId, address indexed assetContract, (uint256 listingId, uint256 tokenId, uint256 quantity, uint256 pricePerToken, uint128 startTimestamp, uint128 endTimestamp, address listingCreator, address assetContract, address currency, uint8 tokenType, uint8 status, bool reserved) listing)",
-  //     });
-
-  //     console.log({ newListingEvent });
-  //     console.log({ topic: newListingEvent.topics });
-
-  //     const customEvent = await getCompletedListingEvent();
-  //     console.log({ customEvent });
-
-  //     const eventsV2 = await getContractEvents({
-  //       contract,
-  //       events: [customEvent],
-  //       // blockRange: BigInt(7009702),
-  //       // fromBlock: BigInt(6302547),
-  //       // blockHash: '0x359026f295440ecc96f2700ccbf2186fe7d860b08d312cafaeda70e88c6a8e1d',
-  //       blockHash:
-  //         "0xbb20968c710bccec27847ac540efcddd9d530e6749426793801b515a4b234b9a",
-  //     });
-
-  //     console.log({ eventsV2 });
-  //   };
-
-  //   getEvent();
-  // }, [contract]);
-
   const {
     data: newAuction,
     isLoading: isLoadingNewAuction,
@@ -135,21 +90,6 @@ export function Sliders() {
     isLoading: isLoadingAcceptedOffer,
     isError: isErrorAcceptedOffer,
   } = useAcceptedOfferEventQuery({});
-
-  // const { data: userListing } = useUserListingBlockchainQuery({
-  //   limit: 2,
-  //   type: "expired-listing",
-  // });
-
-  // const { data: userAuction } = useUserAuctionBlockchainQuery({
-  //   limit: 2,
-  //   type: "expired-auction",
-  // });
-
-  // const { data: userOffer } = useUserOfferBlockchainQuery({
-  //   limit: 2,
-  //   type: "expired-offer",
-  // });
 
   const isError =
     isErrorCollectionQuery ||

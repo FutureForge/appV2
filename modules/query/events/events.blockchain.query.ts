@@ -27,6 +27,7 @@ import {
   RawOfferEvent,
 } from "./type.events";
 import { StatusType } from "@/utils/enums/messages/index.enum";
+import { queryKeys } from "../query-keys";
 
 const EventQueryLimit = 1000;
 
@@ -44,7 +45,7 @@ async function getEventArgs(event: any, blockHash: string) {
 
 export function useAllContractEventQuery() {
   return useQuery({
-    queryKey: ["getAllContractEvent"],
+    queryKey: [queryKeys.events.allContractEvent],
     queryFn: async () => {
       const response = await axios.get<EventLog>(
         `${CROSSFI_API_URL}/event-logs?contractAddress=${MARKETPLACE_ADDRESS}&removed=false&page=1&limit=${EventQueryLimit}&sort=-blockNumber`
@@ -54,7 +55,7 @@ export function useAllContractEventQuery() {
     },
     staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
     gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
-    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    refetchInterval: 5000, // Refetch every 5 minutes
   });
 }
 
@@ -68,7 +69,7 @@ export function useCompletedListingEventQuery({
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-listing-event", { limit, contractAddress }],
+    queryKey: [queryKeys.events.completedListing, { limit, contractAddress }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -117,12 +118,9 @@ export function useCompletedListingEventQuery({
       }
     },
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
-    // staleTime: 1000 * 60 * 5, // 5 minutes
-    // gcTime: 1000 * 60 * 30, // 30 minutes
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
-    refetchInterval: 5000, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -136,7 +134,7 @@ export function useCompletedAuctionEventQuery({
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["completed-auction-event", { limit, contractAddress }],
+    queryKey: [queryKeys.events.completedAuction, { limit, contractAddress }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -196,11 +194,9 @@ export function useCompletedAuctionEventQuery({
       }
     },
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
-    // staleTime: 1000 * 60 * 5, // 5 minutes
-    // gcTime: 1000 * 60 * 30, // 30 minutes
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    refetchInterval: 5000, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -208,7 +204,7 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["accepted-offer-event", { limit }],
+    queryKey: [queryKeys.events.acceptedOffer, { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -246,11 +242,9 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
       return formattedData.slice(0, limit);
     },
     enabled: !!allContractEventQuery.data && !!limit,
-    // staleTime: 1000 * 60 * 5, // 5 minutes
-    // gcTime: 1000 * 60 * 30, // 30 minutes
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    refetchInterval: 5000, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -258,7 +252,7 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["auction-bid-event", { limit }],
+    queryKey: [queryKeys.events.auctionBid, { limit }],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -300,14 +294,12 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
         );
       });
 
-      return formattedData.slice(0, limit);
+      return filteredFormattedData.slice(0, limit);
     },
     enabled: !!allContractEventQuery.data && !!limit,
-    // staleTime: 1000 * 60 * 5, // 5 minutes
-    // gcTime: 1000 * 60 * 30, // 30 minutes
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    refetchInterval: 5000, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -315,7 +307,7 @@ export function useNewOfferEventQuery() {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
-    queryKey: ["new-offer-event"],
+    queryKey: [queryKeys.events.newOffer],
     queryFn: async () => {
       if (!allContractEventQuery.data) return;
 
@@ -364,13 +356,11 @@ export function useNewOfferEventQuery() {
         );
       });
 
-      return formattedData;
+      return filteredFormattedData;
     },
     enabled: !!allContractEventQuery.data,
-    // staleTime: 1000 * 60 * 5, // 5 minutes
-    // gcTime: 1000 * 60 * 30, // 30 minutes
-    // refetchOnMount: false,
-    // refetchOnWindowFocus: false,
-    refetchInterval: 5000, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }

@@ -91,11 +91,11 @@ export function useAllOffersBlockchainQuery({
         })
       );
 
-      return formattedData;
+      // return formattedData;
 
-      //   return formattedData.filter((data) => {
-      //     return !data.isOfferExpired;
-      //   });
+      return formattedData.filter((data) => {
+        return !data.isOfferExpired;
+      });
     },
     enabled: !!allOfferQuery.data && (!!limit || !!type),
     staleTime: 1000 * 30, // 30 seconds

@@ -112,9 +112,13 @@ export function useCreateNFTMutation() {
         throw new Error("No URI");
       }
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.user.nfts,
+          queryKeys.collection.single,
+          queryKeys.nft.single
+        ],
       });
     },
     onError: (error, variables, context) => {},
@@ -167,9 +171,12 @@ export function useCreateNFTContractMutation() {
 
       return receipt;
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.user.nftContracts,
+          queryKeys.collection.all
+        ],
       });
     },
     meta: {

@@ -107,19 +107,16 @@ export function useMakeListingOfferMutation() {
       return transactionReceipt;
     },
     onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [
-      //     queryKeys.user.all,
-      //     queryKeys.nft.single,
-      //     queryKeys.user.listings,
-      //     queryKeys.offers.all,
-      //     queryKeys.offers.new,
-      //     queryKeys.offers.single,
-      //   ],
-      // });
-
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.nft.single,
+          queryKeys.user.nfts,
+          queryKeys.user.listings,
+          queryKeys.listing.filtered,
+          queryKeys.listing.blockchain,
+          queryKeys.listing.userBlockchain,
+          queryKeys.events.newOffer,
+        ],
       });
     },
     onError: () => {},
@@ -160,18 +157,16 @@ export function useAcceptOfferMutation() {
       return transactionReceipt;
     },
     onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [
-      //     queryKeys.user.all,
-      //     queryKeys.nft.single,
-      //     queryKeys.user.listings,
-      //     queryKeys.offers.all,
-      //     queryKeys.offers.new,
-      //     queryKeys.offers.single,
-      //   ],
-      // });
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.nft.single,
+          queryKeys.user.nfts,
+          queryKeys.user.offers,
+          queryKeys.offers.filtered,
+          queryKeys.offers.blockchain,
+          queryKeys.offers.userBlockchain,
+          queryKeys.events.acceptedOffer,
+        ],
       });
     },
     onError: () => {},
@@ -212,18 +207,16 @@ export function useCancelOfferMutation() {
       return transactionReceipt;
     },
     onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [
-      //     queryKeys.user.all,
-      //     queryKeys.nft.single,
-      //     queryKeys.user.listings,
-      //     queryKeys.offers.all,
-      //     queryKeys.offers.new,
-      //     queryKeys.offers.single,
-      //   ],
-      // });
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.nft.single,
+          queryKeys.user.nfts,
+          queryKeys.user.offers,
+          queryKeys.offers.filtered,
+          queryKeys.offers.blockchain,
+          queryKeys.offers.userBlockchain,
+          queryKeys.events.newOffer,
+        ],
       });
     },
     onError: () => {},
@@ -271,19 +264,20 @@ export function useBidInAuctionMutation() {
       return transactionReceipt;
     },
     onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [
-      //     queryKeys.user.all,
-      //     queryKeys.nft.single,
-      //     queryKeys.user.listings,
-      //     queryKeys.offers.all,
-      //     queryKeys.auction.newBids,
-      //     queryKeys.auction.filteredAll,
-      //   ],
-      // });
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.nft.single,
+          queryKeys.user.nfts,
+          queryKeys.user.auctions,
+          queryKeys.auction.filtered,
+          queryKeys.auction.blockchain,
+          queryKeys.auction.userBlockchain,
+          queryKeys.events.auctionBid,
+        ],
       });
+      // queryClient.invalidateQueries({
+      //   refetchType: "all",
+      // });
     },
     onError: () => {},
     meta: {
@@ -323,19 +317,20 @@ export function useCollectAuctionPayoutMutation() {
       return transactionReceipt;
     },
     onSuccess: () => {
-      // queryClient.invalidateQueries({
-      //   queryKey: [
-      //     queryKeys.user.all,
-      //     queryKeys.nft.single,
-      //     queryKeys.user.listings,
-      //     queryKeys.offers.all,
-      //     queryKeys.auction.filteredAll,
-      //     queryKeys.user.pendingPayout,
-      //   ],
-      // });
       queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.user.nfts,
+          queryKeys.nft.single,
+          queryKeys.user.auctions,
+          queryKeys.auction.filtered,
+          queryKeys.auction.blockchain,
+          queryKeys.auction.userBlockchain,
+          queryKeys.events.completedAuction,
+        ],
       });
+      // queryClient.invalidateQueries({
+      //   refetchType: "all",
+      // });
     },
     onError: () => {},
     meta: {
@@ -377,11 +372,13 @@ export function useCollectAuctionTokensMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.user.all,
           queryKeys.nft.single,
-          queryKeys.user.listings,
-          queryKeys.offers.all,
-          queryKeys.auction.filteredAll,
+          queryKeys.user.nfts,
+          queryKeys.user.auctions,
+          queryKeys.auction.filtered,
+          queryKeys.auction.blockchain,
+          queryKeys.auction.userBlockchain,
+          queryKeys.events.completedAuction,
         ],
       });
     },

@@ -72,7 +72,11 @@ export function useAddCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        refetchType: "all"
+        queryKey: [
+          queryKeys.collection.all,
+          queryKeys.collection.single,
+          queryKeys.user.nftContracts
+        ],
       });
     },
     onError: () => {},
@@ -152,7 +156,10 @@ export function useUpdateCollectionMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        refetchType: "all"
+        queryKey: [
+          queryKeys.collection.single,
+          queryKeys.collection.all
+        ],
       });
     },
     onError: () => {},

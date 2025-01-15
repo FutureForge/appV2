@@ -19,8 +19,11 @@ export function useAllAuctionsBaseQuery() {
   return useQuery({
     queryKey: [queryKeys.auction.blockchain],
     queryFn: getAllAuctions,
-    staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
+    // staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
+    // gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -95,18 +98,16 @@ export function useAllAuctionsBlockchainQuery({
         })
       );
 
-      return formattedData;
+      // return formattedData;
 
-      //   return formattedData.filter((data) => {
-      //     return !data.isAuctionExpired;
-      //   });
+      return formattedData.filter((data) => {
+        return !data.isAuctionExpired;
+      });
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -182,9 +183,8 @@ export function useUserAuctionBlockchainQuery({
       return formattedData;
     },
     enabled: !!allAuctionsQuery.data && (!!limit || !!type) && !!userAddress,
-    staleTime: 1000 * 60 * 30, // Data remains fresh for 30 minutes
-    gcTime: 1000 * 60 * 30, // Cache is kept for 30 minutes
-    refetchOnMount: true, // Refetch when component mounts if data is stale
-    refetchOnWindowFocus: true, // Refetch when window regains focus if data is stale
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }

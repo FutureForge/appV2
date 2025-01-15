@@ -14,14 +14,6 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { sendAndConfirmTransaction } from "thirdweb";
 
-/**
- * NEEDED VALUES
- * tokenId
- * assetContract
- * pricePerToken
- * endTimestamp
- */
-
 export function useCreateListingMutation() {
   const queryClient = useQueryClient();
   const { activeAccount } = useUserChainInfo();
@@ -61,15 +53,13 @@ export function useCreateListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.listing.all,
-          queryKeys.user.all,
           queryKeys.nft.single,
+          queryKeys.user.nfts,
           queryKeys.user.listings,
-          queryKeys.collection.all,
+          queryKeys.listing.blockchain,
+          queryKeys.listing.userBlockchain,
+          queryKeys.listing.filtered,
         ],
-      });
-      queryClient.invalidateQueries({
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -126,10 +116,14 @@ export function useUpdateListingMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [queryKeys.user.all, queryKeys.nft.single],
-      });
-      queryClient.invalidateQueries({
-        refetchType: "all",
+        queryKey: [
+          queryKeys.nft.single,
+          queryKeys.user.nfts,
+          queryKeys.user.listings,
+          queryKeys.listing.blockchain,
+          queryKeys.listing.userBlockchain,
+          queryKeys.listing.filtered,
+        ],
       });
     },
     onError: () => {},
@@ -172,15 +166,13 @@ export function useCancelDirectListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.user.all,
-          queryKeys.nft.single,
+          queryKeys.listing.blockchain,
+          queryKeys.listing.userBlockchain,
+          queryKeys.listing.filtered,
           queryKeys.user.listings,
-          queryKeys.listing.all,
+          queryKeys.user.nfts,
+          queryKeys.nft.single,
         ],
-      });
-
-      queryClient.invalidateQueries({
-        refetchType: "all",
       });
     },
     onError: () => {},
@@ -234,10 +226,12 @@ export function useBuyFromDirectListingMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [
-          queryKeys.user.all,
           queryKeys.nft.single,
+          queryKeys.user.nfts,
           queryKeys.user.listings,
-          queryKeys.listing.all,
+          queryKeys.listing.blockchain,
+          queryKeys.listing.userBlockchain,
+          queryKeys.listing.filtered,
         ],
       });
 

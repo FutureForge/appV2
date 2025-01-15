@@ -315,29 +315,6 @@ export function useUserPendingPayoutQuery() {
   });
 }
 
-// export function useUserBidsQuery() {
-//   const { activeAccount } = useUserChainInfo();
-//   const userAddress = activeAccount?.address;
-
-//   // const { data: userBids, isLoading: isUserBidsLoading } =
-//   //   useFilteredUserNewBidsQuery({
-//   //     address: userAddress?.toLowerCase() || "",
-//   //   });
-
-//   return useQuery({
-//     queryKey: [queryKeys.user.bids, userAddress],
-//     queryFn: async () => {
-//       return {
-//         userBids,
-//         userBidsLength: userBids?.length,
-//       };
-//     },
-//     enabled: !!userAddress && !isUserBidsLoading,
-//     // refetchInterval: 5000,
-//     staleTime: Infinity,
-//     gcTime: Infinity,
-//   });
-// }
 
 export function useUserOffersReceivedQuery() {
   const { activeAccount } = useUserChainInfo();
@@ -439,7 +416,7 @@ export function useUserExpiredOffersQuery() {
     });
 
   return useQuery({
-    queryKey: [queryKeys.user.expiredAuctions, { userAddress }],
+    queryKey: [queryKeys.user.expiredOffers, { userAddress }],
     queryFn: async () => {
       return {
         expiredOffers: userExpiredOffer,
@@ -458,7 +435,7 @@ export function useUserCollectionsQuery() {
   const userAddress = activeAccount?.address;
 
   return useQuery({
-    queryKey: [queryKeys.user.all, { userAddress }],
+    queryKey: [queryKeys.user.collection, { userAddress }],
     queryFn: async () => {
       const response = await axios.get(
         `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
@@ -476,9 +453,9 @@ export function useUserCollectionsQuery() {
       return collections;
     },
     enabled: !!userAddress,
-    // refetchInterval: 5000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -519,9 +496,9 @@ export function useUserNFTActivitiesQuery() {
       return updatedTokenTransfers;
     },
     enabled: !!userAddress,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
     refetchInterval: 5000,
-    // staleTime: 1000 * 60,
-    // gcTime: 1000 * 60 * 5,
   });
 }
 
@@ -575,8 +552,8 @@ export function useUserNFTContractQuery() {
       return deployedContractsUpdated;
     },
     enabled: !!userAddress,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
     refetchInterval: 5000,
-    // staleTime: 1000 * 60,
-    // gcTime: 1000 * 60 * 5,
   });
 }

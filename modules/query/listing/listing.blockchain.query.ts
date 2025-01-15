@@ -34,8 +34,6 @@ export function useAllListingBlockchainQuery({
 }) {
   const allListingQuery = useAllListingBaseQuery();
 
-//   console.log({ allListingQuery });
-
   return useQuery({
     queryKey: [queryKeys.listing.filtered, { type, limit, contractAddress }],
     queryFn: async () => {
@@ -94,11 +92,11 @@ export function useAllListingBlockchainQuery({
         })
       );
 
-      return formattedData;
+      // return formattedData;
 
-      //   return formattedData.filter((data) => {
-      //     return !data.isListingExpired;
-      //   });
+      return formattedData.filter((data) => {
+        return !data.isListingExpired;
+      });
     },
     enabled: !!allListingQuery.data && (!!limit || !!type),
     staleTime: 1000 * 60 * 5, // 5 minutes

@@ -48,7 +48,7 @@ export function useCheckIfItsACollectionQuery({
       return { isCFC721, nftData };
     },
     enabled: !!contractAddress,
-    refetchInterval: 50000,
+    refetchInterval: 5000,
   });
 }
 
@@ -157,9 +157,9 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
       };
     },
     enabled: !!limit && !!page,
-    // refetchInterval: 5000,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -188,8 +188,9 @@ export function useSingleCollectionInfoQuery({
       };
     },
     enabled: !!contractAddress,
-    staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep unused data in cache for 30 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -327,11 +328,9 @@ export function useSingleCollectionQuery({
       !isLoadingCompletedOffer &&
       !isLoadingCompletedAuction &&
       !isLoadingCompletedListing,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }
 
@@ -347,8 +346,8 @@ export function usePromotedCollectionsQuery() {
 
       return promotedCollections;
     },
-    // refetchInterval: 60000,
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
+    refetchInterval: 5000,
   });
 }

@@ -209,10 +209,10 @@ export function useSingleNFTQuery({
       } catch (error) {}
     },
     enabled: !!contractAddress || !!tokenId,
-    gcTime: 1000 * 60 * 30, // 30 minutes
     refetchOnMount: 'always',
     refetchOnWindowFocus: 'always',
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
     refetchInterval: 5000,
-    // refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 }
