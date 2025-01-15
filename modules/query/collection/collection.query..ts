@@ -8,7 +8,7 @@ import {
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
 import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
-import { getNFT, isERC721 } from "thirdweb/extensions/erc721";
+import { getNFT, isERC721, totalSupply } from "thirdweb/extensions/erc721";
 import {
   CollectionsQueryResponse,
   SingleCollection,
@@ -23,14 +23,9 @@ import {
   useAllListingBlockchainQuery,
 } from "../listing/listing.blockchain.query";
 import { useAllOffersBlockchainQuery } from "../offers/offers.blockchain.query";
-import {
-  useAllContractEventQuery,
-  useCompletedAuctionEventQuery,
-  useCompletedListingEventQuery,
-} from "..";
-import { ensureSerializable, to3DP } from "@/utils/functions";
+import { to3DP } from "@/utils/functions";
 import { StatusType } from "@/utils/enums/messages/index.enum";
-import { Auction, fetchNFT, Listing } from "../utils";
+import ERC721Abi from "@/utils/abi/erc721.json";
 
 export async function isNFTContract(contractAddress: string) {
   const contract = await getContractCustom({ contractAddress });
@@ -328,12 +323,10 @@ export function useSingleCollectionQuery({
   return useQuery({
     queryKey: [queryKeys.collection.single, { contractAddress }],
     queryFn: async () => {
-      // const volumeData = calculateCollectionVolumeData({
-      //   liveAuction: liveAuction || [],
-      //   liveListing: liveListing || [],
-      //   completedAuction: completedAuction || [],
-      //   completedListing: completedListing || [],
-      // });
+      const contract = getContractCustom({
+        contractAddress,
+        abi: ERC721Abi,
+      });
 
       const [
         collectionTransfersResponse,
@@ -351,12 +344,59 @@ export function useSingleCollectionQuery({
         }).catch(() => ({})),
       ]);
 
+      console.log({ collectionDetailsResponse });
+
       const tokenTransfers = collectionTransfersResponse.data.docs;
-      const totalSupply = collectionDetailsResponse.data.totalSupply;
       const listedNFTs = liveListing?.length || 0;
+
       const auctionedNFTs = liveAuction?.length || 0;
-      const percentageOfListed = (listedNFTs / totalSupply) * 100;
-      const percentageOfAuctioned = (auctionedNFTs / totalSupply) * 100;
+      const totalSupplyResult = await totalSupply({
+        contract,
+      });
+      const percentageOfListed =
+        Number(totalSupplyResult) > 0
+          ? (listedNFTs / Number(totalSupplyResult)) * 100
+          : 0;
+      const percentageOfAuctioned =
+        Number(totalSupplyResult) > 0
+          ? (auctionedNFTs / Number(totalSupplyResult)) * 100
+          : 0;
+
+      const totalListingVolume = completedListing?.reduce(
+        (acc: number, listing) => {
+          const price = listing.pricePerToken;
+          return acc + price;
+        },
+        0
+      );
+
+      const totalAuctionVolume = completedAuction?.reduce((acc, auction) => {
+        const price = auction.buyoutBidAmount;
+        return acc + price;
+      }, 0);
+
+      const totalVolume = totalListingVolume! + totalAuctionVolume!;
+      const formattedTotalVolume = to3DP(totalVolume || 0);
+
+      const floorPrice = (() => {
+        let floor = Infinity;
+
+        if (liveListing) {
+          for (const listing of liveListing) {
+            const listingPrice = listing.pricePerToken;
+            floor = Math.min(floor, listingPrice);
+          }
+        }
+
+        if (liveAuction) {
+          for (const auction of liveAuction) {
+            const auctionPrice = auction.minimumBidAmount;
+            floor = Math.min(floor, auctionPrice);
+          }
+        }
+
+        return floor === Infinity ? 0 : floor;
+      })();
 
       const collectionDetails = {
         listedNFTs,
@@ -364,11 +404,9 @@ export function useSingleCollectionQuery({
         percentageOfListed,
         percentageOfAuctioned,
         holderCount: collectionDetailsResponse.data.holderCount,
-        // totalVolume: volumeData.formattedTotalVolume,
-        totalVolume: 5,
-        totalSupply,
-        // floorPrice: volumeData.floorPrice,
-        floorPrice: 1,
+        totalVolume: formattedTotalVolume,
+        totalSupplyResult,
+        floorPrice: floorPrice,
       };
 
       const updatedTokenTransfers = await Promise.all(

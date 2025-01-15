@@ -271,14 +271,17 @@ export default function CollectionPage() {
     () => filteredCollectionNFTs?.slice(0, displayCount),
     [filteredCollectionNFTs, displayCount]
   );
+
   const paginatedCollectionOffers = filteredCollectionOffers?.slice(
     0,
     displayCount
   );
+
   const paginatedCollectionSales = filteredCollectionSales?.slice(
     0,
     displayCount
   );
+  
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
