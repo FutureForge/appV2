@@ -68,8 +68,8 @@ export function formatBlockchainTimestamp(timestamp: string) {
     day: "numeric",
     hour: "numeric",
     minute: "numeric",
-    // second: 'numeric',
-    // timeZone: 'UTC',
+    timeZoneName: "short",
+    hour12: false,
   };
 
   // Format the date and time

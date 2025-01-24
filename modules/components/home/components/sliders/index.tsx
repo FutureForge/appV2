@@ -143,6 +143,32 @@ export function Sliders() {
         }}
       />
 
+      {/* Completed Listing */}
+      <DataSlider
+        isLoading={isLoadingCompletedListing}
+        title="Completed Listing"
+        cta="View More"
+        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_LISTING}`}
+        data={completedListingEventQuery || []}
+        renderItem={(completedListing: CompletedListingEvent) => {
+          return (
+            <NFTCard
+              key={completedListing.listingId}
+              data={completedListing}
+              type="completed-listing"
+              cta="View Item"
+              nft={completedListing.nft}
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: completedListing.assetContract,
+                  tokenId: completedListing.tokenId.toString(),
+                });
+              }}
+            />
+          );
+        }}
+      />
+
       {/* Recently Listed */}
       <DataSlider
         isLoading={isLoadingNewListing}
@@ -169,6 +195,32 @@ export function Sliders() {
         }}
       />
 
+      {/* Completed Auction */}
+      <DataSlider
+        isLoading={isLoadingCompletedAuction}
+        title="Completed Auction"
+        cta="View More"
+        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_AUCTION}`}
+        data={completedAuctionEventQuery || []}
+        renderItem={(completedAuction: CompletedAuctionEvent) => {
+          return (
+            <NFTCard
+              key={completedAuction.auctionId}
+              data={completedAuction}
+              nft={completedAuction.nft}
+              type="completed-auction"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: completedAuction.assetContract,
+                  tokenId: completedAuction.tokenId.toString(),
+                });
+              }}
+            />
+          );
+        }}
+      />
+
       {/* Recently Auctioned */}
       <DataSlider
         isLoading={isLoadingNewAuction}
@@ -188,6 +240,32 @@ export function Sliders() {
                 handleViewItem({
                   contractAddress: auction.assetContract,
                   tokenId: auction.tokenId.toString(),
+                });
+              }}
+            />
+          );
+        }}
+      />
+
+      {/* Accepted Offers */}
+      <DataSlider
+        isLoading={isLoadingAcceptedOffer}
+        title="Accepted Offers"
+        cta="View More"
+        href={`/browse?filter=${QueryBrowsePageFilters.ACCEPTED_OFFERS}`}
+        data={acceptedOfferEventQuery || []}
+        renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
+          return (
+            <NFTCard
+              key={acceptedOfferEvent.offerId}
+              data={acceptedOfferEvent}
+              nft={acceptedOfferEvent.nft}
+              type="accepted-offers"
+              cta="View Item"
+              onClick={() => {
+                handleViewItem({
+                  contractAddress: acceptedOfferEvent.assetContract,
+                  tokenId: acceptedOfferEvent.tokenId.toString(),
                 });
               }}
             />
@@ -240,84 +318,6 @@ export function Sliders() {
                 handleViewItem({
                   contractAddress: auctionBid.assetContract,
                   tokenId: auctionBid.auction.tokenId.toString(),
-                });
-              }}
-            />
-          );
-        }}
-      />
-
-      {/* Completed Listing */}
-      <DataSlider
-        isLoading={isLoadingCompletedListing}
-        title="Completed Listing"
-        cta="View More"
-        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_LISTING}`}
-        data={completedListingEventQuery || []}
-        renderItem={(completedListing: CompletedListingEvent) => {
-          return (
-            <NFTCard
-              key={completedListing.listingId}
-              data={completedListing}
-              type="completed-listing"
-              cta="View Item"
-              nft={completedListing.nft}
-              onClick={() => {
-                handleViewItem({
-                  contractAddress: completedListing.assetContract,
-                  tokenId: completedListing.tokenId.toString(),
-                });
-              }}
-            />
-          );
-        }}
-      />
-
-      {/* Completed Auction */}
-      <DataSlider
-        isLoading={isLoadingCompletedAuction}
-        title="Completed Auction"
-        cta="View More"
-        href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_AUCTION}`}
-        data={completedAuctionEventQuery || []}
-        renderItem={(completedAuction: CompletedAuctionEvent) => {
-          return (
-            <NFTCard
-              key={completedAuction.auctionId}
-              data={completedAuction}
-              nft={completedAuction.nft}
-              type="completed-auction"
-              cta="View Item"
-              onClick={() => {
-                handleViewItem({
-                  contractAddress: completedAuction.assetContract,
-                  tokenId: completedAuction.tokenId.toString(),
-                });
-              }}
-            />
-          );
-        }}
-      />
-
-      {/* Accepted Offers */}
-      <DataSlider
-        isLoading={isLoadingAcceptedOffer}
-        title="Accepted Offers"
-        cta="View More"
-        href={`/browse?filter=${QueryBrowsePageFilters.ACCEPTED_OFFERS}`}
-        data={acceptedOfferEventQuery || []}
-        renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
-          return (
-            <NFTCard
-              key={acceptedOfferEvent.offerId}
-              data={acceptedOfferEvent}
-              nft={acceptedOfferEvent.nft}
-              type="accepted-offers"
-              cta="View Item"
-              onClick={() => {
-                handleViewItem({
-                  contractAddress: acceptedOfferEvent.assetContract,
-                  tokenId: acceptedOfferEvent.tokenId.toString(),
                 });
               }}
             />
