@@ -49,7 +49,7 @@ export const CROSSFI_API_MAINNET = "https://api.xfiscan.com/api/1.0";
 export const testnetProviderUrl = "https://rpc.xfi.ms/archive/4157";
 
 export const testnetProviderUrlMap = [
-  // "https://rpc.testnet.ms/",
+  "https://rpc.testnet.ms/",
   "https://rpc.xfi.ms/archive/4157",
 ];
 
