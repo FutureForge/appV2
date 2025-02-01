@@ -49,13 +49,20 @@ export const CROSSFI_API_MAINNET = "https://api.xfiscan.com/api/1.0";
 export const testnetProviderUrl = "https://rpc.xfi.ms/archive/4157";
 
 export const testnetProviderUrlMap = [
+  // "https://crossfi-testnet.g.alchemy.com/v2/LyMEMlI9ehqzPfajiDhvBXZ4MGjUQ6L-",
+  'https://4157.rpc.thirdweb.com',
   "https://rpc.testnet.ms/",
   "https://rpc.xfi.ms/archive/4157",
 ];
 
+export const mainnetProviderUrlMap = [
+  // "https://crossfi-mainnet.g.alchemy.com/v2/LyMEMlI9ehqzPfajiDhvBXZ4MGjUQ6L-",
+  "https://rpc.mainnet.ms/",
+  'https://4158.rpc.thirdweb.com',
+];
+
 export const crossFiTestnet = defineChain({
   id: 4157,
-  // rpc: testnetProviderUrl,
   name: "CrossFi Testnet",
   nativeCurrency: {
     decimals: 18,
@@ -73,8 +80,6 @@ export const crossFiTestnet = defineChain({
   ],
 });
 
-export const mainnetProviderUrlMap = ["https://rpc.mainnet.ms/"];
-
 export const crossFiMainnet = defineChain({
   id: 4158,
   name: "CrossFi Mainnet",
@@ -85,14 +90,12 @@ export const crossFiMainnet = defineChain({
   },
   rpcUrls: {
     default: {
-      // http: ['https://rpc.mainnet.ms/'],
       http: mainnetProviderUrlMap,
     },
   },
   blockExplorers: {
     default: { name: "Explorer", url: "https://xfiscan.com/" },
   },
-  // blockExplorers: [{ name: "Explorer", url: "https://xfiscan.com/" }],
 });
 
 export const chainInfo = IS_TESTNET ? crossFiTestnet : crossFiMainnet;
