@@ -53,7 +53,7 @@ export function useSingleNFTQuery({
             `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
           ),
           await axios.get(
-            `${backendURL}/collection/${contractAddress}/without-nfts`
+            `${backendURL}/collection/${contractAddress}?withoutNFT=true`
           ),
           getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
           getPlatformFeeInfoCustom({
@@ -206,11 +206,13 @@ export function useSingleNFTQuery({
           listingData: ensureSerializable(updatedNFTListingList) as Listing,
           auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };
-      } catch (error) {}
+      } catch (error) {
+        // console.log({ error });
+      }
     },
     enabled: !!contractAddress || !!tokenId,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: 'always',
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
     refetchInterval: 5000,

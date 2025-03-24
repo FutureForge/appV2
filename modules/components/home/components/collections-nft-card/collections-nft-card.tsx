@@ -8,7 +8,6 @@ import { cn } from "@/modules/app/utils";
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
 
-
 export type CollectionWithoutOwnerBackground = Omit<
   Collection,
   | "collectionBackgroundImage"
@@ -28,6 +27,7 @@ export type CollectionWithoutOwnerBackground = Omit<
 export type CollectionNFTCardProps = CollectionWithoutOwnerBackground & {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   cta?: string;
+  isPromoted?: boolean;
 };
 
 export function CollectionsNFTCard(props: CollectionNFTCardProps) {
@@ -39,6 +39,7 @@ export function CollectionsNFTCard(props: CollectionNFTCardProps) {
     cta,
     floorPrice,
     totalVolume,
+    isPromoted = false,
   } = props;
 
   return (
@@ -65,19 +66,21 @@ export function CollectionsNFTCard(props: CollectionNFTCardProps) {
           />
         )}
       </div>
-      <div className="flex items-center w-full justify-between">
-        <div>
-          <div className="flex items-center gap-1">
-            <XFI className="size-6" />
-            <p className="text-lg font-medium text-white">{floorPrice} XFI</p>
+      {!isPromoted && (
+        <div className="flex items-center w-full justify-between">
+          <div>
+            <div className="flex items-center gap-1">
+              <XFI className="size-6" />
+              <p className="text-lg font-medium text-white">{floorPrice} XFI</p>
+            </div>
+            <p className="text-sm text-muted-foreground">Floor Price</p>
           </div>
-          <p className="text-sm text-muted-foreground">Floor Price</p>
+          <div>
+            <p className="text-lg font-medium text-white">{totalVolume} XFI</p>
+            <p className="text-sm text-muted-foreground">Volume</p>
+          </div>
         </div>
-        <div>
-          <p className="text-lg font-medium text-white">{totalVolume} XFI</p>
-          <p className="text-sm text-muted-foreground">Volume</p>
-        </div>
-      </div>
+      )}
       {cta && (
         <div className="w-full flex items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <motion.button

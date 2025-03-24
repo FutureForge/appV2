@@ -253,8 +253,6 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
     tokenId: tokenId as string,
   });
 
-  console.log({ nftData, error });
-
   const isApproved = useCheckApprovalStatusQuery({
     collectionContractAddress: contractAddress as string,
     tokenId: tokenId as string,

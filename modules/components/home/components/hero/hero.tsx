@@ -146,6 +146,7 @@ export function Hero() {
     //     )}
     //   </div>
     // </div>
+
     <div className="h-[90vh] min-[1680px]:h-[60vh] w-full relative border mb-16">
       {/* Banner */}
       {promotedCollections && promotedCollections.length > 1 ? (
@@ -205,6 +206,7 @@ export function Hero() {
                     totalVolume={collection.totalVolume}
                     onClick={handleClick}
                     cta="Shop Collections"
+                    isPromoted={true}
                   />
                 );
               })}
