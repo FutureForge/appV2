@@ -108,7 +108,11 @@ export function ProfilePage() {
     isLoading: isUserNFTsLoading,
     isPending: isUserNFTsPending,
     isError: isUserNFTsError,
+    error,
   } = useUserNFTsQuery();
+
+  console.log({ chainInfo });
+  console.log({ userNFTs });
 
   const {
     data: userListings,
@@ -184,6 +188,21 @@ export function ProfilePage() {
     isLoading: isUserNFTActivitiesLoading,
     isError: isUserNFTActivitiesError,
   } = useUserNFTActivitiesQuery();
+
+  console.log({
+    error,
+    isUserNFTsError,
+    isUserListingsError,
+    isUserAuctionsError,
+    isUserCollectionsError,
+    isUserExpiredAuctionsError,
+    isUserExpiredListingsError,
+    isUserExpiredOffersError,
+    isUserNFTActivitiesError,
+    isUserOffersReceivedError,
+    isUserOffersError,
+    isUserPendingPayoutError,
+  });
 
   const copyToClipboard = useCopyToClipboard()[1];
   const handleCopy = (content: string) => {
@@ -275,18 +294,18 @@ export function ProfilePage() {
   const getFilteredData = () => {
     switch (selectedFilter) {
       case filters[0]:
-        const filteredAllNFTs = userNFTs?.filter((nft) => {
-          if (!nft?.nft?.metadata?.name) return false;
+        const filteredAllNFTs = userNFTs?.filter((userNFT) => {
+          if (!userNFT?.nft?.metadata?.name) return false;
 
           const searchTerm = searchQuery
             .toLowerCase()
             .trim()
             .replace(/\s+/g, "");
 
-          const nameNoSpace = nft?.nft?.metadata?.name
+          const nameNoSpace = userNFT?.nft?.metadata?.name
             .toLowerCase()
             .replace(/\s+/g, "");
-          const tokenIdNoSpace = nft.tokenId
+          const tokenIdNoSpace = userNFT.tokenId
             .toString()
             .toLowerCase()
             .replace(/\s+/g, "");
@@ -1313,6 +1332,8 @@ function CustomNFTCard({ data }: { data: UserNFTData }) {
   const { name, image } = metadata || {};
   const cta = "View Item";
 
+  console.log("custom nft card", { data });
+
   const handleViewItemClick = ({
     contractAddress,
     tokenId,
@@ -1355,7 +1376,7 @@ function CustomNFTCard({ data }: { data: UserNFTData }) {
             <p className="text-lg font-medium text-white">Owner</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            {getFormatAddress(owner)}
+            {owner ? getFormatAddress(owner) : ""}
           </p>
         </div>
         {/* <div>

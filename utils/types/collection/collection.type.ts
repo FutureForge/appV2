@@ -71,10 +71,10 @@ export type TokenDetails = {
   transferCount: number;
 };
 
-export type CollectionsQueryResponse = {
-  collections: Collection[];
-  totalCount: number;
-};
+// export type CollectionsQueryResponse = {
+//   collections: Collection[];
+//   totalCount: number;
+// };
 
 export type CollectionNFTType = {
   id?: bigint | string | number;

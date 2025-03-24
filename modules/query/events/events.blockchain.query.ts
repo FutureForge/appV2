@@ -71,50 +71,85 @@ export function useCompletedListingEventQuery({
   return useQuery({
     queryKey: [queryKeys.events.completedListing, { limit, contractAddress }],
     queryFn: async () => {
-      if (!allContractEventQuery.data) return;
+      if (!allContractEventQuery.data) return [];
 
-      const completedListingEvent = await getCompletedListingEvent();
+      try {
+        const completedListingEvent = await getCompletedListingEvent();
+        const eventLogs = allContractEventQuery.data;
 
-      const eventLogs = allContractEventQuery.data;
+        const completedListingEvents = eventLogs
+          .filter((event) => {
+            try {
+              return event.rawData.topics.some(
+                (topic) =>
+                  topic?.toLowerCase() === completedListingEvent.topics[0]?.toLowerCase()
+              );
+            } catch (error) {
+              console.error("Error filtering event topics:", error);
+              return false;
+            }
+          })
+          .map((event) => event.blockHash)
+          .filter(Boolean);
 
-      const completedListingEvents = eventLogs
-        .filter((event) => {
-          return event.rawData.topics.some(
-            (topic) =>
-              topic.toLowerCase() ===
-              completedListingEvent.topics[0].toLowerCase()
-          );
-        })
-        .map((event) => event.blockHash);
+        if (!completedListingEvents.length) return [];
 
-      const completedEventResults = await Promise.all(
-        completedListingEvents.map(async (blockHash) => {
-          const eventData = await getEventArgs(
-            completedListingEvent,
-            blockHash
-          );
-          return eventData as unknown as RawCompletedListingEvent;
-        })
-      );
+        const completedEventResults = await Promise.allSettled(
+          completedListingEvents.map(async (blockHash) => {
+            try {
+              const eventData = await getEventArgs(
+                completedListingEvent,
+                blockHash
+              );
+              return eventData as unknown as RawCompletedListingEvent;
+            } catch (error) {
+              console.error(`Error getting event args for block ${blockHash}:`, error);
+              return null;
+            }
+          })
+        );
 
-      const formattedData = await Promise.all(
-        completedEventResults.map(async (listing) => {
-          const nft = await fetchNFT({
-            assetContract: listing.assetContract,
-            tokenId: listing.tokenId,
+        const validEventResults = completedEventResults
+          .filter((result): result is PromiseFulfilledResult<RawCompletedListingEvent> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        const formattedData = await Promise.allSettled(
+          validEventResults.map(async (listing) => {
+            try {
+              if (!listing?.assetContract || !listing?.tokenId) return null;
+              
+              const nft = await fetchNFT({
+                assetContract: listing.assetContract,
+                tokenId: listing.tokenId,
+              });
+              return formatCompletedListingSale(listing, nft);
+            } catch (error) {
+              console.error("Error formatting listing data:", error);
+              return null;
+            }
+          })
+        );
+
+        const validFormattedData = formattedData
+          .filter((result): result is PromiseFulfilledResult<any> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        if (contractAddress) {
+          return validFormattedData.filter((data) => {
+            return (
+              data?.assetContract?.toLowerCase() === contractAddress.toLowerCase()
+            );
           });
-          return formatCompletedListingSale(listing, nft);
-        })
-      );
-
-      if (contractAddress) {
-        return formattedData.filter((data) => {
-          return (
-            data.assetContract.toLowerCase() === contractAddress.toLowerCase()
-          );
-        });
-      } else {
-        return formattedData.slice(0, limit);
+        } else {
+          return validFormattedData.slice(0, limit);
+        }
+      } catch (error) {
+        console.error("Error in useCompletedListingEventQuery:", error);
+        return [];
       }
     },
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
@@ -136,61 +171,95 @@ export function useCompletedAuctionEventQuery({
   return useQuery({
     queryKey: [queryKeys.events.completedAuction, { limit, contractAddress }],
     queryFn: async () => {
-      if (!allContractEventQuery.data) return;
+      if (!allContractEventQuery.data) return [];
 
-      const completedAuctionEvent = await getCompletedAuctionEvent();
+      try {
+        const completedAuctionEvent = await getCompletedAuctionEvent();
+        const eventLogs = allContractEventQuery.data;
 
-      const eventLogs = allContractEventQuery.data;
+        const completedAuctionEvents = eventLogs
+          .filter((event) => {
+            try {
+              return event.rawData.topics.some(
+                (topic) =>
+                  topic?.toLowerCase() === completedAuctionEvent.topics[0]?.toLowerCase()
+              );
+            } catch (error) {
+              console.error("Error filtering event topics:", error);
+              return false;
+            }
+          })
+          .map((event) => event.blockHash)
+          .filter(Boolean);
 
-      const completedAuctionEvents = eventLogs
-        .filter((event) => {
-          return event.rawData.topics.some(
-            (topic) =>
-              topic.toLowerCase() ===
-              completedAuctionEvent.topics[0].toLowerCase()
-          );
-        })
-        .map((event) => event.blockHash);
+        if (!completedAuctionEvents.length) return [];
 
-      const completedEventResults = await Promise.all(
-        completedAuctionEvents.map(async (blockHash) => {
-          const eventData = await getEventArgs(
-            completedAuctionEvent,
-            blockHash
-          );
-
-          return eventData as unknown as RawCompletedAuctionEvent;
-        })
-      );
-
-      const updatedEventData = completedEventResults
-        .filter(
-          (event) =>
-            event.closer.toLowerCase() === event.winningBidder.toLowerCase()
-        )
-        .filter(
-          (event, index, self) =>
-            index === self.findIndex((e) => e.auctionId === event.auctionId)
+        const completedEventResults = await Promise.allSettled(
+          completedAuctionEvents.map(async (blockHash) => {
+            try {
+              const eventData = await getEventArgs(
+                completedAuctionEvent,
+                blockHash
+              );
+              return eventData as unknown as RawCompletedAuctionEvent;
+            } catch (error) {
+              console.error(`Error getting event args for block ${blockHash}:`, error);
+              return null;
+            }
+          })
         );
 
-      const formattedData = await Promise.all(
-        updatedEventData.map(async (auction) => {
-          const nft = await fetchNFT({
-            assetContract: auction.assetContract,
-            tokenId: auction.tokenId,
-          });
-          return formatCompletedAuctionSale(auction, nft);
-        })
-      );
+        const validEventResults = completedEventResults
+          .filter((result): result is PromiseFulfilledResult<RawCompletedAuctionEvent> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
 
-      if (contractAddress) {
-        return formattedData.filter((data) => {
-          return (
-            data.assetContract.toLowerCase() === contractAddress.toLowerCase()
+        const updatedEventData = validEventResults
+          .filter(
+            (event) =>
+              event?.closer?.toLowerCase() === event?.winningBidder?.toLowerCase()
+          )
+          .filter(
+            (event, index, self) =>
+              index === self.findIndex((e) => e?.auctionId === event?.auctionId)
           );
-        });
-      } else {
-        return formattedData.slice(0, limit);
+
+        const formattedData = await Promise.allSettled(
+          updatedEventData.map(async (auction) => {
+            try {
+              if (!auction?.assetContract || !auction?.tokenId) return null;
+              
+              const nft = await fetchNFT({
+                assetContract: auction.assetContract,
+                tokenId: auction.tokenId,
+              });
+              return formatCompletedAuctionSale(auction, nft);
+            } catch (error) {
+              console.error("Error formatting auction data:", error);
+              return null;
+            }
+          })
+        );
+
+        const validFormattedData = formattedData
+          .filter((result): result is PromiseFulfilledResult<any> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        if (contractAddress) {
+          return validFormattedData.filter((data) => {
+            return (
+              data?.assetContract?.toLowerCase() === contractAddress.toLowerCase()
+            );
+          });
+        } else {
+          return validFormattedData.slice(0, limit);
+        }
+      } catch (error) {
+        console.error("Error in useCompletedAuctionEventQuery:", error);
+        return [];
       }
     },
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
@@ -206,40 +275,75 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.events.acceptedOffer, { limit }],
     queryFn: async () => {
-      if (!allContractEventQuery.data) return;
+      if (!allContractEventQuery.data) return [];
 
-      const acceptedOfferEvent = await getAcceptedOfferEvent();
+      try {
+        const acceptedOfferEvent = await getAcceptedOfferEvent();
+        const eventLogs = allContractEventQuery.data;
 
-      const eventLogs = allContractEventQuery.data;
+        const acceptedOfferEvents = eventLogs
+          .filter((event) => {
+            try {
+              return event.rawData.topics.some(
+                (topic) =>
+                  topic?.toLowerCase() === acceptedOfferEvent.topics[0]?.toLowerCase()
+              );
+            } catch (error) {
+              console.error("Error filtering event topics:", error);
+              return false;
+            }
+          })
+          .map((event) => event.blockHash)
+          .filter(Boolean);
 
-      const acceptedOfferEvents = eventLogs
-        .filter((event) => {
-          return event.rawData.topics.some(
-            (topic) =>
-              topic.toLowerCase() === acceptedOfferEvent.topics[0].toLowerCase()
-          );
-        })
-        .map((event) => event.blockHash);
+        if (!acceptedOfferEvents.length) return [];
 
-      const completedEventResults = await Promise.all(
-        acceptedOfferEvents.map(async (blockHash) => {
-          const eventData = await getEventArgs(acceptedOfferEvent, blockHash);
+        const completedEventResults = await Promise.allSettled(
+          acceptedOfferEvents.map(async (blockHash) => {
+            try {
+              const eventData = await getEventArgs(acceptedOfferEvent, blockHash);
+              return eventData as unknown as RawAcceptedOfferEvent;
+            } catch (error) {
+              console.error(`Error getting event args for block ${blockHash}:`, error);
+              return null;
+            }
+          })
+        );
 
-          return eventData as unknown as RawAcceptedOfferEvent;
-        })
-      );
+        const validEventResults = completedEventResults
+          .filter((result): result is PromiseFulfilledResult<RawAcceptedOfferEvent> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
 
-      const formattedData = await Promise.all(
-        completedEventResults.map(async (offer) => {
-          const nft = await fetchNFT({
-            assetContract: offer.assetContract,
-            tokenId: offer.tokenId,
-          });
-          return formatAcceptedOffer(offer, nft);
-        })
-      );
+        const formattedData = await Promise.allSettled(
+          validEventResults.map(async (offer) => {
+            try {
+              if (!offer?.assetContract || !offer?.tokenId) return null;
+              
+              const nft = await fetchNFT({
+                assetContract: offer.assetContract,
+                tokenId: offer.tokenId,
+              });
+              return formatAcceptedOffer(offer, nft);
+            } catch (error) {
+              console.error("Error formatting offer data:", error);
+              return null;
+            }
+          })
+        );
 
-      return formattedData.slice(0, limit);
+        const validFormattedData = formattedData
+          .filter((result): result is PromiseFulfilledResult<any> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        return validFormattedData.slice(0, limit);
+      } catch (error) {
+        console.error("Error in useAcceptedOfferEventQuery:", error);
+        return [];
+      }
     },
     enabled: !!allContractEventQuery.data && !!limit,
     staleTime: 1000 * 30,
@@ -254,47 +358,82 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
   return useQuery({
     queryKey: [queryKeys.events.auctionBid, { limit }],
     queryFn: async () => {
-      if (!allContractEventQuery.data) return;
+      if (!allContractEventQuery.data) return [];
 
-      const newAuctionEvent = await getNewAuctionBidEvent();
+      try {
+        const newAuctionEvent = await getNewAuctionBidEvent();
+        const eventLogs = allContractEventQuery.data;
 
-      const eventLogs = allContractEventQuery.data;
+        const newAuctionBidEvent = eventLogs
+          .filter((event) => {
+            try {
+              return event.rawData.topics.some(
+                (topic) =>
+                  topic?.toLowerCase() === newAuctionEvent.topics[0]?.toLowerCase()
+              );
+            } catch (error) {
+              console.error("Error filtering event topics:", error);
+              return false;
+            }
+          })
+          .map((event) => event.blockHash)
+          .filter(Boolean);
 
-      const newAuctionBidEvent = eventLogs
-        .filter((event) => {
-          return event.rawData.topics.some(
-            (topic) =>
-              topic.toLowerCase() === newAuctionEvent.topics[0].toLowerCase()
-          );
-        })
-        .map((event) => event.blockHash);
+        if (!newAuctionBidEvent.length) return [];
 
-      const completedEventResults = await Promise.all(
-        newAuctionBidEvent.map(async (blockHash) => {
-          const eventData = await getEventArgs(newAuctionEvent, blockHash);
-
-          return eventData as unknown as RawAuctionBidEvent;
-        })
-      );
-
-      const formattedData = await Promise.all(
-        completedEventResults.map(async (auctionBid) => {
-          const nft = await fetchNFT({
-            assetContract: auctionBid.assetContract,
-            tokenId: auctionBid.auction.tokenId,
-          });
-          return formatNewAuctionBid(auctionBid, nft);
-        })
-      );
-
-      const filteredFormattedData = formattedData.filter((auctionBid) => {
-        return !(
-          auctionBid.auction.isAuctionExpired ||
-          auctionBid.auction.isAuctionActivityExpired
+        const completedEventResults = await Promise.allSettled(
+          newAuctionBidEvent.map(async (blockHash) => {
+            try {
+              const eventData = await getEventArgs(newAuctionEvent, blockHash);
+              return eventData as unknown as RawAuctionBidEvent;
+            } catch (error) {
+              console.error(`Error getting event args for block ${blockHash}:`, error);
+              return null;
+            }
+          })
         );
-      });
 
-      return filteredFormattedData.slice(0, limit);
+        const validEventResults = completedEventResults
+          .filter((result): result is PromiseFulfilledResult<RawAuctionBidEvent> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        const formattedData = await Promise.allSettled(
+          validEventResults.map(async (auctionBid) => {
+            try {
+              if (!auctionBid?.assetContract || !auctionBid?.auction?.tokenId) return null;
+              
+              const nft = await fetchNFT({
+                assetContract: auctionBid.assetContract,
+                tokenId: auctionBid.auction.tokenId,
+              });
+              return formatNewAuctionBid(auctionBid, nft);
+            } catch (error) {
+              console.error("Error formatting auction bid data:", error);
+              return null;
+            }
+          })
+        );
+
+        const validFormattedData = formattedData
+          .filter((result): result is PromiseFulfilledResult<any> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        const filteredFormattedData = validFormattedData.filter((auctionBid) => {
+          return !(
+            auctionBid.auction.isAuctionExpired ||
+            auctionBid.auction.isAuctionActivityExpired
+          );
+        });
+
+        return filteredFormattedData.slice(0, limit);
+      } catch (error) {
+        console.error("Error in useAuctionBidEventQuery:", error);
+        return [];
+      }
     },
     enabled: !!allContractEventQuery.data && !!limit,
     staleTime: 1000 * 30,
@@ -309,54 +448,89 @@ export function useNewOfferEventQuery() {
   return useQuery({
     queryKey: [queryKeys.events.newOffer],
     queryFn: async () => {
-      if (!allContractEventQuery.data) return;
+      if (!allContractEventQuery.data) return [];
 
-      const newOfferEvent = await getNewOfferEvent();
+      try {
+        const newOfferEvent = await getNewOfferEvent();
+        const eventLogs = allContractEventQuery.data;
 
-      const eventLogs = allContractEventQuery.data;
+        const newOfferBidEvent = eventLogs
+          .filter((event) => {
+            try {
+              return event.rawData.topics.some(
+                (topic) =>
+                  topic?.toLowerCase() === newOfferEvent.topics[0]?.toLowerCase()
+              );
+            } catch (error) {
+              console.error("Error filtering event topics:", error);
+              return false;
+            }
+          })
+          .map((event) => event.blockHash)
+          .filter(Boolean);
 
-      const newOfferBidEvent = eventLogs
-        .filter((event) => {
-          return event.rawData.topics.some(
-            (topic) =>
-              topic.toLowerCase() === newOfferEvent.topics[0].toLowerCase()
-          );
-        })
-        .map((event) => event.blockHash);
+        if (!newOfferBidEvent.length) return [];
 
-      const completedEventResults = await Promise.all(
-        newOfferBidEvent.map(async (blockHash) => {
-          const eventData = await getEventArgs(newOfferEvent, blockHash);
-
-          return eventData as unknown as RawOfferEvent;
-        })
-      );
-
-      const formattedData = await Promise.all(
-        completedEventResults.map(async (newOffer) => {
-          const nft = await fetchNFT({
-            assetContract: newOffer.assetContract,
-            tokenId: newOffer.offer.tokenId,
-          });
-          return formatNewOffer(newOffer, nft);
-        })
-      );
-
-      const filteredFormattedData = formattedData.filter((offer) => {
-        const endTimeFormatted = new Date(
-          offer.offer.expirationTimestamp
-        ).getTime();
-        const currentTime = new Date().getTime();
-
-        const isExpired = currentTime > endTimeFormatted;
-
-        return (
-          (offer.offer.status === StatusType.CREATED && !isExpired) ||
-          !isExpired
+        const completedEventResults = await Promise.allSettled(
+          newOfferBidEvent.map(async (blockHash) => {
+            try {
+              const eventData = await getEventArgs(newOfferEvent, blockHash);
+              return eventData as unknown as RawOfferEvent;
+            } catch (error) {
+              console.error(`Error getting event args for block ${blockHash}:`, error);
+              return null;
+            }
+          })
         );
-      });
 
-      return filteredFormattedData;
+        const validEventResults = completedEventResults
+          .filter((result): result is PromiseFulfilledResult<RawOfferEvent> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        const formattedData = await Promise.allSettled(
+          validEventResults.map(async (newOffer) => {
+            try {
+              if (!newOffer?.assetContract || !newOffer?.offer?.tokenId) return null;
+              
+              const nft = await fetchNFT({
+                assetContract: newOffer.assetContract,
+                tokenId: newOffer.offer.tokenId,
+              });
+              return formatNewOffer(newOffer, nft);
+            } catch (error) {
+              console.error("Error formatting new offer data:", error);
+              return null;
+            }
+          })
+        );
+
+        const validFormattedData = formattedData
+          .filter((result): result is PromiseFulfilledResult<any> => 
+            result.status === 'fulfilled' && result.value !== null
+          )
+          .map(result => result.value);
+
+        const filteredFormattedData = validFormattedData.filter((offer) => {
+          const endTimeFormatted = new Date(
+            offer.offer.expirationTimestamp
+          ).getTime();
+          const currentTime = new Date().getTime();
+
+          const isExpired = currentTime > endTimeFormatted;
+
+          return (
+            (offer.offer.status === StatusType.CREATED && !isExpired) ||
+            !isExpired
+          );
+        });
+
+        return filteredFormattedData;
+      } catch (error) {
+        console.error("Error in useNewOfferEventQuery:", error);
+        return [];
+      }
     },
     enabled: !!allContractEventQuery.data,
     staleTime: 1000 * 30,

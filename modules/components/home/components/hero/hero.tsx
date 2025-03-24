@@ -150,7 +150,7 @@ export function Hero() {
       {/* Banner */}
       {promotedCollections && promotedCollections.length > 1 ? (
         <Slider {...settings}>
-          {promotedCollections?.map((collection, index) => (
+          {promotedCollections?.map((collection: Collection, index: number) => (
             <div
               key={index}
               className="h-[90vh] min-[1680px]:h-[60vh]  relative w-full"
@@ -166,7 +166,7 @@ export function Hero() {
           ))}
         </Slider>
       ) : (
-        promotedCollections?.map((collection, index) => (
+        promotedCollections?.map((collection: Collection, index: number) => (
           <div key={index} className="h-full w-full overflow-hidden">
             <Image
               src={collection.promotionBackgroundImage}
@@ -215,4 +215,4 @@ export function Hero() {
   );
 }
 
-const promoted = ['/image-3.png',]
+const promoted = ["/image-3.png"];

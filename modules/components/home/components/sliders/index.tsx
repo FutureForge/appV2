@@ -4,9 +4,6 @@ import {
   useAllAuctionsBlockchainQuery,
   useAllListingBlockchainQuery,
   useAllOffersBlockchainQuery,
-  useUserListingBlockchainQuery,
-  useUserAuctionBlockchainQuery,
-  useUserOfferBlockchainQuery,
   useCompletedListingEventQuery,
   useCompletedAuctionEventQuery,
   useAcceptedOfferEventQuery,
@@ -44,6 +41,7 @@ export function Sliders() {
     data: newAuction,
     isLoading: isLoadingNewAuction,
     isError: isErrorNewAuction,
+    error: errorNewAuction,
   } = useAllAuctionsBlockchainQuery({
     limit: 2,
     type: "new-auction",
@@ -53,6 +51,7 @@ export function Sliders() {
     data: newListing,
     isLoading: isLoadingNewListing,
     isError: isErrorNewListing,
+    error: errorNewListing,
   } = useAllListingBlockchainQuery({
     limit: 2,
     type: "new-listing",
@@ -62,6 +61,7 @@ export function Sliders() {
     data: newOffer,
     isLoading: isLoadingNewOffer,
     isError: isErrorNewOffer,
+    error: errorNewOffer,
   } = useAllOffersBlockchainQuery({
     limit: 2,
     type: "new-offer",
@@ -71,35 +71,50 @@ export function Sliders() {
     data: auctionBidEventQuery,
     isLoading: isLoadingAuctionBidEvent,
     isError: isErrorAuctionBidEvent,
+    error: errorAuctionBidEvent,
   } = useAuctionBidEventQuery({});
 
   const {
     data: completedListingEventQuery,
     isLoading: isLoadingCompletedListing,
     isError: isErrorCompletedListing,
+    error: errorCompletedListing,
   } = useCompletedListingEventQuery({});
 
   const {
     data: completedAuctionEventQuery,
     isLoading: isLoadingCompletedAuction,
     isError: isErrorCompletedAuction,
+    error: errorCompletedAuction,
   } = useCompletedAuctionEventQuery({});
 
   const {
     data: acceptedOfferEventQuery,
     isLoading: isLoadingAcceptedOffer,
     isError: isErrorAcceptedOffer,
+    error: errorAcceptedOffer,
   } = useAcceptedOfferEventQuery({});
 
-  const isError =
-    isErrorCollectionQuery ||
-    isErrorNewAuction ||
-    isErrorNewListing ||
-    isErrorAuctionBidEvent ||
-    isErrorCompletedListing ||
-    isErrorCompletedAuction ||
-    isErrorAcceptedOffer ||
-    isErrorNewOffer;
+  // console.log({
+  //   errorAcceptedOffer,
+  //   errorAuctionBidEvent,
+  //   errorCompletedListing,
+  //   errorCompletedAuction,
+  //   errorNewOffer,
+  //   errorNewListing,
+  //   errorNewAuction,
+  // });
+
+  // console.log({
+  //   isErrorCollectionQuery,
+  //   isErrorNewAuction,
+  //   isErrorNewListing,
+  //   isErrorAuctionBidEvent,
+  //   isErrorCompletedListing,
+  //   isErrorCompletedAuction,
+  //   isErrorAcceptedOffer,
+  //   isErrorNewOffer,
+  // });
 
   const handleViewItem = ({
     contractAddress,
@@ -110,10 +125,6 @@ export function Sliders() {
   }) => {
     router.push(`/nft/${contractAddress}/${tokenId}`);
   };
-
-  if (isError) {
-    return <ErrorComponent />;
-  }
 
   return (
     <div className="px-6 w-full overflow-hidden flex flex-col max-w-[1730px] mx-auto">
@@ -149,7 +160,7 @@ export function Sliders() {
         title="Completed Listing"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_LISTING}`}
-        data={completedListingEventQuery || []}
+        data={isErrorCompletedListing ? [] : completedListingEventQuery || []}
         renderItem={(completedListing: CompletedListingEvent) => {
           return (
             <NFTCard
@@ -175,7 +186,7 @@ export function Sliders() {
         title="Recently Listed"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.ALL_LISTINGS}`}
-        data={newListing || []}
+        data={isErrorNewListing ? [] : newListing || []}
         renderItem={(listing: Listing) => {
           return (
             <NFTCard
@@ -201,7 +212,7 @@ export function Sliders() {
         title="Completed Auction"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_AUCTION}`}
-        data={completedAuctionEventQuery || []}
+        data={isErrorCompletedAuction ? [] : completedAuctionEventQuery || []}
         renderItem={(completedAuction: CompletedAuctionEvent) => {
           return (
             <NFTCard
@@ -227,7 +238,7 @@ export function Sliders() {
         title="Recently Auctioned NFTs"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.ALL_AUCTIONS}`}
-        data={newAuction || []}
+        data={isErrorNewAuction ? [] : newAuction || []}
         renderItem={(auction: Auction) => {
           return (
             <NFTCard
@@ -253,7 +264,7 @@ export function Sliders() {
         title="Accepted Offers"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.ACCEPTED_OFFERS}`}
-        data={acceptedOfferEventQuery || []}
+        data={isErrorAcceptedOffer ? [] : acceptedOfferEventQuery || []}
         renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
           return (
             <NFTCard
@@ -279,7 +290,7 @@ export function Sliders() {
         title="Recent Offers"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.ALL_OFFERS}`}
-        data={newOffer || []}
+        data={isErrorNewOffer ? [] : newOffer || []}
         renderItem={(offer: Offer) => {
           return (
             <NFTCard
@@ -305,7 +316,7 @@ export function Sliders() {
         title="Recent Auction Bids"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.AUCTION_BIDS}`}
-        data={auctionBidEventQuery || []}
+        data={isErrorAuctionBidEvent ? [] : auctionBidEventQuery || []}
         renderItem={(auctionBid: AuctionBidEvent) => {
           return (
             <NFTCard

@@ -10,7 +10,7 @@ import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blo
 import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
 import { getNFT, isERC721, totalSupply } from "thirdweb/extensions/erc721";
 import {
-  CollectionsQueryResponse,
+  Collection,
   SingleCollection,
 } from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
@@ -173,12 +173,14 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
   return useQuery({
     queryKey: [queryKeys.collection.all, limit, page],
     queryFn: async () => {
-      const response = await axios.get<CollectionsQueryResponse>(
+      const response = await axios.get(
         `${backendURL}/collection?limit=${limit}&page=${page}`
       );
 
+      const collections = response.data.collections as Collection[];
+
       const updatedCollections = await Promise.all(
-        response.data.collections.map(async (collection) => {
+        collections.map(async (collection) => {
           try {
             const collectionDetailsResponse = await axios.get(
               `${CROSSFI_API_URL}/tokens/${collection.collectionAddress}`
@@ -208,13 +210,6 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
                 listing.assetContract.toLowerCase() === contractAddress
             );
 
-            // console.log(`${collection.collectionName}`, {
-            //   updatedActiveAuction,
-            //   updatedActiveListing,
-            //   updatedCompletedAuction,
-            //   updatedCompletedListing,
-            // });
-
             const { floorPrice, formattedTotalVolume } =
               calculateCollectionVolumeData({
                 liveAuction: updatedActiveAuction,
@@ -238,7 +233,7 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
 
       return {
         collections: updatedCollections.reverse(),
-        totalCount: response.data.totalCount,
+        totalCount: response.data.total,
       };
     },
     enabled: !!limit && !!page,
@@ -470,12 +465,8 @@ export function usePromotedCollectionsQuery() {
   return useQuery({
     queryKey: [queryKeys.collection.promoted],
     queryFn: async () => {
-      const response = await axios.get<CollectionsQueryResponse>(
-        `${backendURL}/collection/promoted/collections`
-      );
-
-      const promotedCollections = response.data.collections;
-
+      const response = await axios.get(`${backendURL}/collection/promoted/`);
+      const promotedCollections = response.data;
       return promotedCollections;
     },
     staleTime: 1000 * 30,
