@@ -5,7 +5,7 @@ import { useRef, useState, useEffect, useMemo } from "react";
 
 import {
   useSingleCollectionInfoQuery,
-  useSingleCollectionQuery,
+  useSingleCollectionStatsQuery,
   useUserChainInfo,
 } from "@/modules/query";
 import { useInView } from "react-intersection-observer";
@@ -25,6 +25,7 @@ import {
 import { getFormatAddress } from "@/utils/functions";
 import {
   Collection,
+  CollectionNFTData,
   CollectionNFTType,
 } from "@/utils/types/collection/collection.type";
 import XFI from "@/assets/xfi.svg";
@@ -100,7 +101,8 @@ export default function CollectionPage() {
     isPending,
     isLoading,
     isError,
-  } = useSingleCollectionQuery({
+    error,
+  } = useSingleCollectionStatsQuery({
     contractAddress: collectionAddress?.toString() as string,
   });
 
@@ -108,6 +110,7 @@ export default function CollectionPage() {
     data: singleCollectionInfo,
     isPending: isPendingCollectionInfo,
     isLoading: isLoadingCollectionInfo,
+    error: collectionInfoError,
   } = useSingleCollectionInfoQuery({
     contractAddress: collectionAddress?.toString() as string,
   });
@@ -281,7 +284,7 @@ export default function CollectionPage() {
     0,
     displayCount
   );
-  
+
   const paginatedCollectionTokenTransfers =
     filteredCollectionTokenTransfers?.slice(0, displayCount);
 
@@ -1100,12 +1103,12 @@ function CollectionNFTCard({
   nft,
   collectionAddress,
 }: {
-  nft: CollectionNFTType;
+  nft: CollectionNFTData;
   collectionAddress: string;
 }) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const { metadata, tokenId, owner } = nft || {};
+  const { metadata, tokenId, ownerAddress } = nft || {};
   const { name, image } = metadata || {};
   const cta = "View Item";
 
@@ -1145,7 +1148,7 @@ function CollectionNFTCard({
             <p className="text-lg font-medium text-white">Owner</p>
           </div>
           <p className="text-sm text-muted-foreground">
-            {getFormatAddress(owner)}
+            {getFormatAddress(ownerAddress)}
           </p>
         </div>
         {/* <div>

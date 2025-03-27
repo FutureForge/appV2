@@ -57,7 +57,9 @@ interface ISocial {
 export type SingleCollection = {
   collection: Collection;
   nftLength: number;
-  nfts: CollectionNFTType[];
+  // nfts: CollectionNFTType[];
+  nfts: CollectionNFTData[];
+  hasMetadataField: boolean;
 };
 
 export type TokenDetails = {
@@ -97,3 +99,53 @@ export type UserNFTData = {
   tokenType: string;
   type: string;
 };
+
+export interface NFTAttribute {
+  trait_type: string;
+  value: string;
+}
+
+export interface CollectionNFTMetadata {
+  image: string;
+  external_url: string;
+  description: string;
+  name: string;
+  attributes: NFTAttribute[];
+  background_color: string;
+  animation_url: string;
+  tokenId: string;
+}
+
+export interface CollectionNFTData {
+  contractAddress: string;
+  tokenId: string;
+  blockNumber: number;
+  creatorAddress: string;
+  ownerAddress: string;
+  timestamp: string;
+  tokenType: string;
+  tokenURI: string;
+  transferCount: number;
+  metadata: CollectionNFTMetadata;
+}
+
+export interface NFTResultMetadata {
+  id: string;
+  uri: string;
+  name: string;
+  description: string;
+  image: string;
+  attributes: Attribute[];
+  external_url: string;
+}
+
+export interface NFTResult {
+  metadata: NFTResultMetadata;
+  owner: string;
+  type: string;
+  supply: string;
+}
+
+export interface NFTResultResponse {
+  result: NFTResult;
+}

@@ -1,5 +1,13 @@
 import { createThirdwebClient, defineChain } from "thirdweb";
 
+if (!process.env.NEXT_PUBLIC_THIRDWEB_ENGINE_TOKEN) {
+  throw new Error("NEXT_PUBLIC_THIRDWEB_ENGINE_TOKEN is not set");
+}
+
+if (!process.env.NEXT_PUBLIC_THIRDWEB_ENGINE_URL) {
+  throw new Error("NEXT_PUBLIC_THIRDWEB_ENGINE_URL is not set");
+}
+
 if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL is not set");
 }
@@ -8,14 +16,18 @@ if (!process.env.NEXT_PUBLIC_IS_TESTNET) {
   throw new Error("NEXT_PUBLIC_IS_TESTNET is not set");
 }
 
-export const IS_TESTNET = process.env.NEXT_PUBLIC_IS_TESTNET === "true";
-
 if (!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID) {
   throw new Error("NEXT_PUBLIC_THIRDWEB_CLIENT_ID is not set");
 }
 
+export const IS_TESTNET = process.env.NEXT_PUBLIC_IS_TESTNET === "true";
+
+export const THIRDWEB_ENGINE_URL = process.env.NEXT_PUBLIC_THIRDWEB_ENGINE_URL;
+
+export const THIRDWEB_ENGINE_TOKEN =
+  process.env.NEXT_PUBLIC_THIRDWEB_ENGINE_TOKEN;
+
 export const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
-// export const backendURL = "http://localhost:7090/api/v1";
 
 export const client = createThirdwebClient({
   clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!,
@@ -50,7 +62,7 @@ export const testnetProviderUrl = "https://rpc.xfi.ms/archive/4157";
 
 export const testnetProviderUrlMap = [
   // "https://crossfi-testnet.g.alchemy.com/v2/LyMEMlI9ehqzPfajiDhvBXZ4MGjUQ6L-",
-  'https://4157.rpc.thirdweb.com',
+  "https://4157.rpc.thirdweb.com",
   "https://rpc.testnet.ms/",
   "https://rpc.xfi.ms/archive/4157",
 ];
@@ -58,7 +70,7 @@ export const testnetProviderUrlMap = [
 export const mainnetProviderUrlMap = [
   // "https://crossfi-mainnet.g.alchemy.com/v2/LyMEMlI9ehqzPfajiDhvBXZ4MGjUQ6L-",
   "https://rpc.mainnet.ms/",
-  'https://4158.rpc.thirdweb.com',
+  "https://4158.rpc.thirdweb.com",
 ];
 
 export const crossFiTestnet = defineChain({

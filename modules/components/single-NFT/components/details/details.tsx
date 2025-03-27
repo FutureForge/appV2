@@ -270,6 +270,8 @@ export function Details({ contractAddress, tokenId }: DetailsProps) {
   const { metadata } = nft || {};
   const { description, name, image } = metadata || {};
 
+  console.log({ image, metadata });
+
   const isAuctionExpired = auctionPricingData?.isAuctionExpired;
   const isAuctionPendingPayout = nftData?.isAuctionPendingPayout;
 

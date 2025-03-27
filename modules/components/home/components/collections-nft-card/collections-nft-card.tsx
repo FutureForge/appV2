@@ -143,6 +143,12 @@ export function ImageHolder({
       {/* Image clipped to the SVG path */}
       <MediaRenderer
         client={client}
+        // src={"ipfs://bafybeiecgmm6llofhusk4vu3i7zgigbsfxqh4bdapflftws3vbcj5nx33y/egg4.webp"}
+        // src={'https://ipfs.io/ipfs/QmNwgcqdGk1Xyfgbbo9XiqyoRDmRogTtGajeKuR5kXkyHF/undead6.avif'}
+        // src={
+        //   "https://ipfs.io/ipfs/bafybeidewbu35fkcjaq7ykxr7yrziofvkiaefq6pzbk3xyhsrowaaegrfq/egg1.webp"
+        // }
+        // src={'https://ipfs.io/ipfs/bafybeidgbigwzrxmtiulm5x4fzwnt2o7kon7ahcyjnnspckna6fr6ouaxm/Screenshot%202024-11-19%20at%2008.44.41.png'}
         src={src}
         alt={alt}
         className={`${className} transition-transform duration-300 ease-in-out`}
