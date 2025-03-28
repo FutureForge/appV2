@@ -11,6 +11,7 @@ import { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import { RootLayout } from "@/modules/app/layout";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { Analytics } from "@vercel/analytics/react";
 
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -44,6 +45,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryProvider>
         <TooltipPrimitive.Provider delayDuration={500}>
           {getLayout(<Component {...pageProps} />)}
+          <Analytics />
         </TooltipPrimitive.Provider>
       </QueryProvider>
     </ThirdwebProvider>
