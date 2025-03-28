@@ -11,7 +11,10 @@ import {
   Hex,
   waitForReceipt,
   getContract as getContractThirdweb,
+  getRpcClient,
 } from "thirdweb";
+
+export const rpcRequest = getRpcClient({ client, chain: chainInfo });
 
 export const provider = new ethers.providers.JsonRpcProvider(chainInfo.rpc);
 

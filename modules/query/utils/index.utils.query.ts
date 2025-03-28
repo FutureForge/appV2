@@ -162,7 +162,7 @@ export async function formatCompletedAuctionSale(
   nft: ThirdwebNFTType
 ): Promise<CompletedAuctionEvent> {
   const winningBid = await getWinningBid({
-    auctionId: rawAuctionData.auctionId,
+    auctionId: BigInt(rawAuctionData.auctionId),
   });
 
   const winningBidBody = {
@@ -217,7 +217,7 @@ export async function formatNewAuctionBid(
 
   if (!isExpired) {
     const isAuctionActive = await getIsAuctionExpired({
-      auctionId: rawNewAuctionBidData.auctionId,
+      auctionId: BigInt(rawNewAuctionBidData.auctionId),
     });
     isAuctionExpired = !isAuctionActive;
   }
@@ -296,12 +296,12 @@ export async function fetchNFT({
   tokenId,
 }: {
   assetContract: string;
-  tokenId: bigint;
+  tokenId: bigint | number | string;
 }) {
   const contract = getContractCustom({ contractAddress: assetContract });
   return getNFT({
     contract,
-    tokenId: tokenId,
+    tokenId: BigInt(tokenId),
     includeOwner: true,
   });
 }

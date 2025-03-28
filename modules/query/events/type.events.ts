@@ -26,53 +26,53 @@ export interface RawCompletedListingEvent {
   assetContract: string;
   buyer: string;
   listingCreator: string;
-  listingId: bigint;
-  quantityBought: bigint;
-  tokenId: bigint;
-  totalPricePaid: bigint;
+  listingId: number;
+  quantityBought: number;
+  tokenId: number;
+  totalPricePaid: number;
 }
 
 export interface RawCompletedAuctionEvent {
   assetContract: string;
   auctionCreator: string;
-  auctionId: bigint;
+  auctionId: string;
   closer: string;
-  tokenId: bigint;
+  tokenId: string;
   winningBidder: string;
 }
 
 export interface RawAcceptedOfferEvent {
   assetContract: string;
-  offerId: bigint;
+  offerId: string;
   offeror: string;
-  quantityBought: bigint;
+  quantityBought: string;
   seller: string;
-  tokenId: bigint;
-  totalPricePaid: bigint;
+  tokenId: string;
+  totalPricePaid: string;
 }
 
 export interface RawAuctionBidEvent {
   assetContract: string;
   auction: RawAuctionEvent;
-  auctionId: bigint;
-  bidAmount: bigint;
+  auctionId: string;
+  bidAmount: string;
   bidder: string;
 }
 
 export interface RawAuctionEvent {
   assetContract: string;
   auctionCreator: string;
-  auctionId: bigint;
-  bidBufferBps: bigint;
-  buyoutBidAmount: bigint;
+  auctionId: string;
+  bidBufferBps: string;
+  buyoutBidAmount: string;
   currency: string;
-  endTimestamp: bigint;
-  minimumBidAmount: bigint;
-  quantity: bigint;
-  startTimestamp: bigint;
+  endTimestamp: string;
+  minimumBidAmount: string;
+  quantity: string;
+  startTimestamp: string;
   status: number;
-  timeBufferInSeconds: bigint;
-  tokenId: bigint;
+  timeBufferInSeconds: string;
+  tokenId: string;
   tokenType: number;
 }
 
@@ -81,15 +81,15 @@ export interface RawOfferEvent {
   offer: {
     assetContract: string;
     currency: string;
-    expirationTimestamp: bigint;
-    offerId: bigint;
+    expirationTimestamp: string;
+    offerId: string;
     offeror: string;
-    quantity: bigint;
+    quantity: string;
     status: number;
-    tokenId: bigint;
+    tokenId: string;
     tokenType: number;
-    totalPrice: bigint;
+    totalPrice: string;
   };
-  offerId: bigint;
+  offerId: string;
   offeror: string;
 }

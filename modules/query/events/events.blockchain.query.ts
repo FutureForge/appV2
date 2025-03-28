@@ -1,4 +1,4 @@
-import { getContractCustom } from "@/modules/blockchain";
+import { getContractCustom, getContractEthers } from "@/modules/blockchain";
 import {
   getAcceptedOfferEvent,
   getCompletedAuctionEvent,
@@ -28,10 +28,25 @@ import {
 } from "./type.events";
 import { StatusType } from "@/utils/enums/messages/index.enum";
 import { queryKeys } from "../query-keys";
+import MarketplaceABI from "@/utils/abi/marketplaceABI.json";
+import { ethers } from "ethers";
 
 const EventQueryLimit = 1000;
 
-async function getEventArgs(event: any, blockHash: string) {
+const MARKETPLACE_CONTRACT_INTERFACE = getContractEthers({
+  contractAddress: MARKETPLACE_ADDRESS,
+  abi: MarketplaceABI,
+});
+
+const MARKETPLACE_INTERFACE = new ethers.utils.Interface(MarketplaceABI);
+
+async function getEventArgs({
+  blockHash,
+  event,
+}: {
+  event: any;
+  blockHash?: string;
+}) {
   const contract = getContractCustom({ contractAddress: MARKETPLACE_ADDRESS });
 
   const eventResult = await getContractEvents({
@@ -41,6 +56,29 @@ async function getEventArgs(event: any, blockHash: string) {
   });
 
   return eventResult[0].args;
+}
+
+function getEventArgsEthers({
+  data,
+  name,
+  topics,
+}: {
+  name: string;
+  data: string;
+  topics: string[];
+}) {
+  try {
+    const decodedData = MARKETPLACE_INTERFACE.decodeEventLog(
+      name,
+      data,
+      topics
+    );
+
+    return decodedData as any;
+  } catch (error) {
+    console.error("decoded event data", { error });
+    return [];
+  }
 }
 
 export function useAllContractEventQuery() {
@@ -53,8 +91,8 @@ export function useAllContractEventQuery() {
 
       return response.data.docs;
     },
-    staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
+    // staleTime: 1000 * 60 * 30, // Consider data fresh for 1 minute
+    // gcTime: 1000 * 60 * 5 * 30, // Keep in cache for 5 minutes
     refetchInterval: 5000, // Refetch every 5 minutes
   });
 }
@@ -74,52 +112,51 @@ export function useCompletedListingEventQuery({
       if (!allContractEventQuery.data) return [];
 
       try {
-        const completedListingEvent = await getCompletedListingEvent();
+        const listingEvent = await getCompletedListingEvent();
         const eventLogs = allContractEventQuery.data;
 
-        const completedListingEvents = eventLogs
+        const listingEvents = eventLogs
           .filter((event) => {
             try {
               return event.rawData.topics.some(
                 (topic) =>
-                  topic?.toLowerCase() === completedListingEvent.topics[0]?.toLowerCase()
+                  topic?.toLowerCase() === listingEvent.topics[0]?.toLowerCase()
               );
             } catch (error) {
-              console.error("Error filtering event topics:", error);
+              // console.error("Error filtering event topics:", error);
               return false;
             }
           })
-          .map((event) => event.blockHash)
+          .map((event) => event)
           .filter(Boolean);
 
-        if (!completedListingEvents.length) return [];
+        if (!listingEvents.length) return [];
 
-        const completedEventResults = await Promise.allSettled(
-          completedListingEvents.map(async (blockHash) => {
-            try {
-              const eventData = await getEventArgs(
-                completedListingEvent,
-                blockHash
-              );
-              return eventData as unknown as RawCompletedListingEvent;
-            } catch (error) {
-              console.error(`Error getting event args for block ${blockHash}:`, error);
-              return null;
-            }
-          })
-        );
+        const eventResults = listingEvents.map((listingEvents) => {
+          const decodedEvents = getEventArgsEthers({
+            data: listingEvents.rawData.data,
+            topics: listingEvents.rawData.topics,
+            name: listingEvent.abiEvent.name,
+          });
 
-        const validEventResults = completedEventResults
-          .filter((result): result is PromiseFulfilledResult<RawCompletedListingEvent> => 
-            result.status === 'fulfilled' && result.value !== null
-          )
-          .map(result => result.value);
+          const formattedDecodedEvents: RawCompletedListingEvent = {
+            assetContract: decodedEvents.assetContract,
+            buyer: decodedEvents.buyer,
+            listingCreator: decodedEvents.listingCreator,
+            listingId: decodedEvents.listingId.toString(),
+            tokenId: decodedEvents.tokenId.toString(),
+            quantityBought: decodedEvents.quantityBought.toString(),
+            totalPricePaid: decodedEvents.totalPricePaid.toString(),
+          };
+
+          return formattedDecodedEvents;
+        });
 
         const formattedData = await Promise.allSettled(
-          validEventResults.map(async (listing) => {
+          eventResults.map(async (listing) => {
             try {
-              if (!listing?.assetContract || !listing?.tokenId) return null;
-              
+              if (!listing.assetContract || !listing.tokenId) return null;
+
               const nft = await fetchNFT({
                 assetContract: listing.assetContract,
                 tokenId: listing.tokenId,
@@ -133,29 +170,31 @@ export function useCompletedListingEventQuery({
         );
 
         const validFormattedData = formattedData
-          .filter((result): result is PromiseFulfilledResult<any> => 
-            result.status === 'fulfilled' && result.value !== null
+          .filter(
+            (result): result is PromiseFulfilledResult<any> =>
+              result.status === "fulfilled" && result.value !== null
           )
-          .map(result => result.value);
+          .map((result) => result.value);
 
         if (contractAddress) {
           return validFormattedData.filter((data) => {
             return (
-              data?.assetContract?.toLowerCase() === contractAddress.toLowerCase()
+              data?.assetContract?.toLowerCase() ===
+              contractAddress.toLowerCase()
             );
           });
         } else {
           return validFormattedData.slice(0, limit);
         }
       } catch (error) {
-        console.error("Error in useCompletedListingEventQuery:", error);
+        // console.error("Error in useCompletedListingEventQuery:", error);
         return [];
       }
     },
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
 
@@ -174,62 +213,60 @@ export function useCompletedAuctionEventQuery({
       if (!allContractEventQuery.data) return [];
 
       try {
-        const completedAuctionEvent = await getCompletedAuctionEvent();
+        const auctionEvent = await getCompletedAuctionEvent();
         const eventLogs = allContractEventQuery.data;
 
-        const completedAuctionEvents = eventLogs
+        const auctionEvents = eventLogs
           .filter((event) => {
             try {
               return event.rawData.topics.some(
                 (topic) =>
-                  topic?.toLowerCase() === completedAuctionEvent.topics[0]?.toLowerCase()
+                  topic?.toLowerCase() === auctionEvent.topics[0]?.toLowerCase()
               );
             } catch (error) {
-              console.error("Error filtering event topics:", error);
+              // console.error("Error filtering event topics:", error);
               return false;
             }
           })
-          .map((event) => event.blockHash)
+          .map((event) => event)
           .filter(Boolean);
 
-        if (!completedAuctionEvents.length) return [];
+        if (!auctionEvents.length) return [];
 
-        const completedEventResults = await Promise.allSettled(
-          completedAuctionEvents.map(async (blockHash) => {
-            try {
-              const eventData = await getEventArgs(
-                completedAuctionEvent,
-                blockHash
-              );
-              return eventData as unknown as RawCompletedAuctionEvent;
-            } catch (error) {
-              console.error(`Error getting event args for block ${blockHash}:`, error);
-              return null;
-            }
-          })
-        );
+        const eventResults = auctionEvents.map((auctionEvents) => {
+          const decodedEvents = getEventArgsEthers({
+            data: auctionEvents.rawData.data,
+            topics: auctionEvents.rawData.topics,
+            name: auctionEvent.abiEvent.name,
+          });
 
-        const validEventResults = completedEventResults
-          .filter((result): result is PromiseFulfilledResult<RawCompletedAuctionEvent> => 
-            result.status === 'fulfilled' && result.value !== null
-          )
-          .map(result => result.value);
+          const formattedDecodedEvents: RawCompletedAuctionEvent = {
+            assetContract: decodedEvents.assetContract,
+            auctionCreator: decodedEvents.auctionCreator,
+            auctionId: decodedEvents.auctionId.toString(),
+            closer: decodedEvents.closer,
+            winningBidder: decodedEvents.winningBidder,
+            tokenId: decodedEvents.tokenId.toString(),
+          };
 
-        const updatedEventData = validEventResults
+          return formattedDecodedEvents;
+        });
+
+        const updatedEventData = eventResults
           .filter(
             (event) =>
-              event?.closer?.toLowerCase() === event?.winningBidder?.toLowerCase()
+              event.closer.toLowerCase() === event.winningBidder.toLowerCase()
           )
           .filter(
             (event, index, self) =>
-              index === self.findIndex((e) => e?.auctionId === event?.auctionId)
+              index === self.findIndex((e) => e.auctionId === event.auctionId)
           );
 
         const formattedData = await Promise.allSettled(
           updatedEventData.map(async (auction) => {
             try {
-              if (!auction?.assetContract || !auction?.tokenId) return null;
-              
+              if (!auction.assetContract || !auction.tokenId) return null;
+
               const nft = await fetchNFT({
                 assetContract: auction.assetContract,
                 tokenId: auction.tokenId,
@@ -243,15 +280,16 @@ export function useCompletedAuctionEventQuery({
         );
 
         const validFormattedData = formattedData
-          .filter((result): result is PromiseFulfilledResult<any> => 
-            result.status === 'fulfilled' && result.value !== null
+          .filter(
+            (result): result is PromiseFulfilledResult<any> =>
+              result.status === "fulfilled" && result.value !== null
           )
-          .map(result => result.value);
+          .map((result) => result.value);
 
         if (contractAddress) {
           return validFormattedData.filter((data) => {
             return (
-              data?.assetContract?.toLowerCase() === contractAddress.toLowerCase()
+              data.assetContract.toLowerCase() === contractAddress.toLowerCase()
             );
           });
         } else {
@@ -265,7 +303,7 @@ export function useCompletedAuctionEventQuery({
     enabled: !!allContractEventQuery.data && (!!limit || !!contractAddress),
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
 
@@ -286,41 +324,44 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
             try {
               return event.rawData.topics.some(
                 (topic) =>
-                  topic?.toLowerCase() === acceptedOfferEvent.topics[0]?.toLowerCase()
+                  topic?.toLowerCase() ===
+                  acceptedOfferEvent.topics[0]?.toLowerCase()
               );
             } catch (error) {
-              console.error("Error filtering event topics:", error);
+              // console.error("Error filtering event topics:", error);
               return false;
             }
           })
-          .map((event) => event.blockHash)
+          .map((event) => event)
           .filter(Boolean);
 
         if (!acceptedOfferEvents.length) return [];
 
-        const completedEventResults = await Promise.allSettled(
-          acceptedOfferEvents.map(async (blockHash) => {
-            try {
-              const eventData = await getEventArgs(acceptedOfferEvent, blockHash);
-              return eventData as unknown as RawAcceptedOfferEvent;
-            } catch (error) {
-              console.error(`Error getting event args for block ${blockHash}:`, error);
-              return null;
-            }
-          })
-        );
+        const eventResults = acceptedOfferEvents.map((offerEvent) => {
+          const decodedEvents = getEventArgsEthers({
+            data: offerEvent.rawData.data,
+            topics: offerEvent.rawData.topics,
+            name: acceptedOfferEvent.abiEvent.name,
+          });
 
-        const validEventResults = completedEventResults
-          .filter((result): result is PromiseFulfilledResult<RawAcceptedOfferEvent> => 
-            result.status === 'fulfilled' && result.value !== null
-          )
-          .map(result => result.value);
+          const formattedDecodedEvents: RawAcceptedOfferEvent = {
+            assetContract: decodedEvents.assetContract,
+            offerId: decodedEvents.offerId.toString(),
+            offeror: decodedEvents.offeror,
+            quantityBought: decodedEvents.quantityBought.toString(),
+            seller: decodedEvents.seller,
+            tokenId: decodedEvents.tokenId.toString(),
+            totalPricePaid: decodedEvents.totalPricePaid.toString(),
+          };
+
+          return formattedDecodedEvents;
+        });
 
         const formattedData = await Promise.allSettled(
-          validEventResults.map(async (offer) => {
+          eventResults.map(async (offer) => {
             try {
-              if (!offer?.assetContract || !offer?.tokenId) return null;
-              
+              if (!offer.assetContract || !offer.tokenId) return null;
+
               const nft = await fetchNFT({
                 assetContract: offer.assetContract,
                 tokenId: offer.tokenId,
@@ -334,10 +375,11 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
         );
 
         const validFormattedData = formattedData
-          .filter((result): result is PromiseFulfilledResult<any> => 
-            result.status === 'fulfilled' && result.value !== null
+          .filter(
+            (result): result is PromiseFulfilledResult<any> =>
+              result.status === "fulfilled" && result.value !== null
           )
-          .map(result => result.value);
+          .map((result) => result.value);
 
         return validFormattedData.slice(0, limit);
       } catch (error) {
@@ -348,7 +390,7 @@ export function useAcceptedOfferEventQuery({ limit = 50 }: { limit?: number }) {
     enabled: !!allContractEventQuery.data && !!limit,
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
 
@@ -361,49 +403,68 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
       if (!allContractEventQuery.data) return [];
 
       try {
-        const newAuctionEvent = await getNewAuctionBidEvent();
+        const newAuctionBidEvent = await getNewAuctionBidEvent();
         const eventLogs = allContractEventQuery.data;
 
-        const newAuctionBidEvent = eventLogs
+        const newAuctionBidEvents = eventLogs
           .filter((event) => {
             try {
               return event.rawData.topics.some(
                 (topic) =>
-                  topic?.toLowerCase() === newAuctionEvent.topics[0]?.toLowerCase()
+                  topic?.toLowerCase() ===
+                  newAuctionBidEvent.topics[0]?.toLowerCase()
               );
             } catch (error) {
               console.error("Error filtering event topics:", error);
               return false;
             }
           })
-          .map((event) => event.blockHash)
+          .map((event) => event)
           .filter(Boolean);
 
-        if (!newAuctionBidEvent.length) return [];
+        if (!newAuctionBidEvents.length) return [];
 
-        const completedEventResults = await Promise.allSettled(
-          newAuctionBidEvent.map(async (blockHash) => {
-            try {
-              const eventData = await getEventArgs(newAuctionEvent, blockHash);
-              return eventData as unknown as RawAuctionBidEvent;
-            } catch (error) {
-              console.error(`Error getting event args for block ${blockHash}:`, error);
-              return null;
-            }
-          })
-        );
+        const eventResults = newAuctionBidEvents.map((newAuctionEvent) => {
+          const decodedEvents = getEventArgsEthers({
+            data: newAuctionEvent.rawData.data,
+            topics: newAuctionEvent.rawData.topics,
+            name: newAuctionBidEvent.abiEvent.name,
+          });
 
-        const validEventResults = completedEventResults
-          .filter((result): result is PromiseFulfilledResult<RawAuctionBidEvent> => 
-            result.status === 'fulfilled' && result.value !== null
-          )
-          .map(result => result.value);
+          const formattedDecodedEvents: RawAuctionBidEvent = {
+            assetContract: decodedEvents.assetContract,
+            auctionId: decodedEvents.auctionId.toString(),
+            bidAmount: decodedEvents.bidAmount.toString(),
+            bidder: decodedEvents.bidder,
+            auction: {
+              assetContract: decodedEvents.auction.assetContract,
+              auctionCreator: decodedEvents.auction.auctionCreator,
+              auctionId: decodedEvents.auction.auctionId.toString(),
+              bidBufferBps: decodedEvents.auction.bidBufferBps.toString(),
+              buyoutBidAmount: decodedEvents.auction.buyoutBidAmount.toString(),
+              currency: decodedEvents.auction.currency,
+              endTimestamp: decodedEvents.auction.endTimestamp.toString(),
+              minimumBidAmount:
+                decodedEvents.auction.minimumBidAmount.toString(),
+              quantity: decodedEvents.auction.quantity.toString(),
+              startTimestamp: decodedEvents.auction.startTimestamp.toString(),
+              status: decodedEvents.auction.status,
+              timeBufferInSeconds:
+                decodedEvents.auction.timeBufferInSeconds.toString(),
+              tokenId: decodedEvents.auction.tokenId.toString(),
+              tokenType: decodedEvents.auction.tokenType,
+            },
+          };
+
+          return formattedDecodedEvents;
+        });
 
         const formattedData = await Promise.allSettled(
-          validEventResults.map(async (auctionBid) => {
+          eventResults.map(async (auctionBid) => {
             try {
-              if (!auctionBid?.assetContract || !auctionBid?.auction?.tokenId) return null;
-              
+              if (!auctionBid.assetContract || !auctionBid.auction.tokenId)
+                return null;
+
               const nft = await fetchNFT({
                 assetContract: auctionBid.assetContract,
                 tokenId: auctionBid.auction.tokenId,
@@ -417,17 +478,21 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
         );
 
         const validFormattedData = formattedData
-          .filter((result): result is PromiseFulfilledResult<any> => 
-            result.status === 'fulfilled' && result.value !== null
+          .filter(
+            (result): result is PromiseFulfilledResult<any> =>
+              result.status === "fulfilled" && result.value !== null
           )
-          .map(result => result.value);
+          .map((result) => result.value);
 
-        const filteredFormattedData = validFormattedData.filter((auctionBid) => {
-          return !(
-            auctionBid.auction.isAuctionExpired ||
-            auctionBid.auction.isAuctionActivityExpired
-          );
-        });
+        const filteredFormattedData = validFormattedData.filter(
+          (auctionBid) => {
+            return auctionBid;
+            // return !(
+            //   auctionBid.auction.isAuctionExpired ||
+            //   auctionBid.auction.isAuctionActivityExpired
+            // );
+          }
+        );
 
         return filteredFormattedData.slice(0, limit);
       } catch (error) {
@@ -438,11 +503,11 @@ export function useAuctionBidEventQuery({ limit = 50 }: { limit?: number }) {
     enabled: !!allContractEventQuery.data && !!limit,
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
 
-export function useNewOfferEventQuery() {
+export function useNewOfferEventQuery({ limit = 50 }: { limit?: number }) {
   const allContractEventQuery = useAllContractEventQuery();
 
   return useQuery({
@@ -454,46 +519,59 @@ export function useNewOfferEventQuery() {
         const newOfferEvent = await getNewOfferEvent();
         const eventLogs = allContractEventQuery.data;
 
-        const newOfferBidEvent = eventLogs
+        const newOfferEvents = eventLogs
           .filter((event) => {
             try {
               return event.rawData.topics.some(
                 (topic) =>
-                  topic?.toLowerCase() === newOfferEvent.topics[0]?.toLowerCase()
+                  topic?.toLowerCase() ===
+                  newOfferEvent.topics[0]?.toLowerCase()
               );
             } catch (error) {
               console.error("Error filtering event topics:", error);
               return false;
             }
           })
-          .map((event) => event.blockHash)
+          .map((event) => event)
           .filter(Boolean);
 
-        if (!newOfferBidEvent.length) return [];
+        if (!newOfferEvents.length) return [];
 
-        const completedEventResults = await Promise.allSettled(
-          newOfferBidEvent.map(async (blockHash) => {
-            try {
-              const eventData = await getEventArgs(newOfferEvent, blockHash);
-              return eventData as unknown as RawOfferEvent;
-            } catch (error) {
-              console.error(`Error getting event args for block ${blockHash}:`, error);
-              return null;
-            }
-          })
-        );
+        const eventResults = newOfferEvents.map((newOffer) => {
+          const decodedEvents = getEventArgsEthers({
+            data: newOffer.rawData.data,
+            topics: newOffer.rawData.topics,
+            name: newOfferEvent.abiEvent.name,
+          });
 
-        const validEventResults = completedEventResults
-          .filter((result): result is PromiseFulfilledResult<RawOfferEvent> => 
-            result.status === 'fulfilled' && result.value !== null
-          )
-          .map(result => result.value);
+          const formattedDecodedEvents: RawOfferEvent = {
+            assetContract: decodedEvents.assetContract,
+            offerId: decodedEvents.offerId.toString(),
+            offeror: decodedEvents.offeror,
+            offer: {
+              assetContract: decodedEvents.offer.assetContract,
+              currency: decodedEvents.offer.currency,
+              expirationTimestamp:
+                decodedEvents.offer.expirationTimestamp.toString(),
+              offerId: decodedEvents.offer.offerId.toString(),
+              offeror: decodedEvents.offer.bidder,
+              status: decodedEvents.offer.status,
+              totalPrice: decodedEvents.offer.totalPrice.toString(),
+              tokenId: decodedEvents.offer.tokenId.toString(),
+              tokenType: decodedEvents.offer.tokenType,
+              quantity: decodedEvents.offer.quantity.toString(),
+            },
+          };
+
+          return formattedDecodedEvents;
+        });
 
         const formattedData = await Promise.allSettled(
-          validEventResults.map(async (newOffer) => {
+          eventResults.map(async (newOffer) => {
             try {
-              if (!newOffer?.assetContract || !newOffer?.offer?.tokenId) return null;
-              
+              if (!newOffer.assetContract || !newOffer.offer.tokenId)
+                return null;
+
               const nft = await fetchNFT({
                 assetContract: newOffer.assetContract,
                 tokenId: newOffer.offer.tokenId,
@@ -507,10 +585,11 @@ export function useNewOfferEventQuery() {
         );
 
         const validFormattedData = formattedData
-          .filter((result): result is PromiseFulfilledResult<any> => 
-            result.status === 'fulfilled' && result.value !== null
+          .filter(
+            (result): result is PromiseFulfilledResult<any> =>
+              result.status === "fulfilled" && result.value !== null
           )
-          .map(result => result.value);
+          .map((result) => result.value);
 
         const filteredFormattedData = validFormattedData.filter((offer) => {
           const endTimeFormatted = new Date(
@@ -526,15 +605,15 @@ export function useNewOfferEventQuery() {
           );
         });
 
-        return filteredFormattedData;
+        return validFormattedData.slice(0, limit);
       } catch (error) {
         console.error("Error in useNewOfferEventQuery:", error);
         return [];
       }
     },
-    enabled: !!allContractEventQuery.data,
+    enabled: !!allContractEventQuery.data && !!limit,
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
   });
 }
