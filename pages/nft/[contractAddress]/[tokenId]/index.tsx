@@ -1,10 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import {
-  //  Details,
-  TraitsOffers,
-  RefactoredDetails,
-} from "@/modules/components/single-NFT";
+import { Details, TraitsOffers } from "@/modules/components/single-NFT";
 
 export default function SingleNFTPage() {
   const router = useRouter();
@@ -19,7 +15,7 @@ export default function SingleNFTPage() {
           content={`Single NFT on Mint Mingle Marketplace`}
         />
       </Head>
-      <RefactoredDetails
+      <Details
         contractAddress={contractAddress as string}
         tokenId={tokenId as string}
       />

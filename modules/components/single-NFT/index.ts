@@ -1,3 +1,3 @@
-export { Details } from "./components/details/details";
-export { Details as RefactoredDetails } from "./components/details/refactoredDetails";
+// export { Details } from "./components/details/details";
+export { Details } from "./components/details/refactored-details";
 export { TraitsOffers } from "./components/traits-offers/traits-offers";
