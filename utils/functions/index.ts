@@ -57,11 +57,15 @@ export function getFormatAddress(address: string, width?: number): string {
   return `${start}...${end}`;
 }
 
-export function formatBlockchainTimestamp(timestamp: string) {
-  // Convert the timestamp to a Date object
-  const date = new Date(parseInt(timestamp) * 1000);
+export function formatBlockchainTimestamp(timestamp?: string) {
+  if (!timestamp) return "";
 
-  // Fix the error by specifying the correct types for the options object
+  const timestampInMs = timestamp.length === 10 
+    ? parseInt(timestamp) * 1000 
+    : parseInt(timestamp);
+  
+  const date = new Date(timestampInMs);
+
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
@@ -72,7 +76,6 @@ export function formatBlockchainTimestamp(timestamp: string) {
     hour12: false,
   };
 
-  // Format the date and time
   const formattedDate = date?.toLocaleString("en-US", options);
 
   return formattedDate;

@@ -202,7 +202,7 @@ export function useSingleNFTQuery({
           isActiveTypeExpired,
           winningBidBody,
           offers: ensureSerializable(nftOffers) as Offer,
-          collectionDetails: collectionDetails as Collection,
+          collectionDetails: collectionDetails.collection as Collection,
           listingData: ensureSerializable(updatedNFTListingList) as Listing,
           auctionData: ensureSerializable(updatedNFTAuctionList) as Auction,
         };

@@ -35,7 +35,6 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   const activeType = nftData?.activeType;
   const nftActivities = nftData?.nftActivity;
   const nftOffers = nftData?.offers;
-  const auctionPricingData = nftData?.auctionData;
   const winningBid = nftData?.winningBidBody;
 
   const nft = nftData?.nft;
