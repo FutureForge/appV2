@@ -315,7 +315,6 @@ export function useUserPendingPayoutQuery() {
   });
 }
 
-
 export function useUserOffersReceivedQuery() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
@@ -438,10 +437,10 @@ export function useUserCollectionsQuery() {
     queryKey: [queryKeys.user.collection, { userAddress }],
     queryFn: async () => {
       const response = await axios.get(
-        `${backendURL}/collection/user/${userAddress?.toLowerCase()}`
-      );
+        `${backendURL}/collection/user/${userAddress}`
+      )
 
-      const collections = response.data.filteredCollections as Collection[];
+      const collections = response.data as Collection[];
 
       for (const collection of collections) {
         try {

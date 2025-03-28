@@ -111,9 +111,6 @@ export function ProfilePage() {
     error,
   } = useUserNFTsQuery();
 
-  console.log({ chainInfo });
-  console.log({ userNFTs });
-
   const {
     data: userListings,
     isLoading: isUserListingsLoading,
@@ -189,21 +186,6 @@ export function ProfilePage() {
     isError: isUserNFTActivitiesError,
   } = useUserNFTActivitiesQuery();
 
-  console.log({
-    error,
-    isUserNFTsError,
-    isUserListingsError,
-    isUserAuctionsError,
-    isUserCollectionsError,
-    isUserExpiredAuctionsError,
-    isUserExpiredListingsError,
-    isUserExpiredOffersError,
-    isUserNFTActivitiesError,
-    isUserOffersReceivedError,
-    isUserOffersError,
-    isUserPendingPayoutError,
-  });
-
   const copyToClipboard = useCopyToClipboard()[1];
   const handleCopy = (content: string) => {
     if (content) {
@@ -269,27 +251,12 @@ export function ProfilePage() {
     isUserAuctionsLoading ||
     isUserOffersLoading ||
     isUserOffersReceivedLoading ||
-    // isUserBidsLoading ||
     isUserExpiredListingsLoading ||
     isUserExpiredAuctionsLoading ||
     isUserExpiredOffersLoading ||
     isUserCollectionsLoading ||
     isUserNFTActivitiesLoading ||
     isUserPendingPayoutLoading;
-
-  const isError =
-    isUserAuctionsError ||
-    // isUserBidsError ||
-    isUserOffersReceivedError ||
-    isUserExpiredListingsError ||
-    isUserExpiredAuctionsError ||
-    isUserExpiredOffersError ||
-    isUserCollectionsError ||
-    isUserNFTActivitiesError ||
-    isUserOffersError ||
-    isUserNFTsError ||
-    isUserListingsError ||
-    isUserPendingPayoutError;
 
   const getFilteredData = () => {
     switch (selectedFilter) {
@@ -483,9 +450,9 @@ export function ProfilePage() {
     return null;
   }
 
-  if (isError) {
-    return <ErrorComponent />;
-  }
+  // if (isError) {
+  //   return <ErrorComponent />;
+  // }
 
   return (
     <div className="mt-20 w-full min-h-screen pb-20">
@@ -1331,8 +1298,6 @@ function CustomNFTCard({ data }: { data: UserNFTData }) {
   const { metadata, tokenId, owner } = data?.nft || {};
   const { name, image } = metadata || {};
   const cta = "View Item";
-
-  console.log("custom nft card", { data });
 
   const handleViewItemClick = ({
     contractAddress,
