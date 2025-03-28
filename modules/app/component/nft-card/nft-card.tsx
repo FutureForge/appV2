@@ -12,8 +12,6 @@ import {
   useListingInfoStore,
   useAuctionInfoStore,
 } from "@/modules/components/now-dialog/store";
-
-// icons
 import XFI from "@/assets/xfi.svg";
 import LinkIcon from "@/assets/arrow-right-up-line.svg";
 import { useUserChainInfo } from "@/modules/query";
@@ -50,23 +48,79 @@ export function NFTCard(props: NFTCardProps) {
   const { setListingInfo } = useListingInfoStore();
   const { setAuctionInfo } = useAuctionInfoStore();
 
-  const { title1, title2, info1, info2 } = getNFTCardInfo({
-    type: type,
-    data,
-  });
+  const { title1, title2, info1, info2 } = getNFTCardInfo({ type, data });
 
   useEffect(() => {
     if (type === "listing") setListingInfo(data as Listing);
     if (type === "auction") setAuctionInfo(data as Auction);
-  }, [type, data]);
+  }, [type, data, setListingInfo, setAuctionInfo]);
 
   const isOwner = owner?.toLowerCase() === userAddress?.toLowerCase();
+
+  const renderPriceInfo = (value: string, label: string) => (
+    <div>
+      <div className="flex items-center gap-1">
+        <XFI className="size-6" />
+        <p className="text-lg font-medium text-white">{value || extraInfo}</p>
+      </div>
+      <p className="text-sm text-muted-foreground">{label || extraTitle}</p>
+    </div>
+  );
+
+  const renderAddressInfo = (value: string, label: string) => (
+    <div>
+      <p className="text-lg font-medium text-white">{value || extraInfo}</p>
+      <p className="text-sm text-muted-foreground">{label || extraTitle}</p>
+    </div>
+  );
+
+  const renderActionButton = (
+    label: string,
+    onClickHandler?: React.MouseEventHandler<HTMLButtonElement>,
+    isAction?: boolean
+  ) => (
+    <motion.button
+      onClick={onClickHandler}
+      initial={{ y: "-100%", opacity: 0 }}
+      animate={{
+        y: isHovered ? 0 : 40,
+        opacity: isHovered ? 1 : 0,
+      }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
+        ctaStyles,
+        { "bg-border hover:bg-border/95": !isAction && (extraCTA || actionCTA) }
+      )}
+      disabled={isDisabled}
+    >
+      {label} <LinkIcon className="size-4 text-foreground" />
+    </motion.button>
+  );
+
+  const renderBuyNowDialog = () => {
+    if (!extraCTA || isOwner) return null;
+
+    return (
+      <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger>{renderActionButton(extraCTA)}</DialogTrigger>
+        <DialogContent className="w-[564px]">
+          {status === "listed" && (
+            <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
+          )}
+          {status === "auctioned" && (
+            <BuyNowAuctionDialog setIsDialogOpen={setIsDialogOpen} />
+          )}
+        </DialogContent>
+      </DialogRoot>
+    );
+  };
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="bg-card w-[293px] border group cursor-pointer border-border rounded-2xl  flex flex-col gap-6 p-4 backdrop-blur-2xl"
+      className="bg-card w-[293px] border group cursor-pointer border-border rounded-2xl flex flex-col gap-6 p-4 backdrop-blur-2xl"
     >
       <div className="flex items-center justify-between">
         <p className="font-medium text-white">
@@ -103,93 +157,17 @@ export function NFTCard(props: NFTCardProps) {
           />
         )}
       </div>
+
       <div className="flex items-center w-full justify-between">
-        <div>
-          <div className="flex items-center gap-1">
-            <XFI className="size-6" />
-            <p className="text-lg font-medium text-white">
-              {info1 || extraInfo}
-            </p>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {title1 || extraTitle}
-          </p>
-        </div>
-        <div>
-          <p className="text-lg font-medium text-white">{info2 || extraInfo}</p>
-          <p className="text-sm text-muted-foreground">
-            {title2 || extraTitle}
-          </p>
-        </div>
+        {renderPriceInfo(info1, title1)}
+        {renderAddressInfo(info2, title2)}
       </div>
-      {(cta || extraCTA) && (
+
+      {(cta || extraCTA || actionCTA) && (
         <div className="w-full flex items-center justify-center gap-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          {cta && (
-            <motion.button
-              onClick={onClick}
-              initial={{ y: "-100%", opacity: 0 }}
-              animate={{
-                y: isHovered ? 0 : 40,
-                opacity: isHovered ? 1 : 0,
-              }}
-              transition={{ duration: 0.3 }}
-              className={cn(
-                "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
-                ctaStyles,
-                { "bg-border hover:bg-border/95": extraCTA || actionCTA }
-              )}
-            >
-              {cta} <LinkIcon className="size-4 text-foreground" />
-            </motion.button>
-          )}
-
-          {/** action cta for owner (cancel listing/auction/offer) */}
-          {actionCTA && (
-            <motion.button
-              onClick={actionOnClick}
-              initial={{ y: "-100%", opacity: 0 }}
-              animate={{
-                y: isHovered ? 0 : 40,
-                opacity: isHovered ? 1 : 0,
-              }}
-              transition={{ duration: 0.3 }}
-              className={cn(
-                "bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium hover:bg-primary/95",
-                ctaStyles
-              )}
-              disabled={isDisabled}
-            >
-              {actionCTA} <LinkIcon className="size-4 text-foreground" />
-            </motion.button>
-          )}
-
-          {/** buy now section for non-owner */}
-          {extraCTA && !isOwner && (
-            <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger>
-                <motion.button
-                  // onClick={extraOnClick}
-                  initial={{ y: "-100%", opacity: 0 }}
-                  animate={{
-                    y: isHovered ? 0 : 40,
-                    opacity: isHovered ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-primary text-white w-fit rounded-lg flex items-center gap-1 py-2 px-3 text-sm font-medium"
-                >
-                  {extraCTA} <LinkIcon className="size-4 text-foreground" />
-                </motion.button>
-              </DialogTrigger>
-              <DialogContent className="w-[564px]">
-                {status === "listed" && (
-                  <BuyNowListingDialog setIsDialogOpen={setIsDialogOpen} />
-                )}
-                {status === "auctioned" && (
-                  <BuyNowAuctionDialog setIsDialogOpen={setIsDialogOpen} />
-                )}
-              </DialogContent>
-            </DialogRoot>
-          )}
+          {cta && renderActionButton(cta, onClick)}
+          {actionCTA && renderActionButton(actionCTA, actionOnClick, true)}
+          {renderBuyNowDialog()}
         </div>
       )}
     </div>

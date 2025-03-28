@@ -2,8 +2,14 @@ import React from "react";
 import { Button } from "..";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { cn } from "@/modules/app/utils";
 
-export function ErrorComponent() {
+type ErrorComponentProps = {
+  className?: string;
+  message?: string;
+};
+
+export function ErrorComponent({ className, message }: ErrorComponentProps) {
   const router = useRouter();
 
   const handleGoBack = () => {
@@ -15,7 +21,7 @@ export function ErrorComponent() {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-139px)] max-md:px-4 flex items-center justify-center">
+    <div className={cn("w-full flex items-center justify-center", className)}>
       <Head>
         <title>404: This page was not found.</title>
       </Head>
@@ -27,8 +33,10 @@ export function ErrorComponent() {
         <div className="text-center flex flex-col items-center justify-center w-full gap-4">
           <div className="flex items-center flex-col gap-2">
             <p className="text-lg text-muted-foreground font-bold flex items-center gap-1">
-              Something gone{" "}
-              <span className="uppercase text-pry-text">wrong!</span>
+              {message || "Something gone "}
+              <span className="uppercase text-pry-text">
+                {message ? "WRONG!" : "wrong!"}
+              </span>
             </p>
           </div>
 
