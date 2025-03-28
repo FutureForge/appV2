@@ -7,10 +7,10 @@ import { getFormatAddress } from "@/utils/functions";
 import Link from "next/link";
 import { useSingleNFTQuery, useUserChainInfo } from "@/modules/query";
 import { chainInfo } from "@/utils/configs";
-import { singleNFTFilters } from "../details/details";
 import { WinningBidTable } from "../tables/winning-bid";
 import { OffersTable } from "../tables/offers-table";
 import { TraitsSkeleton } from "../skeleton/traits-skeleton";
+import { singleNFTFilters } from "../details/refactored-details";
 
 type Traits_OffersProps = {
   contractAddress: string;
