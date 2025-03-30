@@ -9,6 +9,7 @@ import {
   AcceptedOfferEvent,
 } from "@/modules/query/utils";
 import { NFT } from "thirdweb";
+import { DEAD_ADDRESS } from "@/utils/configs";
 
 export type NFTCardInfo =
   | "listing"
@@ -82,157 +83,170 @@ export const getNFTCardInfo = ({
   type: NFTCardInfo;
   data: NFTType;
 }): CardInfo => {
-  const defaultInfo: CardInfo = {
-    title1: "Floor Price",
-    title2: "Volume",
-    info1: "",
-    info2: "",
-  };
+  switch (type) {
+    case "new-auction":
+      if (isAuction(data)) {
+        return {
+          title1: "Buyout Price",
+          title2: "Auctioned By",
+          info1: `${data.buyoutBidAmount} XFI`,
+          info2: getFormatAddress(data.auctionCreator),
+        };
+      }
 
-  try {
-    switch (type) {
-      case "new-auction":
-        if (isAuction(data)) {
-          return {
-            title1: "Buyout Price",
-            title2: "Auctioned By",
-            info1: `${data.buyoutBidAmount} XFI`,
-            info2: getFormatAddress(data.auctionCreator),
-          };
-        }
-        break;
+    case "new-offers":
+      if (isOffer(data)) {
+        return {
+          title1: "Price Offered",
+          title2: "Offered By",
+          info1: `${data.totalPrice} WXFI`,
+          info2: getFormatAddress(data.offeror),
+        };
+      }
 
-      case "new-offers":
-        if (isOffer(data)) {
-          return {
-            title1: "Price Offered",
-            title2: "Offered By",
-            info1: `${data.totalPrice} WXFI`,
-            info2: getFormatAddress(data.offeror),
-          };
-        }
-        break;
+    case "listing":
+    case "user-listing":
+      if (isListing(data)) {
+        return type === "listing"
+          ? {
+              title1: "Listing Price",
+              title2: "Listed By",
+              info1: `${data.pricePerToken} XFI`,
+              info2: getFormatAddress(data.listingCreator),
+            }
+          : {
+              title1: "Listing Price",
+              title2: "",
+              info1: `${data.pricePerToken} XFI`,
+              info2: "",
+            };
+      }
 
-      case "listing":
-      case "user-listing":
-        if (isListing(data)) {
-          return type === "listing"
-            ? {
-                title1: "Listing Price",
-                title2: "Listed By",
-                info1: `${data.pricePerToken} XFI`,
-                info2: getFormatAddress(data.listingCreator),
-              }
-            : {
-                title1: "Listing Price",
-                title2: "",
-                info1: `${data.pricePerToken} XFI`,
-                info2: "",
-              };
-        }
-        break;
+    case "auction":
+    case "user-auction":
+      if (isAuction(data)) {
+        return type === "auction"
+          ? {
+              title1: "Buyout Price",
+              title2: "Auctioned By",
+              info1: `${data.buyoutBidAmount} XFI`,
+              info2: getFormatAddress(data.auctionCreator),
+            }
+          : {
+              title1: "Buyout Price",
+              title2: "Minimum Bid",
+              info1: `${data.buyoutBidAmount} XFI`,
+              info2: `${data.minimumBidAmount} XFI`,
+            };
+      }
 
-      case "auction":
-      case "user-auction":
-        if (isAuction(data)) {
-          return type === "auction"
-            ? {
-                title1: "Buyout Price",
-                title2: "Auctioned By",
-                info1: `${data.buyoutBidAmount} XFI`,
-                info2: getFormatAddress(data.auctionCreator),
-              }
-            : {
-                title1: "Buyout Price",
-                title2: "Minimum Bid",
-                info1: `${data.buyoutBidAmount} XFI`,
-                info2: `${data.minimumBidAmount} XFI`,
-              };
+    case "offers":
+    case "user-offers":
+    case "user-offers-received":
+      if (isOffer(data)) {
+        switch (type) {
+          case "offers":
+            return {
+              title1: "Price Offered",
+              title2: "Offered By",
+              info1: `${data.totalPrice} WXFI`,
+              info2: getFormatAddress(data.offeror),
+            };
+          case "user-offers":
+            return {
+              title1: "Price Offered",
+              title2: "",
+              info1: `${data.totalPrice} WXFI`,
+              info2: "",
+            };
+          case "user-offers-received":
+            return {
+              title1: "Highest Offer",
+              title2: "",
+              info1: `${data.totalPrice} WXFI`,
+              info2: "",
+            };
         }
-        break;
+      }
 
-      case "offers":
-      case "user-offers":
-      case "user-offers-received":
-        if (isOffer(data)) {
-          switch (type) {
-            case "offers":
-              return {
-                title1: "Price Offered",
-                title2: "Offered By",
-                info1: `${data.totalPrice} WXFI`,
-                info2: getFormatAddress(data.offeror),
-              };
-            case "user-offers":
-              return {
-                title1: "Price Offered",
-                title2: "",
-                info1: `${data.totalPrice} WXFI`,
-                info2: "",
-              };
-            case "user-offers-received":
-              return {
-                title1: "Highest Offer",
-                title2: "",
-                info1: `${data.totalPrice} WXFI`,
-                info2: "",
-              };
-          }
-        }
-        break;
+    case "completed-listing":
+    case "completed-auction":
+    case "accepted-offers":
+      if (
+        isCompletedListingEvent(data) ||
+        (isListing(data) && type === "completed-listing")
+      ) {
+        const completedListingInfo1 = isCompletedListingEvent(data)
+          ? data.totalPricePaid
+          : isListing(data)
+          ? data.pricePerToken
+          : "";
+        const completedListingInfo2 = isCompletedListingEvent(data)
+          ? data.buyer
+          : isListing(data)
+          ? data.nft.owner
+          : DEAD_ADDRESS;
 
-      case "completed-listing":
-      case "completed-auction":
-      case "accepted-offers":
-        if (isCompletedListingEvent(data) && type === "completed-listing") {
-          return {
-            title1: "Price Paid",
-            title2: "Bought By",
-            info1: `${data.totalPricePaid} XFI`,
-            info2: getFormatAddress(data.buyer),
-          };
-        } else if (
-          isCompletedAuctionEvent(data) &&
-          type === "completed-auction"
-        ) {
-          return {
-            title1: "Price Paid",
-            title2: "Bought By",
-            info1: `${data.bidAmount} XFI`,
-            info2: getFormatAddress(data.winningBidder),
-          };
-        } else if (isAcceptedOfferEvent(data) && type === "accepted-offers") {
-          return {
-            title1: "Price Paid",
-            title2: "Bought By",
-            info1: `${data.totalPricePaid} XFI`,
-            info2: getFormatAddress(data.seller),
-          };
-        }
-        break;
+        return {
+          title1: "Price Paid",
+          title2: "Bought By",
+          info1: `${completedListingInfo1} XFI`,
+          info2: getFormatAddress(completedListingInfo2!),
+        };
+      } else if (
+        isCompletedAuctionEvent(data) ||
+        (isAuction(data) && type === "completed-auction")
+      ) {
+        const completedAuctionInfo1 = isCompletedAuctionEvent(data)
+          ? data.bidAmount
+          : isAuction(data)
+          ? data.buyoutBidAmount
+          : "";
+        const completedAuctionInfo2 = isCompletedAuctionEvent(data)
+          ? data.winningBidder
+          : isAuction(data)
+          ? data.winningBid?.bidder
+          : DEAD_ADDRESS;
 
-      case "auction-bids":
-      case "user-bids":
-        if (isAuctionBidEvent(data)) {
-          return type === "auction-bids"
-            ? {
-                title1: "Bid Amount",
-                title2: "Bidder",
-                info1: `${data.bidAmount} XFI`,
-                info2: getFormatAddress(data.bidder),
-              }
-            : {
-                title1: "Bid Amount",
-                title2: "",
-                info1: `${data.bidAmount} XFI`,
-                info2: "",
-              };
-        }
-        break;
-    }
-  } catch (error) {
-    console.error("Error getting NFT card info:", error);
+        return {
+          title1: "Price Paid",
+          title2: "Bought By",
+          info1: `${completedAuctionInfo1} XFI`,
+          info2: getFormatAddress(completedAuctionInfo2!),
+        };
+      } else if (isAcceptedOfferEvent(data) && type === "accepted-offers") {
+        return {
+          title1: "Price Paid",
+          title2: "Bought By",
+          info1: `${data.totalPricePaid} XFI`,
+          info2: getFormatAddress(data.seller),
+        };
+      }
+
+    case "auction-bids":
+    case "user-bids":
+      if (isAuctionBidEvent(data)) {
+        return type === "auction-bids"
+          ? {
+              title1: "Bid Amount",
+              title2: "Bidder",
+              info1: `${data.bidAmount} XFI`,
+              info2: getFormatAddress(data.bidder),
+            }
+          : {
+              title1: "Bid Amount",
+              title2: "",
+              info1: `${data.bidAmount} XFI`,
+              info2: "",
+            };
+      }
+
+    default:
+      return {
+        title1: "Floor Price",
+        title2: "Volume",
+        info1: "",
+        info2: "",
+      };
   }
-
-  return defaultInfo;
 };

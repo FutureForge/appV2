@@ -11,6 +11,16 @@ import {
 } from "@/modules/query";
 import { Listing } from "@/modules/query/utils";
 
+export enum QueryBrowsePageFilters {
+  ALL_LISTINGS = "all_listings",
+  ALL_AUCTIONS = "all_auctions",
+  ALL_OFFERS = "all_offers",
+  COMPLETED_LISTING = "completed_listing",
+  COMPLETED_AUCTION = "completed_auction",
+  ACCEPTED_OFFERS = "accepted_offers",
+  AUCTION_BIDS = "auction_bids",
+}
+
 export const useBrowseFilters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();

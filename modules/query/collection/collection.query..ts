@@ -319,7 +319,7 @@ export function useSingleCollectionInfoQuery({
       );
 
       return {
-        collection,
+        collection: collection as Collection,
         collectionNFTs: updatedNFTs,
         totalNFTs: nftLength,
       };

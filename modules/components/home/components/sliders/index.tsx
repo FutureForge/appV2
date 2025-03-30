@@ -27,7 +27,7 @@ import {
   Listing,
   Offer,
 } from "@/modules/query/utils";
-import { QueryBrowsePageFilters } from "@/modules/components/browse/components/browse-page/browse-page";
+import { QueryBrowsePageFilters } from "@/modules/components/browse/components/browse-page/browse-hooks";
 
 export function Sliders() {
   const router = useRouter();

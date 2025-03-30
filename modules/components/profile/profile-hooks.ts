@@ -13,7 +13,7 @@ import {
   useUserPendingPayoutQuery,
 } from "@/modules/query";
 import { Auction, Listing, Offer } from "@/modules/query/utils";
-import { ITEMS_PER_PAGE } from "@/pages/collections/[collectionAddress]";
+import { ITEMS_PER_PAGE } from "@/pages/collections/old-[collectionAddress]";
 import {
   Collection,
   UserNFTData,

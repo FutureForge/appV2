@@ -1,4 +1,3 @@
-// browse-component.tsx
 import React from "react";
 import { EmptyState, NFTCard } from "@/modules/app";
 import { Pagination } from "@/modules/app/component/pagination";
@@ -30,7 +29,6 @@ export const BrowseEmptyState = ({
   />
 );
 
-// Enhanced type guards with proper type predicates
 const isListing = (item: any): item is Listing =>
   "listingId" in item && "nft" in item;
 const isAuction = (item: any): item is Auction =>
