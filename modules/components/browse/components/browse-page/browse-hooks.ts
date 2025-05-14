@@ -9,7 +9,13 @@ import {
   useCompletedAuctionEventQuery,
   useCompletedListingEventQuery,
 } from "@/modules/query";
-import { Listing } from "@/modules/query/utils";
+import {
+  AcceptedOfferEvent,
+  AuctionBidEvent,
+  CompletedAuctionEvent,
+  CompletedListingEvent,
+  Listing,
+} from "@/modules/query/utils";
 
 export enum QueryBrowsePageFilters {
   ALL_LISTINGS = "all_listings",
@@ -176,25 +182,37 @@ export const useBrowseData = (selectedFilter: string, searchQuery: string) => {
         };
       case "Completed Listing":
         return {
-          data: filterData(completedListingEventQuery || [], searchQuery),
+          data: filterData(
+            (completedListingEventQuery as CompletedListingEvent[]) || [],
+            searchQuery
+          ),
           isLoading: isLoadingCompletedListing,
           error: isErrorCompletedListing,
         };
       case "Completed Auction":
         return {
-          data: filterData(completedAuctionEventQuery || [], searchQuery),
+          data: filterData(
+            (completedAuctionEventQuery as CompletedAuctionEvent[]) || [],
+            searchQuery
+          ),
           isLoading: isLoadingCompletedAuction,
           error: isErrorCompletedAuction,
         };
       case "Accepted Offers":
         return {
-          data: filterData(acceptedOfferEventQuery || [], searchQuery),
+          data: filterData(
+            (acceptedOfferEventQuery as AcceptedOfferEvent[]) || [],
+            searchQuery
+          ),
           isLoading: isLoadingAcceptedOffer,
           error: isErrorAcceptedOffer,
         };
       case "Auction Bids":
         return {
-          data: filterData(auctionBidEventQuery || [], searchQuery),
+          data: filterData(
+            (auctionBidEventQuery as AuctionBidEvent[]) || [],
+            searchQuery
+          ),
           isLoading: isLoadingAuctionBidEvent,
           error: isErrorAuctionBidEvent,
         };

@@ -160,7 +160,7 @@ export function Sliders() {
         title="Completed Listing"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_LISTING}`}
-        data={isErrorCompletedListing ? [] : completedListingEventQuery || []}
+        data={isErrorCompletedListing ? [] : (Array.isArray(completedListingEventQuery) ? completedListingEventQuery : [])}
         renderItem={(completedListing: CompletedListingEvent) => {
           return (
             <NFTCard
@@ -212,7 +212,7 @@ export function Sliders() {
         title="Completed Auction"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.COMPLETED_AUCTION}`}
-        data={isErrorCompletedAuction ? [] : completedAuctionEventQuery || []}
+        data={isErrorCompletedAuction ? [] : (Array.isArray(completedAuctionEventQuery) ? completedAuctionEventQuery : [])}
         renderItem={(completedAuction: CompletedAuctionEvent) => {
           return (
             <NFTCard
@@ -264,7 +264,7 @@ export function Sliders() {
         title="Accepted Offers"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.ACCEPTED_OFFERS}`}
-        data={isErrorAcceptedOffer ? [] : acceptedOfferEventQuery || []}
+        data={isErrorAcceptedOffer ? [] : (Array.isArray(acceptedOfferEventQuery) ? acceptedOfferEventQuery : [])}
         renderItem={(acceptedOfferEvent: AcceptedOfferEvent) => {
           return (
             <NFTCard
@@ -316,7 +316,7 @@ export function Sliders() {
         title="Recent Auction Bids"
         cta="View More"
         href={`/browse?filter=${QueryBrowsePageFilters.AUCTION_BIDS}`}
-        data={isErrorAuctionBidEvent ? [] : auctionBidEventQuery || []}
+        data={isErrorAuctionBidEvent ? [] : (Array.isArray(auctionBidEventQuery) ? auctionBidEventQuery : [])}
         renderItem={(auctionBid: AuctionBidEvent) => {
           return (
             <NFTCard

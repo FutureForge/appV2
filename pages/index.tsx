@@ -1,13 +1,13 @@
 import Head from "next/head";
 import { Hero, Sliders } from "@/modules/components/home";
-import {
-  useAllContractEventQuery,
-  useCompletedListingEventQuery,
-  useCompletedAuctionEventQuery,
-  useAcceptedOfferEventQuery,
-  useAuctionBidEventQuery,
-  useNewOfferEventQuery,
-} from "@/modules/query";
+// import {
+//   useAllContractEventQuery,
+//   useCompletedListingEventQuery,
+//   useCompletedAuctionEventQuery,
+//   useAcceptedOfferEventQuery,
+//   // useAuctionBidEventQuery,
+//   // useNewOfferEventQuery,
+// } from "@/modules/query";
 
 export default function Home() {
   // const contractAddress = "0x55babee194af5c59a5f17f9dea47be4a37dfb36d";
@@ -29,6 +29,11 @@ export default function Home() {
 
   // const  { data: newOfferEvent } = useNewOfferEventQuery({});
   // console.log({ newOfferEvent });
+
+  // const completedAuctionEvent = useCompletedAuctionEventQuery({});
+  // console.log({ completedAuctionEvent });
+  // const completedListingEvent = useCompletedListingEventQuery({});
+  // console.log({ completedListingEvent });
 
   return (
     <div className="h-full w-full pb-20">
