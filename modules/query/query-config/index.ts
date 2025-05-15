@@ -1,5 +1,5 @@
 export const QUERY_DEFAULTS = {
-  STALE_TIME: 1000 * 60 * 5, // 5 minutes
+  STALE_TIME: 1000 * 60 * 10, // 5 minutes
   GC_TIME: 1000 * 60 * 30, // 30 minutes
   REFETCH_INTERVAL: 1000 * 60 * 5, // 5 minutes
   // REFETCH_INTERVAL: 5000, // 5 seconds
