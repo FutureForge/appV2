@@ -41,7 +41,7 @@ export function makeWinningBidColumn() {
       return (
         <div className="flex gap-2">
           <XFI className="size-4" />
-          <p>{getValue()} XFI</p>
+          <p>{getValue()} BOT</p>
         </div>
       );
     },

@@ -71,11 +71,11 @@ export function PlaceBidDialog({
   const notes = [
     [
       "Bids must be greater than the minimum bid amount.",
-      `Minimum bid amount: ${decimalOffChain(minimumBidAmount)} XFI`,
+      `Minimum bid amount: ${decimalOffChain(minimumBidAmount)} BOT`,
     ],
     [
       "Bids must be less than the buyout price.",
-      `Buyout price: ${decimalOffChain(buyoutBidAmount)} XFI`,
+      `Buyout price: ${decimalOffChain(buyoutBidAmount)} BOT`,
     ],
   ];
 
@@ -162,9 +162,9 @@ export function PlaceBidDialog({
                     setValue(newValue);
 
                     if (Number(newValue) < minBid) {
-                      setError(`Bid must be at least ${minBid} XFI`);
+                      setError(`Bid must be at least ${minBid} BOT`);
                     } else if (Number(newValue) > maxBid) {
-                      setError(`Bid cannot exceed ${maxBid} XFI`);
+                      setError(`Bid cannot exceed ${maxBid} BOT`);
                     } else {
                       setError("");
                     }
@@ -177,7 +177,7 @@ export function PlaceBidDialog({
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                   <XFI className="size-4" />
-                  <span className="text-gray-400">XFI</span>
+                  <span className="text-gray-400">BOT</span>
                 </div>
               </div>
               {error && (

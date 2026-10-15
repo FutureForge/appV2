@@ -40,7 +40,7 @@ export function TraitsOffers({ contractAddress, tokenId }: Traits_OffersProps) {
   const nft = nftData?.nft;
   const { metadata } = nft || {};
   const attributes = Array.isArray(metadata?.attributes)
-    ? metadata.attributes
+    ? (metadata.attributes as { trait_type: string; value: string }[])
     : [];
 
   const isOwner = userAddress?.toLowerCase() === nft?.owner?.toLowerCase();

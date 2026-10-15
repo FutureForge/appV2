@@ -1,4 +1,7 @@
-import { AddCollectionsPage } from "@/modules/components/add-collection";
+import {
+  AddCollectionPasswordGate,
+  AddCollectionsPage,
+} from "@/modules/components/add-collection";
 import Head from "next/head";
 
 export default function AddCollections() {
@@ -11,7 +14,9 @@ export default function AddCollections() {
           content={`Add collection to Mint Mingle Marketplace`}
         />
       </Head>
-      <AddCollectionsPage />
+      <AddCollectionPasswordGate>
+        <AddCollectionsPage />
+      </AddCollectionPasswordGate>
     </div>
   );
 }

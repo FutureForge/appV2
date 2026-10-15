@@ -9,7 +9,7 @@ export default function Create() {
         <title>MintMingles Marketplace - Create NFT</title>
         <meta
           name="description"
-          content={`Create NFT on CrossFi via MintMingles Marketplace`}
+          content={`Create NFT on Botchain via MintMingles Marketplace`}
         />
       </Head>
       <CreatePage />

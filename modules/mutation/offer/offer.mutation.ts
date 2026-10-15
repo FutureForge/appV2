@@ -15,67 +15,50 @@ import { useUserChainInfo } from "@/modules/query";
 import { queryKeys } from "@/modules/query/query-keys";
 import {
   MARKETPLACE_ADDRESS_TESTNET,
-  WRAPPED_TOKEN_CONTRACT,
+  USDT_TOKEN_CONTRACT,
 } from "@/utils/configs";
 import { MessagesEnum } from "@/utils/enums/messages/messages.enum";
 import { MakeOfferListingType } from "@/utils/types/blockchain/blockchain.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BigNumber } from "ethers";
 import { sendAndConfirmTransaction } from "thirdweb";
-import WXFIAbi from "@/utils/abi/wxfi.json";
-import {
-  useConvertXFIToWXFIMutation,
-  useIncreaseAllowanceMutation,
-} from "../wxfi/wxfi.mutation";
+import USDTAbi from "@/utils/abi/usdt.json";
+import { useIncreaseUSDTAllowanceMutation } from "../usdt/usdt.mutation";
 
 export function useMakeListingOfferMutation() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { activeAccount } = useUserChainInfo();
-  const increaseAllowanceMutation = useIncreaseAllowanceMutation();
-  const convertXFIToWXFIMutation = useConvertXFIToWXFIMutation();
+  const increaseAllowanceMutation = useIncreaseUSDTAllowanceMutation();
 
   return useMutation({
     mutationFn: async ({ makeOffer }: { makeOffer: MakeOfferListingType }) => {
       if (!activeAccount) return toast.error("Please connect your wallet");
 
-      const WXFIContract = await getContractEthers({
-        contractAddress: WRAPPED_TOKEN_CONTRACT,
-        abi: WXFIAbi,
+      const USDTContract = await getContractEthers({
+        contractAddress: USDT_TOKEN_CONTRACT,
+        abi: USDTAbi,
       });
 
       const makeOfferValue = decimalOnChain(makeOffer.totalPrice);
-      const wxfiBalanceRaw = await WXFIContract.balanceOf(
-        activeAccount.address
-      );
+      const usdtBalanceRaw = await USDTContract.balanceOf(activeAccount.address);
 
-      // Step 1: Convert XFI to WXFI if needed
-      if (BigNumber.from(wxfiBalanceRaw).lt(makeOfferValue!)) {
-        await toast.loading("Wrapping XFI to WXFI");
-        await convertXFIToWXFIMutation.mutateAsync({
-          amount: makeOffer.totalPrice!,
-        });
-
-        const updatedWxfiBalance = await WXFIContract.balanceOf(
-          activeAccount.address
-        );
-        if (BigNumber.from(updatedWxfiBalance).lt(makeOfferValue!)) {
-          throw new Error("Insufficient WXFI balance after conversion");
-        }
+      if (BigNumber.from(usdtBalanceRaw).lt(makeOfferValue!)) {
+        throw new Error("Insufficient USDT balance");
       }
 
-      // Step 2: Increase allowance if needed
-      const currentAllowance = await WXFIContract.allowance(
+      // Increase allowance if needed
+      const currentAllowance = await USDTContract.allowance(
         activeAccount?.address,
         MARKETPLACE_ADDRESS_TESTNET
       );
       if (BigNumber.from(currentAllowance).lt(makeOfferValue!)) {
-        await toast.loading("Approving WXFI to spend");
+        await toast.loading("Approving USDT to spend");
         await increaseAllowanceMutation.mutateAsync({
           amount: makeOfferValue!.toString(),
         });
 
-        const updatedAllowance = await WXFIContract.allowance(
+        const updatedAllowance = await USDTContract.allowance(
           activeAccount?.address,
           MARKETPLACE_ADDRESS_TESTNET
         );

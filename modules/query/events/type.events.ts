@@ -2,24 +2,22 @@ export interface EventLog {
   hasNext: false;
   limit: number;
   page: 1;
-  docs: [
-    {
-      contractAddress: string;
-      logIndex: number;
-      transactionHash: string;
-      blockHash: string;
-      blockNumber: number;
-      originAddress: string;
-      rawData: {
-        address: string;
-        topics: string[]; // Usually contains event signature and indexed parameters
-        data: string; // Contains non-indexed parameters in hex format
-      };
-      removed: boolean;
-      timestamp: string;
-      transactionIndex: number;
-    }
-  ];
+  docs: {
+    contractAddress: string;
+    logIndex: number;
+    transactionHash: string;
+    blockHash: string;
+    blockNumber: number;
+    originAddress: string;
+    rawData: {
+      address: string;
+      topics: string[]; // Usually contains event signature and indexed parameters
+      data: string; // Contains non-indexed parameters in hex format
+    };
+    removed: boolean;
+    timestamp: string;
+    transactionIndex: number;
+  }[];
 }
 
 export interface RawCompletedListingEvent {

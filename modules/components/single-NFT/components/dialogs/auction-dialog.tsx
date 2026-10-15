@@ -165,7 +165,7 @@ export function AuctionDialog({
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <XFI className="size-4" />
-                    <span className="text-gray-400">XFI</span>
+                    <span className="text-gray-400">BOT</span>
                   </div>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export function AuctionDialog({
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <XFI className="size-4" />
-                    <span className="text-gray-400">XFI</span>
+                    <span className="text-gray-400">BOT</span>
                   </div>
                 </div>
               </div>

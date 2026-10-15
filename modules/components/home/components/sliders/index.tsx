@@ -359,17 +359,9 @@ export const DataSlider: React.FC<DataSliderProps> = ({
   const { width } = useWindowSize();
   const isMobile = width && width <= 550;
 
+  // Hide the section entirely when there is no data.
   if (data.length === 0) {
-    return (
-      <div className="flex gap-8 flex-col mt-12">
-        <div className="flex items-center w-full justify-between">
-          <h3 className="font-medium text-2xl text-white">{title}</h3>
-        </div>
-        <div className="flex justify-center items-center min-h-[200px]">
-          <span className="text-white/50 text-2xl">No {title} found</span>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (data.length <= 3 && (!isMobile || data.length <= 1)) {

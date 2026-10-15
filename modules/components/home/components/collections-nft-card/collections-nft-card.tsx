@@ -71,12 +71,12 @@ export function CollectionsNFTCard(props: CollectionNFTCardProps) {
           <div>
             <div className="flex items-center gap-1">
               <XFI className="size-6" />
-              <p className="text-lg font-medium text-white">{floorPrice} XFI</p>
+              <p className="text-lg font-medium text-white">{floorPrice} BOT</p>
             </div>
             <p className="text-sm text-muted-foreground">Floor Price</p>
           </div>
           <div>
-            <p className="text-lg font-medium text-white">{totalVolume} XFI</p>
+            <p className="text-lg font-medium text-white">{totalVolume} BOT</p>
             <p className="text-sm text-muted-foreground">Volume</p>
           </div>
         </div>

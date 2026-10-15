@@ -53,7 +53,7 @@ export function makeAllListingsColumn() {
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{getValue()} XFI</p>
+        <p>{getValue()} BOT</p>
       </div>
     ),
     meta: { headerName: LISTING_PRICE_HEADER_NAME },

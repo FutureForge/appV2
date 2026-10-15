@@ -89,7 +89,7 @@ export const getNFTCardInfo = ({
         return {
           title1: "Buyout Price",
           title2: "Auctioned By",
-          info1: `${data.buyoutBidAmount} XFI`,
+          info1: `${data.buyoutBidAmount} BOT`,
           info2: getFormatAddress(data.auctionCreator),
         };
       }
@@ -99,7 +99,7 @@ export const getNFTCardInfo = ({
         return {
           title1: "Price Offered",
           title2: "Offered By",
-          info1: `${data.totalPrice} WXFI`,
+          info1: `${data.totalPrice} USDT`,
           info2: getFormatAddress(data.offeror),
         };
       }
@@ -111,13 +111,13 @@ export const getNFTCardInfo = ({
           ? {
               title1: "Listing Price",
               title2: "Listed By",
-              info1: `${data.pricePerToken} XFI`,
+              info1: `${data.pricePerToken} BOT`,
               info2: getFormatAddress(data.listingCreator),
             }
           : {
               title1: "Listing Price",
               title2: "",
-              info1: `${data.pricePerToken} XFI`,
+              info1: `${data.pricePerToken} BOT`,
               info2: "",
             };
       }
@@ -129,14 +129,14 @@ export const getNFTCardInfo = ({
           ? {
               title1: "Buyout Price",
               title2: "Auctioned By",
-              info1: `${data.buyoutBidAmount} XFI`,
+              info1: `${data.buyoutBidAmount} BOT`,
               info2: getFormatAddress(data.auctionCreator),
             }
           : {
               title1: "Buyout Price",
               title2: "Minimum Bid",
-              info1: `${data.buyoutBidAmount} XFI`,
-              info2: `${data.minimumBidAmount} XFI`,
+              info1: `${data.buyoutBidAmount} BOT`,
+              info2: `${data.minimumBidAmount} BOT`,
             };
       }
 
@@ -149,21 +149,21 @@ export const getNFTCardInfo = ({
             return {
               title1: "Price Offered",
               title2: "Offered By",
-              info1: `${data.totalPrice} WXFI`,
+              info1: `${data.totalPrice} USDT`,
               info2: getFormatAddress(data.offeror),
             };
           case "user-offers":
             return {
               title1: "Price Offered",
               title2: "",
-              info1: `${data.totalPrice} WXFI`,
+              info1: `${data.totalPrice} USDT`,
               info2: "",
             };
           case "user-offers-received":
             return {
               title1: "Highest Offer",
               title2: "",
-              info1: `${data.totalPrice} WXFI`,
+              info1: `${data.totalPrice} USDT`,
               info2: "",
             };
         }
@@ -190,7 +190,7 @@ export const getNFTCardInfo = ({
         return {
           title1: "Price Paid",
           title2: "Bought By",
-          info1: `${completedListingInfo1} XFI`,
+          info1: `${completedListingInfo1} BOT`,
           info2: getFormatAddress(completedListingInfo2!),
         };
       } else if (
@@ -211,14 +211,14 @@ export const getNFTCardInfo = ({
         return {
           title1: "Price Paid",
           title2: "Bought By",
-          info1: `${completedAuctionInfo1} XFI`,
+          info1: `${completedAuctionInfo1} BOT`,
           info2: getFormatAddress(completedAuctionInfo2!),
         };
       } else if (isAcceptedOfferEvent(data) && type === "accepted-offers") {
         return {
           title1: "Price Paid",
           title2: "Bought By",
-          info1: `${data.totalPricePaid} XFI`,
+          info1: `${data.totalPricePaid} BOT`,
           info2: getFormatAddress(data.seller),
         };
       }
@@ -230,13 +230,13 @@ export const getNFTCardInfo = ({
           ? {
               title1: "Bid Amount",
               title2: "Bidder",
-              info1: `${data.bidAmount} XFI`,
+              info1: `${data.bidAmount} BOT`,
               info2: getFormatAddress(data.bidder),
             }
           : {
               title1: "Bid Amount",
               title2: "",
-              info1: `${data.bidAmount} XFI`,
+              info1: `${data.bidAmount} BOT`,
               info2: "",
             };
       }

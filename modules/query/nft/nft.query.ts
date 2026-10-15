@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
   backendURL,
-  CROSSFI_API_URL,
+  EXPLORER_API_URL,
   MARKETPLACE_ADDRESS_TESTNET,
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
@@ -50,7 +50,7 @@ export function useSingleNFTQuery({
           allOffers,
         ] = await Promise.all([
           axios.get<NFTActivityResponse>(
-            `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
+            `${EXPLORER_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenId=${tokenId}&tokenType=CFC-721&page=1&limit=100&sort=-blockNumber`
           ),
           await axios.get(
             `${backendURL}/collection/${contractAddress}?withoutNFT=true`

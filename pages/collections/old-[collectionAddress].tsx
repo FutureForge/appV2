@@ -25,7 +25,6 @@ import {
 import { getFormatAddress } from "@/utils/functions";
 import {
   Collection,
-  CollectionNFTData,
   CollectionNFTType,
 } from "@/utils/types/collection/collection.type";
 import XFI from "@/assets/xfi.svg";
@@ -327,7 +326,7 @@ export default function CollectionPage() {
     return displayOrder.map((key) => {
       const value = collectionDetails[key as keyof typeof collectionDetails];
       const label = collectionLabels[key as keyof typeof collectionLabels];
-      const symbol = "XFI";
+      const symbol = "BOT";
 
       const displayValue =
         value === undefined || value === Infinity ? 0 : value;
@@ -1103,7 +1102,7 @@ function CollectionNFTCard({
   nft,
   collectionAddress,
 }: {
-  nft: CollectionNFTData;
+  nft: any;
   collectionAddress: string;
 }) {
   const router = useRouter();

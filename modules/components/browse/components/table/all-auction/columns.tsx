@@ -53,7 +53,7 @@ export function makeAllAuctionsColumn() {
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{getValue()} XFI</p>
+        <p>{getValue()} BOT</p>
       </div>
     ),
     meta: { headerName: MINIMUM_BID_HEADER_NAME },
@@ -72,7 +72,7 @@ export function makeAllAuctionsColumn() {
     cell: ({ getValue }) => (
       <div className="flex gap-2">
         <XFI className="size-4" />
-        <p>{getValue()} XFI</p>
+        <p>{getValue()} BOT</p>
       </div>
     ),
     meta: { headerName: BUYOUT_BID_HEADER_NAME },

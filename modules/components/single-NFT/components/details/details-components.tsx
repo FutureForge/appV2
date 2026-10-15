@@ -82,7 +82,7 @@ export const PricingDetailItem = ({
         {icon && icon}
         <p className="font-medium text-sm">
           {value}
-          {noSymbol && " XFI"}
+          {noSymbol && " BOT"}
         </p>
       </span>
       <p className="text-muted-foreground capitalize text-sm">{label}</p>

@@ -176,9 +176,9 @@ export function CreatePage() {
                   <p className="text-muted-foreground text-sm min-[1550px]:text-lg">
                     Ready to bring your vision to life? Start by creating a
                     personalized NFT collection for just{" "}
-                    <strong>{creationFee} XFI</strong>. Each NFT you mint within
+                    <strong>{creationFee} BOT</strong>. Each NFT you mint within
                     your collection costs an additional{" "}
-                    <strong>{mintFee} XFI</strong>. It's simple, transparent,
+                    <strong>{mintFee} BOT</strong>. It's simple, transparent,
                     and built to empower creators like you!
                   </p>
                 </div>

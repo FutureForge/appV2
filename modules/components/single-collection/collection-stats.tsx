@@ -36,7 +36,7 @@ export const CollectionDetails = ({ details }: CollectionDetailsProps) => {
       {displayOrder.map((key) => {
         const value = details[key as keyof typeof details];
         const label = labels[key as keyof typeof labels];
-        const symbol = "XFI";
+        const symbol = "BOT";
 
         const displayValue =
           value === undefined || value === Infinity ? 0 : value;

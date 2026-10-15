@@ -77,6 +77,11 @@ export function Hero() {
     },
   };
 
+  // Hide the banner entirely when there is no promoted data.
+  if (!promotedCollections || promotedCollections.length === 0) {
+    return null;
+  }
+
   return (
     // <div className="h-[60vh] w-full relative overflow-x-hidden">
     //   {/* Banner */}

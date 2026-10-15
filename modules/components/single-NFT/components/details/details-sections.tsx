@@ -75,7 +75,7 @@ export const DetailsGridSection = ({
       { label: "Token Standard", value: "CRC-721" },
       {
         label: "Chain",
-        value: `${chainInfo.name || "CrossFi"}`,
+        value: `${chainInfo.name || "Botchain"}`,
         icon: <XFI className="size-5" />,
       },
     ].map((item, index) => (

@@ -54,7 +54,7 @@ export function makeCollectionColumns() {
     cell: ({ getValue }) => (
       <div className="flex gap-2 items-center">
         <XFI className="size-6" />
-        <p>{getValue()} XFI</p>
+        <p>{getValue()} BOT</p>
       </div>
     ),
     meta: { headerName: FLOORPRICE_HEADER_NAME },
@@ -72,7 +72,7 @@ export function makeCollectionColumns() {
     ),
     cell: ({ getValue }) => (
       <div>
-        <p>{getValue()} XFI</p>
+        <p>{getValue()} BOT</p>
       </div>
     ),
     meta: { headerName: VOLUME_HEADER_NAME },

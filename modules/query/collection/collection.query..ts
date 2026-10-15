@@ -3,47 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../query-keys";
 import {
   backendURL,
-  chainInfo,
-  CROSSFI_API_URL,
+  EXPLORER_API_URL,
   MARKETPLACE_ADDRESS_TESTNET,
-  THIRDWEB_ENGINE_TOKEN,
-  THIRDWEB_ENGINE_URL,
 } from "@/utils/configs";
 import { getPlatformFeeInfoCustom } from "@/modules/blockchain/global/global.blockchain";
-import { decimalOffChain, getContractCustom } from "@/modules/blockchain";
-import { getNFT, isERC721, totalSupply } from "thirdweb/extensions/erc721";
+import { getContractCustom } from "@/modules/blockchain";
 import {
-  Collection,
-  NFTResultResponse,
-  SingleCollection,
-} from "@/utils/types/collection/collection.type";
+  getNFT,
+  getNFTs,
+  isERC721,
+  totalSupply,
+} from "thirdweb/extensions/erc721";
+import { Collection } from "@/utils/types/collection/collection.type";
 import { NFTActivityResponse } from "@/utils/types/global";
-import {
-  useAllAuctionsBaseQuery,
-  useAllAuctionsBlockchainQuery,
-} from "../auction/auction.blockchain.query";
-import {
-  useAllListingBaseQuery,
-  useAllListingBlockchainQuery,
-} from "../listing/listing.blockchain.query";
+import { useAllAuctionsBlockchainQuery } from "../auction/auction.blockchain.query";
+import { useAllListingBlockchainQuery } from "../listing/listing.blockchain.query";
 import { useAllOffersBlockchainQuery } from "../offers/offers.blockchain.query";
-import { to3DP } from "@/utils/functions";
-import { StatusType } from "@/utils/enums/messages/index.enum";
 import ERC721Abi from "@/utils/abi/erc721.json";
-
-const formatIPFSURL = (url: string): string => {
-  if (!url) return url;
-
-  const ipfsMatch =
-    url.match(/ipfs\/([^/]+)(.*)/)?.[1] ||
-    url.match(/\/ipfs\/([^/]+)(.*)/)?.[1];
-  const pathMatch =
-    url.match(/ipfs\/[^/]+(.*)/)?.[1] || url.match(/\/ipfs\/[^/]+(.*)/)?.[1];
-
-  if (!ipfsMatch) return url;
-
-  return `https://ipfs.io/ipfs/${ipfsMatch}${pathMatch || ""}`;
-};
 
 export async function isNFTContract(contractAddress: string) {
   const contract = await getContractCustom({ contractAddress });
@@ -60,7 +36,7 @@ export function useCheckIfItsACollectionQuery({
     queryKey: [queryKeys.collection.checkContractIsACollection],
     queryFn: async () => {
       const response = await axios.get(
-        `${CROSSFI_API_URL}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
+        `${EXPLORER_API_URL}/contracts?contractAddress=${contractAddress}&page=1&limit=10&sort=-blockNumber`
       );
       const nftData = response.data.docs;
 
@@ -94,100 +70,7 @@ export function useCheckCollectionExistsQuery({
   });
 }
 
-function calculateCollectionVolumeData({
-  liveAuction = [],
-  completedAuction = [],
-  liveListing = [],
-  completedListing = [],
-}: {
-  liveAuction?: any[];
-  completedAuction?: any[];
-  liveListing?: any[];
-  completedListing?: any[];
-}) {
-  const totalListingVolume = completedListing.reduce((acc: number, listing) => {
-    const typePrice =
-      typeof listing.pricePerToken === "string"
-        ? listing.pricePerToken
-        : typeof listing.pricePerToken === "bigint"
-        ? decimalOffChain(listing.pricePerToken)
-        : "0";
-
-    const price = parseFloat(typePrice);
-    return acc + price;
-  }, 0);
-
-  const totalAuctionVolume = completedAuction.reduce((acc, auction) => {
-    const typePrice =
-      typeof auction.buyoutBidAmount === "string"
-        ? auction.buyoutBidAmount
-        : typeof auction.buyoutBidAmount === "bigint"
-        ? decimalOffChain(auction.buyoutBidAmount)
-        : "0";
-
-    const price = parseFloat(typePrice);
-    return acc + price;
-  }, 0);
-
-  const totalVolume = totalListingVolume + totalAuctionVolume;
-  const formattedTotalVolume = to3DP(totalVolume || 0);
-
-  const floorPrice = (() => {
-    let floor = Infinity;
-
-    for (const listing of liveListing) {
-      const price =
-        typeof listing.pricePerToken === "string"
-          ? listing.pricePerToken
-          : typeof listing.pricePerToken === "bigint"
-          ? decimalOffChain(listing.pricePerToken)
-          : "0";
-
-      const listingPrice = parseFloat(price);
-      floor = Math.min(floor, listingPrice);
-    }
-
-    for (const auction of liveAuction) {
-      const price =
-        typeof auction.minimumBidAmount === "string"
-          ? auction.minimumBidAmount
-          : typeof auction.minimumBidAmount === "bigint"
-          ? decimalOffChain(auction.minimumBidAmount)
-          : "0";
-
-      const auctionPrice = parseFloat(price);
-      floor = Math.min(floor, auctionPrice);
-    }
-
-    return floor === Infinity ? 0 : floor;
-  })();
-
-  return {
-    floorPrice: floorPrice,
-    formattedTotalVolume: Number(formattedTotalVolume),
-  };
-}
-
 export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
-  const { data: allListingQuery } = useAllListingBaseQuery();
-  const { data: allAuctionsQuery } = useAllAuctionsBaseQuery();
-
-  const activeListing = allListingQuery?.filter((listing) => {
-    return listing.status === StatusType.CREATED;
-  });
-
-  const activeAuction = allAuctionsQuery?.filter((auction) => {
-    return auction.status === StatusType.CREATED;
-  });
-
-  const completedListing = allListingQuery?.filter((listing) => {
-    return listing.status === StatusType.COMPLETED;
-  });
-
-  const completedAuction = allAuctionsQuery?.filter((auction) => {
-    return auction.status === StatusType.COMPLETED;
-  });
-
   return useQuery({
     queryKey: [queryKeys.collection.all, limit, page],
     queryFn: async () => {
@@ -195,62 +78,8 @@ export function useAllCollectionsQuery({ limit = 10, page = 1 }) {
         `${backendURL}/collection?limit=${limit}&page=${page}`
       );
 
-      const collections = response.data.collections as Collection[];
-
-      const updatedCollections = await Promise.all(
-        collections.map(async (collection) => {
-          try {
-            const collectionDetailsResponse = await axios.get(
-              `${CROSSFI_API_URL}/tokens/${collection.collectionAddress}`
-            );
-
-            const contractAddress = collection.collectionAddress.toLowerCase();
-
-            const holderCount = collectionDetailsResponse.data.holderCount;
-
-            const updatedActiveListing = activeListing?.filter(
-              (listing) =>
-                listing.assetContract.toLowerCase() === contractAddress
-            );
-
-            const updatedCompletedListing = completedListing?.filter(
-              (listing) =>
-                listing.assetContract.toLowerCase() === contractAddress
-            );
-
-            const updatedActiveAuction = activeAuction?.filter(
-              (listing) =>
-                listing.assetContract.toLowerCase() === contractAddress
-            );
-
-            const updatedCompletedAuction = completedAuction?.filter(
-              (listing) =>
-                listing.assetContract.toLowerCase() === contractAddress
-            );
-
-            const { floorPrice, formattedTotalVolume } =
-              calculateCollectionVolumeData({
-                liveAuction: updatedActiveAuction,
-                liveListing: updatedActiveListing,
-                completedAuction: updatedCompletedAuction,
-                completedListing: updatedCompletedListing,
-              });
-
-            return {
-              ...collection,
-              holderCount,
-              floorPrice: floorPrice,
-              totalVolume: formattedTotalVolume,
-            };
-          } catch (error) {
-            // console.log("all collection query", { error });
-            return collection;
-          }
-        })
-      );
-
       return {
-        collections: updatedCollections.reverse(),
+        collections: response.data.collections as Collection[],
         totalCount: response.data.total,
       };
     },
@@ -269,59 +98,38 @@ export function useSingleCollectionInfoQuery({
   return useQuery({
     queryKey: [queryKeys.collection.single, { contractAddress }, "info"],
     queryFn: async () => {
-      const response = await axios.get<SingleCollection>(
-        `${backendURL}/collection/${contractAddress}`
+      const response = await axios.get(
+        `${backendURL}/collection/${contractAddress}?withoutNFT=true`
       );
-      const { collection, nftLength, nfts, hasMetadataField } = response.data;
 
-      const fetchNFTMetadata = async (nft: any) => {
-        const {
-          data: { result },
-        } = await axios.get<NFTResultResponse>(
-          `${THIRDWEB_ENGINE_URL}/contract/${chainInfo.id}/${contractAddress}/erc721/get?tokenId=${nft.tokenId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${THIRDWEB_ENGINE_TOKEN}`,
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-          }
-        );
+      const collection = response.data.collection as Collection;
 
-        const { metadata } = result;
+      const contract = getContractCustom({
+        contractAddress,
+        abi: ERC721Abi,
+      });
 
-        return {
-          ...nft,
-          metadata: {
-            tokenId: metadata.id,
-            image: formatIPFSURL(metadata.image),
-            external_url: formatIPFSURL(metadata.external_url),
-            description: metadata.description,
-            name: metadata.name,
-            attributes: metadata.attributes,
-          },
-        };
-      };
+      const nfts = await getNFTs({
+        contract,
+        includeOwners: true,
+        useIndexer: false,
+      });
 
-      const updatedNFTs = await Promise.all(
-        nfts.map(async (nft) => {
-          if (hasMetadataField) {
-            return {
-              ...nft,
-              metadata: {
-                ...nft.metadata,
-                tokenId: nft.tokenId,
-              },
-            };
-          }
-          return fetchNFTMetadata(nft);
-        })
-      );
+      const collectionNFTs = nfts.map((nft) => ({
+        contractAddress,
+        tokenId: nft.id.toString(),
+        ownerAddress: nft.owner,
+        metadata: {
+          ...nft.metadata,
+          name: nft.metadata.name ?? "",
+          image: nft.metadata.image ?? "",
+        },
+      }));
 
       return {
-        collection: collection as Collection,
-        collectionNFTs: updatedNFTs,
-        totalNFTs: nftLength,
+        collection,
+        collectionNFTs,
+        totalNFTs: nfts.length,
       };
     },
     enabled: !!contractAddress,
@@ -388,9 +196,9 @@ export function useSingleCollectionStatsQuery({
           marketplaceFee,
         ] = await Promise.all([
           axios.get<NFTActivityResponse>(
-            `${CROSSFI_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
+            `${EXPLORER_API_URL}/token-transfers?contractAddress=${contractAddress}&tokenType=CFC-721&page=1&limit=20000&sort=-blockNumber`
           ),
-          axios.get(`${CROSSFI_API_URL}/tokens/${contractAddress}`),
+          axios.get(`${EXPLORER_API_URL}/tokens/${contractAddress}`),
           getPlatformFeeInfoCustom({ contractAddress }).catch(() => ({})),
           getPlatformFeeInfoCustom({
             contractAddress: MARKETPLACE_ADDRESS_TESTNET,

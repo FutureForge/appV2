@@ -60,7 +60,7 @@ export function makeOffersColumn({
       return (
         <div className="flex gap-2">
           <XFI className="size-4" />
-          <p>{getValue()} WXFI</p>
+          <p>{getValue()} USDT</p>
         </div>
       );
     },

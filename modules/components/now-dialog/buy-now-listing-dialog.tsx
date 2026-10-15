@@ -108,7 +108,7 @@ export function BuyNowListingDialog({
               <span className="flex items-center gap-2 font-space">
                 <XFI className="size-6" />
                 <h3 className="text-2xl font-medium">
-                  {decimalOffChain(pricePerToken)} XFI
+                  {decimalOffChain(pricePerToken)} BOT
                 </h3>
               </span>
               <p className="text-muted-foreground text-sm">Listing Price</p>
@@ -116,11 +116,11 @@ export function BuyNowListingDialog({
 
             <div className="w-full mt-6">
               <span className="flex items-center justify-between">
-                <p className="text-muted-foreground text-sm">XFI Balance</p>
+                <p className="text-muted-foreground text-sm">BOT Balance</p>
                 <span className="flex items-center gap-2">
                   <XFI className="size-6" />
                   <p className="text-sm font-medium">
-                    {Number(balanceData?.displayValue).toFixed(2)} XFI
+                    {Number(balanceData?.displayValue).toFixed(2)} BOT
                   </p>
                 </span>
               </span>

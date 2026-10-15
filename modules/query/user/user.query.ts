@@ -10,20 +10,25 @@ import {
   backendURL,
   chainInfo,
   client,
-  CROSSFI_API_URL,
+  EXPLORER_API_URL,
   NFT_FACTORY_ADDRESS,
-  WRAPPED_TOKEN_CONTRACT,
+  USDT_TOKEN_CONTRACT,
 } from "@/utils/configs";
-import { NFTActivityResponse, UserNFTResponse } from "@/utils/types/global";
+import { NFTActivityResponse } from "@/utils/types/global";
 import {
   useUserAuctionBlockchainQuery,
   useUserListingBlockchainQuery,
   useUserOfferBlockchainQuery,
 } from "..";
-import { getContractEthers, getIsAuctionExpired } from "@/modules/blockchain";
-import { tryParseJSON } from "@/utils/functions";
+import {
+  getContractCustom,
+  getContractEthers,
+  getIsAuctionExpired,
+} from "@/modules/blockchain";
+import { getOwnedNFTs } from "thirdweb/extensions/erc721";
 import nftFactoryABI from "@/utils/abi/nftFactory.json";
 import nftBaseABI from "@/utils/abi/nftBase.json";
+import ERC721Abi from "@/utils/abi/erc721.json";
 import { Listing, Auction, fetchNFT } from "../utils";
 import { Collection } from "@/utils/types/collection/collection.type";
 
@@ -60,20 +65,20 @@ export function getUserNativeBalance() {
   return { balanceData, isBalanceLoading, isBalanceError };
 }
 
-export function getUserWrappedTokenBalance() {
+export function getUserUSDTBalance() {
   const { activeAccount } = useUserChainInfo();
   const userAddress = activeAccount?.address;
 
   const {
-    data: wrappedBalance,
-    isLoading: isWrappedBalanceLoading,
-    isError: isWrappedBalanceError,
+    data: usdtBalance,
+    isLoading: isUSDTBalanceLoading,
+    isError: isUSDTBalanceError,
   } = useWalletBalance(
     {
       chain: chainInfo,
       address: userAddress,
       client,
-      tokenAddress: WRAPPED_TOKEN_CONTRACT,
+      tokenAddress: USDT_TOKEN_CONTRACT,
     },
     {
       enabled: !!userAddress,
@@ -81,7 +86,7 @@ export function getUserWrappedTokenBalance() {
     }
   );
 
-  return { wrappedBalance, isWrappedBalanceLoading, isWrappedBalanceError };
+  return { usdtBalance, isUSDTBalanceLoading, isUSDTBalanceError };
 }
 
 export function useUserNFTsQuery() {
@@ -101,69 +106,56 @@ export function useUserNFTsQuery() {
   return useQuery({
     queryKey: [queryKeys.user.nfts, { userAddress }],
     queryFn: async () => {
-      const response = await axios.get<UserNFTResponse>(
-        `${CROSSFI_API_URL}/token-holders?address=${userAddress}&tokenType=CFC-721&page=1&limit=1000&sort=-balance`
+      if (!userAddress) return [];
+
+      const response = await axios.get(
+        `${backendURL}/collection?limit=100&page=1`
       );
+      const collections = response.data.collections as Collection[];
 
-      const userNFTs = response.data.docs;
+      const ownedNFTsPerCollection = await Promise.all(
+        collections.map(async (collection) => {
+          try {
+            const contract = getContractCustom({
+              contractAddress: collection.collectionAddress,
+              abi: ERC721Abi,
+            });
 
-      const updatedNFTs = await Promise.all(
-        userNFTs.map(async (nfts) => {
-          const { tokenIds, contractAddress } = nfts;
+            const nfts = await getOwnedNFTs({
+              contract,
+              owner: userAddress,
+              useIndexer: false,
+            });
 
-          const uniqueTokenIds = Array.from(new Set(tokenIds));
-
-          const tokenIdNFTs = await Promise.all(
-            uniqueTokenIds.map(async (ids) => {
-              const nft = await fetchNFT({
-                assetContract: contractAddress,
-                tokenId: BigInt(ids),
-              });
-
-              let updatedNFT = nft;
-
-              const uri = nft.tokenURI;
-              const parsedMetadata =
-                typeof uri === "string" ? tryParseJSON(uri) : uri;
-
-              if (parsedMetadata && typeof parsedMetadata === "object") {
-                updatedNFT = {
-                  ...nft,
-                  tokenURI: parsedMetadata.image,
-                  metadata: {
-                    ...parsedMetadata,
-                  },
-                };
-              }
-
-              return {
-                ...nfts,
-                nft: { ...updatedNFT, tokenId: ids },
-                type: "NFTs",
-                tokenId: ids,
-              };
-            })
-          );
-
-          return tokenIdNFTs;
+            return nfts.map((nft) => ({
+              contractAddress: collection.collectionAddress,
+              tokenId: nft.id.toString(),
+              type: "NFTs",
+              nft: {
+                ...nft,
+                tokenId: nft.id.toString(),
+              },
+            }));
+          } catch (error) {
+            return [];
+          }
         })
       );
 
-      const flatNFTs = updatedNFTs.flat();
+      const ownedNFTs = ownedNFTsPerCollection.flat();
 
-      const userNFTsNotListed = flatNFTs?.filter((nft: any) => {
-        const nftTokenId = nft.tokenId;
+      const userNFTsNotListed = ownedNFTs.filter(
+        (nft) =>
+          !userListedNFTs?.some(
+            (listing: Listing) =>
+              listing.assetContract.toLowerCase() ===
+                nft.contractAddress.toLowerCase() &&
+              listing.tokenId.toString() === nft.tokenId
+          )
+      );
 
-        return !userListedNFTs?.some(
-          (listing: Listing) =>
-            listing.assetContract.toLowerCase() ===
-              nft.contractAddress.toLowerCase() &&
-            listing.tokenId.toString() === nftTokenId
-        );
-      });
-
-      const userNFTsNotAuctioned = userNFTsNotListed?.filter(
-        (nft: any) =>
+      const userNFTsNotAuctioned = userNFTsNotListed.filter(
+        (nft) =>
           !userListedAuctions?.some(
             (auction: Auction) =>
               auction.assetContract.toLowerCase() ===
@@ -466,7 +458,7 @@ export function useUserNFTActivitiesQuery() {
     queryKey: [queryKeys.user.nftActivities, { userAddress }],
     queryFn: async () => {
       const response = await axios.get<NFTActivityResponse>(
-        `${CROSSFI_API_URL}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
+        `${EXPLORER_API_URL}/token-transfers?address=${userAddress?.toLowerCase()}&tokenType=CFC-721&page=1&limit=1000&sort=-blockNumber`
       );
 
       const tokenTransfers = response.data.docs;

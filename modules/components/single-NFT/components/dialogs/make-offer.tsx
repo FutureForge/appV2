@@ -9,9 +9,9 @@ import {
 import React, { useEffect, useState } from "react";
 import Check from "@/assets/Checkbox [1.0].svg";
 import { MediaRenderer } from "thirdweb/react";
-import { client, WRAPPED_TOKEN_CONTRACT } from "@/utils/configs";
+import { client, USDT_TOKEN_CONTRACT } from "@/utils/configs";
 import { TransitionLinks } from "@/modules/app/component/nav/transition-links";
-import { getUserWrappedTokenBalance, useUserChainInfo } from "@/modules/query";
+import { getUserUSDTBalance, useUserChainInfo } from "@/modules/query";
 import { useMakeListingOfferMutation } from "@/modules/mutation";
 import DatePicker from "react-datepicker";
 
@@ -29,11 +29,11 @@ type MakeOfferDialogProps = {
 
 const notes = [
   [
-    "Offers are made in WXFI.",
-    "Don’t have WXFI? Don’t worry, we’ll handle the conversion for you.",
+    "Offers are made in USDT.",
+    "Don’t have USDT? Don’t worry, you can acquire some to get started.",
   ],
 
-  ["You can also", "swap for WXFI", "manually."],
+  ["You can also", "swap for USDT", "manually."],
 ];
 
 export function MakeOfferDialog({
@@ -59,8 +59,7 @@ export function MakeOfferDialog({
     !activeAccount ||
     Boolean(error);
 
-  const { wrappedBalance, isWrappedBalanceLoading } =
-    getUserWrappedTokenBalance();
+  const { usdtBalance, isUSDTBalanceLoading } = getUserUSDTBalance();
 
   const handleDateChange = (date: Date | null) => {
     const newDate = date || oneWeekFromNow;
@@ -79,7 +78,7 @@ export function MakeOfferDialog({
           totalPrice: value,
           quantity: "1",
           expirationTimestamp: selectedDate,
-          currency: WRAPPED_TOKEN_CONTRACT,
+          currency: USDT_TOKEN_CONTRACT,
         },
       },
       {
@@ -93,11 +92,11 @@ export function MakeOfferDialog({
     );
   };
 
-  const balance = isWrappedBalanceLoading
+  const balance = isUSDTBalanceLoading
     ? "0"
-    : Number(wrappedBalance?.displayValue).toFixed(2) || 0;
+    : Number(usdtBalance?.displayValue).toFixed(2) || 0;
 
-  const symbol = wrappedBalance?.symbol || "WXFI";
+  const symbol = usdtBalance?.symbol || "USDT";
 
   useEffect(() => {
     if (Number(value) > Number(balance)) {
@@ -186,7 +185,7 @@ export function MakeOfferDialog({
                     MAX
                   </button>
                   <XFI className="size-4" />
-                  <span className="text-gray-400">WXFI</span>
+                  <span className="text-gray-400">USDT</span>
                 </div>
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}

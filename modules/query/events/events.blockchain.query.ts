@@ -6,9 +6,8 @@ import {
   getNewAuctionBidEvent,
   getNewOfferEvent,
 } from "@/modules/blockchain/events/index.event";
-import { CROSSFI_API_URL, MARKETPLACE_ADDRESS } from "@/utils/configs";
+import { MARKETPLACE_ADDRESS } from "@/utils/configs";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { getContractEvents, Hex, NFT, PreparedEvent } from "thirdweb";
 import {
   fetchNFT,
@@ -90,12 +89,15 @@ function getEventArgsEthers({
 export function useAllContractEventQuery() {
   return useQuery({
     queryKey: [queryKeys.events.allContractEvent],
-    queryFn: async () => {
-      const response = await axios.get<EventLog>(
-        `${CROSSFI_API_URL}/event-logs?contractAddress=${MARKETPLACE_ADDRESS}&removed=false&page=1&limit=${QUERY_DEFAULTS.EVENT_QUERY_LIMIT}&sort=-blockNumber`
-      );
-
-      return response.data.docs;
+    queryFn: async (): Promise<EventLog["docs"]> => {
+      // TODO: explorer event-logs API removed. Commented out until the BOT Chain
+      // explorer API is provided. Returning an empty list for now.
+      // const response = await axios.get<EventLog>(
+      //   `${EXPLORER_API_URL}/event-logs?contractAddress=${MARKETPLACE_ADDRESS}&removed=false&page=1&limit=${QUERY_DEFAULTS.EVENT_QUERY_LIMIT}&sort=-blockNumber`
+      // );
+      //
+      // return response.data.docs;
+      return [];
     },
     staleTime: QUERY_DEFAULTS.STALE_TIME,
     gcTime: QUERY_DEFAULTS.GC_TIME,
