@@ -1,5 +1,7 @@
 import Head from "next/head";
 import { Hero, Sliders } from "@/modules/components/home";
+import { usePromotedCollectionsQuery } from "@/modules/query";
+import { cn } from "@/modules/app/utils";
 // import {
 //   useAllContractEventQuery,
 //   useCompletedListingEventQuery,
@@ -35,8 +37,14 @@ export default function Home() {
   // const completedListingEvent = useCompletedListingEventQuery({});
   // console.log({ completedListingEvent });
 
+  const { data: promotedCollections } = usePromotedCollectionsQuery();
+  const hasPromotedCollections =
+    !!promotedCollections && promotedCollections.length > 0;
+
   return (
-    <div className="h-full w-full pb-20">
+    <div
+      className={cn("h-full w-full pb-20", !hasPromotedCollections && "pt-20")}
+    >
       <Head>
         <title>MintMingles Marketplace - Cross-Fi NFT Marketplace</title>
         <meta name="description" content={`Cross-Fi NFT Marketplace`} />

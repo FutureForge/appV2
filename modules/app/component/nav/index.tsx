@@ -157,15 +157,17 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-8 max-sm:gap-2">
-          <TransitionLinks
-            href="/profile"
-            className={cn(
-              "font-medium text-muted-foreground max-[936px]:hidden hover:text-foreground transition-colors duration-300 ease-in-out",
-              { "text-foreground": pathname === "/profile" }
-            )}
-          >
-            Profile
-          </TransitionLinks>
+          {walletAddress && (
+            <TransitionLinks
+              href="/profile"
+              className={cn(
+                "font-medium text-muted-foreground max-[936px]:hidden hover:text-foreground transition-colors duration-300 ease-in-out",
+                { "text-foreground": pathname === "/profile" }
+              )}
+            >
+              Profile
+            </TransitionLinks>
+          )}
           {!walletAddress || !isChainSupported ? (
             <ConnectButton
               client={client}
@@ -296,27 +298,38 @@ export function Nav() {
         )}
       </div>
       {isMobileNavOpen && (
-        <MobileNav onClose={() => setIsMobileNavOpen(false)} />
+        <MobileNav
+          onClose={() => setIsMobileNavOpen(false)}
+          walletAddress={walletAddress}
+        />
       )}
     </nav>
   );
 }
 
-function MobileNav({ onClose }: { onClose: () => void }) {
+function MobileNav({
+  onClose,
+  walletAddress,
+}: {
+  onClose: () => void;
+  walletAddress?: string;
+}) {
   const pathname = usePathname();
   return (
     <div className="fixed top-[64px] left-0 w-full h-screen flex flex-col items-center bg-background text-primary-foreground z-50">
       <div className="flex flex-col items-center justify-center gap-5 mt-10">
-        <TransitionLinks
-          href="/profile"
-          className={cn(
-            "font-medium text-xl text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out",
-            { "text-foreground": pathname === "/profile" }
-          )}
-          onClick={onClose}
-        >
-          Profile
-        </TransitionLinks>
+        {walletAddress && (
+          <TransitionLinks
+            href="/profile"
+            className={cn(
+              "font-medium text-xl text-muted-foreground hover:text-foreground transition-colors duration-300 ease-in-out",
+              { "text-foreground": pathname === "/profile" }
+            )}
+            onClick={onClose}
+          >
+            Profile
+          </TransitionLinks>
+        )}
         {Nav_Links.map((item) => {
           const { name, link } = item;
           const isActive = pathname === link;
